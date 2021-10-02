@@ -46,17 +46,221 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\Tuple\tuple.h">
       <Filter>Fluidum\Utils\Tuple</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\info.h">
-      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\info.h">
+      <Filter>Fluidum\Draw\Vulkan\KeyManager\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\manager.h">
-      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\manager.h">
+      <Filter>Fluidum\Draw\Vulkan\KeyManager\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\type.h">
-      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\type.h">
+      <Filter>Fluidum\Draw\Vulkan\KeyManager\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\exception.h">
-      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\exception.h">
+      <Filter>Fluidum\Draw\Vulkan\KeyManager\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\assist.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Api</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\using.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Api</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\api.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Api</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\indexbuffer.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\uniformbuffer.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\vertexbuffer.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\buffer.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\commandbuffer.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\framebuffer.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\commands.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\element.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\command.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\CommandPool\commandpool.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\CommandPool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\commandtype.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\define.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\fkm.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\fvktype.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\include.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\info.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\log.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\mutex.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\passkey.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\type.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Data\data.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Data\info.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Data\type.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorpool.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Descriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorset.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Descriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\updatedescriptorset.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Descriptor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Draw\draw.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\glfw.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\surface.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\swapchain.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\window.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\image.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\imageview.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\sampler.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\texture.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Exception\exception.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Exception\glfw.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\graphicspipeline.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\graphicspipelinelayout.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\RenderPass\renderpass.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\RnderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\RenderPass\shadermodule.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\RnderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Instance\instance.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Instance\messenger.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\converter.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\include.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\key.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\Keys\commandkeys.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\Keys\datakeys.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\Keys\using.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\type.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\using.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\variant.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Sync\fence.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Sync</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Sync\semaphore.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Sync</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\PhysicalDevice\physicaldevice.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\PhysicalDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\LogicalDevice\devicememory.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\LogicalDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\LogicalDevice\logicaldevice.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\LogicalDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\LogicalDevice\queue.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\LogicalDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Manager\concept.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Manager\include.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Manager\manager.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Manager\type.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\backend.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\image.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\imgui.h">
+      <Filter>Fluidum\Draw\Vulkan\Source\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -102,17 +306,80 @@
     <Filter Include="Fluidum\Draw">
       <UniqueIdentifier>{5fd10c02-43de-476f-82a7-e78854a7ea60}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\Draw\KeyManager">
-      <UniqueIdentifier>{282b7bb8-169b-4438-a7c6-6b2e47be649c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fluidum\Draw\KeyManager\Source">
-      <UniqueIdentifier>{6e5f9b3b-305a-4874-8af9-b47fde117915}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\Draw\Vulkan">
       <UniqueIdentifier>{c88a158a-ebc9-4c8a-9b48-64f85388beeb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Fluidum\Draw\Source">
       <UniqueIdentifier>{c5be09f9-ac3f-42c5-9772-9fa358b3e02d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source">
+      <UniqueIdentifier>{a1b2a2c4-bcd8-4f54-8943-a0447fca01e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\KeyManager">
+      <UniqueIdentifier>{282b7bb8-169b-4438-a7c6-6b2e47be649c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\KeyManager\Source">
+      <UniqueIdentifier>{6e5f9b3b-305a-4874-8af9-b47fde117915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Api">
+      <UniqueIdentifier>{02d80eeb-0952-4e4a-8171-52a26ef622ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Buffer">
+      <UniqueIdentifier>{41048b76-2892-49d2-86b1-49e0475adf6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Command">
+      <UniqueIdentifier>{0e73e847-c6b8-439a-8bea-99d95ab787b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\CommandPool">
+      <UniqueIdentifier>{deb3d38a-379c-4660-ad5c-604c8de9eb0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Common">
+      <UniqueIdentifier>{ca7f16ee-4c82-4879-9927-c8221866cf92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Data">
+      <UniqueIdentifier>{780e06a3-cf75-4fa0-ae65-44aae18d813d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Descriptor">
+      <UniqueIdentifier>{e0067666-13d5-41aa-9884-29cb04ab65f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Exception">
+      <UniqueIdentifier>{b23c18f8-a404-4eb1-a97a-61ca7725ba64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Window">
+      <UniqueIdentifier>{cff87422-e602-4a81-8e7f-d927ef03b2b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Image">
+      <UniqueIdentifier>{b763f403-17eb-4494-a0a8-9de068d4bda6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Draw">
+      <UniqueIdentifier>{282cc32e-1010-47aa-934c-c56fa7f04632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Pipeline">
+      <UniqueIdentifier>{9979c516-1cc9-4618-be50-c939bd4429b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\RnderPass">
+      <UniqueIdentifier>{e9033da2-3704-4f7c-ae78-25ae5eb7dd9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Instance">
+      <UniqueIdentifier>{333c2570-35a3-4c0a-a745-cb75803c4752}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Key">
+      <UniqueIdentifier>{8a538e69-18de-4aea-b8ba-62d5e3a46bd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Sync">
+      <UniqueIdentifier>{c0d90083-61bc-4ec8-97ea-3fb5426e2c1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\PhysicalDevice">
+      <UniqueIdentifier>{dc75dcb4-8210-4ae3-a1b6-92afceaf3c11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\LogicalDevice">
+      <UniqueIdentifier>{f9171f1d-1cd6-4e13-8a9d-c9aba2da8ddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\Manager">
+      <UniqueIdentifier>{506d07b2-ca72-4ec0-9d81-137dc56821ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan\Source\ImGui">
+      <UniqueIdentifier>{9511a5b6-7c0d-4c59-80d4-769287ec5fdb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -146,14 +413,137 @@
     <ClCompile Include="..\..\..\Libraries\imgui\backends\imgui_impl_glfw.cpp">
       <Filter>Libraries\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\type.cpp">
-      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\info.cpp">
+      <Filter>Fluidum\Draw\Vulkan\KeyManager\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\exception.cpp">
-      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\type.cpp">
+      <Filter>Fluidum\Draw\Vulkan\KeyManager\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\info.cpp">
-      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\exception.cpp">
+      <Filter>Fluidum\Draw\Vulkan\KeyManager\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\assist.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\api.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\indexbuffer.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\uniformbuffer.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\vertexbuffer.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\buffer.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\commandbuffer.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\framebuffer.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\drawcommand.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\commands.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\CommandPool\commandpool.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\CommandPool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorpool.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Descriptor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorset.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Descriptor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\updatedescriptorset.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Descriptor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Draw\draw.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\glfw.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\surface.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\swapchain.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\window.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\image.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\imageview.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\sampler.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\texture.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Exception\exception.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Exception\glfw.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\graphicspipeline.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\graphicspipelinelayout.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\RenderPass\renderpass.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\RnderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\RenderPass\shadermodule.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\RnderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Instance\instance.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Instance\messenger.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Sync\fence.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Sync</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Sync\semaphore.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Sync</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\PhysicalDevice\physicaldevice.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\PhysicalDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\LogicalDevice\devicememory.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\LogicalDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\LogicalDevice\logicaldevice.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\LogicalDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\LogicalDevice\queue.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\LogicalDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Manager\manager.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\backend.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\image.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\imgui.cpp">
+      <Filter>Fluidum\Draw\Vulkan\Source\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

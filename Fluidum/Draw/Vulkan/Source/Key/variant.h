@@ -1,0 +1,26 @@
+#pragma once
+
+#include "FVKkey.h"
+#include <variant>
+
+namespace FVK::Internal::Key {
+
+	//ParameterÇ…égÇ§
+	template<template<typename>typename T>
+	using VariantKey = std::variant<T<CharKeyType>, T<StringKeyType>, T<IndexKeyType>, T<SelectKeyType>>;
+
+	//vector<variant>Ç≈ÇÕÇ»Ç≠variant<vector>
+	template<template<typename>typename T>
+	using VariantVectorKey =
+		std::variant<
+		std::vector<T<CharKeyType>>,
+		std::vector<T<StringKeyType>>,
+		std::vector<T<IndexKeyType>>,
+		std::vector<T<SelectKeyType>>
+		>;
+
+	template<typename T>//Ç‡Ç§ÇøÇÂÇ¢çlÇ¶ÇÈ
+	concept IsVariantKey = FU::Concept::IsInstanceOf<T, std::variant>;
+
+}
+
