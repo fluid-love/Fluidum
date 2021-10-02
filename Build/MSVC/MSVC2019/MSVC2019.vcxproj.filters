@@ -1,2 +1,150 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Class\class.h">
+      <Filter>Fluidum\Utils\Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Class\classcode.h">
+      <Filter>Fluidum\Utils\Class</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Concept\concept.h">
+      <Filter>Fluidum\Utils\Concept</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Container\container.h">
+      <Filter>Fluidum\Utils\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Debug\consolelog.h">
+      <Filter>Fluidum\Utils\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Debug\warning.h">
+      <Filter>Fluidum\Utils\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\File\text.h">
+      <Filter>Fluidum\Utils\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\File\path.h">
+      <Filter>Fluidum\Utils\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\ImGui\operator.h">
+      <Filter>Fluidum\Utils\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\ImGui\imgui.h">
+      <Filter>Fluidum\Utils\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Log\messenger.h">
+      <Filter>Fluidum\Utils\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Log\type.h">
+      <Filter>Fluidum\Utils\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Text\guitext.h">
+      <Filter>Fluidum\Utils\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\include.h">
+      <Filter>Fluidum\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Tuple\tuple.h">
+      <Filter>Fluidum\Utils\Tuple</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\exception.h">
+      <Filter>Fluidum\KeyManager\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\manager.h">
+      <Filter>Fluidum\KeyManager\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\type.h">
+      <Filter>Fluidum\KeyManager\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\info.h">
+      <Filter>Fluidum\KeyManager\Source</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Fluidum">
+      <UniqueIdentifier>{d202c188-ab2f-48e1-8daa-3ad5b96d0063}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils">
+      <UniqueIdentifier>{821f5055-7030-4c37-911e-b1699a0d5072}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\Class">
+      <UniqueIdentifier>{44500355-e427-46ca-9920-a4acdd3a21a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\Concept">
+      <UniqueIdentifier>{1a108e5e-0d0a-4ad1-8312-52cea002e771}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\Container">
+      <UniqueIdentifier>{c3632560-90d4-4d00-b10c-ed6f021f3121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\Debug">
+      <UniqueIdentifier>{afa25c34-b66a-4583-87c7-494c3d1134c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\File">
+      <UniqueIdentifier>{3c6df8ea-f854-4a62-95fc-707b649266ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\ImGui">
+      <UniqueIdentifier>{dab5da28-463a-4887-9632-415cf3661d45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\Log">
+      <UniqueIdentifier>{91c8b460-3699-4c99-b137-b315ad14a293}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\Text">
+      <UniqueIdentifier>{3f2fdde0-751a-496e-a195-c87a39b06784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\Tuple">
+      <UniqueIdentifier>{d24d0efe-70c8-4664-8515-1073bfd99dea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\KeyManager">
+      <UniqueIdentifier>{282b7bb8-169b-4438-a7c6-6b2e47be649c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\KeyManager\Source">
+      <UniqueIdentifier>{6e5f9b3b-305a-4874-8af9-b47fde117915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{710efd66-98f8-458e-80de-c289d63088f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\ImGui">
+      <UniqueIdentifier>{9a3f37ba-652a-4e83-9633-0045e21485a7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Fluidum\main.cpp">
+      <Filter>Fluidum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\operator.cpp">
+      <Filter>Fluidum\Utils\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\imgui.cpp">
+      <Filter>Fluidum\Utils\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Utils\Log\messenger.cpp">
+      <Filter>Fluidum\Utils\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Utils\Text\guitext.cpp">
+      <Filter>Fluidum\Utils\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\exception.cpp">
+      <Filter>Fluidum\KeyManager\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\type.cpp">
+      <Filter>Fluidum\KeyManager\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\info.cpp">
+      <Filter>Fluidum\KeyManager\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libraries\imgui\imgui.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libraries\imgui\imgui_draw.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libraries\imgui\imgui_tables.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libraries\imgui\imgui_widgets.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Libraries\imgui\backends\imgui_impl_glfw.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
