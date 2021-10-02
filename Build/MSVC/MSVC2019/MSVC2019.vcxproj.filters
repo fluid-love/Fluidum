@@ -46,17 +46,17 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\Tuple\tuple.h">
       <Filter>Fluidum\Utils\Tuple</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\exception.h">
-      <Filter>Fluidum\KeyManager\Source</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\info.h">
+      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\manager.h">
-      <Filter>Fluidum\KeyManager\Source</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\manager.h">
+      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\type.h">
-      <Filter>Fluidum\KeyManager\Source</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\type.h">
+      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\info.h">
-      <Filter>Fluidum\KeyManager\Source</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\exception.h">
+      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -93,17 +93,26 @@
     <Filter Include="Fluidum\Utils\Tuple">
       <UniqueIdentifier>{d24d0efe-70c8-4664-8515-1073bfd99dea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\KeyManager">
-      <UniqueIdentifier>{282b7bb8-169b-4438-a7c6-6b2e47be649c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fluidum\KeyManager\Source">
-      <UniqueIdentifier>{6e5f9b3b-305a-4874-8af9-b47fde117915}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Libraries">
       <UniqueIdentifier>{710efd66-98f8-458e-80de-c289d63088f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Libraries\ImGui">
       <UniqueIdentifier>{9a3f37ba-652a-4e83-9633-0045e21485a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw">
+      <UniqueIdentifier>{5fd10c02-43de-476f-82a7-e78854a7ea60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\KeyManager">
+      <UniqueIdentifier>{282b7bb8-169b-4438-a7c6-6b2e47be649c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\KeyManager\Source">
+      <UniqueIdentifier>{6e5f9b3b-305a-4874-8af9-b47fde117915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Vulkan">
+      <UniqueIdentifier>{c88a158a-ebc9-4c8a-9b48-64f85388beeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Draw\Source">
+      <UniqueIdentifier>{c5be09f9-ac3f-42c5-9772-9fa358b3e02d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -122,15 +131,6 @@
     <ClCompile Include="..\..\..\Fluidum\Utils\Text\guitext.cpp">
       <Filter>Fluidum\Utils\Text</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\exception.cpp">
-      <Filter>Fluidum\KeyManager\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\type.cpp">
-      <Filter>Fluidum\KeyManager\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\info.cpp">
-      <Filter>Fluidum\KeyManager\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Libraries\imgui\imgui.cpp">
       <Filter>Libraries\ImGui</Filter>
     </ClCompile>
@@ -145,6 +145,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Libraries\imgui\backends\imgui_impl_glfw.cpp">
       <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\type.cpp">
+      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\exception.cpp">
+      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\info.cpp">
+      <Filter>Fluidum\Draw\KeyManager\Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

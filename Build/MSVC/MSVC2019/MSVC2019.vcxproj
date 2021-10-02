@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\exception.h" />
-    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\info.h" />
-    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\manager.h" />
-    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\type.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\exception.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\info.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\manager.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\KeyManager\Source\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Class\class.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Class\classcode.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Concept\concept.h" />
@@ -40,9 +40,9 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\Tuple\tuple.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\exception.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\info.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\type.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\exception.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\info.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\KeyManager\Source\type.cpp" />
     <ClCompile Include="..\..\..\Fluidum\main.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\imgui.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\operator.cpp" />
