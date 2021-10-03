@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FVKtype.h"
+#include "type.h"
 
 namespace FVK::Internal {
 	inline FU::Log::Messenger GMessenger{};

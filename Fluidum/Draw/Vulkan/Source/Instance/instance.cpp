@@ -1,10 +1,10 @@
-#include "FVKinstance.h"
+#include "instance.h"
 
 FVK::Internal::Instance::Instance(ManagerPassKey, const Data::InstanceData& data, const Parameter& parameter) {
 	this->create(data, parameter);
 }
 
-FVK::Internal::Instance::Instance(ManagerPassKey, const Data::InstanceData& data, const MessangerParameter& parameter) {
+FVK::Internal::Instance::Instance(ManagerPassKey, const Data::InstanceData& data, const MessengerParameter& parameter) {
 	this->create(data, parameter);
 }
 
@@ -37,7 +37,7 @@ void FVK::Internal::Instance::create(const Data::InstanceData& data,const Parame
 	this->createInstance(instanceCreateInfo);
 }
 
-void FVK::Internal::Instance::create(const Data::InstanceData& data, const MessangerParameter& parameter) {
+void FVK::Internal::Instance::create(const Data::InstanceData& data, const MessengerParameter& parameter) {
 	auto applicationVersion = VK_MAKE_VERSION(parameter.appInfo.appVersion.major, parameter.appInfo.appVersion.minor, parameter.appInfo.appVersion.patch);
 	constexpr auto engineVersion = VK_MAKE_VERSION(EngineVersion.major, EngineVersion.minor, EngineVersion.patch);
 
@@ -53,7 +53,7 @@ void FVK::Internal::Instance::create(const Data::InstanceData& data, const Messa
 	};
 
 	auto extensions = getRequiredExtensions();
-	const auto layerNames = makeValidationLayerNames(parameter.messangerParameter.validationLayer);
+	const auto layerNames = makeValidationLayerNames(parameter.messengerParameter.validationLayer);
 	vk::InstanceCreateInfo instanceCreateInfo = {
 		.pApplicationInfo = &appInfo,
 		.enabledLayerCount = 0,
@@ -62,12 +62,12 @@ void FVK::Internal::Instance::create(const Data::InstanceData& data, const Messa
 		.ppEnabledExtensionNames = extensions.data()
 	};
 
-	if (parameter.messangerParameter.validationLayer == Messanger::ValidationLayer::VK_LAYER_KHRONOS_validation)
+	if (parameter.messengerParameter.validationLayer == Messenger::ValidationLayer::VK_LAYER_KHRONOS_validation)
 		instanceCreateInfo.enabledLayerCount = 1;
 
 	this->createInstance(instanceCreateInfo);
 
-	this->info.isMessangerCreated = true;
+	this->info.isMessengerCreated = true;
 }
 
 const FVK::Internal::Data::InstanceInfo& FVK::Internal::Instance::get() const noexcept {
@@ -88,8 +88,8 @@ unsigned int FVK::Internal::Instance::convertVulkanApiVersion(const VulkanApiVer
 	return VK_API_VERSION_1_0;
 }
 
-std::vector<const char*> FVK::Internal::Instance::makeValidationLayerNames(const Messanger::ValidationLayer type) const noexcept {
-	if (type == Messanger::ValidationLayer::VK_LAYER_KHRONOS_validation)
+std::vector<const char*> FVK::Internal::Instance::makeValidationLayerNames(const Messenger::ValidationLayer type) const noexcept {
+	if (type == Messenger::ValidationLayer::VK_LAYER_KHRONOS_validation)
 		return { "VK_LAYER_KHRONOS_validation" };
 
 	return {};

@@ -1,4 +1,4 @@
-﻿#include "FVKshadermodule.h"
+﻿#include "shadermodule.h"
 
 //前方宣言
 std::vector<char> readFile(const char* filePath);

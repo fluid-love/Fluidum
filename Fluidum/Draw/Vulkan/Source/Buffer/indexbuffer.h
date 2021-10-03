@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Common/FVKinclude.h"
-#include "FVKbuffer.h"
+#include "../Common/include.h"
+#include "buffer.h"
 
 namespace FVK::Internal {
 

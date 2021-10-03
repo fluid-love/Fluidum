@@ -28,8 +28,8 @@ Exception
 
 #pragma once
 
-#include "FVKusing.h"
-#include "FVKassist.h"
+#include "using.h"
+#include "assist.h"
 
 #define FluidumVK_API
 
@@ -269,7 +269,7 @@ namespace FVK {
 
 	//Instance‚Ì’Ç‰Á‚Æì¬
 	/*
-		Parameter‚ğInstanceMessangerParameter‚É‚·‚é‚ÆMessanger‚ğ“o˜^‚Å‚«‚éD
+		Parameter‚ğInstanceMessengerParameter‚É‚·‚é‚ÆMessenger‚ğ“o˜^‚Å‚«‚éD
 
 		ˆø”:
 			key       ì¬‚·‚éInstance‚ÉŠ„‚è“–‚Ä‚ékey
@@ -285,12 +285,12 @@ namespace FVK {
 				->ì¬‚É¸”s
 	*/
 	FluidumVK_API void createInstance(const char* key, const InstanceParameter& parameter);
-	FluidumVK_API void createInstance(const char* key, const InstanceMessangerParameter& parameter);
+	FluidumVK_API void createInstance(const char* key, const InstanceMessengerParameter& parameter);
 
 
 	//Instance‚Ì”j‰ó
 	/*
-	Messanger•t‚È‚çˆê‚Éíœ
+	Messenger•t‚È‚çˆê‚Éíœ
 
 	ˆø”:
 		key íœ‚·‚éInstance‚Ìkey
@@ -308,14 +308,14 @@ namespace FVK {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		API::checkManagerEmpty();
-		//Messanger‚ ‚è‚Ìê‡
+		//Messenger‚ ‚è‚Ìê‡
 		const StringKeyType instanceStrKey = Key::Converter::keyToStringKeyType(key);
-		StringKeyType messangerStrKey = "__Messanger_";
-		messangerStrKey += instanceStrKey;
+		StringKeyType messengerStrKey = "__Messenger_";
+		messengerStrKey += instanceStrKey;
 
 		const Data::InstanceInfo& info = GManager->refInfo<FvkType::Instance>(key);
-		if (info.isMessangerCreated)
-			GManager->erase<FvkType::Messanger>(Key::MessangerKey<const char*>{messangerStrKey.c_str()});
+		if (info.isMessengerCreated)
+			GManager->erase<FvkType::Messenger>(Key::MessengerKey<const char*>{messengerStrKey.c_str()});
 
 		GManager->erase<FvkType::Instance>(key);
 	}

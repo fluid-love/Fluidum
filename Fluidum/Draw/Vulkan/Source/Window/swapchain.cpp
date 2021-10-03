@@ -1,4 +1,4 @@
-#include "FVKswapchain.h"
+#include "swapchain.h"
 
 FVK::Internal::Swapchain::Swapchain(const ManagerPassKey, const Data::SwapchainData& data, Parameter& parameter) {
 	this->create(data, parameter);

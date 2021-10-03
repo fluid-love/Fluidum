@@ -1,4 +1,4 @@
-#include "FVKsemaphore.h"
+#include "semaphore.h"
 
 FVK::Internal::Semaphore::Semaphore(ManagerPassKey, const Data::SemaphoreData& data, const Parameter& parameter) {
 	this->create(data, parameter);

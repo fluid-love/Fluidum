@@ -1,4 +1,4 @@
-#include "FVKimage.h"
+#include "image.h"
 
 FVK::Internal::ImGuiImage::ImGuiImage(ManagerPassKey, const Data::ImGuiImageData& data, const Parameter& parameter) {
 	this->create(data, parameter);

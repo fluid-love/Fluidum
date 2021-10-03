@@ -1,10 +1,10 @@
 #pragma once
 
-//FluidumVK
-#include "FVKtype.h"
+//Fluidum Vulkan
+#include "type.h"
 
-//FluidumKeyManager
-#include <FKMinclude.h>
+//KeyManager
+#include "../../KeyManager/include.h"
 
 //disable warning push
 FluidumUtils_Debug_BeginDisableAllWarning
@@ -20,19 +20,18 @@ FluidumUtils_Debug_BeginDisableAllWarning
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_ENABLE_EXPERIMENTAL
-#include "../../library/glm/glm/glm.hpp"
-#include "../../library/glm/glm/gtc/matrix_transform.hpp"
-#include "../../library/glm/glm/gtx/hash.hpp"
+#include "../../../Libraries/glm/glm/glm.hpp"
+#include "../../../Libraries/glm/glm/gtc/matrix_transform.hpp"
+#include "../../../Libraries/glm/glm/gtx/hash.hpp"
 
 //disable warning pop
 FluidumUtils_Debug_EndDisableAllWarning
 
-//FluidumVK
-#include "FVKdefine.h"
-#include "../Exception/FVKexception.h"
-#include "FVKpasskey.h"
-#include "../Data/FVKdata.h"
-#include "FVKinfo.h"
-#include "../Key/FVKinclude.h"
-#include "FVKmutex.h"
-#include "FVKlog.h"
+//Fluidum Vulkan
+#include "../Exception/exception.h"
+#include "passkey.h"
+#include "../Data/data.h"
+#include "info.h"
+#include "../Key/include.h"
+#include "mutex.h"
+#include "log.h"

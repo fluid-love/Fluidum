@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "../Common/FVKtype.h"
-#include "FVKglfw.h"
-#include "../Common/FVKfkm.h"
+#include "../Common/type.h"
+#include "glfw.h"
+#include "../Common/fkm.h"
 
 namespace FVK::Internal::Exception {
 

@@ -1,9 +1,7 @@
 #pragma once
 
-#include "FVKdefine.h"
-
 namespace FVK {
-	constexpr const char* EngineName = "FluidumVK";
+	constexpr const char* EngineName = "FluidumVulkan";
 
 	constexpr inline struct EngineVersion {
 		const uint16_t major = 1;

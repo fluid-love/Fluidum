@@ -1,6 +1,6 @@
-#include "FVKimgui.h"
+#include "fluidum_imgui.h"
 
-#include "../Buffer/FVKbuffer.h"
+#include "../Buffer/buffer.h"
 
 FVK::Internal::FvkImGui::FvkImGui(ManagerPassKey, const Data::ImGuiData& data, const Parameter& parameter) {
 	this->create(data, parameter);

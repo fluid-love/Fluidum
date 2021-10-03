@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../FVKusing.h"
+#include "../using.h"
 
 namespace FVK::Internal::Key {
 
@@ -110,7 +110,7 @@ namespace FVK::Internal::Key {
 	};
 
 	template<>
-	struct RequiredDataKeys<FvkType::Messanger> final : public RequiredDataKeysBase<FvkType::Messanger> {
+	struct RequiredDataKeys<FvkType::Messenger> final : public RequiredDataKeysBase<FvkType::Messenger> {
 		template<IsKeyType T1>
 		explicit RequiredDataKeys(
 			const InstanceKey<T1>& instance

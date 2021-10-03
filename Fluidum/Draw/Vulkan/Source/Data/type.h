@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "../Common/FVKinclude.h"
-#include "FVKinfo.h"
+#include "../Common/include.h"
+#include "info.h"
 
 namespace FVK::Internal::Data {
 

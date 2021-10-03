@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FVKinclude.h"
+#include "include.h"
 
 namespace FVK::Internal {
 
@@ -11,8 +11,8 @@ namespace FVK::Internal {
 	concept IsParameter =
 		IsWindowParameter<T> ||
 		std::same_as<T, const Instance::Instance::Parameter> ||
-		std::same_as<T, const Instance::Instance::MessangerParameter> ||
-		std::same_as<T, const Messanger::Parameter> ||
+		std::same_as<T, const Instance::Instance::MessengerParameter> ||
+		std::same_as<T, const Messenger::Parameter> ||
 		std::same_as<T, const Surface::Parameter> ||
 		std::same_as<T, const PhysicalDevice::Parameter> ||
 		std::same_as<T, const PhysicalDevice::SwapchainParameter> ||

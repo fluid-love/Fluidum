@@ -1,7 +1,7 @@
 #pragma once
 
-#include "FVKdatakeys.h"
-#include "FVKcommandkeys.h"
+#include "datakeys.h"
+#include "commandkeys.h"
 
 namespace FVK::Internal::Key {
 

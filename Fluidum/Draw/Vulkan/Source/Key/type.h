@@ -1,8 +1,7 @@
 #pragma once
 
-#include <FKMinclude.h>
-#include "../Common/FVKfvktype.h"
-#include "../Common/FVKfkm.h"
+#include "../Common/fvktype.h"
+#include "../Common/fkm.h"
 
 namespace FVK::Internal::Key {
 	using StringKeyType = std::string;

@@ -1,4 +1,4 @@
-#include "FVKassist.h"
+#include "assist.h"
 
 void FVK::Internal::API::checkManagerEmpty() {
 	if (!Internal::GManager)

@@ -1,4 +1,4 @@
-#include "FVKsampler.h"
+#include "sampler.h"
 
 FVK::Internal::Sampler::Sampler(ManagerPassKey, const Data::SamplerData& data, const Parameter& parameter) {
 	this->create(data, parameter);

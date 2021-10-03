@@ -1,4 +1,4 @@
-#include "FVKimageview.h"
+#include "imageview.h"
 
 FVK::Internal::ImageView::ImageView(ManagerPassKey, const Data::ImageViewData& data, Parameter& parameter) {
 	this->create(data, parameter);

@@ -2,9 +2,9 @@
 
 #include "info.h"
 
-namespace Fluidum::KeyManager {
+namespace FKM {
 
-	template<Utils::Concept::IsScopedEnum Enum>
+	template<FU::Concept::IsScopedEnum Enum>
 	class KeyManager final : protected std::vector<Internal::Element<Enum>> {
 	public:
 		KeyManager() = default;
@@ -66,7 +66,7 @@ namespace Fluidum::KeyManager {
 				}
 			}
 
-			Utils::Container::sortAscendingOrder_EraseDuplicateElms(result);
+			FU::Container::sortAscendingOrder_EraseDuplicateElms(result);
 
 			result.shrink_to_fit();
 
@@ -74,9 +74,9 @@ namespace Fluidum::KeyManager {
 			this->addCallback(magic_enum::enum_name<Type>(), key, currentOrder() - 1, Elms::back().connections);
 		}
 
-		template<Enum Type, auto TypeArray, Utils::Concept::IsStdArrayParticularType<IndexKey> IndexArray>
+		template<Enum Type, auto TypeArray, FU::Concept::IsStdArrayParticularType<IndexKey> IndexArray>
 		void add(const char* key, const IndexArray& connections)
-			requires Utils::Concept::IsStdArrayParticularType<decltype(TypeArray), Enum>
+			requires FU::Concept::IsStdArrayParticularType<decltype(TypeArray), Enum>
 		{
 			static_assert(TypeArray.size() == std::tuple_size_v<IndexArray>, "TypeArray.size() != IndexArray.size()");
 

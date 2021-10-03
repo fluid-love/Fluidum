@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FVKcommand.h"
+#include "command.h"
 
 namespace FVK::Internal::Command {
 

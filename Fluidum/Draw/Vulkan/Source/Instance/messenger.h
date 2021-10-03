@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Common/FVKinclude.h"
+#include "../Common/include.h"
 
 namespace FVK::Internal {
 
-	class Messanger final {
+	class Messenger final {
 	public:
 		enum class ValidationLayer : UT {
 			None,
@@ -18,24 +18,24 @@ namespace FVK::Internal {
 
 		struct Parameter {
 			ValidationLayer validationLayer = ValidationLayer::VK_LAYER_KHRONOS_validation;
-			PFN_vkDebugUtilsMessengerCallbackEXT callback = messangerCallback;
+			PFN_vkDebugUtilsMessengerCallbackEXT callback = messengerCallback;
 			Message message = {};
 		};
 
-		static inline VKAPI_ATTR VkBool32 VKAPI_CALL messangerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+		static inline VKAPI_ATTR VkBool32 VKAPI_CALL messengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
 			std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 			return VK_FALSE;
 		}
 
 	public:
-		explicit Messanger(ManagerPassKey, const Data::MessengerData& data, const Parameter& parameter);
-		~Messanger() = default;
-		FluidumUtils_Class_Default_CopyMove(Messanger)
+		explicit Messenger(ManagerPassKey, const Data::MessengerData& data, const Parameter& parameter);
+		~Messenger() = default;
+		FluidumUtils_Class_Default_CopyMove(Messenger)
 
 	private:
 		void create(const Data::MessengerData& data, const Parameter& parameter);
 	public:
-		_NODISCARD const Data::MessangerInfo& get() const noexcept;
+		_NODISCARD const Data::MessengerInfo& get() const noexcept;
 		void destroy();
 
 	private:
@@ -45,7 +45,7 @@ namespace FVK::Internal {
 
 		void fillInfo(const Data::MessengerData& data) VULKAN_HPP_NOEXCEPT;
 	private://data
-		Data::MessangerInfo info = {};
+		Data::MessengerInfo info = {};
 	};
 
 

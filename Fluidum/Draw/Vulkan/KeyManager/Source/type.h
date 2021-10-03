@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "../../Utils/include.h"
+#include "../../../../Utils/include.h"
 #include "../../../Libraries/magic_enum/include/magic_enum.hpp"
 
-namespace Fluidum::KeyManager {
+namespace FKM {
 
 	class OrderKey final {
 	public:
@@ -46,7 +46,7 @@ namespace Fluidum::KeyManager {
 
 }
 
-namespace Fluidum::KeyManager {
+namespace FKM {
 
 	using CharKey = const char*;
 
@@ -61,7 +61,7 @@ namespace Fluidum::KeyManager {
 
 }
 
-namespace Fluidum::KeyManager::Internal {
+namespace FKM::Internal {
 
 	template<typename T>
 	concept IsIndexKey = std::same_as<T, IndexKey>;
@@ -85,7 +85,7 @@ namespace Fluidum::KeyManager::Internal {
 }
 
 //callbacks
-namespace Fluidum::KeyManager {
+namespace FKM {
 
 	using AddCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey::Type, const std::vector<OrderKey>&);
 	using EraseCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey::Type);

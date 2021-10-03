@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common/FVKfvktype.h"
+#include "../Common/fvktype.h"
 
 namespace FVK::Internal::Data {
 
@@ -19,13 +19,13 @@ namespace FVK::Internal::Data {
 	template<>
 	struct Info<FvkType::Instance> final {
 		vk::Instance instance = nullptr;
-		bool isMessangerCreated = false;
+		bool isMessengerCreated = false;
 	};
 
 	template<>
-	struct Info<FvkType::Messanger> final {
+	struct Info<FvkType::Messenger> final {
 		vk::Instance instance = nullptr;
-		VkDebugUtilsMessengerEXT messanger = nullptr;
+		VkDebugUtilsMessengerEXT messenger = nullptr;
 	};
 
 	template<>
@@ -231,7 +231,7 @@ namespace FVK::Internal::Data {
 
 	using WindowInfo = Info<FvkType::Window>;
 	using InstanceInfo = Info<FvkType::Instance>;
-	using MessangerInfo = Info<FvkType::Messanger>;
+	using MessengerInfo = Info<FvkType::Messenger>;
 	using SurfaceInfo = Info<FvkType::Surface>;
 	using PhysicalDeviceInfo = Info<FvkType::PhysicalDevice>;
 	using LogicalDeviceInfo = Info<FvkType::LogicalDevice>;

@@ -1,4 +1,4 @@
-#include "FVKfence.h"
+#include "fence.h"
 
 FVK::Internal::Fence::Fence(ManagerPassKey, const Data::FenceData& data, const Parameter& parameter) {
 	this->create(data, parameter);

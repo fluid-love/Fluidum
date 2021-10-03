@@ -1,4 +1,4 @@
-#include "FVKglfw.h"
+#include "glfw.h"
 
 std::string glfwErrorMessage{};
 

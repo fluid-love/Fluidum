@@ -1,12 +1,12 @@
 #pragma once
 
-#include "FVKinclude.h"
+#include "include.h"
 
 namespace FVK::Internal {
 
 	using Windows = std::vector<Window>;
 	using Instances = std::vector<Instance>;
-	using Messangers = std::vector<Messanger>;
+	using Messengers = std::vector<Messenger>;
 	using Surfaces = std::vector<Surface>;
 	using PhysicalDevices = std::vector<PhysicalDevice>;
 	using LogicalDevices = std::vector<LogicalDevice>;
@@ -45,7 +45,7 @@ namespace FVK::Internal::Manager {
 		Glfw,
 		Windows,
 		Instances,
-		Messangers,
+		Messengers,
 		Surfaces,
 		PhysicalDevices,
 		LogicalDevices,
@@ -86,7 +86,7 @@ namespace FVK::Internal::Manager {
 		std::make_pair(FvkType::Glfw, 0),
 		std::make_pair(FvkType::Window, 1),
 		std::make_pair(FvkType::Instance, 2),
-		std::make_pair(FvkType::Messanger, 3),
+		std::make_pair(FvkType::Messenger, 3),
 		std::make_pair(FvkType::Surface, 4),
 		std::make_pair(FvkType::PhysicalDevice, 5),
 		std::make_pair(FvkType::PhysicalDevice_Swapchain, 5),
@@ -147,8 +147,8 @@ namespace FVK::Internal::Manager {
 			return FvkType::Window;
 		else if constexpr (std::same_as<T, Instance>)
 			return FvkType::Instance;
-		else if constexpr (std::same_as<T, Messanger>)
-			return FvkType::Messanger;
+		else if constexpr (std::same_as<T, Messenger>)
+			return FvkType::Messenger;
 		else if constexpr (std::same_as<T, Surface>)
 			return FvkType::Surface;
 		else if constexpr (std::same_as<T, PhysicalDevice>)

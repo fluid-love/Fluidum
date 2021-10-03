@@ -1,7 +1,7 @@
 #pragma once
 
-#include "FVKvariant.h"
-#include "FVKconverter.h"
+#include "variant.h"
+#include "converter.h"
 
 namespace FVK::Internal::Key {
 
@@ -16,9 +16,9 @@ namespace FVK::Internal::Key {
 	using InstanceKeys = std::vector<InstanceKey<T>>;
 
 	template<IsKeyType T>
-	using MessangerKey = Key<FvkType::Messanger, T>;
+	using MessengerKey = Key<FvkType::Messenger, T>;
 	template<IsKeyType T>
-	using MessageKeys = std::vector<MessangerKey<T>>;
+	using MessageKeys = std::vector<MessengerKey<T>>;
 
 	template<IsKeyType T>
 	using SurfaceKey = Key<FvkType::Surface, T>;
@@ -171,8 +171,8 @@ namespace FVK::Internal::Key {
 	using InstanceVariantKey = VariantKey<InstanceKey>;
 	using InstanceVariantVectorKey = VariantVectorKey<InstanceKey>;
 
-	using MessangerVariantKey = VariantKey<MessangerKey>;
-	using MessangerVariantVectorKey = VariantVectorKey<MessangerKey>;
+	using MessengerVariantKey = VariantKey<MessengerKey>;
+	using MessengerVariantVectorKey = VariantVectorKey<MessengerKey>;
 
 	using SurfaceVariantKey = VariantKey<SurfaceKey>;
 	using SurfaceVariantVectorKey = VariantVectorKey<SurfaceKey>;

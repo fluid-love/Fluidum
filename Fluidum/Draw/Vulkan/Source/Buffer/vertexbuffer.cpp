@@ -1,4 +1,4 @@
-#include "FVKvertexbuffer.h"
+#include "vertexbuffer.h"
 
 FVK::Internal::VertexBuffer::VertexBuffer(ManagerPassKey, const Data::VertexBufferData& data,const Parameter& parameter) {
 	this->create(data, parameter);

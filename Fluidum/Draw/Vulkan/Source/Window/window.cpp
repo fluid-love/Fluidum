@@ -1,4 +1,4 @@
-#include "FVKwindow.h"
+#include "window.h"
 
 void FVK::Internal::Window::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
 	auto app = reinterpret_cast<FVK::Internal::Window*>(glfwGetWindowUserPointer(window));

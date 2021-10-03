@@ -1,8 +1,8 @@
-#include "FVKtexture.h"
-#include "../Buffer/FVKbuffer.h"
+#include "texture.h"
+#include "../Buffer/buffer.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../library/stb/stb_image.h"
+#include "../../../Libraries/stb/stb_image.h"
 
 FVK::Internal::Texture::Texture(ManagerPassKey, const Data::TextureData& data, const Parameter& parameter) {
 	this->create(data, parameter);

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Common/FVKtype.h"
-#include "../Common/FVKfvktype.h"
-#include "../Common/FVKcommandtype.h"
-#include "FVKtype.h"
+#include "../Common/type.h"
+#include "../Common/fvktype.h"
+#include "../Common/commandtype.h"
+#include "type.h"
 
 namespace FVK::Internal::Data {
 
@@ -36,7 +36,7 @@ namespace FVK::Internal::Data {
 
 	using WindowData = Data<FvkType::Window>;
 	using InstanceData = Data<FvkType::Instance>;
-	using MessengerData = Data<FvkType::Messanger>;
+	using MessengerData = Data<FvkType::Messenger>;
 	using SurfaceData = Data<FvkType::Surface>;
 	using PhysicalDeviceData = Data<FvkType::PhysicalDevice>;
 	using PhysicalDeviceSwapchainData = Data<FvkType::PhysicalDevice_Swapchain>;

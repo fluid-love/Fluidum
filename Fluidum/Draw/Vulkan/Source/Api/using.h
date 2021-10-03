@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Manager/FVKmanager.h"
+#include "../Manager/manager.h"
 
 //Key
 namespace FVK {
@@ -19,12 +19,12 @@ namespace FVK {
 	using Internal::Key::WindowKey;
 }
 
-//Instance Messanger
+//Instance Messenger
 namespace FVK {
 	using InstanceParameter = Internal::Instance::Parameter;
-	using InstanceMessangerParameter = Internal::Instance::MessangerParameter;
-	using MessangerParameter = Internal::Messanger::Parameter;
-	using Message = Internal::Messanger::Message;
+	using InstanceMessengerParameter = Internal::Instance::MessengerParameter;
+	using MessengerParameter = Internal::Messenger::Parameter;
+	using Message = Internal::Messenger::Message;
 	using ApplicationInfo = Internal::Instance::ApplicationInfo;
 	using VulkanApiVersion = Internal::Instance::VulkanApiVersion;
 

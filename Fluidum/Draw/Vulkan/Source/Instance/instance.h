@@ -1,21 +1,20 @@
 #pragma once
 
-#include "../Common/FVKinclude.h"
-#include "../Messanger/FVKmessenger.h"
+#include "../Common/include.h"
+#include "messenger.h"
 
 namespace FVK::Internal {
 
 	class Instance final {
 	public:
 
-		//アプリケーションのバージョン
 		struct ApplicationVersion {
 			const uint16_t major = 1;
 			const uint16_t minor = 0;
 			const uint16_t patch = 0;
 		};
 
-		//vulkanのversion 
+		//vulkan api version 
 		//バージョンを超えた機能を利用しようとするとメッセージが飛ぶ
 		enum class VulkanApiVersion : UT {
 			version_1_0,
@@ -33,22 +32,22 @@ namespace FVK::Internal {
 			ApplicationInfo appInfo = {};
 		};
 
-		//Messanger
-		struct MessangerParameter {
-			Messanger::Parameter messangerParameter{};
+		//Messenger
+		struct MessengerParameter {
+			Messenger::Parameter messengerParameter{};
 			ApplicationInfo appInfo = {};
 		};
 
 	public:
 		explicit Instance(ManagerPassKey, const Data::InstanceData& data, const Parameter& parameter);
-		explicit Instance(ManagerPassKey, const Data::InstanceData& data, const MessangerParameter& parameter);
+		explicit Instance(ManagerPassKey, const Data::InstanceData& data, const MessengerParameter& parameter);
 
 		~Instance() = default;
 		FluidumUtils_Class_Default_CopyMove(Instance)
 
 	private:
 		void create(const Data::InstanceData& data, const Parameter& parameter);
-		void create(const Data::InstanceData& data, const MessangerParameter& parameter);
+		void create(const Data::InstanceData& data, const MessengerParameter& parameter);
 
 	public:
 		_NODISCARD const Data::InstanceInfo& get() const noexcept;
@@ -56,7 +55,7 @@ namespace FVK::Internal {
 
 	private:
 		_NODISCARD unsigned int convertVulkanApiVersion(const VulkanApiVersion vulkanApiVersion) const noexcept;
-		_NODISCARD std::vector<const char*> makeValidationLayerNames(const Messanger::ValidationLayer type) const noexcept;
+		_NODISCARD std::vector<const char*> makeValidationLayerNames(const Messenger::ValidationLayer type) const noexcept;
 		_NODISCARD std::vector<const char*> getRequiredExtensions() const;
 		void createInstance(const vk::InstanceCreateInfo& info);
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "FVKtype.h"
+#include "type.h"
 
-//‘O•ûéŒ¾
+//forward
 namespace FVK::Internal::Manager {
 	class Manager;
 }

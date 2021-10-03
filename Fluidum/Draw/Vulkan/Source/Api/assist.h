@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Manager/FVKmanager.h"
+#include "../Manager/manager.h"
 
 namespace FVK::Internal::API {
 
-	//GMnaager‚ªì¬‚³‚ê‚Ä‚¢‚È‚¢ê‡‚Í—áŠO‚ğ“Š‚°‚éNotCreated
+	//if (GMnaager.operator bool() == false) throw NotCreated
 	void checkManagerEmpty();
 
 

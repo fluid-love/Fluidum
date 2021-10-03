@@ -1,4 +1,4 @@
-#include "FVKdescriptorpool.h"
+#include "descriptorpool.h"
 
 void FVK::Internal::DescriptorPool::create(const Data::DescriptorPoolData& data, const Parameter& parameter) {
 

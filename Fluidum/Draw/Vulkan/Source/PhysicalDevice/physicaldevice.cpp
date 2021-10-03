@@ -1,4 +1,4 @@
-﻿#include "FVKphysicaldevice.h"
+﻿#include "physicaldevice.h"
 
 bool FVK::Internal::PhysicalDevice::checkDeviceExtensionSupport(const vk::PhysicalDevice device, const std::vector<const char*>& deviceExtensions) {
 	using namespace FVK::Internal;

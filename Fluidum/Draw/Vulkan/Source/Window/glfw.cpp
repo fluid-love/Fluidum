@@ -1,5 +1,5 @@
-#include "FVKglfw.h"
-#include "../Exception/FVKglfw.h"
+#include "glfw.h"
+#include "../Exception/glfw.h"
 
 FVK::Internal::Glfw::Glfw(ManagerPassKey) {
 	this->init();

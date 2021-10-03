@@ -1,4 +1,4 @@
-﻿#include "FVKgraphicspipeline.h"
+﻿#include "graphicspipeline.h"
 
 FVK::Internal::GraphicsPipeline::GraphicsPipeline(ManagerPassKey, const Data::GraphicsPipelineData& data, Parameter& parameter) {
 	this->create(data, parameter);

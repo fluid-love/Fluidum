@@ -1,5 +1,5 @@
-#include "FVKbuffer.h"
-#include "../PhysicalDevice/FVKphysicaldevice.h"
+#include "buffer.h"
+#include "../PhysicalDevice/physicaldevice.h"
 
 void FVK::Internal::Buffer::createBuffer(const vk::PhysicalDevice physicalDevice, const vk::Device device, const vk::DeviceSize size, const vk::BufferUsageFlags usage, const vk::MemoryPropertyFlags properties, vk::Buffer& buffer, vk::DeviceMemory& bufferMemory) {
 

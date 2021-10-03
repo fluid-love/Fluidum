@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common/FVKinclude.h"
+#include "../Common/include.h"
 
 namespace FVK::Internal::Buffer {
 	void createBuffer(const vk::PhysicalDevice physicalDevice, const vk::Device device, const vk::DeviceSize size, const vk::BufferUsageFlags usage, const vk::MemoryPropertyFlags properties, vk::Buffer& buffer, vk::DeviceMemory& bufferMemory);

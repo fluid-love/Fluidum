@@ -1,7 +1,7 @@
 #pragma once
 
-#include <FKMinclude.h>
-#include "../Common/FVKtype.h"
+#include "../../KeyManager/include.h"
+#include "../Common/type.h"
 
 namespace FVK::Internal {
 	//Global FluidumKeyManager

@@ -1,4 +1,4 @@
-#include "FVKcommandbuffer.h"
+#include "commandbuffer.h"
 
 FVK::Internal::CommandBuffer::CommandBuffer(ManagerPassKey, const Data::CommandBufferData& data, Parameter& parameter) {
 	this->allocate(data, parameter);

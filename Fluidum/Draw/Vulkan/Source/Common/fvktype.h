@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FVKtype.h"
+#include "type.h"
 
 namespace FVK::Internal {
 
@@ -14,7 +14,7 @@ namespace FVK::Internal {
 			return DataTypeArray<0>();
 		else if constexpr (Type == Instance)
 			return DataTypeArray<0>();
-		else if constexpr (Type == Messanger)
+		else if constexpr (Type == Messenger)
 			return DataTypeArray<1>({ Instance });
 		else if constexpr (Type == Surface)
 			return DataTypeArray<2>({ Window, Instance });

@@ -1,5 +1,5 @@
-#include "FVKlogicaldevice.h"
-#include "../PhysicalDevice/FVKphysicaldevice.h"
+#include "logicaldevice.h"
+#include "../PhysicalDevice/physicaldevice.h"
 
 FVK::Internal::LogicalDevice::LogicalDevice(ManagerPassKey, const Data::LogicalDeviceData& data, const Parameter& parameter) {
 	this->create(data, parameter);

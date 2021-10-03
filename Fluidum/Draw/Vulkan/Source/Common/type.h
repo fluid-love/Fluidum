@@ -17,20 +17,15 @@
 #include <condition_variable>
 #include <sstream>
 
-#include <FluidumUtilsDebug/FUdebug.h>
-#include <FluidumUtilsClass/FUclass.h>
-#include <FluidumUtilsConcept/FUconcept.h>
-#include <FluidumUtilsTuple/FUtuple.h>
-#include <FluidumUtilsFile/FUfile.h>
-#include <FluidumUtilsLog/FUlog.h>
+#include "../../../../Utils/include.h"
 
 //vulkan
 #define VULKAN_HPP_NO_SPACESHIP_OPERATOR
 #define VULKAN_HPP_NO_EXCEPTIONS
 #define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
-#define VULKAN_HPP_NO_SETTERS //setterÇè¡Ç∑Å@ç°ÇÃvulkanSDKÇ≈ÇÕëŒâûÇµÇƒÇ¢Ç»Ç¢
+#define VULKAN_HPP_NO_SETTERS
 
-FluidumUtils_Debug_BeginDisableAllWarning //C26812ÇÕè¡Ç¶Ç»Ç¢
+FluidumUtils_Debug_BeginDisableAllWarning 
 #include <vulkan/vulkan.hpp>
 FluidumUtils_Debug_EndDisableAllWarning
 
@@ -47,7 +42,7 @@ namespace FVK::Internal {
 		Glfw,
 		Window,
 		Instance,
-		Messanger,
+		Messenger,
 		Surface,
 		PhysicalDevice,
 		PhysicalDevice_Swapchain,
@@ -86,15 +81,6 @@ namespace FVK::Internal {
 		ImGuiImage,
 
 		COUNT,
-
-
-		//OffscreenFrameBuffer,
-
-
-
-		//ViewPort,
-
-		//SwapchainImageView,
 
 
 	};

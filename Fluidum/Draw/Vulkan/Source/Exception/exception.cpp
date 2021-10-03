@@ -1,4 +1,4 @@
-#include "FVKexception.h"
+#include "exception.h"
 
 void FVK::Internal::Exception::throwNotInitialized(const char* message) {
 	throw ::FVK::Exception::NotInitialized(message);

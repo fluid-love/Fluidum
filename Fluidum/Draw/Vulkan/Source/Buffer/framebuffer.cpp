@@ -1,4 +1,4 @@
-#include "FVKframebuffer.h"
+#include "framebuffer.h"
 
 FVK::Internal::FrameBuffer::FrameBuffer(ManagerPassKey, const Data::FrameBufferData& data, Parameter& parameter) {
 	this->create(data, parameter);

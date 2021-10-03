@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "FVKtype.h"
-#include "FVKconcept.h"
-#include "../Common/FVKfkm.h"
+#include "type.h"
+#include "concept.h"
+#include "../Common/fkm.h"
 
 namespace FVK::Internal::Manager {
 

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "FVKkey.h"
-#include <variant>
+#include "key.h"
 
 namespace FVK::Internal::Key {
 

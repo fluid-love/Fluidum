@@ -2,9 +2,9 @@
 
 #include "exception.h"
 
-namespace Fluidum::KeyManager::Internal {
+namespace FKM::Internal {
 
-	template<Utils::Concept::IsScopedEnum Enum>
+	template<FU::Concept::IsScopedEnum Enum>
 	struct Element final {
 	public:
 		Element(const Enum type, const OrderKey order, const char* key) noexcept :

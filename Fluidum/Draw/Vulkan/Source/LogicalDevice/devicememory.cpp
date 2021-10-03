@@ -1,4 +1,4 @@
-#include "FVKdevicememory.h"
+#include "devicememory.h"
 
 FVK::Internal::DeviceMemory::DeviceMemory(ManagerPassKey, const Data::DeviceMemoryData& data, const Parameter& parameter) {
 	this->create(data, parameter);

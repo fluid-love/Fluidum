@@ -1,12 +1,12 @@
-﻿#include "FVKmessenger.h"
+﻿#include "messenger.h"
 
-FVK::Internal::Messanger::Messanger(ManagerPassKey, const Data::MessengerData& data, const Parameter& parameter) {
+FVK::Internal::Messenger::Messenger(ManagerPassKey, const Data::MessengerData& data, const Parameter& parameter) {
 	this->create(data, parameter);
 }
 
-void FVK::Internal::Messanger::create(const Data::MessengerData& data, const Parameter& parameter) {
+void FVK::Internal::Messenger::create(const Data::MessengerData& data, const Parameter& parameter) {
 	if (!checkValidationLayerSupport(parameter))
-		Exception::throwFailedToCreate("Failed to create Messanger. ValidationLayer NotSupported");
+		Exception::throwFailedToCreate("Failed to create Messenger. ValidationLayer NotSupported");
 
 	VkDebugUtilsMessengerCreateInfoEXT debugInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
@@ -15,13 +15,13 @@ void FVK::Internal::Messanger::create(const Data::MessengerData& data, const Par
 		.pfnUserCallback = parameter.callback
 	};
 
-	if (createDebugUtilsMessengerEXT(data,&debugInfo, nullptr, &info.messanger) != VK_SUCCESS)
-		Exception::throwFailedToCreate("Failed to create Messanger.");
+	if (createDebugUtilsMessengerEXT(data,&debugInfo, nullptr, &info.messenger) != VK_SUCCESS)
+		Exception::throwFailedToCreate("Failed to create Messenger.");
 
 	this->fillInfo(data);
 }
 
-bool FVK::Internal::Messanger::checkValidationLayerSupport(const Parameter& parameter) const {
+bool FVK::Internal::Messenger::checkValidationLayerSupport(const Parameter& parameter) const {
 	auto result = vk::enumerateInstanceLayerProperties();
 	std::vector<vk::LayerProperties> availableLayers = result.value;
 	const auto names = this->makeValidationLayerNames(parameter);
@@ -43,7 +43,7 @@ bool FVK::Internal::Messanger::checkValidationLayerSupport(const Parameter& para
 	return true;
 }
 
-VkResult FVK::Internal::Messanger::createDebugUtilsMessengerEXT(const Data::MessengerData& data, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
+VkResult FVK::Internal::Messenger::createDebugUtilsMessengerEXT(const Data::MessengerData& data, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(data.get<FvkType::Instance>().instance, "vkCreateDebugUtilsMessengerEXT");
 	if (func) {
 		return func(data.get<FvkType::Instance>().instance, pCreateInfo, pAllocator, pDebugMessenger);
@@ -52,14 +52,14 @@ VkResult FVK::Internal::Messanger::createDebugUtilsMessengerEXT(const Data::Mess
 	return VK_ERROR_EXTENSION_NOT_PRESENT;
 }
 
-std::vector<const char*> FVK::Internal::Messanger::makeValidationLayerNames(const Parameter& parameter) const noexcept {
+std::vector<const char*> FVK::Internal::Messenger::makeValidationLayerNames(const Parameter& parameter) const noexcept {
 	if (parameter.validationLayer == ValidationLayer::VK_LAYER_KHRONOS_validation)
 		return { "VK_LAYER_KHRONOS_validation" };
 
 	return {};
 }
 
-void FVK::Internal::Messanger::fillInfo(const Data::MessengerData& data) VULKAN_HPP_NOEXCEPT {
+void FVK::Internal::Messenger::fillInfo(const Data::MessengerData& data) VULKAN_HPP_NOEXCEPT {
 	this->info.instance = data.get<FvkType::Instance>().instance;
 }
 
@@ -69,17 +69,17 @@ void vkDestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerE
 	vkDestroyDebugUtilsMessenger(instance, debugMessenger, pAllocator);
 }
 
-const FVK::Internal::Data::MessangerInfo& FVK::Internal::Messanger::get() const noexcept {
-	assert(this->info.messanger);
+const FVK::Internal::Data::MessengerInfo& FVK::Internal::Messenger::get() const noexcept {
+	assert(this->info.messenger);
 	return this->info;
 }
 
-void FVK::Internal::Messanger::destroy() {
-	assert(this->info.messanger);
+void FVK::Internal::Messenger::destroy() {
+	assert(this->info.messenger);
 
 	vkDestroyDebugUtilsMessenger =
 		(PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
 			this->info.instance, "vkDestroyDebugUtilsMessengerEXT");
-	vkDestroyDebugUtilsMessengerEXT(this->info.instance, info.messanger, nullptr);
+	vkDestroyDebugUtilsMessengerEXT(this->info.instance, info.messenger, nullptr);
 }
 

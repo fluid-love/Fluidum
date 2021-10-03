@@ -1,5 +1,5 @@
-#include "FVKuniformbuffer.h"
-#include "FVKbuffer.h"
+#include "uniformbuffer.h"
+#include "buffer.h"
 
 FVK::Internal::UniformBuffer::UniformBuffer(ManagerPassKey, const Data::UniformBufferData& data, const Parameter& parameter) {
 	this->create(data, parameter);

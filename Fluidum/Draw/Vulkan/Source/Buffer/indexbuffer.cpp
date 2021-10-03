@@ -1,5 +1,5 @@
-#include "FVKindexbuffer.h"
-#include "FVKbuffer.h"
+#include "indexbuffer.h"
+#include "buffer.h"
 
 FVK::Internal::IndexBuffer::IndexBuffer(ManagerPassKey, const Data::IndexBufferData& data, const Parameter& parameter) { 
 	this->create(data,parameter);

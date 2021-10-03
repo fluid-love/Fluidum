@@ -1,4 +1,4 @@
-#include "FVKapi.h"
+#include "api.h"
 
 namespace FVK::Internal {
 	void addKeyCallback(const magic_enum::string_view& type, const char* key, OrderKey::Type order, const std::vector<OrderKey>& connections) {
@@ -61,18 +61,18 @@ void FVK::createInstance(const char* key, const InstanceParameter& parameter) {
 	GManager->add<FvkType::Instance>(key, parameter);
 }
 
-void FVK::createInstance(const char* key, const InstanceMessangerParameter& parameter) {
+void FVK::createInstance(const char* key, const InstanceMessengerParameter& parameter) {
 	using namespace Internal;
 	LockGuard lock(GMutex);
 	API::checkManagerEmpty();
 
 	GManager->add<FvkType::Instance>(key, parameter);
 
-	std::string messangerKey = "__Messanger_";
-	messangerKey += key;
+	std::string messengerKey = "__Messenger_";
+	messengerKey += key;
 	const IndexKey instanceIndex = Internal::GKeyManager.toIndexKey(key);
-	const Key::RequiredDataKeys<FvkType::Messanger> connections{ InstanceKey<const char*>(key) };
-	GManager->add<FvkType::Messanger>(messangerKey.c_str(), parameter.messangerParameter, connections);
+	const Key::RequiredDataKeys<FvkType::Messenger> connections{ InstanceKey<const char*>(key) };
+	GManager->add<FvkType::Messenger>(messengerKey.c_str(), parameter.messengerParameter, connections);
 }
 
 void FVK::createSurface(const char* key, const SurfaceParameter& parameter) {

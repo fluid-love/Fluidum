@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../Common/FVKinclude.h"
-//#include "FVKdrawcommand.h"
-#include "../Buffer/FVKuniformbuffer.h"
+#include "../Common/include.h"
+#include "../Buffer/uniformbuffer.h"
 
 namespace FVK::Internal {
 

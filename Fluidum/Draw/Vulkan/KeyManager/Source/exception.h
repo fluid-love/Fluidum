@@ -2,7 +2,7 @@
 
 #include "type.h"
 
-namespace Fluidum::KeyManager::Exception {
+namespace FKM::Exception {
 
 	class CollisionOfKeys : public std::exception {
 	private:
@@ -47,7 +47,7 @@ namespace Fluidum::KeyManager::Exception {
 
 }
 
-namespace Fluidum::KeyManager::Exception::Internal {
+namespace FKM::Exception::Internal {
 
 	_NODISCARD std::string makeCollisionOfKeysMessage(const char* key);
 	[[noreturn]] void throwCollisionOfKeys(const char* key);

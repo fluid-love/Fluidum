@@ -1,4 +1,4 @@
-#include "FVKdescriptorset.h"
+#include "descriptorset.h"
 
 FVK::Internal::DescriptorSet::DescriptorSet(ManagerPassKey, const Data::DescriptorSetData& data, Parameter& parameter) {
 	this->allocate(data, parameter);
