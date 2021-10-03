@@ -1,26 +1,26 @@
 #include "guitext.h"
 
-Fluidum::Utils::GuiText::Text::Text(const std::string text)
+FU::GuiText::Text::Text(const std::string text)
 	: text(text)
 {}
 
-Fluidum::Utils::GuiText::Text::Text(std::string&& text) noexcept
+FU::GuiText::Text::Text(std::string&& text) noexcept
 	: text(text)
 {}
 
-Fluidum::Utils::GuiText::Text::Text(const char* text)
+FU::GuiText::Text::Text(const char* text)
 	: text(text)
 {}
 
-void Fluidum::Utils::GuiText::Text::operator=(const std::string& text) {
+void FU::GuiText::Text::operator=(const std::string& text) {
 	this->text = text;
 }
 
-void Fluidum::Utils::GuiText::Text::operator=(std::string&& text) noexcept {
+void FU::GuiText::Text::operator=(std::string&& text) noexcept {
 	this->text = std::move(text);
 }
 
-Fluidum::Utils::GuiText::Text::operator const char* () const noexcept {
+FU::GuiText::Text::operator const char* () const noexcept {
 	return this->text.c_str();
 }
 

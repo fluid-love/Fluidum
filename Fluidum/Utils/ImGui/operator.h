@@ -7,7 +7,7 @@
 never use "using namespace" in header file. 
 e.g. 
 //header.h
-using namespace ::Fluidum::Utils::ImGui::Operators;
+using namespace ::FU::ImGui::Operators;
 
 void test(){
 	ImVec2 a,b;
@@ -16,11 +16,11 @@ void test(){
 
 use in .cpp / inside a function
 void test(){
-	using namespace ::Fluidum::Utils::ImGui::Operators;
+	using namespace ::FU::ImGui::Operators;
 	//foo
 */
 
-namespace Fluidum::Utils::ImGui::Operators {
+namespace FU::ImGui::Operators {
 
 	/*
 	l.x + r.x

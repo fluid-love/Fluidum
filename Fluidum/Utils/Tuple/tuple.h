@@ -7,11 +7,11 @@
 
 #include "../Concept/concept.h"
 
-namespace Fluidum::Utils::Tuple {
+namespace FU::Tuple {
 
 
 	template<typename... T>
-	concept IsTuple = ::Fluidum::Utils::Concept::IsTuple<T...>;
+	concept IsTuple = ::FU::Concept::IsTuple<T...>;
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ namespace Fluidum::Utils::Tuple {
 				return false;
 			else {
 				using T = std::tuple_element_t<Size - 1, Tuple>;
-				if constexpr (Utils::Tuple::getSameTypeSize<Tuple, T>() > 1)
+				if constexpr (FU::Tuple::getSameTypeSize<Tuple, T>() > 1)
 					return true;
 				else
 					return false;
@@ -212,7 +212,7 @@ namespace Fluidum::Utils::Tuple {
 				return Indices<>();
 			else {
 				using T = std::tuple_element_t<Size - 1, Tuple>;
-				constexpr auto index = Utils::Tuple::getSameTypeIndex<BaseTuple, T>();
+				constexpr auto index = FU::Tuple::getSameTypeIndex<BaseTuple, T>();
 				auto result = getSameTupleTypeIndices<Size - 1, BaseTuple, Tuple>();
 				return result.push<index>();
 			}

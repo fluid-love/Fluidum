@@ -9,7 +9,9 @@
 #include <memory>
 #include <cassert>
 
-namespace Fluidum::Utils::File {
+#include <boost/predef.h>
+
+namespace FU::File {
 
 	//get length of string(const char*)
 	_NODISCARD consteval std::size_t Strlen(const char* str) noexcept {
@@ -19,7 +21,7 @@ namespace Fluidum::Utils::File {
 	struct PathArg final {
 		template<std::size_t Size>
 		constexpr PathArg(const char(&path)[Size]) : ptr(path) {}
-		const char* const ptr;
+		const char* ptr;
 	};
 
 	template<PathArg FullPath, const std::size_t BackCount, PathArg AddPath>
@@ -37,13 +39,20 @@ namespace Fluidum::Utils::File {
 
 			for (std::size_t count = 0; count < BackCount; count++) {
 				for (int64_t i = fullPathSize - 1; i >= 0; i--) {
-					if (result.at(i) == '/') {
+#ifdef BOOST_OS_WINDOWS
+					if (result.at(i) == '/' || result.at(i) == '\\') {
 						result.at(i) = '\0';
 						break;
 					}
-					result.at(i) = '\0';
+#else 
+					if (result.at(i) == '/') {
+						result.at(i) = '\0';
+						break;
 				}
+#endif
+					result.at(i) = '\0';
 			}
+		}
 
 			for (uint32_t j = 0; j < addPathSize; j++) {
 				for (int32_t i = 0; i < result.size(); i++) {
@@ -57,7 +66,7 @@ namespace Fluidum::Utils::File {
 			assert(result.back() == '\0');
 
 			return result;
-		}
+	}
 
 	private:
 		//auto == std::array<char,size>
@@ -69,7 +78,7 @@ namespace Fluidum::Utils::File {
 		_NODISCARD constexpr operator const char* ()const noexcept {
 			return Path.data();
 		}
-	};
+};
 
 
 }

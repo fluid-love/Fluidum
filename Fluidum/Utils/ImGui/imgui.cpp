@@ -3,7 +3,7 @@
 #include <imgui_internal.h>
 #include <cmath>
 
-void Fluidum::Utils::ImGui::helpTooltip(const char* desc) {
+void FU::ImGui::helpTooltip(const char* desc) {
     ::ImGui::TextDisabled("(?)");
     if (::ImGui::IsItemHovered()) {
         ::ImGui::BeginTooltip();
@@ -14,7 +14,7 @@ void Fluidum::Utils::ImGui::helpTooltip(const char* desc) {
     }
 }
 
-void Fluidum::Utils::ImGui::exclamationTooltip(const char* desc) {
+void FU::ImGui::exclamationTooltip(const char* desc) {
     ::ImGui::TextDisabled("(!)");
     if (::ImGui::IsItemHovered()) {
         ::ImGui::BeginTooltip();
@@ -25,11 +25,11 @@ void Fluidum::Utils::ImGui::exclamationTooltip(const char* desc) {
     }
 }
 
-void Fluidum::Utils::ImGui::exclamationFadeTooltip(const ImVec2& pos, const char* desc) {
+void FU::ImGui::exclamationFadeTooltip(const ImVec2& pos, const char* desc) {
 
 }
 
-void Fluidum::Utils::ImGui::hoveredMarker(const char* desc) {
+void FU::ImGui::hoveredMarker(const char* desc) {
     if (::ImGui::IsItemHovered()) {
         ::ImGui::BeginTooltip();
         ::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
@@ -67,7 +67,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-bool Fluidum::Utils::ImGui::spinner(const char* label, float radius, float thickness, const ImU32& color) {
+bool FU::ImGui::spinner(const char* label, float radius, float thickness, const ImU32& color) {
     using namespace ::ImGui;
 
     ImGuiWindow* window = GetCurrentWindow();

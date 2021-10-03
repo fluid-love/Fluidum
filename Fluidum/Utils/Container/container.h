@@ -6,7 +6,7 @@
 
 #include "../Concept/concept.h"
 
-namespace Fluidum::Utils::Container {
+namespace FU::Container {
 
 	//sort ascending order -> erase duplicate elements
 	template<Concept::IsStdVector T>

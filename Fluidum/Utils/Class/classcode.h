@@ -2,7 +2,7 @@
 
 #include "../../../libraries/lithash/lithash.h"
 
-namespace Fluidum::Utils::Class {
+namespace FU::Class {
 
 	class ClassCode final {
 	public:

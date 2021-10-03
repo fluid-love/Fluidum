@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 
-namespace Fluidum::Utils::ImGui {
+namespace FU::ImGui {
 
 	void helpTooltip(const char* desc);
 

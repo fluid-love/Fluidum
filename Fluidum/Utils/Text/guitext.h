@@ -3,7 +3,7 @@
 #include <string>
 #include "../Class/class.h"
 
-namespace Fluidum::Utils::GuiText{
+namespace FU::GuiText{
 
 	class Text final {
 	public:

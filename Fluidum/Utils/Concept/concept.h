@@ -5,7 +5,7 @@
 #include <array>
 #include <vector>
 
-namespace Fluidum::Utils::Concept {
+namespace FU::Concept {
 
 
 	//remove all const

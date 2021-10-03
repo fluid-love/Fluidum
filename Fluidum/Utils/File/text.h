@@ -3,16 +3,16 @@
 #include "path.h"
 #include "../Concept/concept.h"
 
-namespace Fluidum::Utils::File {
+namespace FU::File {
 
-	template<PathArg Path, Concept::IsScopedEnum Enum>
+	template<const char* const Path, Concept::IsScopedEnum Enum>
 	class Text final {
 	private:
 		using UT = std::underlying_type_t<Enum>;
 
 	public:
 		Text(const UT index) {
-			std::ifstream ifs(Path.ptr, std::ios::in);
+			std::ifstream ifs(Path, std::ios::in);
 
 			if (!ifs)
 				throw std::runtime_error("Failed to open file.");
