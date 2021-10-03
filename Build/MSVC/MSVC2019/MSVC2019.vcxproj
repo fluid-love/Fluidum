@@ -19,6 +19,35 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Fluidum\Data\Coding\tab.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Common\common.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Common\resource.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\color.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\layout.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\text.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Log\console.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Log\log.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Log\type.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\project.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\selectproject.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Scene\scene.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Scene\window.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Api\api.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Api\using.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Common\define.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Common\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Common\messenger.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Common\mutex.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Common\resource.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Exception\exception.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Vulkan\Base\base.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Vulkan\Base\mainloop.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Vulkan\Image\imgui_image.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Vulkan\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Source\Vulkan\Initialization\initialize.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\exception.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\info.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\manager.h" />
@@ -37,7 +66,6 @@
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\commands.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\element.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\commandtype.h" />
-    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\define.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\fkm.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\fvktype.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Common\include.h" />
@@ -51,6 +79,7 @@
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Data\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorpool.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorset.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorsetlayout.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\updatedescriptorset.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Draw\draw.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Exception\exception.h" />
@@ -61,7 +90,7 @@
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\texture.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\backend.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\image.h" />
-    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\imgui.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\fluidum_imgui.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Instance\instance.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Instance\messenger.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Key\converter.h" />
@@ -83,14 +112,51 @@
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\PhysicalDevice\physicaldevice.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\graphicspipeline.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\graphicspipelinelayout.h" />
+    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\shadermodule.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\RenderPass\renderpass.h" />
-    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\RenderPass\shadermodule.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Sync\fence.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Sync\semaphore.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\glfw.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\surface.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\swapchain.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\window.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\Data\manager.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\Data\type.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\Scene\base.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\Scene\exception.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\Scene\manager.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\Scene\scene.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\Scene\type.h" />
+    <ClInclude Include="..\..\..\Fluidum\Manager\Scene\using.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Left\leftbar.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Credit\credit.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\menubar.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\newproject.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Status\statusbar.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Check\check.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Log\log.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\type.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\select.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Tab\tab.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Common\common.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Common\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Common\resource.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Common\using.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Left\layout.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Right\layout.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Title\title.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\FSpopupselect.h" />
+    <ClInclude Include="..\..\..\Fluidum\TextEditor\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\TextEditor\Source\texteditor.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Class\class.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Class\classcode.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Concept\concept.h" />
@@ -108,6 +174,18 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\Tuple\tuple.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Fluidum\Data\Coding\tab.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\color.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\layout.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\text.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Log\log.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\project.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Scene\scene.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Scene\window.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\Source\Api\api.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\Source\Vulkan\Base\mainloop.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\Source\Vulkan\Image\imgui_image.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\Source\Vulkan\Initialization\initialize.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\exception.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\info.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\type.cpp" />
@@ -121,9 +199,9 @@
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\vertexbuffer.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\CommandPool\commandpool.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\commands.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Command\drawcommand.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorpool.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorset.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorsetlayout.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\updatedescriptorset.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Draw\draw.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Exception\exception.cpp" />
@@ -134,7 +212,7 @@
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\texture.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\backend.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\image.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\imgui.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\ImGui\fluidum_imgui.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Instance\instance.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Instance\messenger.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\LogicalDevice\devicememory.cpp" />
@@ -144,8 +222,8 @@
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\PhysicalDevice\physicaldevice.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\graphicspipeline.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\graphicspipelinelayout.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Pipeline\shadermodule.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\RenderPass\renderpass.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\RenderPass\shadermodule.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Sync\fence.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Sync\semaphore.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\glfw.cpp" />
@@ -153,15 +231,40 @@
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\swapchain.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\window.cpp" />
     <ClCompile Include="..\..\..\Fluidum\main.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Left\leftbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Credit\credit.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\menubar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\newproject.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Status\statusbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Check\check.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.SleepMilliSeconds.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.SleepSeconds.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.Terminate.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\select.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Tab\tab.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Left\layout.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Right\layout.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Title\title.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\TextEditor\Source\texteditor.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\imgui.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\operator.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\Log\messenger.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\Text\guitext.cpp" />
+    <ClCompile Include="..\..\..\Libraries\ImGuiColorTextEdit\TextEditor.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\Libraries\imgui\misc\freetype\imgui_freetype.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -231,18 +334,18 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/boost/libs/predef/include;../../../Libraries/freetype-2.10.0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;../../../Libraries/Vulkan-Headers/lib;../../../Libraries/freetype-2.10.0/objs;../../../Libraries/lua-5.4.3/lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;LuaBuild.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -251,10 +354,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/boost/libs/predef/include;../../../Libraries/freetype-2.10.0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -263,25 +366,25 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;../../../Libraries/Vulkan-Headers/lib;../../../Libraries/freetype-2.10.0/objs;../../../Libraries/lua-5.4.3/lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;LuaBuild.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/boost/libs/predef/include;../../../Libraries/freetype-2.10.0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;../../../Libraries/Vulkan-Headers/lib;../../../Libraries/freetype-2.10.0/objs;../../../Libraries/lua-5.4.3/lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;LuaBuild.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -290,10 +393,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/boost/libs/predef/include;../../../Libraries/freetype-2.10.0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -302,8 +405,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions> %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;../../../Libraries/Vulkan-Headers/lib;../../../Libraries/freetype-2.10.0/objs;../../../Libraries/lua-5.4.3/lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;LuaBuild.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

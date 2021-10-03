@@ -1,0 +1,10 @@
+github https://github.com/google/material-design-icons
+
+web https://fonts.google.com/icons?selected=Material+Icons
+
+ライセンスは「Apache License, Version 2.0」です．
+
+ライセンス条文(Japanese , English)
+・https://www.apache.org/licenses/LICENSE-2.0
+・https://licenses.opensource.jp/Apache-2.0/Apache-2.0.html
+
