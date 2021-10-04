@@ -121,7 +121,9 @@ namespace FS {
 		Fluidum_Lua_Api Ret sleepMilliSeconds(State L);
 
 		//終了させる
+FluidumUtils_Debug_BeginDisableWarning(4646)
 		Fluidum_Lua_Api [[noreturn]] Ret terminate(State L);
+FluidumUtils_Debug_EndDisableWarning
 
 		//private:
 		//	FLUIDUM_LUA_API Ret create_Piano(State L);

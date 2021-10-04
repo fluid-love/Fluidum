@@ -2,6 +2,6 @@
 
 #include "resource.h"
 
-namespace FS::Internal {
+namespace FS {
 	inline ::FD::LogWrite GLog{};
 }

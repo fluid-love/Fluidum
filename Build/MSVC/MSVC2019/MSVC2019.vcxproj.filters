@@ -397,7 +397,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.h">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\FSpopupselect.h">
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.h">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Left\layout.h">
@@ -459,6 +459,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Log\log.h">
       <Filter>Fluidum\Scene\Calc\Lua\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\message.h">
+      <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -994,6 +997,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Libraries\ImGuiColorTextEdit\TextEditor.cpp">
       <Filter>Libraries\ImGuiColorTextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\message.cpp">
+      <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

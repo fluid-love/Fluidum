@@ -3,7 +3,7 @@
 FS::LeftLayout::LeftLayout(const FD::LayoutRead* const layoutRead, FD::LayoutWrite* const layoutWrite, const FD::GuiRead* const guiRead, FD::GuiWrite* const guiWrite)
 	: layoutRead(layoutRead), layoutWrite(layoutWrite), guiRead(guiRead), guiWrite(guiWrite)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct LeftLayuotScene.");
+	GLog.add<FD::Log::Type::None>("Construct LeftLayuotScene.");
 
 	style.windowPos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() };
 	style.windowSize = { guiRead->windowSize().x / 4.0f,guiRead->windowSize().y - style.windowPos.y };
@@ -14,7 +14,7 @@ FS::LeftLayout::LeftLayout(const FD::LayoutRead* const layoutRead, FD::LayoutWri
 
 FS::LeftLayout::~LeftLayout() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct LeftLayuotScene.");
+		GLog.add<FD::Log::Type::None>("Destruct LeftLayuotScene.");
 	}
 	catch (const std::exception& e) {
 		try {

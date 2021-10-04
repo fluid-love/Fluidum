@@ -3,7 +3,7 @@
 FS::StatusBar::StatusBar(const FD::GuiRead* const guiRead)
 	: guiRead(guiRead)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct StatusBarScene.");
+	GLog.add<FD::Log::Type::None>("Construct StatusBarScene.");
 
 	//style èâä˙âª
 	style.taskIcon = ImGui::CalcTextSize(text.task).x;
@@ -23,7 +23,7 @@ FS::StatusBar::StatusBar(const FD::GuiRead* const guiRead)
 
 FS::StatusBar::~StatusBar() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct StatusBarScene.");
+		GLog.add<FD::Log::Type::None>("Destruct StatusBarScene.");
 	}
 	catch (const std::exception& e) {
 		try {

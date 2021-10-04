@@ -16,7 +16,7 @@ FS::TitleBar::TitleBar(
 	windowRead(windowRead),
 	sceneRead(sceneRead)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct TitleBarScene.");
+	GLog.add<FD::Log::Type::None>("Construct TitleBarScene.");
 
 
 	style.windowPos = ImVec2(guiRead->windowSize().x * 0.91f, 0.0f);
@@ -35,7 +35,7 @@ FS::TitleBar::TitleBar(
 
 FS::TitleBar::~TitleBar() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct TitleBarScene.");
+		GLog.add<FD::Log::Type::None>("Destruct TitleBarScene.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -115,11 +115,11 @@ void FS::TitleBar::bar() {
 	bool close = ImGui::Button(ICON_MD_CLOSE, style.buttonSize);
 
 	if (minimize) {
-		Internal::GLog.add<FD::Log::Type::None>("Request MinimizeWindow.");
+		GLog.add<FD::Log::Type::None>("Request MinimizeWindow.");
 		FDR::minimizeWindow();
 	}
 	else if (close) {
-		Internal::GLog.add<FD::Log::Type::None>("Request Terminate.");
+		GLog.add<FD::Log::Type::None>("Request Terminate.");
 		*windowWrite->getCloseFlag() = true;
 	}
 

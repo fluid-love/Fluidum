@@ -3,13 +3,13 @@
 FS::Internal::Coding::Tab::Tab(const FD::ProjectRead* const projectRead)
 	: projectRead(projectRead)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct Coding::TabScene.");
+	GLog.add<FD::Log::Type::None>("Construct Coding::TabScene.");
 
 }
 
 FS::Internal::Coding::Tab::~Tab() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct Coding::TabScene.");
+		GLog.add<FD::Log::Type::None>("Destruct Coding::TabScene.");
 	}
 	catch (const std::exception& e) {
 		try {

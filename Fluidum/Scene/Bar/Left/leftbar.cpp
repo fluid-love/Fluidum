@@ -15,7 +15,7 @@ FS::LeftBar::LeftBar(
 	std::vector<FDR::ImGuiImage>&& images
 ) : projectRead(projectRead), guiRead(guiRead), sceneRead(sceneRead), images(images)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
+	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
 
 
 	const auto windowSizeX = guiRead->windowSize().x * 0.03f;
@@ -34,7 +34,7 @@ FS::LeftBar::LeftBar(
 
 FS::LeftBar::~LeftBar() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct MenuBarScene.");
+		GLog.add<FD::Log::Type::None>("Destruct MenuBarScene.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -161,25 +161,25 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 		this->addCodingScene();
 	}
 	else {
-		Internal::GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
 		abort();
 	}
 }
 
 void FS::LeftBar::addCodingScene() {
 	//画像のロード
-	std::string path = Internal::Resource::LeftBarIconsFilePath;
+	std::string path = Resource::LeftBarIconsFilePath;
 	path += "tab.png";
 	sub.codingImages = { FDR::createImGuiImage(path.c_str()) };
 
 	//現在のプロジェクトにmainファイルがない
 	if (projectRead->getMainCodeFilePath().empty()) {
-		Internal::GLog.add<FD::Log::Type::None>("Main file is empty.");
-		Internal::GLog.add<FD::Log::Type::None>("Request add CodingSelectScene.");
+		GLog.add<FD::Log::Type::None>("Main file is empty.");
+		GLog.add<FD::Log::Type::None>("Request add CodingSelectScene.");
 		Scene::addScene<CodingSelect>();
 	}
 	else {
-		Internal::GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");
+		GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");
 		Scene::addScene<TextEditor>(projectRead->getMainCodeFilePath());
 	}
 }
@@ -188,11 +188,11 @@ void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 	if (code == Internal::MainScenes[0]) {
 		//画像の開放
 		sub.codingImages = std::nullopt;
-		Internal::GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
+		GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
 		Scene::deleteScene<CodingSelect>();
 	}
 	else {
-		Internal::GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
 		abort();
 	}
 }

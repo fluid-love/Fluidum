@@ -4,7 +4,7 @@
 
 using namespace FU::ImGui::Operators;
 
-namespace FS::Internal::Bar {
+namespace FS::Bar::Internal {
 	std::vector<FDR::ImGuiImage> makeImages() {
 		std::vector<FDR::ImGuiImage> result;
 		for (uint16_t i = 0; i < 5; i++) {
@@ -18,7 +18,7 @@ namespace FS::Internal::Bar {
 
 }
 
-FS::NewProject::NewProject(
+FS::Bar::NewProject::NewProject(
 	const FD::SceneRead* const sceneRead,
 	FD::WindowWrite* const windowWrite,
 	const FD::GuiRead* const guiRead,
@@ -28,7 +28,7 @@ FS::NewProject::NewProject(
 	windowWrite(windowWrite),
 	guiRead(guiRead),
 	guiWrite(guiWrite),
-	images(Internal::Bar::makeImages()),
+	images(Internal::makeImages()),
 	emptyTemplates({
 			ButtonInfo{images.at(0), "_Empty", text.empty, text.emptyDescription},
 			ButtonInfo{images.at(1), "_ELua", text.emptyLua, text.emptyLuaDescription},
@@ -40,7 +40,7 @@ FS::NewProject::NewProject(
 		})
 
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct NewProjectScene.");
+	GLog.add<FD::Log::Type::None>("Construct NewProjectScene.");
 
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
@@ -48,16 +48,16 @@ FS::NewProject::NewProject(
 
 	style.buttonSize = ImVec2(style.windowSize.x / 2.2f, style.windowSize.y * 0.09f);
 
-	Internal::GLog.add<FD::Log::Type::None>("Request PopupBackWindowScene.");
+	GLog.add<FD::Log::Type::None>("Request PopupBackWindowScene.");
 	Scene::addScene<PopupBackWindow>();
 }
 
-FS::NewProject::~NewProject() noexcept {
+FS::Bar::NewProject::~NewProject() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Request delete PopupBackWindowScene.");
+		GLog.add<FD::Log::Type::None>("Request delete PopupBackWindowScene.");
 		Scene::deleteScene<PopupBackWindow>();
 
-		Internal::GLog.add<FD::Log::Type::None>("Destruct NewProjectScene.");
+		GLog.add<FD::Log::Type::None>("Destruct NewProjectScene.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -73,9 +73,9 @@ FS::NewProject::~NewProject() noexcept {
 	}
 }
 
-void FS::NewProject::call() {
+void FS::Bar::NewProject::call() {
 
-	if (!sceneRead->isExist<Internal::Bar::ProjectForm>())
+	if (!sceneRead->isExist<ProjectForm>())
 		ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);
@@ -109,7 +109,7 @@ void FS::NewProject::call() {
 	ImGui::PopStyleVar(3);
 }
 
-void FS::NewProject::title() {
+void FS::Bar::NewProject::title() {
 	ImGui::BeginChild("NPtitle", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.07f));
 	ImGui::SetWindowFontScale(1.7f);
 
@@ -127,7 +127,7 @@ void FS::NewProject::title() {
 	ImGui::EndChild();
 }
 
-void FS::NewProject::recent() {
+void FS::Bar::NewProject::recent() {
 
 	ImGui::BeginChild("Recent", ImVec2(style.windowSize.x / 2.5f, style.windowSize.y / 2.0f));
 
@@ -146,7 +146,7 @@ void FS::NewProject::recent() {
 	ImGui::EndChild();
 }
 
-void FS::NewProject::select() {
+void FS::Bar::NewProject::select() {
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
@@ -173,7 +173,7 @@ void FS::NewProject::select() {
 	ImGui::PopStyleVar(2);
 }
 
-void FS::NewProject::filter() {
+void FS::Bar::NewProject::filter() {
 	int32_t layoutIndex = 0;
 
 	constexpr const char* icons[] = { ICON_MD_INBOX" ",ICON_FA_DNA"  " };
@@ -201,7 +201,7 @@ void FS::NewProject::filter() {
 	}
 }
 
-void FS::NewProject::buttons() {
+void FS::Bar::NewProject::buttons() {
 
 	ImGui::BulletText(text.empty);
 	for (auto& x : emptyTemplates) {
@@ -217,15 +217,15 @@ void FS::NewProject::buttons() {
 
 }
 
-void FS::NewProject::formScene(const bool isButtonClicked, const char* type) {
+void FS::Bar::NewProject::formScene(const bool isButtonClicked, const char* type) {
 	if (!isButtonClicked)
 		return;
 
-	Internal::GLog.add<FD::Log::Type::None>("Request add ProjectFromScene.");
-	Scene::addScene<Internal::Bar::ProjectForm>(type);
+	GLog.add<FD::Log::Type::None>("Request add ProjectFromScene.");
+	Scene::addScene<ProjectForm>(type);
 }
 
-void FS::NewProject::bottom() {
+void FS::Bar::NewProject::bottom() {
 
 	const ImVec2 buttonSize = ImVec2(ImGui::GetWindowSize().x * 0.2f, 0.0f);
 
@@ -235,7 +235,7 @@ void FS::NewProject::bottom() {
 		ImGui::CloseCurrentPopup();//popupを終了	
 
 		//PopupBackWindowはデストラクタで削除
-		Internal::GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
+		GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
 		Scene::deleteScene<NewProject>();
 
 	}
@@ -245,7 +245,7 @@ void FS::NewProject::bottom() {
 }
 
 #include <imgui_internal.h>
-bool FS::NewProject::button(const FDR::ImGuiImage& image, const char* label, const char* title, const char* description) {
+bool FS::Bar::NewProject::button(const FDR::ImGuiImage& image, const char* label, const char* title, const char* description) {
 	ImGui::BeginChild(label, style.buttonSize, true);
 
 	const ImVec2 dummy = { 0.0f, style.buttonSize.y * 0.12f };

@@ -1,12 +1,13 @@
 #include "projectform.h"
 #include "../../../Utils/Popup/popupselect.h"
 #include "../../../Utils/Popup/backwindow.h"
+#include "../../../Utils/Popup/message.h"
 #include "../../../Title/title.h"
 #include "newproject.h"
 
 using namespace FU::ImGui::Operators;
 
-FS::Internal::Bar::ProjectForm::ProjectForm(
+FS::Bar::ProjectForm::ProjectForm(
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
 	const FD::GuiRead* const guiRead,
@@ -14,7 +15,7 @@ FS::Internal::Bar::ProjectForm::ProjectForm(
 )
 	: projectWrite(projectWrite), projectRead(projectRead), guiRead(guiRead), projectType(projectType)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct ProjectFormScene.");
+	GLog.add<FD::Log::Type::None>("Construct ProjectFormScene.");
 
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
@@ -29,9 +30,15 @@ FS::Internal::Bar::ProjectForm::ProjectForm(
 
 }
 
-FS::Internal::Bar::ProjectForm::~ProjectForm() noexcept {
+FS::Bar::ProjectForm::~ProjectForm() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct ProjectFormScene.");
+		GLog.add<FD::Log::Type::None>("Destruct ProjectFormScene.");
+
+		GLog.add<FD::Log::Type::None>("Request trydelete Utils::MessageScene.");
+		if (Scene::tryDeleteScene<Utils::Message>())
+			GLog.add<FD::Log::Type::None>("Delete Utils::MessageScene. Scene::tryDelete() == true");
+		else
+			GLog.add<FD::Log::Type::None>("Utils::MessageScene does not exist. Scene::tryDelete() == false.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -47,7 +54,7 @@ FS::Internal::Bar::ProjectForm::~ProjectForm() noexcept {
 	}
 }
 
-void FS::Internal::Bar::ProjectForm::call() {
+void FS::Bar::ProjectForm::call() {
 
 	ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
@@ -83,7 +90,7 @@ void FS::Internal::Bar::ProjectForm::call() {
 	ImGui::PopStyleVar(3);
 }
 
-void FS::Internal::Bar::ProjectForm::title() {
+void FS::Bar::ProjectForm::title() {
 	ImGui::BeginChild("Title1", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.07f));
 	ImGui::SetWindowFontScale(1.7f);
 	ImGui::Text(projectType.c_str());
@@ -101,20 +108,21 @@ void FS::Internal::Bar::ProjectForm::title() {
 
 }
 
-void FS::Internal::Bar::ProjectForm::folderPath() {
+void FS::Bar::ProjectForm::folderPath() {
 	ImGui::Text(text.folderPath);
-	ImGui::InputText("##ppath", folderPathStr.data(), folderPathStr.capacity());
-
+	bool input = ImGui::InputText("##ppath", folderPathStr.data(), folderPathStr.capacity());
+	pos.projectFolder = ImGui::GetItemRectMin();
 }
 
-void FS::Internal::Bar::ProjectForm::projectName() {
+void FS::Bar::ProjectForm::projectName() {
 	ImGui::Spacing(); ImGui::Spacing();
 
 	ImGui::Text(text.projectName);
 	ImGui::InputText("##pname", projectNameStr.data(), projectNameStr.capacity());
+	pos.projectName = ImGui::GetItemRectMin();
 }
 
-void FS::Internal::Bar::ProjectForm::bottom() {
+void FS::Bar::ProjectForm::bottom() {
 	ImGui::Dummy({ 0.0f,(style.windowPos.y + style.windowSize.y) - style.innerPosHeight - 50.0f });
 	ImGui::BeginChild("Bottom");
 
@@ -122,7 +130,7 @@ void FS::Internal::Bar::ProjectForm::bottom() {
 
 	//戻る
 	if (ImGui::Button(text.back, buttonSize)) {
-		Internal::GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
+		GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
 		Scene::deleteScene<ProjectForm>();//シーンを消す
 	}
 
@@ -131,25 +139,27 @@ void FS::Internal::Bar::ProjectForm::bottom() {
 	//キャンセルボタン　赤字
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::Button(text.cancel, buttonSize)) {
-		Internal::GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
+		GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
 		Scene::deleteScene<ProjectForm>();
-		Internal::GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
-		Scene::deleteScene<NewProject>();
+		GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
+		Scene::deleteScene<Bar::NewProject>();
 	}
 	ImGui::PopStyleColor();
 
 	ImGui::SameLine();
 
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.7f, 0.1f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.35f, 0.02f, 1.0f));
 	if (ImGui::Button(text.create, buttonSize)) {//作成ボタン
+		pos.create = ImGui::GetItemRectMin();
+
 		bool success = this->createProject();
 		if (success) {
-			Internal::GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
+			GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
 			Scene::deleteScene<ProjectForm>();
-			Internal::GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
-			Scene::deleteScene<NewProject>();
+			GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
+			Scene::deleteScene<Bar::NewProject>();
 			//TitleSceneで追加されたらTitleを消しておく
-			Internal::GLog.add<FD::Log::Type::None>("try delete TitleScene.");
+			GLog.add<FD::Log::Type::None>("try delete TitleScene.");
 			Scene::tryDeleteScene<Title>();
 		}
 	}
@@ -158,25 +168,28 @@ void FS::Internal::Bar::ProjectForm::bottom() {
 	ImGui::EndChild();
 }
 
-bool FS::Internal::Bar::ProjectForm::createProject() {
-	//error表示はまた実装する．
-
+bool FS::Bar::ProjectForm::createProject() {
 	//現在のプロジェクトが保存されていない場合は
 	//保存して作成　保存せずに作成　キャンセル　
 	if (projectRead->isDataChanged()) {
-		Internal::GLog.add<FD::Log::Type::None>("Request add PopupSelectScene.");
+		GLog.add<FD::Log::Type::None>("Request add PopupSelectScene.");
 		Scene::addScene<PopupSelect>(Utils::PopupSelectIconType::Warning, text.notSaved, text.cancel, text.createWithoutSaving, text.saveAndCreate);
 
 		return false;
 	}
+	std::cout << std::boolalpha << std::string(folderPathStr.c_str()).empty();
 
 	//チェック
 	if (std::string(folderPathStr.c_str()).empty()) {
-		Internal::GLog.add<FD::Log::Type::None>("Failed to create new project. Folder path is empty.");
+		GLog.add<FD::Log::Type::None>("Failed to create new project. Folder path is empty.");
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.projectFolder);
 		return false;
 	}
 	if (std::string(projectNameStr.c_str()).empty()) {
-		Internal::GLog.add<FD::Log::Type::None>("Failed to create new project. Project name is empty.");
+		GLog.add<FD::Log::Type::None>("Failed to create new project. Project name is empty.");
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.projectName);
 		return false;
 	}
 
@@ -185,22 +198,25 @@ bool FS::Internal::Bar::ProjectForm::createProject() {
 	info.projectFolderPath = folderPathStr.c_str();
 	info.projectName = projectNameStr.c_str();
 
-	Internal::GLog.add<FD::Log::Type::None>("Request create new project. Project name \"{}\". Project folder path \"{}\".", projectNameStr.c_str(), folderPathStr.c_str());
+	GLog.add<FD::Log::Type::None>("Request create new project. Project name \"{}\". Project folder path \"{}\".", projectNameStr.c_str(), folderPathStr.c_str());
 	try {
 		projectWrite->createNewProject(info);
 	}
 	catch (const FD::Project::ExceptionType type) {
-		Internal::GLog.add<FD::Log::Type::None>("Failed to create new project. Project name \"{}\". Project folder path \"{}\".", projectNameStr.c_str(), folderPathStr.c_str());
+		GLog.add<FD::Log::Type::None>("Failed to create new project. Project name \"{}\". Project folder path \"{}\".", projectNameStr.c_str(), folderPathStr.c_str());
 
 		//既に存在している(同じ名前のフォルダが存在する)
-		if (type == FD::Project::ExceptionType::AlreadyProjectFolderExist)
+		if (type == FD::Project::ExceptionType::AlreadyProjectFolderExist) {
+			GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+			Scene::addScene<Utils::Message>(text.error_emptyForm, pos.create);
 			return false;
+		}
 		else {
-			Internal::GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
 			abort();
 		}
 	}
 
-	Internal::GLog.add<FD::Log::Type::None>("Create new project. Project name \"{}\". Project folder path \"{}\".", projectNameStr, folderPathStr);
+	GLog.add<FD::Log::Type::None>("Create new project. Project name \"{}\". Project folder path \"{}\".", projectNameStr, folderPathStr);
 	return true;
 }

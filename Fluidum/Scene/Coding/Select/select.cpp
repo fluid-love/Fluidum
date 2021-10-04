@@ -4,11 +4,11 @@
 
 using namespace FU::ImGui::Operators;
 
-FS::CodingSelect::CodingSelect(const FD::ProjectRead* const projectRead, FD::ProjectWrite* const projectWrite, const FD::GuiRead* const guiRead, FD::GuiWrite* const guiWrite)
-	: projectRead(projectRead), projectWrite(projectWrite), guiRead(guiRead), guiWrite(guiWrite),
-	newImage(FDR::createImGuiImage(Internal::Resource::CodingNewFilePath)), openImage(FDR::createImGuiImage(Internal::Resource::CodingOpenFilePath))
+FS::CodingSelect::CodingSelect(const FD::ProjectRead* const projectRead, FD::ProjectWrite* const projectWrite, const FD::GuiRead* const guiRead)
+	: projectRead(projectRead), projectWrite(projectWrite), guiRead(guiRead),
+	newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::createImGuiImage(Resource::CodingOpenFilePath))
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct CodingSelectScene.");
+	GLog.add<FD::Log::Type::None>("Construct CodingSelectScene.");
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
@@ -28,7 +28,7 @@ FS::CodingSelect::CodingSelect(const FD::ProjectRead* const projectRead, FD::Pro
 
 FS::CodingSelect::~CodingSelect() {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct CodingSelectScene.");
+		GLog.add<FD::Log::Type::None>("Destruct CodingSelectScene.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -317,7 +317,7 @@ void FS::CodingSelect::bottom() {
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::Button(text.cancel, buttonSize)) {
 		ImGui::CloseCurrentPopup();//popupを終了	
-		Internal::GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
+		GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
 		Scene::deleteScene<CodingSelect>();//シーンを消す
 	}
 	ImGui::PopStyleColor();
@@ -335,9 +335,9 @@ void FS::CodingSelect::bottom() {
 		if (checkQuickInfo()) {//問題なし
 			this->createNewFileQuick();
 			ImGui::CloseCurrentPopup();//popupを終了			
-			Internal::GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
+			GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
 			Scene::deleteScene<CodingSelect>();//シーンを消す
-			Internal::GLog.add<FD::Log::Type::None>("Request add CodingScene.");
+			GLog.add<FD::Log::Type::None>("Request add CodingScene.");
 			Scene::addScene<TextEditor>();
 		}
 	}
@@ -420,38 +420,38 @@ void FS::CodingSelect::createNewFileQuick() {
 	else
 		abort();
 
-	Internal::GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
+	GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
 	projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
 }
 
 bool FS::CodingSelect::checkQuickInfo() {
-	Internal::GLog.add<FD::Log::Type::None>("Check QuickInfo.");
+	GLog.add<FD::Log::Type::None>("Check QuickInfo.");
 
 	tryAddSlash(quickInfo.folderPath);
 	auto [err, path] = checkFile(quickInfo.folderPath, quickInfo.fileName, quickInfo.extension);
 
 	//問題なければtrue
 	if (err == ErrorType::None) {
-		Internal::GLog.add<FD::Log::Type::None>("QuickInfo NoError.");
+		GLog.add<FD::Log::Type::None>("QuickInfo NoError.");
 		quickInfo.fullPath = std::move(path);
 		return true;
 	}
 
 	//問題があれば問題に応じた文字を出す
 	if (err == ErrorType::EmptyFolderPath) {
-		Internal::GLog.add<FD::Log::Type::None>("Error EmptyFolderPath.");
+		GLog.add<FD::Log::Type::None>("Error EmptyFolderPath.");
 		error.errorPopupMessage = text.error_emptyForm;
 	}
 	else if (err == ErrorType::EmptyFileName) {
-		Internal::GLog.add<FD::Log::Type::None>("Error EmptyFileName.");
+		GLog.add<FD::Log::Type::None>("Error EmptyFileName.");
 		error.errorPopupMessage = text.error_emptyForm;
 	}
 	else if (err == ErrorType::NotFound) {
-		Internal::GLog.add<FD::Log::Type::None>("Error NotFoundDirectory. Typed directory is {}.", quickInfo.folderPath);
+		GLog.add<FD::Log::Type::None>("Error NotFoundDirectory. Typed directory is {}.", quickInfo.folderPath);
 		error.errorPopupMessage = text.error_notFoundDirectory;
 	}
 	else if (err == ErrorType::AlreadyExist) {
-		Internal::GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", quickInfo.fileName, path);
+		GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", quickInfo.fileName, path);
 		error.errorPopupMessage = text.error_notFoundDirectory;
 	}
 	return false;

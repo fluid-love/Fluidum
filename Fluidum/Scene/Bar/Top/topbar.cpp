@@ -11,7 +11,7 @@ FS::TopBar::TopBar(
 )
 	: projectRead(projectRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct TopBarScene.");
+	GLog.add<FD::Log::Type::None>("Construct TopBarScene.");
 
 	style.windowPos = ImVec2(0.0f, guiRead->menuBarHeight());
 	const float windowHeight = guiRead->menuBarHeight();
@@ -30,7 +30,7 @@ FS::TopBar::TopBar(
 
 FS::TopBar::~TopBar() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct TopBarScene.");
+		GLog.add<FD::Log::Type::None>("Destruct TopBarScene.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -255,7 +255,7 @@ void FS::TopBar::run() {
 
 	}
 	else if (type == Lua) {
-		Internal::GLog.add<FD::Log::Type::None>("Request add LuaCalcScene.");
+		GLog.add<FD::Log::Type::None>("Request add LuaCalcScene.");
 		Scene::addAsyncScene<LuaCalc>();
 	}
 	else if (type == Python) {

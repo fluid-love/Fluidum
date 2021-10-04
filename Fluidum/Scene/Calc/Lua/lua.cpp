@@ -4,12 +4,12 @@ FS::LuaCalc::LuaCalc(const FD::ProjectRead* const projectread)
 	: projectread(projectread), state(luaL_newstate())
 {
 	assert(this->state);
-	Internal::GLog.add<FD::Log::Type::None>("Construct LuaCalcScene.");
+	GLog.add<FD::Log::Type::None>("Construct LuaCalcScene.");
 }
 
 FS::LuaCalc::~LuaCalc() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct LuaCalcScene.");
+		GLog.add<FD::Log::Type::None>("Destruct LuaCalcScene.");
 
 		this->terminate();
 	}
@@ -40,14 +40,14 @@ void FS::LuaCalc::call() {
 	auto error = luaL_loadfile(state, "C:/FluidumSceneDetails/FluidumSceneLua/test/test.lua");
 
 	if (error != LUA_OK) {//文法errorなど
-		assert(lua_isstring(state, -1) == true);
+		assert(lua_isstring(state, -1));
 		assert(error == LUA_ERRSYNTAX);
 
-		Internal::GLog.add<FD::Log::Type::None>("Syntax error: {}.", luaL_tolstring(state, -1, nullptr));
+		GLog.add<FD::Log::Type::None>("Syntax error: {}.", luaL_tolstring(state, -1, nullptr));
 	}
 	else {//エラーがなければ
 
-		Internal::GLog.add<FD::Log::Type::None>("lua_pcall().");
+		GLog.add<FD::Log::Type::None>("lua_pcall().");
 
 		//実行
 		try {
@@ -55,12 +55,12 @@ void FS::LuaCalc::call() {
 		}
 		catch (std::exception& e) {//実行時エラー
 			//errorだが内部エラーではないのでType::Logで記録
-			Internal::GLog.add<FD::Log::Type::None>("LuaError: {}.", e.what());
+			GLog.add<FD::Log::Type::None>("LuaError: {}.", e.what());
 		}
 
 	}
 
-	Internal::GLog.add<FD::Log::Type::None>("Request delete LuaCalcScene.");
+	GLog.add<FD::Log::Type::None>("Request delete LuaCalcScene.");
 	Scene::deleteAsyncScene<LuaCalc>();
 }
 
@@ -158,7 +158,7 @@ void FS::LuaCalc::terminate() {
 	lua_pop(state, num);
 	lua_close(state);
 
-	Internal::GLog.add<FD::Log::Type::None>("Close Lua.");
+	GLog.add<FD::Log::Type::None>("Close Lua.");
 
 }
 //

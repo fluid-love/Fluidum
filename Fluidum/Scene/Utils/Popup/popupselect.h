@@ -26,7 +26,7 @@ namespace FS {
 			buttonLabels({ buttonLabels... }),
 			image(createImage(type))
 		{
-			Internal::GLog.add<FD::Log::Type::None>("Construct PopupSelectScene.");
+			GLog.add<FD::Log::Type::None>("Construct PopupSelectScene.");
 
 			this->init();
 

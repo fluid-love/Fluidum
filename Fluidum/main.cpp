@@ -3,10 +3,7 @@
 std::unique_ptr<FS::MainFluidumScene> GScene = nullptr;
 
 void loop() {
-	//ImGui::Begin("");
-	//
-	//ImGui::End();
-	//GScene->call();
+	GScene->call();
 }
 
 void callback(const std::string& m) {
@@ -14,7 +11,6 @@ void callback(const std::string& m) {
 }
 
 int main() {
-
 	GScene = std::make_unique<FS::MainFluidumScene>();
 	try
 	{
@@ -31,5 +27,7 @@ int main() {
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what();
+		abort();
 	}
+	GScene.reset();
 }

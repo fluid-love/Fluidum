@@ -7,11 +7,19 @@ namespace FS {
 	class Title final : public Scene {
 	public:
 		explicit Title(
+			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
+			const FD::SceneRead* const sceneRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::GuiRead* const guiRead
 		);
-		void Constructor(FD::ProjectRead, FD::GuiWrite, FD::GuiRead);
+		void Constructor(
+			FD::ProjectWrite,
+			FD::ProjectRead,
+			FD::SceneRead,
+			FD::GuiWrite,
+			FD::GuiRead
+		);
 
 		~Title() noexcept;
 
@@ -21,7 +29,9 @@ namespace FS {
 		virtual void call() override;
 
 	private:
+		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
+		const FD::SceneRead* const sceneRead;
 		FD::GuiWrite* const guiWrite;
 		const FD::GuiRead* const guiRead;
 
@@ -30,6 +40,10 @@ namespace FS {
 	private:
 		std::once_flag once{};
 		const std::array<FD::Project::HistoryInfo, 50> recentProjectInfos;
+
+		struct {
+			ImVec2 open{};
+		}pos;
 
 	private:
 		//constructor‚Í‚Ü‚¾FluidumDraw‚Ì‰Šú‰»‚ªI‚í‚Á‚Ä‚È‚¢‚Ì‚Åƒ‹[ƒv“à‚Åˆê‰ñ‚¾‚¯‚æ‚Ô
@@ -44,7 +58,13 @@ namespace FS {
 		//select recent project
 		void selectProject();
 
+		void recentProject();
+
 		void newProject();
+		void openProjectButton();
+		void openProject(const char* filePath);
+		void documentLink();
+
 	private:
 
 		//1920~1080 title‰æ‘œ

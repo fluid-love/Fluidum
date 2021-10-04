@@ -64,7 +64,23 @@ FD::Internal::Text::Title::Title() {
 	this->newProject = data;
 
 	std::getline(ifs, data);
+	this->openProject = data;
+
+	std::getline(ifs, data);
 	this->document = data;
+
+	std::getline(ifs, data);
+	this->error_openProjectFile = data;
+
+	std::getline(ifs, data);
+	this->error_illegalFile = data;
+
+	std::getline(ifs, data);
+	this->error_brokenFile = data;
+
+	std::getline(ifs, data);
+	this->error_internal = data;
+
 
 }
 
@@ -357,6 +373,15 @@ FD::Internal::Text::ProjectForm::ProjectForm() {
 
 	std::getline(ifs, data);
 	this->createWithoutSaving = data;
+
+	std::getline(ifs, data);
+	this->error_emptyForm = data;
+
+	std::getline(ifs, data);
+	this->error_notFoundDirectory = data;
+
+	std::getline(ifs, data);
+	this->error_alreadyExist = data;
 
 }
 

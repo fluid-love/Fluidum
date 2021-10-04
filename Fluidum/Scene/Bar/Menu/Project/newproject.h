@@ -7,7 +7,7 @@ MenuBar->V‹Kì¬
 #include <unordered_map>
 #include "../../../Common/common.h"
 
-namespace FS {
+namespace FS::Bar {
 
 	class NewProject final : public Scene {
 	public:

@@ -4,7 +4,7 @@ using namespace FU::ImGui::Operators;
 
 FS::PopupSelect::~PopupSelect() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct PopupSelectScene.");
+		GLog.add<FD::Log::Type::None>("Destruct PopupSelectScene.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -75,9 +75,9 @@ void FS::PopupSelect::button() {
 	for (auto& x : buttonLabels) {
 		if (ImGui::Button(x, style.buttonSize)) {
 			ImGui::CloseCurrentPopup();
-			Internal::GLog.add<FD::Log::Type::None>("Pressed button. Label is {}.", x);
+			GLog.add<FD::Log::Type::None>("Pressed button. Label is {}.", x);
 
-			Internal::GLog.add<FD::Log::Type::None>("Request delete PopupSelectScene.");
+			GLog.add<FD::Log::Type::None>("Request delete PopupSelectScene.");
 			Scene::deleteScene<PopupSelect>();
 		}
 		ImGui::SameLine();
@@ -104,7 +104,7 @@ std::optional<FDR::ImGuiImage> FS::PopupSelect::createImage(const Utils::PopupSe
 		"warning.png"
 	};
 
-	std::string path = Internal::Resource::UtilsIconFolderPath;
+	std::string path = Resource::UtilsIconFolderPath;
 
 	using enum Utils::PopupSelectIconType;
 

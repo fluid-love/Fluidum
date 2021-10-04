@@ -19,7 +19,13 @@ namespace FD::Internal::Text {
 
 		GuiText recentProject;
 		GuiText newProject;
+		GuiText openProject;
 		GuiText document;
+
+		GuiText error_openProjectFile;
+		GuiText error_illegalFile;
+		GuiText error_brokenFile;
+		GuiText error_internal;
 
 	};
 
@@ -143,6 +149,12 @@ namespace FD::Internal::Text {
 		GuiText notSaved;
 		GuiText saveAndCreate;
 		GuiText createWithoutSaving;
+
+		GuiText error_emptyForm;
+		GuiText error_notFoundDirectory;
+		GuiText error_alreadyExist;
+
+
 
 	};
 

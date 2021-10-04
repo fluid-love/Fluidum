@@ -14,6 +14,12 @@
 //project
 #include "../Bar/Menu/Project/newproject.h"
 
+//utils
+#include "../Utils/Popup/message.h"
+
+//file dialog
+#include <nfd.h>
+
 namespace FS::Internal {
 	std::vector<FDR::ImGuiImage> createImages() {
 		//画像をセット
@@ -32,7 +38,7 @@ namespace FS::Internal {
 		std::vector<FDR::ImGuiImage> result{};
 
 		for (uint16_t i = 0; i < std::extent_v<decltype(imageFileNames), 0>; i++) {
-			std::string path = Internal::Resource::LeftBarIconsFilePath;
+			std::string path = Resource::LeftBarIconsFilePath;
 			path += imageFileNames[i];
 
 			result.emplace_back(FDR::createImGuiImage(path.c_str()));
@@ -54,17 +60,19 @@ void FS::Title::call() {
 }
 
 FS::Title::Title(
+	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
+	const FD::SceneRead* const sceneRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::GuiRead* const guiRead
-) : projectRead(projectRead), guiWrite(guiWrite), guiRead(guiRead), recentProjectInfos(projectRead->getProjectHistory())
+) : projectWrite(projectWrite), projectRead(projectRead), sceneRead(sceneRead), guiWrite(guiWrite), guiRead(guiRead), recentProjectInfos(projectRead->getProjectHistory())
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct TitleScene.");
+	GLog.add<FD::Log::Type::None>("Construct TitleScene.");
 }
 
 FS::Title::~Title() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct TitleScene.");
+		GLog.add<FD::Log::Type::None>("Destruct TitleScene.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -97,9 +105,8 @@ void FS::Title::writeGuiData() {
 	this->style.windowPos = centerPos - (style.imageHalfSize / 2.0f);
 	this->style.windowPos.y -= style.imageHalfSize.y / 10.0f;
 
-	this->image = FDR::createImGuiImage(Internal::Resource::TitleImageFilePath);
-	this->projectIcon = FDR::createImGuiImage(Internal::Resource::TitleBarIconFilePath);
-
+	this->image = FDR::createImGuiImage(Resource::TitleImageFilePath);
+	this->projectIcon = FDR::createImGuiImage(Resource::TitleBarIconFilePath);
 
 	this->leftBarImages = Internal::createImages();
 
@@ -110,25 +117,25 @@ void FS::Title::writeGuiData() {
 }
 
 void FS::Title::changeScene() {
-	if (!isSelectProjectHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-		Internal::GLog.add<FD::Log::Type::None>("Request delete TitleScene.");
+	if ((!isSelectProjectHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !sceneRead->isExist<Bar::NewProject>()) || !projectRead->isDefaultProject()) {
+		GLog.add<FD::Log::Type::None>("Request delete TitleScene.");
 		Scene::deleteScene<Title>();//このシーンを消す
 
 		//Barを追加
-		Internal::GLog.add<FD::Log::Type::None>("Request add MenuBarScene.");
+		GLog.add<FD::Log::Type::None>("Request add MenuBarScene.");
 		Scene::addScene<MenuBar>();
-		Internal::GLog.add<FD::Log::Type::None>("Request add StatusBarScene.");
+		GLog.add<FD::Log::Type::None>("Request add StatusBarScene.");
 		Scene::addScene<StatusBar>();
-		Internal::GLog.add<FD::Log::Type::None>("Request add TopBarScene.");
+		GLog.add<FD::Log::Type::None>("Request add TopBarScene.");
 		Scene::addScene<TopBar>();
-		Internal::GLog.add<FD::Log::Type::None>("Request add LeftBarScene.");
+		GLog.add<FD::Log::Type::None>("Request add LeftBarScene.");
 		Scene::addScene<LeftBar>(std::move(this->leftBarImages.value()));
-		Internal::GLog.add<FD::Log::Type::None>("Request add TitleBarScene.");
+		GLog.add<FD::Log::Type::None>("Request add TitleBarScene.");
 		Scene::addScene<TitleBar>();
 
-		Internal::GLog.add<FD::Log::Type::None>("Request add LeftLayoutScene.");
+		GLog.add<FD::Log::Type::None>("Request add LeftLayoutScene.");
 		Scene::addScene<LeftLayout>();
-		Internal::GLog.add<FD::Log::Type::None>("Request add RightLayoutScene.");
+		GLog.add<FD::Log::Type::None>("Request add RightLayoutScene.");
 		Scene::addScene<RightLayout>();
 	}
 }
@@ -185,36 +192,33 @@ void FS::Title::selectProject() {
 	ImGui::EndChild();
 	ImGui::BeginChild("History", ImVec2(), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-	const auto windowSize = ImGui::GetWindowSize();
-
-	for (auto& x : recentProjectInfos) {
-		if (x.projectName.empty())
-			break;
-
-
-		std::string buttonText = ICON_MD_FOLDER_OPEN + x.projectName + '\n' + x.projectFilePath + '\n' + x.ymd_h;
-		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign,ImVec2());
-		ImGui::Button(buttonText.c_str(), { ImGui::GetWindowWidth() * 0.97f,0.0f });
-		ImGui::PopStyleVar();
-		ImGui::Spacing();
-	}
-
-
+	this->recentProject();
 
 	ImGui::EndChild();
 	ImGui::EndChild(); ImGui::SameLine();
 	ImGui::BeginChild("SelectProjectR");
 
+	//create NewProject
 	if (ImGui::Button(ICON_MD_ADD))
 		this->newProject();
-
 	ImGui::SameLine();
 	ImGui::Text(text.newProject);
 
-	ImGui::Spacing(); ImGui::Separator();
+	ImGui::Spacing();
 
-	ImGui::Button(ICON_MD_LANGUAGE); ImGui::SameLine();
+	//open a project file which exist
+	this->openProjectButton();
+	ImGui::SameLine();
+	ImGui::Text(text.openProject);
+
+	ImGui::Spacing(); ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing(); ImGui::Spacing();
+
+	bool document = ImGui::Button(ICON_MD_LANGUAGE); ImGui::SameLine();
 	ImGui::Text(text.document);
+	if (document)
+		this->documentLink();
 
 	ImGui::EndChild();
 	ImGui::End();
@@ -222,7 +226,94 @@ void FS::Title::selectProject() {
 	ImGui::PopStyleVar(3);
 }
 
+void FS::Title::recentProject() {
+	for (auto& x : recentProjectInfos) {
+		if (x.projectName.empty())
+			break;
+
+		std::string buttonText = ICON_MD_FOLDER_OPEN + x.projectName + '\n' + x.projectFilePath + '\n' + x.ymd_h;
+		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2());
+		bool clicked = ImGui::Button(buttonText.c_str(), { ImGui::GetWindowWidth() * 0.97f,0.0f });
+		ImGui::PopStyleVar();
+		ImGui::Spacing();
+
+		if (clicked) {
+			this->openProject(x.projectFilePath.c_str());
+		}
+	}
+}
+
 void FS::Title::newProject() {
-	Internal::GLog.add<FD::Log::Type::None>("Request add NewProjectScene.");
-	Scene::addScene<NewProject>();
+	GLog.add<FD::Log::Type::None>("Request add NewProjectScene.");
+	Scene::addScene<Bar::NewProject>();
+}
+
+void FS::Title::openProjectButton() {
+	if (!ImGui::Button(ICON_MD_FOLDER_OPEN))
+		return;
+
+	pos.open = ImGui::GetItemRectMin();
+
+	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
+	GLog.add<FD::Log::Type::None>("Open file dialog.");
+	const nfdresult_t result = NFD_OpenDialog(".fproj", NULL, outPath.get());
+	if (result == NFD_OKAY) {
+		GLog.add<FD::Log::Type::None>("Select .fproj file. Path is {}.", *outPath.get());
+		this->openProject(*outPath.get());
+	}
+	else if (result == NFD_CANCEL) {
+		GLog.add<FD::Log::Type::None>("Cancel file dialog.");
+	}
+	else {//NFD_ERROR
+		GLog.add<FD::Log::Type::Error>("Error file dialog.");
+		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+	}
+
+}
+
+void FS::Title::openProject(const char* filePath) {
+	GLog.add<FD::Log::Type::None>("Request load .fproj file.");
+	try {
+		projectWrite->loadExistProject(filePath);
+	}
+	catch (const FD::Project::ExceptionType type) {
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+
+		//std::ifstream::operator bool() == false
+		if (type == FD::Project::ExceptionType::FailedToOpenProjectFile) {
+			Scene::addScene<Utils::Message>(text.error_openProjectFile, pos.open);
+		}
+		//wrong identifier 
+		else if (type == FD::Project::ExceptionType::IllegalFile) {
+			Scene::addScene<Utils::Message>(text.error_illegalFile, pos.open);
+		}
+		//broken file
+		else if (type == FD::Project::ExceptionType::BrokenFile) {
+			Scene::addScene<Utils::Message>(text.error_brokenFile, pos.open);
+		}
+		else {
+			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+			abort();
+		}
+		GLog.add<FD::Log::Type::Error>("Failed to open .fproj file.");
+		return;
+	}
+	catch (const std::exception&) {
+		GLog.add<FD::Log::Type::Error>("Failed to open .fproj file.");
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		Scene::addScene<Utils::Message>(text.error_internal, pos.open);
+		return;
+	}
+
+	GLog.add<FD::Log::Type::None>("Load .fproj file.");
+}
+
+void FS::Title::documentLink() {
+#ifdef BOOST_OS_WINDOWS
+	system("start https://github.com/fluid-love/Fluidum");
+#elif BOOST_OS_MAC
+	system("open https://github.com/fluid-love/Fluidum");
+#else
+#error Not Supported
+#endif 
 }

@@ -4,7 +4,7 @@
 
 //相対パスにする時はResources/までの相対パスを指定する
 
-namespace FS::Internal::Resource {
+namespace FS::Resource {
 
 #ifdef Fluidum_Path
 	constexpr inline const char* TitleImageFilePath = Fluidum_Path "/Resources/Images/Title/title.jpg";
@@ -15,7 +15,7 @@ namespace FS::Internal::Resource {
 }
 
 //Bar
-namespace FS::Internal::Resource {
+namespace FS::Resource {
 
 #ifdef FluidumScene_Path
 	constexpr inline const char* LeftBarIconsFilePath = Fluidum_Path "/Resources/Images/Bar/Icons/";
@@ -23,16 +23,16 @@ namespace FS::Internal::Resource {
 	constexpr inline const char* NewProjectIconFolderPath = Fluidum_Path "/Resources/Images/Bar/NewProjectIcons/";
 
 #else
-	constexpr inline const char* LeftBarIconsFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Imaes/Bar/Icons/")>();
-	constexpr inline const char* TitleBarIconFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Imaes/Bar/Icon/Fluidum.png")>();
-	constexpr inline const char* NewProjectIconFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Imaes/Bar/NewProjectIcons/")>();
+	constexpr inline const char* LeftBarIconsFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Bar/Icons/")>();
+	constexpr inline const char* TitleBarIconFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Bar/Icon/Fluidum.png")>();
+	constexpr inline const char* NewProjectIconFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Bar/NewProjectIcons/")>();
 
 #endif	
 
 }
 
 //Font
-namespace FS::Internal::Resource {
+namespace FS::Resource {
 
 #ifdef Fluidum_Path
 	constexpr inline const char* MPlusFontFilePath = Fluidum_Path "/Resources/Fonts/mplus/mplus-1c-medium.ttf";
@@ -43,7 +43,7 @@ namespace FS::Internal::Resource {
 }
 
 //Coding
-namespace FS::Internal::Resource {
+namespace FS::Resource {
 
 #ifdef Fluidum_Path
 	constexpr inline const char* CodingNewFilePath = Fluidum_Path "/Resources/Images/Coding/Icon/open.png";
@@ -56,7 +56,7 @@ namespace FS::Internal::Resource {
 }
 
 //Utils
-namespace FS::Internal::Resource {
+namespace FS::Resource {
 
 #ifdef Fluidum_Path
 	constexpr inline const char* UtilsIconFolderPath = Fluidum_Path "/Resources/Utils/icon/";
@@ -67,7 +67,7 @@ namespace FS::Internal::Resource {
 }
 
 //Calc
-namespace FS::Internal::Resource {
+namespace FS::Resource {
 
 #ifdef Fluidum_Path
 	constexpr inline const char* LuaMessagePath = Fluidum_Path "/Resources/Log/LuaMessage.jpn";

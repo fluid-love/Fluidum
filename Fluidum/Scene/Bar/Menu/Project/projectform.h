@@ -6,7 +6,7 @@ MenuBar->V‹Kì¬->•K—v‚Èî•ñ‚ğ“ü‚ê‚é
 
 #include "../../../Common/common.h"
 
-namespace FS::Internal::Bar {
+namespace FS::Bar {
 
 	class ProjectForm final : public Scene {
 	public:
@@ -43,6 +43,12 @@ namespace FS::Internal::Bar {
 
 			float innerPosHeight = 0.0f;
 		}style;
+
+		struct {
+			ImVec2 projectFolder{};
+			ImVec2 projectName{};
+			ImVec2 create{};
+		}pos;
 
 	private:
 		void title();

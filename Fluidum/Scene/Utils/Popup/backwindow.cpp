@@ -3,7 +3,7 @@
 FS::PopupBackWindow::PopupBackWindow(const FD::GuiRead* const guiRead)
 	: guiRead(guiRead)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct PopupBackWindowScene.");
+	GLog.add<FD::Log::Type::None>("Construct PopupBackWindowScene.");
 
 	style.windowPos = { 0.0f,0.0f };
 	style.windowSize = guiRead->windowSize();
@@ -11,7 +11,7 @@ FS::PopupBackWindow::PopupBackWindow(const FD::GuiRead* const guiRead)
 
 FS::PopupBackWindow::~PopupBackWindow() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct PopupBackWindowScene.");
+		GLog.add<FD::Log::Type::None>("Destruct PopupBackWindowScene.");
 	}
 	catch (const std::exception& e) {
 		try {

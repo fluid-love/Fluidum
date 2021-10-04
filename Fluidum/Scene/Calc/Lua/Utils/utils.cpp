@@ -97,8 +97,8 @@ std::vector<FS::Lua::CoreType> FS::Lua::getCoreTypes(State L) {
 }
 
 std::size_t FS::Lua::getArgSize(State L) {
-	std::size_t i = 0;
-	std::size_t count = 0;
+	int32_t i = 0;
+	int32_t count = 0;
 	while (!lua_isnone(L, i)) {
 		i++;
 		count++;

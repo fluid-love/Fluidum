@@ -3,7 +3,7 @@
 FS::RightLayout::RightLayout(const FD::LayoutRead* const layoutRead, FD::LayoutWrite* const layoutWrite, const FD::GuiRead* const guiRead, FD::GuiWrite* const guiWrite)
 	: layoutRead(layoutRead), layoutWrite(layoutWrite), guiRead(guiRead), guiWrite(guiWrite)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct RightLayuotScene.");
+	GLog.add<FD::Log::Type::None>("Construct RightLayuotScene.");
 
 	style.windowPos = { layoutRead->leftLayoutPos().x + layoutRead->leftLayoutSize().x,guiRead->menuBarHeight() + guiRead->topBarHeight() };
 	style.windowSize = { guiRead->windowSize().x - style.windowPos.x, guiRead->windowSize().y - style.windowPos.y };
@@ -14,7 +14,7 @@ FS::RightLayout::RightLayout(const FD::LayoutRead* const layoutRead, FD::LayoutW
 
 FS::RightLayout::~RightLayout() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct RightLayuotScene.");
+		GLog.add<FD::Log::Type::None>("Destruct RightLayuotScene.");
 	}
 	catch (const std::exception& e) {
 		try {

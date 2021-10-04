@@ -1,12 +1,12 @@
 #include "credit.h"
 
 FS::Internal::Bar::Credit::Credit() {
-	Internal::GLog.add<FD::Log::Type::None>("Construct CreditScene.");
+	GLog.add<FD::Log::Type::None>("Construct CreditScene.");
 }
 
 FS::Internal::Bar::Credit::~Credit() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct CreditScene.");
+		GLog.add<FD::Log::Type::None>("Destruct CreditScene.");
 	}
 	catch (const std::exception& e) {
 		try {

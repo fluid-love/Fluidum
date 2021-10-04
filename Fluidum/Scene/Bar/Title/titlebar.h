@@ -30,7 +30,7 @@ namespace FS {
 
 	private://data
 
-		const FDR::ImGuiImage iconImage = FDR::createImGuiImage(Internal::Resource::TitleBarIconFilePath);
+		const FDR::ImGuiImage iconImage = FDR::createImGuiImage(Resource::TitleBarIconFilePath);
 
 		struct {
 			ImVec2 iconWindowPos{};

@@ -88,7 +88,7 @@ FD::ProjectWrite::ProjectWrite(Internal::PassKey) {
 
 	std::ofstream ofs(path, std::ios::out);
 	if (!ofs)
-		std::runtime_error("Failed to write backup file.");
+		throw std::runtime_error("Failed to write backup file.");
 
 	GCurrentData.projectName = projectName;
 
@@ -184,52 +184,74 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 
 	using namespace Internal::Project;
 
+	//例外がでた場合にもとの情報に戻す
+	Data temp{};
+	try {
+		temp = GCurrentData;
+	}
+	catch (...) {
+		abort();
+	}
+
 	//新しく入れ替える
 	GCurrentData.reset();
 
 	std::ifstream ifs(path, std::ios::in | std::ios::binary);
-	if (!ifs)
+	if (!ifs) {
+		GCurrentData = std::move(temp);
 		throw Project::ExceptionType::FailedToOpenProjectFile;
+	}
 
 	std::string data;
 
 	std::size_t identifier = 0;
-	ifs.read(reinterpret_cast<char*>(&identifier), 8);//識別する数値
 
-	if (identifier != FluidumProjectFileIdentifier)
-		throw Project::ExceptionType::IllegalFile;
+	try {
+		ifs.read(reinterpret_cast<char*>(&identifier), 8);//識別する数値
 
-	std::getline(ifs, data);
-	std::getline(ifs, data);//Time
-	std::getline(ifs, data);
-	std::getline(ifs, data);//ProjectName
+		if (identifier != FluidumProjectFileIdentifier)
+			throw Project::ExceptionType::IllegalFile;
 
-	std::getline(ifs, data);
-	GCurrentData.projectName = data;
-
-	std::getline(ifs, data);
-	std::getline(ifs, data);
-	GCurrentData.projectFolderPath = data;
-
-	std::getline(ifs, data);
-	std::getline(ifs, data);
-	GCurrentData.mainCodeFilePath = data;
-
-	std::getline(ifs, data);
-	std::size_t counter = 0;
-	while (true) {
 		std::getline(ifs, data);
-		if (data == "End")
-			break;
-		GCurrentData.includeCodeFilePathes.emplace_back(data);
+		std::getline(ifs, data);//Time
+		std::getline(ifs, data);
+		std::getline(ifs, data);//ProjectName
 
-		counter++;
-		if (counter > 10000)
-			throw Project::ExceptionType::BrokenFile;
+		std::getline(ifs, data);
+		GCurrentData.projectName = data;
+
+		std::getline(ifs, data);
+		std::getline(ifs, data);
+		GCurrentData.projectFolderPath = data;
+
+		std::getline(ifs, data);
+		std::getline(ifs, data);
+		GCurrentData.mainCodeFilePath = data;
+
+		std::getline(ifs, data);
+		std::size_t counter = 0;
+		while (true) {
+			std::getline(ifs, data);
+			if (data == "End")
+				break;
+			GCurrentData.includeCodeFilePathes.emplace_back(data);
+
+			counter++;
+			if (counter > 10000)
+				throw Project::ExceptionType::BrokenFile;
+		}
+
+		this->updateHistory();
+	}
+	catch (const std::exception&) {
+		GCurrentData = std::move(temp);
+		std::rethrow_exception(std::current_exception());
+	}
+	catch (const Project::ExceptionType) {
+		GCurrentData = std::move(temp);
+		std::rethrow_exception(std::current_exception());
 	}
 
-
-	this->updateHistory();
 
 	GCurrentData.isDataChanged = false;
 
@@ -313,7 +335,7 @@ void FD::ProjectWrite::write(const char* path) const {
 	std::ofstream ofs(path, std::ios::out | std::ios::binary);
 
 	if (!ofs)
-		std::runtime_error("Failed to write project file.");
+		throw std::runtime_error("Failed to write project file.");
 
 	using namespace Internal::Project;
 
@@ -522,9 +544,9 @@ FD::Project::CodeType FD::ProjectRead::getCurrentMainCodeType() const {
 		GCurrentData.mainCodeFilePath.rbegin(),
 		GCurrentData.mainCodeFilePath.rend(),
 		[&](char x) {
-		extension.insert(extension.begin(), x);
-		return x == '.';
-	}
+			extension.insert(extension.begin(), x);
+			return x == '.';
+		}
 	);
 
 	if (extension == ".py")

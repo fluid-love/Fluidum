@@ -7,8 +7,8 @@ namespace FS {
 
 	class CodingSelect final : public Scene {
 	public:
-		explicit CodingSelect(const FD::ProjectRead* const projectRead, FD::ProjectWrite* const projectWrite, const FD::GuiRead* const guiRead, FD::GuiWrite* const guiWrite);
-		void Constructor(FD::ProjectRead, FD::ProjectWrite, FD::GuiRead, FD::GuiWrite);
+		explicit CodingSelect(const FD::ProjectRead* const projectRead, FD::ProjectWrite* const projectWrite, const FD::GuiRead* const guiRead);
+		void Constructor(FD::ProjectRead, FD::ProjectWrite, FD::GuiRead);
 
 		~CodingSelect() noexcept;
 
@@ -19,7 +19,6 @@ namespace FS {
 		const FD::ProjectRead* const projectRead;
 		FD::ProjectWrite* const projectWrite;
 		const FD::GuiRead* const guiRead;
-		FD::GuiWrite* const guiWrite;
 
 		FD::Text::CodingSelect text{};
 

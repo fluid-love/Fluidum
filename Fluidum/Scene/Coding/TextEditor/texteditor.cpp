@@ -6,14 +6,14 @@ FS::TextEditor::TextEditor(
 )
 	: guiRead(guiRead)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct TextEditorScene.");
+	GLog.add<FD::Log::Type::None>("Construct TextEditorScene.");
 
 	editor.SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 }
 
 FS::TextEditor::~TextEditor() noexcept {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct TextEditorScene.");
+		GLog.add<FD::Log::Type::None>("Destruct TextEditorScene.");
 	}
 	catch (const std::exception& e) {
 		try {

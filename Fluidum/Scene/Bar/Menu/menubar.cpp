@@ -15,7 +15,7 @@ FS::MenuBar::MenuBar(
 	FD::GuiWrite* const guiWrite
 ) : projectWrite(projectWrite), windowWrite(windowWrite), guiRead(guiRead), guiWrite(guiWrite)
 {
-	Internal::GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
+	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
 
 	const auto size = ImGui::GetFontSize() * 0.45f;
 	style.offset = { size ,size };
@@ -26,7 +26,7 @@ FS::MenuBar::MenuBar(
 
 FS::MenuBar::~MenuBar() {
 	try {
-		Internal::GLog.add<FD::Log::Type::None>("Destruct MenuBarScene.");
+		GLog.add<FD::Log::Type::None>("Destruct MenuBarScene.");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -111,8 +111,8 @@ void FS::MenuBar::itemCreateNewProject() {
 	if (!ImGui::MenuItem(text.create))
 		return;
 
-	Internal::GLog.add<FD::Log::Type::None>("Request add NewProjectScene.");
-	Scene::addScene<NewProject>();
+	GLog.add<FD::Log::Type::None>("Request add NewProjectScene.");
+	Scene::addScene<Bar::NewProject>();
 }
 
 void FS::MenuBar::itemOpen() {
@@ -125,20 +125,20 @@ void FS::MenuBar::itemSave() {
 	if (!ImGui::MenuItem(text.save))
 		return;
 
-	Internal::GLog.add<FD::Log::Type::None>("Request save project.");
+	GLog.add<FD::Log::Type::None>("Request save project.");
 	try {
 		projectWrite->save();
 	}
 	catch (const FD::Project::ExceptionType type) {
 		using enum FD::Project::ExceptionType;
-		Internal::GLog.add<FD::Log::Type::None>("Failed to save project.");
+		GLog.add<FD::Log::Type::None>("Failed to save project.");
 
 		//前回の読み込み(セーブ)からプロジェクトファイルが移動削除された場合
 		if (type == NotFoundProjectFolder) {
 			//表示して新しく作成させる//実装予定
 		}
 		else {
-			Internal::GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
 			abort();
 		}
 		abort();
@@ -160,7 +160,7 @@ void FS::MenuBar::itemTerminate() {
 	//閉じるは赤くする
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::MenuItem(text.terminate)) {
-		Internal::GLog.add<FD::Log::Type::None>("Request Terminate.");
+		GLog.add<FD::Log::Type::None>("Request Terminate.");
 		*windowWrite->getCloseFlag() = true;
 	}
 	ImGui::PopStyleColor();
