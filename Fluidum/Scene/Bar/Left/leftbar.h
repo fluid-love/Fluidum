@@ -80,9 +80,9 @@ namespace FS {
 
 		void subWindowCoding();
 
-		//void subWindowAnalysisGui();
-		//void addAnalysisScene(const FD::SceneType sceneType);
-		//void deleteAnalysisScene(const FD::SceneType sceneType);
+		void addCodingScene(const ClassCode::CodeType code);
+		void deleteCodingScene(const ClassCode::CodeType code);
+
 
 
 		void subWindowHelpSetting();

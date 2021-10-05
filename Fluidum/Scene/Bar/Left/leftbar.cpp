@@ -226,7 +226,7 @@ void FS::LeftBar::subWindow() {
 
 void FS::LeftBar::subWindowCoding() {
 	constexpr std::array<ClassCode::CodeType, 1> scenes = {
-		ClassCode::GetClassCode<Internal::Coding::Tab>()
+		ClassCode::GetClassCode<Coding::Tab>()
 	};
 
 	for (std::size_t i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
@@ -239,7 +239,7 @@ void FS::LeftBar::subWindowCoding() {
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
 			const ImVec2 pos2 = ImGui::GetItemRectMax();
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pos1, pos2, false)) {
-				//this->deleteAnalysisScene(scenes[i]);
+				this->deleteCodingScene(scenes[i]);
 			}
 		}
 		else {
@@ -250,13 +250,33 @@ void FS::LeftBar::subWindowCoding() {
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
 			const ImVec2 pos2 = ImGui::GetItemRectMax();
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pos1, pos2, false)) {
-				//this->addAnalysisScene(scenes[i]);
+				this->addCodingScene(scenes[i]);
 			}
 
 		}
 	}
+}
 
+void FS::LeftBar::addCodingScene(const ClassCode::CodeType code) {
+	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
+		GLog.add<FD::Log::Type::None>("Request add Coding::TabScene.");
+		Scene::addScene<Coding::Tab>();
+	}
+	else {
+		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		abort();
+	}
+}
 
+void FS::LeftBar::deleteCodingScene(const ClassCode::CodeType code) {
+	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
+		GLog.add<FD::Log::Type::None>("Request delete Coding::TabScene.");
+		Scene::deleteScene<Coding::Tab>();
+	}
+	else {
+		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		abort();
+	}
 }
 
 void FS::LeftBar::subWindowHelpSetting() {

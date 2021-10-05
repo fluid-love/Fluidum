@@ -2,7 +2,7 @@
 
 #include "../../Common/common.h"
 
-namespace FS::Internal::Coding {
+namespace FS::Coding {
 
 	class Tab final : public Scene {
 	public:
