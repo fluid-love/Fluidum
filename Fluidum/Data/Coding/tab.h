@@ -16,6 +16,7 @@ namespace FD::Internal::Coding {
 	class TabData final {
 	private:
 		static inline std::vector<std::string> filePathes{};
+		static inline std::string displayFile{};
 
 		static inline std::mutex mtx{};
 	private:
@@ -25,6 +26,8 @@ namespace FD::Internal::Coding {
 	};
 
 }
+
+
 
 namespace FD::Coding {
 
@@ -36,10 +39,22 @@ namespace FD::Coding {
 		FluidumUtils_Class_Delete_CopyMove(TabWrite)
 
 	public:
+		//LimitFileSizeMax == 1000
+		//AlreadyExist
 		void addFile(const char* path) const;
+
+		//NotFound
 		void eraseFile(const char* path) const;
 
+		//NotFound
+		void setDisplayFile(const char* path) const;
 
+	public:
+		enum class Exception : uint8_t {
+			LimitFileSizeMax,
+			NotFound,
+			AlreadyExist,
+		};
 
 	};
 
@@ -52,8 +67,10 @@ namespace FD::Coding {
 
 	public:
 
+		_NODISCARD bool update() const;
 
 		_NODISCARD std::vector<std::string> getFilePathes() const;
+		_NODISCARD std::string getDisplayFilePath() const;
 
 	};
 

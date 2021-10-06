@@ -74,6 +74,10 @@ namespace FD {
 		void checkIsProjectFolderExist() const;
 
 		void updateHistory() const;
+
+	private://read
+		void readTabInfo(std::ifstream& ifs) const;
+
 	};
 
 	//現在のプロジェクト

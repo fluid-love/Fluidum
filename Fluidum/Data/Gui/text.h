@@ -171,11 +171,45 @@ namespace FD::Internal::Text {
 		TextEditor();
 		~TextEditor() = default;
 
-		GuiText mode;
+		GuiText editor;
+
+		GuiText file;
+		GuiText save;
+		GuiText saveAs;
+		GuiText load;
+		GuiText create;
+		GuiText quit;
+
+		GuiText edit;
+		GuiText readOnly;
+		GuiText undo;
+		GuiText redo;
+		GuiText copy;
+		GuiText cut;
+		GuiText del;
+		GuiText paste;
+		GuiText selectAll;
+
 		GuiText theme;
 		GuiText dark;
 		GuiText light;
-		GuiText window;
+		GuiText blue;
+
+		GuiText line;
+		GuiText column;
+
+
+	};
+
+	struct CodingTab final {
+		CodingTab();
+		~CodingTab() = default;
+
+		GuiText error_limitMaxSize;
+		GuiText error_alreadyExist;
+
+
+
 
 	};
 
@@ -192,6 +226,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::ProjectForm;
 	using ::FD::Internal::Text::PopupSelect;
 	using ::FD::Internal::Text::TextEditor;
+	using ::FD::Internal::Text::CodingTab;
 
 }
 

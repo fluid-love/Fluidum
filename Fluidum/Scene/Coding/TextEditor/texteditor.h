@@ -8,10 +8,11 @@ namespace FS {
 	class TextEditor final : public Scene {
 	public:
 		explicit TextEditor(
+			const FD::Coding::TabRead* const tabRead,
 			const FD::GuiRead* const guiRead,
 			const std::string& path = {}
 		);
-		void Constructor(FD::GuiRead);
+		void Constructor(FD::Coding::TabRead,FD::GuiRead);
 
 		~TextEditor() noexcept;
 
@@ -19,9 +20,10 @@ namespace FS {
 		virtual void call() override;
 
 	private://data
-		const FD::GuiRead* const guiRead = nullptr;
+		const FD::Coding::TabRead* const tabRead;
+		const FD::GuiRead* const guiRead;
 
-		//	Text::Coding text;
+		FD::Text::TextEditor text{};
 
 		FTE::TextEditor editor{};
 
@@ -35,8 +37,14 @@ namespace FS {
 
 	private:
 		void textEditorMenu();
+		void fileMenu();
+		void editMenu();
+		void themeMenu();
+
 		void textEditor();
 		void textEditorInfo();
 
+	private:
+		void saveText();
 	};
 }

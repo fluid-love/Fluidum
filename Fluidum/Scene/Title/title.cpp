@@ -57,6 +57,7 @@ void FS::Title::call() {
 
 	this->drawTitleImage();
 	this->selectProject();
+
 }
 
 FS::Title::Title(
@@ -234,11 +235,12 @@ void FS::Title::recentProject() {
 		std::string buttonText = ICON_MD_FOLDER_OPEN + x.projectName + '\n' + x.projectFilePath + '\n' + x.ymd_h;
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2());
 		bool clicked = ImGui::Button(buttonText.c_str(), { ImGui::GetWindowWidth() * 0.97f,0.0f });
+		pos.recentButton = ImGui::GetItemRectMin();
 		ImGui::PopStyleVar();
 		ImGui::Spacing();
 
 		if (clicked) {
-			this->openProject(x.projectFilePath.c_str());
+			this->openProject(x.projectFilePath.c_str(), pos.recentButton);
 		}
 	}
 }
@@ -259,7 +261,7 @@ void FS::Title::openProjectButton() {
 	const nfdresult_t result = NFD_OpenDialog(".fproj", NULL, outPath.get());
 	if (result == NFD_OKAY) {
 		GLog.add<FD::Log::Type::None>("Select .fproj file. Path is {}.", *outPath.get());
-		this->openProject(*outPath.get());
+		this->openProject(*outPath.get(), pos.open);
 	}
 	else if (result == NFD_CANCEL) {
 		GLog.add<FD::Log::Type::None>("Cancel file dialog.");
@@ -271,7 +273,7 @@ void FS::Title::openProjectButton() {
 
 }
 
-void FS::Title::openProject(const char* filePath) {
+void FS::Title::openProject(const char* filePath, const ImVec2& pos) {
 	GLog.add<FD::Log::Type::None>("Request load .fproj file.");
 	try {
 		projectWrite->loadExistProject(filePath);
@@ -281,15 +283,15 @@ void FS::Title::openProject(const char* filePath) {
 
 		//std::ifstream::operator bool() == false
 		if (type == FD::Project::ExceptionType::FailedToOpenProjectFile) {
-			Scene::addScene<Utils::Message>(text.error_openProjectFile, pos.open);
+			Scene::addScene<Utils::Message>(text.error_openProjectFile, pos);
 		}
 		//wrong identifier 
 		else if (type == FD::Project::ExceptionType::IllegalFile) {
-			Scene::addScene<Utils::Message>(text.error_illegalFile, pos.open);
+			Scene::addScene<Utils::Message>(text.error_illegalFile, pos);
 		}
 		//broken file
 		else if (type == FD::Project::ExceptionType::BrokenFile) {
-			Scene::addScene<Utils::Message>(text.error_brokenFile, pos.open);
+			Scene::addScene<Utils::Message>(text.error_brokenFile, pos);
 		}
 		else {
 			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
@@ -301,7 +303,7 @@ void FS::Title::openProject(const char* filePath) {
 	catch (const std::exception&) {
 		GLog.add<FD::Log::Type::Error>("Failed to open .fproj file.");
 		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
-		Scene::addScene<Utils::Message>(text.error_internal, pos.open);
+		Scene::addScene<Utils::Message>(text.error_internal, pos);
 		return;
 	}
 

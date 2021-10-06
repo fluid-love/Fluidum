@@ -50,7 +50,7 @@ namespace FS {
 			ImVec4 dummy = { 0.0f, 0.0f, 0.0f, 0.0f };
 			ImVec4 main = { 0.02f, 0.02f, 0.5f, 0.9f };
 			ImVec4 sub = { 0.2f, 0.02f, 0.02f, 0.9f };
-		} color;
+		}color;
 
 		enum SceneIndex : uint8_t {
 			None = 0,
@@ -58,10 +58,10 @@ namespace FS {
 		};
 
 		struct SubWindow final {
-			bool isSelectNow = false;
-			uint16_t index = 0;//è„Ç©ÇÁ1,2,3...
-			uint16_t current = 0;
+			bool isIconHovered = false;
+			bool isSubWindowHovered = false;
 			ImVec2 selectWindowPos = ImVec2();
+			SceneIndex current = SceneIndex::None;
 
 			std::optional<std::array<FDR::ImGuiImage, 1>> codingImages = std::nullopt;
 		}sub;

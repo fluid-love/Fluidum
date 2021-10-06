@@ -1,12 +1,17 @@
 ﻿#include "select.h"
 #include <imgui_internal.h>
 #include "../TextEditor/texteditor.h"
+#include "../../Utils/Popup/message.h"
 
 using namespace FU::ImGui::Operators;
 
-FS::CodingSelect::CodingSelect(const FD::ProjectRead* const projectRead, FD::ProjectWrite* const projectWrite, const FD::GuiRead* const guiRead)
-	: projectRead(projectRead), projectWrite(projectWrite), guiRead(guiRead),
-	newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::createImGuiImage(Resource::CodingOpenFilePath))
+FS::CodingSelect::CodingSelect(
+	FD::Coding::TabWrite* const tabWrite,
+	const FD::ProjectRead* const projectRead,
+	FD::ProjectWrite* const projectWrite,
+	const FD::GuiRead* const guiRead
+) : tabWrite(tabWrite), projectRead(projectRead), projectWrite(projectWrite), guiRead(guiRead),
+newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::createImGuiImage(Resource::CodingOpenFilePath))
 {
 	GLog.add<FD::Log::Type::None>("Construct CodingSelectScene.");
 
@@ -297,12 +302,14 @@ void FS::CodingSelect::bottomRight() {
 	ImGui::BulletText(text.folderPath); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.95f);
 	ImGui::InputText("##FolderPath", quickInfo.folderPath.data(), quickInfo.folderPath.capacity(), ImGuiInputTextFlags_CallbackAlways, inputTextCallback, &quickInfo.folderPath);
+	pos.folderPath = ImGui::GetItemRectMin();
 
 	ImGui::Spacing();
 
 	ImGui::BulletText(text.fileName); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.6f);
 	ImGui::InputText("##FileName", quickInfo.fileName.data(), quickInfo.fileName.capacity(), ImGuiInputTextFlags_CallbackAlways, inputTextCallback, &quickInfo.fileName);
+	pos.fileName = ImGui::GetItemRectMin();
 	ImGui::SameLine();
 	ImGui::Text(quickInfo.extension.c_str());
 
@@ -330,7 +337,7 @@ void FS::CodingSelect::bottom() {
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.7f, 0.1f, 1.0f));
 	if (ImGui::Button(text.select, buttonSize)) {//作成ボタン
-
+		pos.create = ImGui::GetItemRectMin();
 		//作成する前に確認する
 		if (checkQuickInfo()) {//問題なし
 			this->createNewFileQuick();
@@ -375,8 +382,9 @@ namespace FS {
 
 	std::pair<ErrorType, std::string> checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
 		//空かどうか
-		if (folderPath.empty())
+		if (folderPath.empty()) {
 			return { ErrorType::EmptyFolderPath,{} };
+		}
 
 		if (fileName.empty())
 			return { ErrorType::EmptyFileName,{} };
@@ -397,8 +405,13 @@ namespace FS {
 
 	//入力された文字列に'/'があればそのまま，なければつける
 	void tryAddSlash(std::string& path) {
-		if (path.back() != '/' || path.back() != '\\')
+#ifdef BOOST_OS_WINDOWS
+		if (path.back() != '/' && path.back() != '\\')
 			path.push_back('/');
+#else
+		if (path.back() != '/')
+			path.push_back('/');
+#endif
 	}
 }
 
@@ -422,6 +435,9 @@ void FS::CodingSelect::createNewFileQuick() {
 
 	GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
 	projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
+	tabWrite->addFile(quickInfo.fullPath.c_str());
+	tabWrite->setDisplayFile(quickInfo.fullPath.c_str());
+
 }
 
 bool FS::CodingSelect::checkQuickInfo() {
@@ -437,13 +453,17 @@ bool FS::CodingSelect::checkQuickInfo() {
 		return true;
 	}
 
-	//問題があれば問題に応じた文字を出す
+	//問題があれば問題に応じて警告
 	if (err == ErrorType::EmptyFolderPath) {
 		GLog.add<FD::Log::Type::None>("Error EmptyFolderPath.");
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.folderPath);
 		error.errorPopupMessage = text.error_emptyForm;
 	}
 	else if (err == ErrorType::EmptyFileName) {
 		GLog.add<FD::Log::Type::None>("Error EmptyFileName.");
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.fileName);
 		error.errorPopupMessage = text.error_emptyForm;
 	}
 	else if (err == ErrorType::NotFound) {
@@ -452,6 +472,8 @@ bool FS::CodingSelect::checkQuickInfo() {
 	}
 	else if (err == ErrorType::AlreadyExist) {
 		GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", quickInfo.fileName, path);
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		Scene::addScene<Utils::Message>(text.error_alreadyExistFile, pos.create);
 		error.errorPopupMessage = text.error_notFoundDirectory;
 	}
 	return false;

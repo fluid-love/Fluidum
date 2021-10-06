@@ -50,8 +50,8 @@ namespace FD::Internal::Project {
 	//正規化
 	std::string correctFilePath(const char* path) {
 		std::string result = std::filesystem::path(path).lexically_normal().generic_string();
-#ifdef BOOST_OS_WINDOWS
 		auto itr = result.begin();
+#ifdef BOOST_OS_WINDOWS
 		while (true) {
 			itr = std::find(itr, result.end(), '\\');
 
@@ -117,7 +117,13 @@ void FD::ProjectWrite::createNewProject(const Project::CreateProjectInfo& info) 
 	using namespace Internal::Project;
 
 	//例外がでた場合にもとの情報に戻す
-	Data temp = GCurrentData;
+	Data temp{};
+	try {
+		temp = std::move(GCurrentData);
+	}
+	catch (...) {
+		abort();
+	}
 
 	try {
 		//新しく入れ替える
@@ -232,7 +238,7 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 		std::size_t counter = 0;
 		while (true) {
 			std::getline(ifs, data);
-			if (data == "End")
+			if (data == "Next")
 				break;
 			GCurrentData.includeCodeFilePathes.emplace_back(data);
 
@@ -240,6 +246,8 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 			if (counter > 10000)
 				throw Project::ExceptionType::BrokenFile;
 		}
+
+		this->readTabInfo(ifs);
 
 		this->updateHistory();
 	}
@@ -257,6 +265,10 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 
 	//デフォルトではない
 	GCurrentData.isDefaultProject = false;
+
+
+
+
 }
 
 void FD::ProjectWrite::saveAs(const char* newName, const char* dstProjectFolderPath) const {
@@ -359,6 +371,16 @@ void FD::ProjectWrite::write(const char* path) const {
 	ofs << "IncludeFilePathes" << std::endl;
 	for (const auto& x : GCurrentData.includeCodeFilePathes) {
 		ofs << x << std::endl;
+	}
+	ofs << "Next" << std::endl;
+
+	ofs << "CodingTab" << std::endl;
+	{
+		std::lock_guard<std::mutex> lock(Internal::Coding::TabData::mtx);
+		for (const auto& x : Internal::Coding::TabData::filePathes) {
+			ofs << x << std::endl;
+		}
+		ofs << "Next" << std::endl;
 	}
 
 	ofs << "End" << std::endl;
@@ -468,6 +490,26 @@ void FD::ProjectWrite::updateHistory() const {
 		ofs << x.ymd_h << std::endl;
 	}
 
+}
+
+void FD::ProjectWrite::readTabInfo(std::ifstream& ifs) const {
+	using namespace Internal::Project;
+
+	std::lock_guard<std::mutex> lock(Internal::Coding::TabData::mtx);
+
+	std::string data{};
+	std::size_t counter = 0;
+
+	while (true) {
+		std::getline(ifs, data);
+		if (data == "Next")
+			break;
+		Internal::Coding::TabData::filePathes.emplace_back(data);
+
+		counter++;
+		if (counter > 1000)
+			throw Project::ExceptionType::BrokenFile;
+	}
 }
 
 

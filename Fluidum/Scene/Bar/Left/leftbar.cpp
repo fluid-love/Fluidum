@@ -82,7 +82,7 @@ void FS::LeftBar::call() {
 
 
 	//subwindow
-	if (sub.index != 0 || sub.isSelectNow)
+	if (sub.isIconHovered)
 		this->subWindow();
 }
 
@@ -130,17 +130,15 @@ void FS::LeftBar::imageGui() {
 				this->deleteScene(Internal::MainScenes[i]);
 			}
 			//ImageButtonがHoveredである
-			if (ImGui::IsItemHovered()) {
-				sub.index = static_cast<uint16_t>(i + 1);//上から1,2,3...なのでプラス1してある sub.index = 0のときはSubWindowを描写しない
+			if (ImGui::IsMouseHoveringRect(ImGui::GetItemRectMin(), { ImGui::GetItemRectMax().x + 20.0f,ImGui::GetItemRectMax().y })) {
+				sub.current = static_cast<SceneIndex>(i + 1);
 				sub.selectWindowPos = ImVec2(ImGui::GetItemRectMax().x + 1.0f, ImGui::GetItemRectMin().y);
-				sub.isSelectNow = true;
-				sub.current = static_cast<uint16_t>(i + 1);
+				sub.isIconHovered = true;
 			}
 			else {
-				sub.index = 0;
-				//sub.isSelectNow = false;
+				if (!sub.isSubWindowHovered)
+					sub.isIconHovered = false;
 			}
-
 		}
 		else {
 			//ボタンが押されたら == シーンの追加を要請
@@ -187,14 +185,14 @@ void FS::LeftBar::addCodingScene() {
 void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 	if (code == Internal::MainScenes[0]) {
 		//画像の開放
-		sub.codingImages = std::nullopt;
-		GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
-		Scene::deleteScene<CodingSelect>();
+		GLog.add<FD::Log::Type::None>("Request delete TextEditorScene.");
+		Scene::deleteScene<TextEditor>();
 	}
 	else {
 		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
 		abort();
 	}
+	sub.codingImages = std::nullopt;
 }
 
 void FS::LeftBar::subWindow() {
@@ -208,10 +206,7 @@ void FS::LeftBar::subWindow() {
 
 	ImGui::Begin("SubWinow", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
-	if (ImGui::IsWindowHovered())
-		sub.isSelectNow = true;
-	else if (sub.index == SceneIndex::None)
-		sub.isSelectNow = false;
+	sub.isSubWindowHovered = ImGui::IsWindowHovered();
 
 	if (sub.current == SceneIndex::Coding)
 		this->subWindowCoding();
@@ -225,6 +220,7 @@ void FS::LeftBar::subWindow() {
 }
 
 void FS::LeftBar::subWindowCoding() {
+
 	constexpr std::array<ClassCode::CodeType, 1> scenes = {
 		ClassCode::GetClassCode<Coding::Tab>()
 	};

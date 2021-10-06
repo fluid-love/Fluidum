@@ -7,8 +7,13 @@ namespace FS {
 
 	class CodingSelect final : public Scene {
 	public:
-		explicit CodingSelect(const FD::ProjectRead* const projectRead, FD::ProjectWrite* const projectWrite, const FD::GuiRead* const guiRead);
-		void Constructor(FD::ProjectRead, FD::ProjectWrite, FD::GuiRead);
+		explicit CodingSelect(
+			FD::Coding::TabWrite* const tabWrite,
+			const FD::ProjectRead* const projectRead,
+			FD::ProjectWrite* const projectWrite,
+			const FD::GuiRead* const guiRead
+		);
+		void Constructor(FD::Coding::TabWrite, FD::ProjectRead, FD::ProjectWrite, FD::GuiRead);
 
 		~CodingSelect() noexcept;
 
@@ -16,6 +21,7 @@ namespace FS {
 		virtual void call() override;
 
 	private://data
+		FD::Coding::TabWrite* const tabWrite;
 		const FD::ProjectRead* const projectRead;
 		FD::ProjectWrite* const projectWrite;
 		const FD::GuiRead* const guiRead;
@@ -35,6 +41,12 @@ namespace FS {
 			bool isNewFileWindowHovered = false;
 
 		}style;
+
+		struct {
+			ImVec2 folderPath{};
+			ImVec2 fileName{};
+			ImVec2 create{};
+		}pos;
 
 		enum class Template : uint8_t {
 			None,

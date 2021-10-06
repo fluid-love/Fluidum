@@ -5,7 +5,6 @@
 namespace FD::Internal::Text {
 	using Language = ::FD::Text::Language;
 
-
 }
 
 namespace FD::Internal::Text {
@@ -421,20 +420,95 @@ FD::Internal::Text::TextEditor::TextEditor() {
 
 	std::string data = "";
 
-	//std::getline(ifs, data);
-	//this->yes = data;
+	std::getline(ifs, data);
+	this->editor = data;
 
-	//std::getline(ifs, data);
-	//this->no = data;
+	std::getline(ifs, data);
+	this->file = data;
 
-	//std::getline(ifs, data);
-	//this->cancel = data;
+	std::getline(ifs, data);
+	this->save = data;
 
+	std::getline(ifs, data);
+	this->saveAs = data;
+
+	std::getline(ifs, data);
+	this->load = data;
+
+	std::getline(ifs, data);
+	this->create = data;
+
+	std::getline(ifs, data);
+	this->quit = data;
+
+	std::getline(ifs, data);
+	this->edit = data;
+
+	std::getline(ifs, data);
+	this->readOnly = data;
+
+	std::getline(ifs, data);
+	this->undo = data;
+
+	std::getline(ifs, data);
+	this->redo = data;
+
+	std::getline(ifs, data);
+	this->copy = data;
+
+	std::getline(ifs, data);
+	this->cut = data;
+
+	std::getline(ifs, data);
+	this->del = data;
+
+	std::getline(ifs, data);
+	this->paste = data;
+
+	std::getline(ifs, data);
+	this->selectAll = data;
+
+	std::getline(ifs, data);
+	this->theme = data;
+
+	std::getline(ifs, data);
+	this->dark = data;
+
+	std::getline(ifs, data);
+	this->light = data;
+
+	std::getline(ifs, data);
+	this->blue = data;
+
+	std::getline(ifs, data);
+	this->line = data;
+
+	std::getline(ifs, data);
+	this->column = data;
 
 }
 
 
+FD::Internal::Text::CodingTab::CodingTab() {
 
+	std::ifstream ifs{};
+
+	if (Getter::get() == Language::Japanese)
+		ifs = std::ifstream(Internal::Resource::CodingTabGuiTextJpnFilePath, std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open CodingTab.jpn.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->error_limitMaxSize = data;
+
+	std::getline(ifs, data);
+	this->error_alreadyExist = data;
+
+
+}
 
 
 

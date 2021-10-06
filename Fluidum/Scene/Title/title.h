@@ -43,6 +43,7 @@ namespace FS {
 
 		struct {
 			ImVec2 open{};
+			ImVec2 recentButton{};
 		}pos;
 
 	private:
@@ -62,7 +63,7 @@ namespace FS {
 
 		void newProject();
 		void openProjectButton();
-		void openProject(const char* filePath);
+		void openProject(const char* filePath,const ImVec2& pos);
 		void documentLink();
 
 	private:
