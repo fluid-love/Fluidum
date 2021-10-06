@@ -6,6 +6,13 @@
 <img src="https://github.com/fluid-love/Fluidum/blob/master/Document/Screenshots/logo_white.png" width="240mm">
 <p/>
 
+# Features
+
+- モダンなC++を使用(C++20)
+- 描写のバックエンドにVulkanを採用
+- Fluidumに最適化されたテキストエディタ
+- 汎用的な目的に使用可能
+
 
 # Screenshots
 
