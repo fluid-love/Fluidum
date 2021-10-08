@@ -2,15 +2,13 @@
 
 #include "../../Common/common.h"
 
-namespace FS {
+namespace FS::Utils {
 
-	namespace Utils {
-		enum class PopupSelectIconType {
-			None,
-			Info,
-			Warning,
-		};
-	}
+	enum class PopupSelectIconType {
+		None,
+		Info,
+		Warning,
+	};
 
 	class PopupSelect final : public Scene {
 	public:
@@ -64,4 +62,5 @@ namespace FS {
 		std::optional<FDR::ImGuiImage> createImage(const Utils::PopupSelectIconType type);
 		void init();
 	};
+
 }

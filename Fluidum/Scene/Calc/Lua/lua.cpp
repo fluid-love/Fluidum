@@ -1,13 +1,16 @@
 #include "lua.h"
 
-FS::LuaCalc::LuaCalc(const FD::ProjectRead* const projectread)
-	: projectread(projectread), state(luaL_newstate())
+FS::Lua::Calc::Calc(
+	const FD::ProjectRead* const projectread,
+	FD::ConsoleWrite* const consoleWrite
+)
+	: projectread(projectread), consoleWrite(consoleWrite), state(luaL_newstate())
 {
 	assert(this->state);
 	GLog.add<FD::Log::Type::None>("Construct LuaCalcScene.");
 }
 
-FS::LuaCalc::~LuaCalc() noexcept {
+FS::Lua::Calc::~Calc() noexcept {
 	try {
 		GLog.add<FD::Log::Type::None>("Destruct LuaCalcScene.");
 
@@ -27,9 +30,9 @@ FS::LuaCalc::~LuaCalc() noexcept {
 	}
 }
 
-void FS::LuaCalc::call() {
+void FS::Lua::Calc::call() {
 
-	*static_cast<LuaCalc**>(lua_getextraspace(state)) = this;//メモリ
+	*static_cast<Calc**>(lua_getextraspace(state)) = this;//メモリ
 
 	//cppの関数を登録
 	this->registerCppFunctions();
@@ -37,7 +40,7 @@ void FS::LuaCalc::call() {
 	this->registerLuaLibraries();
 
 	//読み取る
-	auto error = luaL_loadfile(state, "C:/FluidumSceneDetails/FluidumSceneLua/test/test.lua");
+	auto error = luaL_loadfile(state, "C:/Fluidum/Test/test.lua");
 
 	if (error != LUA_OK) {//文法errorなど
 		assert(lua_isstring(state, -1));
@@ -61,13 +64,12 @@ void FS::LuaCalc::call() {
 	}
 
 	GLog.add<FD::Log::Type::None>("Request delete LuaCalcScene.");
-	Scene::deleteAsyncScene<LuaCalc>();
+	Scene::deleteAsyncScene<Calc>();
 }
 
-void FS::LuaCalc::registerCppFunctions() {
+void FS::Lua::Calc::registerCppFunctions() {
 	using namespace Internal;
-	
-	
+
 	//	const luaL_Reg genomeRegs[] = {
 	//		{"Create" , &dispatch<&Lua::create_Genome>},
 	//		{"SinglePointCrossOver" , &dispatch<&Lua::singlePointCrossOver>},
@@ -115,43 +117,37 @@ void FS::LuaCalc::registerCppFunctions() {
 	//	luaL_newlib(state, drawRegs);
 	//	lua_setglobal(state, "FDraw");//FDraw.
 	//
-	//const luaL_Reg systemRegs[] = {
-	//		{"SleepSeconds" , &dispatch<&Lua::sleepSeconds>},
-	//		{"SleepMilliSeconds" , &dispatch<&Lua::sleepMilliSeconds>},
-	//		{"Terminate" , &dispatch<&Lua::terminate>},
-	//
-	//		{nullptr,nullptr}
-	//	};
-	//	luaL_newlib(state, systemRegs);
-	//	lua_setglobal(state, "System");//System.
+
+	//_Internal_System
+	{
+		const luaL_Reg regs[] = {
+				{"SleepSeconds" , &dispatch<&Calc::sleepSeconds>},
+				{"SleepMilliSeconds" , &dispatch<&Calc::sleepMilliSeconds>},
+				{"Terminate" , &dispatch<&Calc::terminate>},
+
+				{nullptr,nullptr}
+		};
+		luaL_newlib(state, regs);
+		lua_setglobal(state, "FSystem");
+	}
+
 	//
 	//
 }
 
-void FS::LuaCalc::registerLuaLibraries() {
-	luaL_openlibs(state);//標準ライブラリ
+void FS::Lua::Calc::registerLuaLibraries() {
+	luaL_openlibs(state);//standard library
 
-	//#ifndef FluidumScene_FilePath
-	//	const auto plotPath = Fluidum::Utils::File::getFullPath(__FILE__, 3, "\\resource\\FluidumSceneLua\\plot.lua");
-	//#else 
-	//	const auto plotPath = FluidumScene_FilePath "/FluidumSceneLua/plot.lua";
-	//#endif
-	//	auto result = luaL_dofile(state, plotPath.c_str());
-	//
-	//#ifndef FluidumScene_FilePath
-	//	const auto drawPath = Fluidum::Utils::File::getFullPath(__FILE__, 3, "\\resource\\FluidumSceneLua\\draw.lua");
-	//#else 
-	//	const auto drawPath = FluidumScene_FilePath "/FluidumSceneLua/draw.lua";
-	//#endif
-	//	result = luaL_dofile(state, drawPath.c_str());
-	//
-	//
-	//
-	//	assert(!result);
-	//
+	//Fluidum library
+	std::string folderPath = Resource::LuaFolderPath;
+	auto result = luaL_dofile(state, (folderPath + "system.lua").c_str());
+
+	assert(result == LUA_OK);
+
+
 }
 
-void FS::LuaCalc::terminate() {
+void FS::Lua::Calc::terminate() {
 
 	//luaを閉じる
 	int32_t num = lua_gettop(state);

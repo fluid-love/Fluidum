@@ -17,13 +17,14 @@ namespace FD::Internal::Coding {
 	private:
 		static inline std::vector<std::string> filePathes{};
 		static inline std::string displayFile{};
-
+		static inline bool change = false;
 		static inline std::mutex mtx{};
 	private:
 		friend ::FD::Coding::TabWrite;
 		friend ::FD::Coding::TabRead;
 		friend ::FD::ProjectWrite;
 	};
+
 
 }
 
@@ -55,6 +56,9 @@ namespace FD::Coding {
 			NotFound,
 			AlreadyExist,
 		};
+
+	private:
+		void update() const;
 
 	};
 

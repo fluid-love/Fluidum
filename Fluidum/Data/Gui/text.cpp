@@ -5,6 +5,8 @@
 namespace FD::Internal::Text {
 	using Language = ::FD::Text::Language;
 
+
+
 }
 
 namespace FD::Internal::Text {
@@ -133,31 +135,43 @@ FD::Internal::Text::MenuBar::MenuBar() {
 	this->saveFileAs = data;//名前を付けて保存
 
 	std::getline(ifs, data);
-	this->terminate = data;//終了
+	this->terminate = data;
 
 	std::getline(ifs, data);
-	this->edit = data;//編集
+	this->edit = data;
 
 	std::getline(ifs, data);
-	this->calc = data;//計算
+	this->calc = data;
 
 	std::getline(ifs, data);
-	this->run = data;//実行
+	this->run = data;
 
 	std::getline(ifs, data);
-	this->runIgnoreStep = data;//ステップなしで実行
+	this->runIgnoreStep = data;
 
 	std::getline(ifs, data);
-	this->calcInfo = data;//情報
+	this->calcInfo = data;
 
 	std::getline(ifs, data);
-	this->view = data;//表示
+	this->view = data;
 
 	std::getline(ifs, data);
-	this->help = data;//ヘルプ
+	this->help = data;
 
 	std::getline(ifs, data);
-	this->credit = data;//クレジット
+	this->document = data;
+
+	std::getline(ifs, data);
+	this->checkCurrentProject = data;
+
+	std::getline(ifs, data);
+	this->cancel = data;
+
+	std::getline(ifs, data);
+	this->saveAndOpen = data;
+
+	std::getline(ifs, data);
+	this->ignore = data;
 
 }
 
@@ -382,6 +396,55 @@ FD::Internal::Text::ProjectForm::ProjectForm() {
 	std::getline(ifs, data);
 	this->error_alreadyExist = data;
 
+}
+
+FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
+
+	std::ifstream ifs{};
+
+	if (Getter::get() == Language::Japanese)
+		ifs = std::ifstream(Internal::Resource::ProjectSaveAsGuiTextJpnFilePath, std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open ProjectSaveAs.jpn.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->title = data;
+
+	std::getline(ifs, data);
+	this->folderPath = data;
+
+	std::getline(ifs, data);
+	this->projectName = data;
+
+	std::getline(ifs, data);
+	this->cancel = data;
+
+	std::getline(ifs, data);
+	this->save = data;
+
+	std::getline(ifs, data);
+	this->checkCurrentProject = data;
+
+	std::getline(ifs, data);
+	this->saveAndWrite = data;
+
+	std::getline(ifs, data);
+	this->ignore = data;
+
+	std::getline(ifs, data);
+	this->error_empty = data;
+
+	std::getline(ifs, data);
+	this->error_alreadyExist = data;
+
+	std::getline(ifs, data);
+	this->error_notFound = data;
+
+	std::getline(ifs, data);
+	this->error_failed = data;
 }
 
 FD::Internal::Text::PopupSelect::PopupSelect() {

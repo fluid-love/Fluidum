@@ -2,19 +2,11 @@
 
 #include "resource.h"
 #include <boost/predef.h>
+#include "../../Libraries/lua-5.4.3/src/lua.hpp"
 
 #include <filesystem>
 #include <deque>
-
-//‘O•ûéŒ¾
-namespace FS {
-
-	class Object;
-	namespace ObjectPart {
-		class Template;
-	}
-
-}
+#include <variant>
 
 //‘O•ûéŒ¾
 namespace FD {

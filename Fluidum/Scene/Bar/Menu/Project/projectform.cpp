@@ -173,11 +173,10 @@ bool FS::Bar::ProjectForm::createProject() {
 	//保存して作成　保存せずに作成　キャンセル　
 	if (projectRead->isDataChanged()) {
 		GLog.add<FD::Log::Type::None>("Request add PopupSelectScene.");
-		Scene::addScene<PopupSelect>(Utils::PopupSelectIconType::Warning, text.notSaved, text.cancel, text.createWithoutSaving, text.saveAndCreate);
+		Scene::addScene<Utils::PopupSelect>(Utils::PopupSelectIconType::Warning, text.notSaved, text.cancel, text.createWithoutSaving, text.saveAndCreate);
 
 		return false;
 	}
-	std::cout << std::boolalpha << std::string(folderPathStr.c_str()).empty();
 
 	//チェック
 	if (std::string(folderPathStr.c_str()).empty()) {

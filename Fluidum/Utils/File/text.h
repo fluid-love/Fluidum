@@ -11,7 +11,7 @@ namespace FU::File {
 		using UT = std::underlying_type_t<Enum>;
 
 	public:
-		Text(const UT index) {
+		Text(const Enum index) {
 			std::ifstream ifs(Path, std::ios::in);
 
 			if (!ifs)

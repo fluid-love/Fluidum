@@ -60,9 +60,14 @@ namespace FD::Internal::Text {
 		GuiText calcInfo;
 
 		GuiText view;
-		GuiText help;
 
-		GuiText credit;
+		GuiText help;
+		GuiText document;
+
+		GuiText checkCurrentProject;
+		GuiText cancel;
+		GuiText saveAndOpen;
+		GuiText ignore;
 
 	};
 
@@ -130,7 +135,6 @@ namespace FD::Internal::Text {
 		GuiText cancel;
 		GuiText select;
 
-
 	};
 
 	struct ProjectForm final {
@@ -156,6 +160,28 @@ namespace FD::Internal::Text {
 
 
 
+	};
+
+	struct ProjectSaveAs final {
+		ProjectSaveAs();
+		~ProjectSaveAs() = default;
+
+		GuiText title;
+
+		GuiText folderPath;
+		GuiText projectName;
+
+		GuiText cancel;
+		GuiText save;
+
+		GuiText checkCurrentProject;
+		GuiText saveAndWrite;
+		GuiText ignore;
+
+		GuiText error_empty;
+		GuiText error_alreadyExist;
+		GuiText error_notFound;
+		GuiText error_failed;
 	};
 
 	struct PopupSelect final {
@@ -208,9 +234,6 @@ namespace FD::Internal::Text {
 		GuiText error_limitMaxSize;
 		GuiText error_alreadyExist;
 
-
-
-
 	};
 
 
@@ -227,6 +250,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::PopupSelect;
 	using ::FD::Internal::Text::TextEditor;
 	using ::FD::Internal::Text::CodingTab;
+	using ::FD::Internal::Text::ProjectSaveAs;
 
 }
 

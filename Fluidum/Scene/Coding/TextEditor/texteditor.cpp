@@ -3,9 +3,11 @@
 FS::TextEditor::TextEditor(
 	const FD::Coding::TabRead* const tabRead,
 	const FD::GuiRead* const guiRead,
+	FD::ProjectWrite* const projectWrite,
+	const FD::ProjectRead* const projectRead,
 	const std::string& path
 )
-	: tabRead(tabRead), guiRead(guiRead)
+	: tabRead(tabRead), guiRead(guiRead), projectWrite(projectWrite), projectRead(projectRead)
 {
 	GLog.add<FD::Log::Type::None>("Construct TextEditorScene.");
 
@@ -14,6 +16,10 @@ FS::TextEditor::TextEditor(
 	std::ifstream ifs(tabRead->getDisplayFilePath());
 	std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 	editor.SetText(str);
+
+	if (projectRead->getCurrentMainCodeType() == FD::Project::CodeType::Empty)
+		projectWrite->setMainCodePath(tabRead->getDisplayFilePath().c_str());
+
 }
 
 FS::TextEditor::~TextEditor() noexcept {
@@ -160,8 +166,8 @@ void FS::TextEditor::textEditorInfo() {
 
 void FS::TextEditor::saveText() {
 	auto textToSave = editor.GetText();
-	
-	std::ofstream ofs(tabRead->getDisplayFilePath(),std::ios::trunc);
+
+	std::ofstream ofs(tabRead->getDisplayFilePath(), std::ios::trunc);
 
 	ofs << textToSave;
 }

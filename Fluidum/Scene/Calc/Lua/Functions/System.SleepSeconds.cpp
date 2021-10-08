@@ -1,37 +1,13 @@
-//#include "../lua.h"
-//
-//
-//void arg() {
-//	const auto types = LuaAssist::getCoreTypes(L);
-//
-//
-//
-//	if (types[0] != CoreType::INTEGER && types[0] != CoreType::NUMBER) {
-//		//ä÷êî{}ÇÃ{}î‘ñ⁄ÇÃà¯êîÇ…åÎÇ¡ÇΩå^Ç™ìnÇ≥ÇÍÇ‹ÇµÇΩÅDìnÇ≥ÇÍÇΩà¯êîÇÃå^:{}ÅDê≥ÇµÇ¢å^:{}ÅD
-//		LuaText::LuaLog<LuaText::LuaLogType::WRONG_TYPE_ARGUMENT> text;
-//		log->add<FD::LogType::ERROR>(
-//			text,
-//			funcName,
-//			0,
-//			LuaAssist::getCoreTypeName(types[0]),
-//			std::string(LuaAssist::getCoreTypeName(CoreType::INTEGER)) + LuaAssist::getCoreTypeName(CoreType::NUMBER)
-//			);
-//		throw std::runtime_error("");
-//	}
-//}
-//
-//template <typename T>
-//auto seconds_to_duration(T seconds) {
-//	return std::chrono::duration<T, std::ratio<1>>(seconds);
-//}
-//
-//FS::Lua::Ret FS::LuaCalc::sleepSeconds(Lua::State L) {
-//	using namespace Lua;
-//	const Num sleepTimeSeconds = lua_tonumber(L, 1);
-//	auto time = std::chrono::duration<Num>(sleepTimeSeconds);
-//
-//	std::this_thread::sleep_for(time);
-//
-//	LuaAssist::pop(L);
-//	return 0;
-//}
+#include "../lua.h"
+
+FS::Lua::Ret FS::Lua::Calc::sleepSeconds(State L) {
+	check.numOfArgs_min<Type::SleepSeconds>(L, 1);
+	check.argType_intNum<Type::SleepSeconds>(L, { CoreType::Number });
+
+	const Num sleepTimeSeconds = lua_tonumber(L, 1);
+	auto time = std::chrono::duration<Num>(sleepTimeSeconds);
+
+	std::this_thread::sleep_for(time);
+
+	return 0;
+}

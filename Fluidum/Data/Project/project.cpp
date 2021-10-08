@@ -50,8 +50,8 @@ namespace FD::Internal::Project {
 	//正規化
 	std::string correctFilePath(const char* path) {
 		std::string result = std::filesystem::path(path).lexically_normal().generic_string();
-		auto itr = result.begin();
 #ifdef BOOST_OS_WINDOWS
+		auto itr = result.begin();
 		while (true) {
 			itr = std::find(itr, result.end(), '\\');
 
@@ -286,19 +286,35 @@ void FD::ProjectWrite::saveAs(const char* newName, const char* dstProjectFolderP
 	//copyする
 	std::filesystem::copy(Internal::Project::GCurrentData.projectFolderPath, projectFolderPath, std::filesystem::copy_options::recursive);
 
-	//copyしたら現在のプロジェクトを入れ替える
 	using namespace Internal::Project;
-	GCurrentData.projectName = newName;
 
-	GCurrentData.projectFolderPath = projectFolderPath;
-	if (GCurrentData.projectFolderPath.back() != '/')
-		GCurrentData.projectFolderPath.push_back('/');
+	//例外がでた場合にもとの情報に戻す
+	Data temp{};
+	try {
+		temp = GCurrentData;
+	}
+	catch (...) {
+		abort();
+	}
 
+	try {
+		//copyしたら現在のプロジェクトを入れ替える
+		GCurrentData.projectName = newName;
 
-	this->updateHistory();
+		GCurrentData.projectFolderPath = projectFolderPath;
+		if (GCurrentData.projectFolderPath.back() != '/')
+			GCurrentData.projectFolderPath.push_back('/');
 
-	GCurrentData.isDataChanged = false;
-	GCurrentData.isDefaultProject = false;
+		this->updateHistory();
+
+		GCurrentData.isDataChanged = false;
+		GCurrentData.isDefaultProject = false;
+	}
+	catch (const std::exception&) {
+		GCurrentData = std::move(temp);
+		std::rethrow_exception(std::current_exception());
+	}
+
 }
 
 void FD::ProjectWrite::save() const {

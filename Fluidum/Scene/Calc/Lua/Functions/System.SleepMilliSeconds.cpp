@@ -1,60 +1,11 @@
-//#include "../lua.h"
-//
-//using namespace FS::LuaType;
-//
-//template<>
-//class FS::LuaCheck::Check<System::SLEEP_MILLISECONDS> final : private Common<> {
-//public:
-//	using Common::Common;
-//
-//private:
-//	const char* const funcName = "System.SleepMilliSeconds";
-//
-//public:
-//	void arg() {
-//		const auto types = LuaAssist::getCoreTypes(L);
-//
-//		//ˆø”‚Ì”‚ª‚¨‚©‚µ‚¢
-//		if (types.size() != 1) {
-//			if (types.size() < 1) {
-//				//ŠÖ”{}‚Ìˆø”‚Ì”‚ª­‚È‚·‚¬‚Ü‚·D“n‚³‚ê‚½ˆø”‚Ì”:{}D³‚µ‚¢ˆø”‚Ì”:{}D
-//				LuaText::LuaLog<LuaText::LuaLogType::ARGUMENT_OVER_MIN> text;
-//				log->add<FD::LogType::ERROR>(text, funcName, types.size(), 1);
-//				throw std::runtime_error("");
-//			}
-//			else {
-//				//ŠÖ”{}‚Ìˆø”‚Ì”‚ª‘½‚·‚¬‚Ü‚·D“n‚³‚ê‚½ˆø”‚Ì”:{}D³‚µ‚¢ˆø”‚Ì”:{}D
-//				LuaText::LuaLog<LuaText::LuaLogType::ARGUMENT_OVER_MAX> text;
-//				log->add<FD::LogType::ERROR>(text, funcName, types.size(), 1);
-//				throw std::runtime_error("");
-//			}
-//		}
-//
-//		if (types[0] != CoreType::INTEGER) {
-//			//ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÉŒë‚Á‚½Œ^‚ª“n‚³‚ê‚Ü‚µ‚½D“n‚³‚ê‚½ˆø”‚ÌŒ^:{}D³‚µ‚¢Œ^:{}D
-//			LuaText::LuaLog<LuaText::LuaLogType::WRONG_TYPE_ARGUMENT> text;
-//			log->add<FD::LogType::WARNING>(
-//				text,
-//				funcName,
-//				0,
-//				LuaAssist::getCoreTypeName(types[0]),
-//				std::string(LuaAssist::getCoreTypeName(CoreType::INTEGER)) + LuaAssist::getCoreTypeName(CoreType::NUMBER)
-//				);
-//
-//			//‚±‚±‚Éinfolog
-//		}
-//
-//	}
-//};
-//
-//Ret FS::Lua::sleepMilliSeconds(State L) {
-//	LuaCheck::Check<LuaType::System::SLEEP_MILLISECONDS> check(L, log);
-//	check.arg();
-//
-//	const Val sleepTimeMilliSeconds = lua_tonumber(L, 1);
-//
-//	std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMilliSeconds));
-//
-//	LuaAssist::pop(L);
-//	return 0;
-//}
+#include "../lua.h"
+
+FS::Lua::Ret FS::Lua::Calc::sleepMilliSeconds(State L) {
+	check.numOfArgs_min<Type::SleepSeconds>(L, 1);
+	check.argType_intNum<Type::SleepSeconds>(L, { CoreType::Number });
+
+	const Num sleepTimeMilliSeconds = lua_tonumber(L, 1);
+	std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<Val>(sleepTimeMilliSeconds)));
+
+	return 0;
+}

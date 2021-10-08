@@ -1,0 +1,35 @@
+#pragma once
+
+#include "../../Common/common.h"
+
+namespace FD::Calc::Internal {
+
+	template<typename...Data>
+	class FunctionContainer final {
+	public:
+		FluidumUtils_Class_Default_ConDestructor(FunctionContainer)
+			FluidumUtils_Class_Delete_CopyMove(FunctionContainer)
+	private:
+		struct Ref final {
+			FU::Class::ClassCode::CodeType type{};
+			uint16_t index{};
+		};
+		std::vector<Ref> ref{};
+		std::tuple<std::vector<Data>...> data{};
+		std::size_t index = 0;
+	public:
+		template<typename T> requires(std::same_as<T, Data> || ...)
+			void push(T&& d) {
+			auto& dataRef = std::get<T>(this->data);
+			dataRef.emplace_back(std::forward<T>(d));
+			constexpr FU::Class::ClassCode::CodeType code = FU::Class::ClassCode::GetClassCode<T>();
+
+			assert(!dataRef.empty());
+			ref.emplace_back({ code,dataRef.size() - 1 });
+			index++;
+		}
+
+
+	};
+
+}

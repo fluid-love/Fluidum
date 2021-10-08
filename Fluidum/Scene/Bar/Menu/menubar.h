@@ -8,11 +8,18 @@ namespace FS {
 	public:
 		explicit MenuBar(
 			FD::ProjectWrite* const projectWrite,
+			const FD::ProjectRead* const projectRead,
 			FD::WindowWrite* const windowWrite,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite
 		);
-		void Constructor(FD::ProjectWrite, FD::WindowWrite, FD::GuiRead, FD::GuiWrite);
+		void Constructor(
+			FD::ProjectWrite,
+			FD::ProjectRead,
+			FD::WindowWrite, 
+			FD::GuiRead, 
+			FD::GuiWrite
+		);
 
 		~MenuBar() noexcept;
 
@@ -21,6 +28,7 @@ namespace FS {
 
 	private://data
 		FD::ProjectWrite* const projectWrite;
+		const FD::ProjectRead* const projectRead;
 		FD::WindowWrite* const windowWrite;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
@@ -42,6 +50,7 @@ namespace FS {
 		void itemOpen();
 		void itemSave();
 		void itemSaveAs();
+		void saveAs(std::string path);
 		void itemTerminate();
 
 		//edit

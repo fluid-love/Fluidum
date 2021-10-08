@@ -36,10 +36,6 @@ namespace FD {
 		~SceneRead() = default;
 		FluidumUtils_Class_Delete_CopyMove(SceneRead)
 
-#ifdef FluidumUtils_Debug
-			SceneRead() = default;
-#endif
-
 	private:
 		using CodeType = FU::Class::ClassCode::CodeType;
 

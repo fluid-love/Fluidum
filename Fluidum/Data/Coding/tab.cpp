@@ -18,7 +18,8 @@ void FD::Coding::TabWrite::addFile(const char* path) const {
 		throw Exception::AlreadyExist;
 
 	TabData::filePathes.emplace_back(path);
-	Update = true;
+	
+	this->update();
 }
 
 void FD::Coding::TabWrite::eraseFile(const char* path) const {
@@ -27,7 +28,8 @@ void FD::Coding::TabWrite::eraseFile(const char* path) const {
 	if (itr == TabData::filePathes.end())
 		throw Exception::NotFound;
 	TabData::filePathes.erase(itr);
-	Update = true;
+
+	this->update();
 }
 
 void FD::Coding::TabWrite::setDisplayFile(const char* path) const {
@@ -36,7 +38,12 @@ void FD::Coding::TabWrite::setDisplayFile(const char* path) const {
 	if (itr == TabData::filePathes.end())
 		throw Exception::NotFound;
 	TabData::displayFile = *itr;
+	this->update();
+}
+
+void FD::Coding::TabWrite::update() const {
 	Update = true;
+	TabData::change = true;
 }
 
 bool FD::Coding::TabRead::update() const {

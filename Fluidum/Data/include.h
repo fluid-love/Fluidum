@@ -12,3 +12,5 @@
 
 #include "Project/project.h"
 #include "Coding/tab.h"
+
+#include "Calc/Function/function.h"

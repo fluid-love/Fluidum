@@ -21,6 +21,7 @@ namespace FD::Internal::Resource {
 	constexpr inline const char* CodingSelectGuiTextFilePath = Fluidum_Path "/Resources/Gui/Text/CodingSelect.jpn";
 	constexpr inline const char* NewProjectGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/NewProject.jpn";
 	constexpr inline const char* ProjectFormGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/ProjectForm.jpn";
+	constexpr inline const char* ProjectFormGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/ProjectSaveAs.jpn";
 	constexpr inline const char* PopupSelectGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/PopupSelect.jpn";
 	constexpr inline const char* TextEditorGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/TextEditor.jpn";
 	constexpr inline const char* CodingTabGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/CodingTab.jpn";
@@ -34,6 +35,7 @@ namespace FD::Internal::Resource {
 	constexpr inline const char* NewProjectGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/NewProject.jpn")>();
 	constexpr inline const char* ProjectFormGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/ProjectForm.jpn")>();
 	constexpr inline const char* PopupSelectGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/PopupSelect.jpn")>();
+	constexpr inline const char* ProjectSaveAsGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/ProjectSaveAs.jpn")>();
 	constexpr inline const char* TextEditorGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/TextEditor.jpn")>();
 	constexpr inline const char* CodingTabGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/CodingTab.jpn")>();
 

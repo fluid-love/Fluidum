@@ -71,8 +71,12 @@ namespace FS::Resource {
 
 #ifdef Fluidum_Path
 	constexpr inline const char* LuaMessagePath = Fluidum_Path "/Resources/Log/LuaMessage.jpn";
+	constexpr inline const char* LuaFolderPath = Fluidum_Path "/Resources/Source/Lua/";
+
 #else
 	constexpr inline const char* LuaMessagePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Log/LuaMessage.jpn")>();
+	constexpr inline const char* LuaFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/")>();
+
 #endif	
 
 }

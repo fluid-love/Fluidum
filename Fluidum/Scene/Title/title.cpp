@@ -260,7 +260,7 @@ void FS::Title::openProjectButton() {
 	GLog.add<FD::Log::Type::None>("Open file dialog.");
 	const nfdresult_t result = NFD_OpenDialog(".fproj", NULL, outPath.get());
 	if (result == NFD_OKAY) {
-		GLog.add<FD::Log::Type::None>("Select .fproj file. Path is {}.", *outPath.get());
+		GLog.add<FD::Log::Type::None>("Open .fproj file({}).", *outPath.get());
 		this->openProject(*outPath.get(), pos.open);
 	}
 	else if (result == NFD_CANCEL) {

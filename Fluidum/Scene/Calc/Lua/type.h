@@ -1,15 +1,14 @@
 #pragma once
 
 #include "../../Common/common.h"
-#include "../../Libraries/lua-5.4.3/src/lua.hpp"
 
 namespace FS::Lua {
 
-	using Ret = int;
-	using Num = LUA_NUMBER;//lua number
-	using Val = long long;
-	using String = const char*;//lua string
-	using State = lua_State*;
+	using Ret = FD::Calc::Lua::Ret;
+	using Num = FD::Calc::Lua::Num;//lua number
+	using Val = FD::Calc::Lua::Val;
+	using String = FD::Calc::Lua::String;//lua string
+	using State = FD::Calc::Lua::State;
 
 }
 

@@ -188,7 +188,7 @@ void FS::TopBar::calc() {
 
 	ImGui::Begin("Calc", nullptr, Internal::Bar::commonWindowFlag | ImGuiWindowFlags_NoBackground);
 
-	bool isRunning = sceneRead->isExist<LuaCalc>();
+	bool isRunning = sceneRead->isExist<Lua::Calc>();
 
 	//前のステップまで戻る
 	//一時停止中以外は選択不可
@@ -255,8 +255,8 @@ void FS::TopBar::run() {
 
 	}
 	else if (type == Lua) {
-		GLog.add<FD::Log::Type::None>("Request add LuaCalcScene.");
-		Scene::addAsyncScene<LuaCalc>();
+		GLog.add<FD::Log::Type::None>("Request add LuaCalcScene(Async).");
+		Scene::addAsyncScene<Lua::Calc>();
 	}
 	else if (type == Python) {
 

@@ -48,7 +48,7 @@ FS::Bar::NewProject::NewProject(
 
 	style.buttonSize = ImVec2(style.windowSize.x / 2.2f, style.windowSize.y * 0.09f);
 
-	GLog.add<FD::Log::Type::None>("Request PopupBackWindowScene.");
+	GLog.add<FD::Log::Type::None>("Request add PopupBackWindowScene.");
 	Scene::addScene<PopupBackWindow>();
 }
 

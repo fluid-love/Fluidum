@@ -1,19 +1,21 @@
 #include "menubar.h"
+#include <nfd.h>
 
-//new project
 #include "Project/newproject.h"
+#include "Project/saveas.h"
 
-//popup back window
 #include "../../Utils/Popup/backwindow.h"
+#include "../../Utils/Popup/popupselect.h"
 
 using namespace FU::ImGui::Operators;
 
 FS::MenuBar::MenuBar(
 	FD::ProjectWrite* const projectWrite,
+	const FD::ProjectRead* const projectRead,
 	FD::WindowWrite* const windowWrite,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite
-) : projectWrite(projectWrite), windowWrite(windowWrite), guiRead(guiRead), guiWrite(guiWrite)
+) : projectWrite(projectWrite), projectRead(projectRead), windowWrite(windowWrite), guiRead(guiRead), guiWrite(guiWrite)
 {
 	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
 
@@ -54,6 +56,7 @@ void FS::MenuBar::call() {
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.087f, 0.087f, 0.087f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.087f, 0.087f, 0.087f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.07f, 0.07f, 0.14f, 0.9f));
+	ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.017f, 0.017f, 0.017f, 1.0f));
 
 	constexpr ImGuiWindowFlags flag =
 		ImGuiWindowFlags_NoBringToFrontOnFocus |
@@ -80,7 +83,7 @@ void FS::MenuBar::call() {
 	}
 	ImGui::End();
 
-	ImGui::PopStyleColor(4);
+	ImGui::PopStyleColor(5);
 	ImGui::PopStyleVar();
 
 }
@@ -114,11 +117,67 @@ void FS::MenuBar::itemCreateNewProject() {
 	GLog.add<FD::Log::Type::None>("Request add NewProjectScene.");
 	Scene::addScene<Bar::NewProject>();
 }
-
+#include "../../../Utils/MessageBox/messagebox.h"
 void FS::MenuBar::itemOpen() {
 	if (!ImGui::MenuItem(text.open))
 		return;
-	
+
+	//FU::MB::show(FU::MB::Icon::Warning, text.checkCurrentProject, text.cancel, text.ignore, text.saveAndOpen);
+
+
+	//std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
+	//GLog.add<FD::Log::Type::None>("Open file dialog.");
+	//const nfdresult_t result = NFD_OpenDialog(".fproj", nullptr, outPath.get());
+	//if (result == NFD_OKAY) {
+	//	GLog.add<FD::Log::Type::None>("Load project file({}).", *outPath.get());
+	//}
+	//else if (result == NFD_CANCEL) {
+	//	GLog.add<FD::Log::Type::None>("Dialog has been canceled.");
+	//	return;
+	//}
+	//else {//NFD_ERROR
+	//	GLog.add<FD::Log::Type::Error>("Error file dialog.");
+	//	throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+	//}
+
+	////not saved
+	//if (projectRead->isDataChanged()) {
+	//	GLog.add<FD::Log::Type::None>("Request add PopupSelectScene.");
+	//	Scene::addScene<Utils::PopupSelect>(Utils::PopupSelectIconType::Warning, text.checkCurrentProject, text.cancel, text.ignore, text.saveAndOpen);
+	//
+	//}
+
+	//try {
+	//	projectWrite->loadExistProject(*outPath.get());
+	//}
+	//catch (const FD::Project::ExceptionType type) {
+	//	GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+
+	//	//std::ifstream::operator bool() == false
+	//	if (type == FD::Project::ExceptionType::FailedToOpenProjectFile) {
+	//		Scene::addScene<Utils::Message>(text.error_openProjectFile, pos);
+	//	}
+	//	//wrong identifier 
+	//	else if (type == FD::Project::ExceptionType::IllegalFile) {
+	//		Scene::addScene<Utils::Message>(text.error_illegalFile, pos);
+	//	}
+	//	//broken file
+	//	else if (type == FD::Project::ExceptionType::BrokenFile) {
+	//		Scene::addScene<Utils::Message>(text.error_brokenFile, pos);
+	//	}
+	//	else {
+	//		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+	//		abort();
+	//	}
+	//	GLog.add<FD::Log::Type::Error>("Failed to open .fproj file.");
+	//	return;
+	//}
+	//catch (const std::exception&) {
+	//	GLog.add<FD::Log::Type::Error>("Failed to open .fproj file.");
+	//	GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+	//	Scene::addScene<Utils::Message>(text.error_internal, pos);
+	//	return;
+	//}
 }
 
 void FS::MenuBar::itemSave() {
@@ -154,6 +213,27 @@ void FS::MenuBar::itemSave() {
 void FS::MenuBar::itemSaveAs() {
 	if (!ImGui::MenuItem(text.saveFileAs))
 		return;
+
+	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
+	GLog.add<FD::Log::Type::None>("Open file dialog(pick folder).");
+	const nfdresult_t result = NFD_PickFolder(nullptr, outPath.get());
+	if (result == NFD_OKAY) {
+		GLog.add<FD::Log::Type::None>("Save as {}.", *outPath.get());
+		this->saveAs(*outPath.get());
+	}
+	else if (result == NFD_CANCEL) {
+		GLog.add<FD::Log::Type::None>("Dialog has been canceled.");
+	}
+	else {//NFD_ERROR
+		GLog.add<FD::Log::Type::Error>("Error file dialog.");
+		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+	}
+
+}
+
+void FS::MenuBar::saveAs(std::string path) {
+	GLog.add<FD::Log::Type::None>("Request add Bar::SaveAsScene.");
+	Scene::addScene<Bar::SaveAs>();
 }
 
 void FS::MenuBar::itemTerminate() {
@@ -202,15 +282,31 @@ void FS::MenuBar::viewGui() {
 }
 
 void FS::MenuBar::helpGui() {
-	if (ImGui::BeginMenu(text.help)) {
+	if (!ImGui::BeginMenu(text.help))
+		return;
 
-		if (ImGui::MenuItem(text.credit)) {
-			//Scene::addScene<FS::BarPart::Credit>();
-		}
-
-
-		ImGui::EndMenu();
+	if (ImGui::MenuItem("github")) {
+#ifdef BOOST_OS_WINDOWS
+		system("start https://github.com/fluid-love/Fluidum");
+#elif BOOST_OS_MAC
+		system("open https://github.com/fluid-love/Fluidum");
+#else
+#error Not Supported
+#endif 
 	}
+	if (ImGui::MenuItem(text.document)) {
+#ifdef BOOST_OS_WINDOWS
+		system("start https://github.com/fluid-love/Fluidum/tree/master/Document");
+#elif BOOST_OS_MAC
+		system("open https://github.com/fluid-love/Fluidum/tree/master/Document");
+#else
+#error Not Supported
+#endif 
+	}
+
+
+	ImGui::EndMenu();
+
 }
 
 

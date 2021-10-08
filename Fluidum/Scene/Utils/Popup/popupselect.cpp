@@ -2,7 +2,7 @@
 
 using namespace FU::ImGui::Operators;
 
-FS::PopupSelect::~PopupSelect() noexcept {
+FS::Utils::PopupSelect::~PopupSelect() noexcept {
 	try {
 		GLog.add<FD::Log::Type::None>("Destruct PopupSelectScene.");
 	}
@@ -20,7 +20,7 @@ FS::PopupSelect::~PopupSelect() noexcept {
 	}
 }
 
-void FS::PopupSelect::call() {
+void FS::Utils::PopupSelect::call() {
 
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);
@@ -58,7 +58,7 @@ void FS::PopupSelect::call() {
 	ImGui::PopStyleVar(3);
 }
 
-void FS::PopupSelect::messageGui() {
+void FS::Utils::PopupSelect::messageGui() {
 	ImGui::SetWindowFontScale(1.15f);
 	const float size = style.windowSize.x * 0.08f;
 	if (image) {
@@ -70,7 +70,7 @@ void FS::PopupSelect::messageGui() {
 
 }
 
-void FS::PopupSelect::button() {
+void FS::Utils::PopupSelect::button() {
 
 	for (auto& x : buttonLabels) {
 		if (ImGui::Button(x, style.buttonSize)) {
@@ -85,7 +85,7 @@ void FS::PopupSelect::button() {
 
 }
 
-ImVec2 FS::PopupSelect::calcButtonSize(const uint16_t size) {
+ImVec2 FS::Utils::PopupSelect::calcButtonSize(const uint16_t size) {
 	float width;
 	float fSize = static_cast<float>(size);
 
@@ -98,7 +98,7 @@ ImVec2 FS::PopupSelect::calcButtonSize(const uint16_t size) {
 	return { width,0.0f };
 }
 
-std::optional<FDR::ImGuiImage> FS::PopupSelect::createImage(const Utils::PopupSelectIconType type) {
+std::optional<FDR::ImGuiImage> FS::Utils::PopupSelect::createImage(const Utils::PopupSelectIconType type) {
 	constexpr const char* fileNames[] = {
 		"info.png",
 		"warning.png"
@@ -120,7 +120,7 @@ std::optional<FDR::ImGuiImage> FS::PopupSelect::createImage(const Utils::PopupSe
 	return std::nullopt;
 }
 
-void FS::PopupSelect::init() {
+void FS::Utils::PopupSelect::init() {
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 8.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
 }

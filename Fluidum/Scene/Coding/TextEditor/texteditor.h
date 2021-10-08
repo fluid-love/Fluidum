@@ -10,9 +10,11 @@ namespace FS {
 		explicit TextEditor(
 			const FD::Coding::TabRead* const tabRead,
 			const FD::GuiRead* const guiRead,
+			FD::ProjectWrite* const projectWrite,
+			const FD::ProjectRead* const projectRead,
 			const std::string& path = {}
 		);
-		void Constructor(FD::Coding::TabRead,FD::GuiRead);
+		void Constructor(FD::Coding::TabRead, FD::GuiRead, FD::ProjectWrite, FD::ProjectRead);
 
 		~TextEditor() noexcept;
 
@@ -22,6 +24,8 @@ namespace FS {
 	private://data
 		const FD::Coding::TabRead* const tabRead;
 		const FD::GuiRead* const guiRead;
+		FD::ProjectWrite* const projectWrite;
+		const FD::ProjectRead* const projectRead;
 
 		FD::Text::TextEditor text{};
 

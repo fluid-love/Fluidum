@@ -4,24 +4,29 @@
 
 #define Fluidum_Lua_Api
 
-namespace FS {
+namespace FS::Lua {
 
-	class LuaCalc final : public Scene {
+	class Calc final : public Scene {
 	public:
-		explicit LuaCalc(const FD::ProjectRead* const projectread);
-		void Constructor(FD::ProjectRead);
+		explicit Calc(
+			const FD::ProjectRead* const projectread,
+			FD::ConsoleWrite* const consoleWrite
+		);
+		void Constructor(FD::ProjectRead, FD::ConsoleWrite);
 
-		~LuaCalc() noexcept;
+		~Calc() noexcept;
 
 	public:
 		virtual void call() override;
 
-	private://using
-		using Ret = Lua::Ret;
-		using State = Lua::State;
+	private:
+		using Type = FD::Calc::Lua::FunctionType;
 
 	private://data
 		const FD::ProjectRead* const projectread;
+		FD::ConsoleWrite* const consoleWrite;
+
+		Internal::Check check{consoleWrite};
 
 		//lua state
 		lua_State* const state;
@@ -121,23 +126,23 @@ namespace FS {
 		Fluidum_Lua_Api Ret sleepMilliSeconds(State L);
 
 		//終了させる
-FluidumUtils_Debug_BeginDisableWarning(4646)
-		Fluidum_Lua_Api [[noreturn]] Ret terminate(State L);
-FluidumUtils_Debug_EndDisableWarning
+		FluidumUtils_Debug_BeginDisableWarning(4646)
+			Fluidum_Lua_Api [[noreturn]] Ret terminate(State L);
+		FluidumUtils_Debug_EndDisableWarning
 
-		//private:
-		//	FLUIDUM_LUA_API Ret create_Piano(State L);
+			//private:
+			//	FLUIDUM_LUA_API Ret create_Piano(State L);
 
 
 
 	};
 
 
-	namespace Lua::Internal {
-		using MenberFunction = ::FS::Lua::Ret(LuaCalc::*)(::FS::Lua::State L);
+	namespace Internal {
+		using MenberFunction = ::FS::Lua::Ret(Calc::*)(::FS::Lua::State L);
 		template <MenberFunction Func>
 		::FS::Lua::Ret dispatch(::FS::Lua::State L) {
-			LuaCalc* ptr = *static_cast<LuaCalc**>(lua_getextraspace(L));
+			Calc* ptr = *static_cast<Calc**>(lua_getextraspace(L));
 			return ((*ptr).*Func)(L);
 		}
 	}

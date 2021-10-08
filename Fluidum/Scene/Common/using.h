@@ -20,7 +20,10 @@ namespace FS {
 		FD::ProjectWrite,
 		FD::ProjectRead,
 		FD::Coding::TabWrite,
-		FD::Coding::TabRead
+		FD::Coding::TabRead,
+		FD::ConsoleWrite,
+		FD::FunctionWrite<FD::Calc::Language::Lua>,
+		FD::FunctionRead<FD::Calc::Language::Lua>
 	>;
 
 	//äeÉVÅ[ÉìÇ≈publicåpè≥Ç∑ÇÈ upcastÇ∑ÇÈÇÃÇ≈public

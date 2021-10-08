@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\container.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\function.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\lua.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Coding\tab.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Common\common.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Common\resource.h" />
@@ -134,6 +137,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\menubar.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\newproject.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\saveas.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Status\statusbar.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.h" />
@@ -171,6 +175,7 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Log\messenger.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Log\type.h" />
+    <ClInclude Include="..\..\..\Fluidum\Utils\MessageBox\messagebox.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Text\guitext.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Tuple\tuple.h" />
   </ItemGroup>
@@ -237,10 +242,10 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\menubar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\newproject.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\saveas.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Status\statusbar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Check\check.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.SleepMilliSeconds.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.SleepSeconds.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.Terminate.cpp" />
@@ -259,6 +264,7 @@
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\imgui.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\operator.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\Log\messenger.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Utils\MessageBox\messagebox.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\Text\guitext.cpp" />
     <ClCompile Include="..\..\..\Libraries\ImGuiColorTextEdit\TextEditor.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\backends\imgui_impl_glfw.cpp" />
@@ -267,6 +273,10 @@
     <ClCompile Include="..\..\..\Libraries\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\misc\freetype\imgui_freetype.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Resources\Source\Lua\system.lua" />
+    <None Include="..\..\..\Test\test.lua" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
