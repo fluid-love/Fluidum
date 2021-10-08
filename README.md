@@ -6,10 +6,31 @@
 <img src="https://github.com/fluid-love/Fluidum/blob/master/Document/Screenshots/logo_white.png" width="240mm">
 <p/>
 
+# Features
+
+- C++20を採用
+- 描写のバックエンドにVulkanを採用
+- Fluidumに最適化されたテキストエディタ
+- 汎用的な目的に使用可能
+
 
 # Screenshots
 
 <img src="https://github.com/fluid-love/Fluidum/blob/master/Document/Screenshots/title.jpg" width="500mm">
+
+# History
+
+[Apr 2021]  
+開発開始  
+
+[Oct 2021]  
+現リポジトリに統一  
+開発メンバが加入
+
+---
+
+[Feb 2022]  
+ver1.0.0完成予定
 
 
 # License
@@ -22,3 +43,17 @@ https://github.com/fluid-love/Fluidum/blob/master/Fluidum/LICENSE
 Libraries Resourcesディレクトリ内はそれぞれのライセンスが適用されます．  
 コピーレフトや再配布禁止のライセンスは避けています．  
 ただしFreeTypeなどバイナリ配布時に条件があるライセンスのライブラリがあります.  
+
+---
+
+- [imgui](https://github.com/ocornut/imgui)  
+- [glm](https://github.com/g-truc/glm)  
+- [lua-5.4.3](https://www.lua.org/)  
+- [magic_enum](https://github.com/Neargye/magic_enum)  
+- [IconFontCppHeaders](https://github.com/juliettef/IconFontCppHeaders)  
+- [ImGuiColorTextEdit](https://github.com/BalazsJako/ImGuiColorTextEdit)  
+- [nativefiledialog](https://github.com/mlabbe/nativefiledialog)  
+- [Vulkan-Headers](https://github.com/KhronosGroup/Vulkan-Headers)  
+- [boost](https://github.com/boostorg/boost)  
+- [freetype-2.10.0](https://www.freetype.org/)  
+- [lithash](https://github.com/fluid-love/Fluidum/tree/master/Libraries/lithash)  
