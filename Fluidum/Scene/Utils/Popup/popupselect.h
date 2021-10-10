@@ -34,6 +34,8 @@ namespace FS::Utils {
 
 		~PopupSelect() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(PopupSelect)
+
 	public:
 		virtual void call() override;
 

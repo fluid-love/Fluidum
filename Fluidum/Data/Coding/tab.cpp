@@ -43,7 +43,10 @@ void FD::Coding::TabWrite::setDisplayFile(const char* path) const {
 
 void FD::Coding::TabWrite::update() const {
 	Update = true;
-	TabData::change = true;
+}
+
+void FD::Coding::TabWrite::save() const {
+	TabData::save.store(true);
 }
 
 bool FD::Coding::TabRead::update() const {
@@ -64,5 +67,6 @@ std::string FD::Coding::TabRead::getDisplayFilePath() const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
 	return TabData::displayFile;
 }
+
 
 

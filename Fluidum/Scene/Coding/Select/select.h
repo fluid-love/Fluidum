@@ -17,6 +17,8 @@ namespace FS {
 
 		~CodingSelect() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(CodingSelect)
+
 	public:
 		virtual void call() override;
 

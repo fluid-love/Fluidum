@@ -1,4 +1,5 @@
 ﻿#include "messagebox.h"
+#include "../Text/guitext.h"
 
 long FU::MB::Internal::iconToVal(const Icon type) {
 	if (type == Icon::Warning)
@@ -35,14 +36,14 @@ int32_t FU::MB::button_button_cancel(
 	using namespace Internal;
 
 	//arg -> utf-8 | windows -> wchar_t
-	std::wstring  wMessage = utf8ToUtf16(message);
+	std::wstring  wMessage = ::FU::Text::utf8ToUtf16(message);
 
 	long icon = iconToVal(iconType);
 
-	Button1 = utf8ToUtf16(button1);
-	Button2 = utf8ToUtf16(button2);
+	Button1 = Text::utf8ToUtf16(button1);
+	Button2 = Text::utf8ToUtf16(button2);
 	if (cancelButton)
-		Button3 = utf8ToUtf16(cancelButton);
+		Button3 = Text::utf8ToUtf16(cancelButton);
 
 	auto result = MsgBox3(wMessage.data(), icon | MB_YESNOCANCEL | MB_TASKMODAL);
 
@@ -66,13 +67,4 @@ void FU::MB::Internal::reset() {
 	Button2.shrink_to_fit();
 	Button3.clear();
 	Button3.shrink_to_fit();
-}
-
-std::wstring FU::MB::Internal::utf8ToUtf16(const std::string& str) {
-	if (str.empty())
-		return std::wstring{};
-	int size = MultiByteToWideChar(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0);
-	std::wstring result(size, 0);
-	MultiByteToWideChar(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), size);
-	return result;
 }

@@ -284,6 +284,8 @@ void FS::Title::openProject(const char* filePath, const ImVec2& pos) {
 		//std::ifstream::operator bool() == false
 		if (type == FD::Project::ExceptionType::FailedToOpenProjectFile) {
 			Scene::addScene<Utils::Message>(text.error_openProjectFile, pos);
+			projectWrite->eraseProjectHistory(filePath);
+			this->recentProjectInfos = projectRead->getProjectHistory();
 		}
 		//wrong identifier 
 		else if (type == FD::Project::ExceptionType::IllegalFile) {

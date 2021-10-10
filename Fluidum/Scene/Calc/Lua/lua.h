@@ -16,6 +16,8 @@ namespace FS::Lua {
 
 		~Calc() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(Calc)
+
 	public:
 		virtual void call() override;
 

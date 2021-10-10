@@ -24,3 +24,12 @@ FU::GuiText::Text::operator const char* () const noexcept {
 	return this->text.c_str();
 }
 
+#include <windows.h>
+std::wstring FU::Text::utf8ToUtf16(const std::string& str) {
+	if (str.empty())
+		return std::wstring{};
+	int size = MultiByteToWideChar(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0);
+	std::wstring result(size, 0);
+	MultiByteToWideChar(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), size);
+	return result;
+}

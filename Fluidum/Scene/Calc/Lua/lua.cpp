@@ -32,7 +32,7 @@ FS::Lua::Calc::~Calc() noexcept {
 
 void FS::Lua::Calc::call() {
 
-	*static_cast<Calc**>(lua_getextraspace(state)) = this;//ÉÅÉÇÉä
+	*static_cast<Calc**>(lua_getextraspace(state)) = this;//memory
 
 	//cppÇÃä÷êîÇìoò^
 	this->registerCppFunctions();
@@ -139,10 +139,10 @@ void FS::Lua::Calc::registerLuaLibraries() {
 	luaL_openlibs(state);//standard library
 
 	//Fluidum library
-	std::string folderPath = Resource::LuaFolderPath;
-	auto result = luaL_dofile(state, (folderPath + "system.lua").c_str());
+	//std::string folderPath = Resource::LuaFolderPath;
+	//auto result = luaL_dofile(state, (folderPath + "system.lua").c_str());
 
-	assert(result == LUA_OK);
+	//assert(result == LUA_OK);
 
 
 }

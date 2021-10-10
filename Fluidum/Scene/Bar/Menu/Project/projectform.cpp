@@ -2,8 +2,8 @@
 #include "../../../Utils/Popup/popupselect.h"
 #include "../../../Utils/Popup/backwindow.h"
 #include "../../../Utils/Popup/message.h"
-#include "../../../Title/title.h"
 #include "newproject.h"
+#include <nfd.h>
 
 using namespace FU::ImGui::Operators;
 
@@ -110,8 +110,26 @@ void FS::Bar::ProjectForm::title() {
 
 void FS::Bar::ProjectForm::folderPath() {
 	ImGui::Text(text.folderPath);
-	bool input = ImGui::InputText("##ppath", folderPathStr.data(), folderPathStr.capacity());
+	ImGui::InputText("##ppath", folderPathStr.data(), folderPathStr.capacity());
 	pos.projectFolder = ImGui::GetItemRectMin();
+
+	ImGui::SameLine();
+	if (!ImGui::Button(ICON_MD_FOLDER_OPEN))
+		return;
+
+	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
+	GLog.add<FD::Log::Type::None>("Open file dialog.");
+	const nfdresult_t result = NFD_PickFolder(NULL, outPath.get());
+	if (result == NFD_OKAY) {
+		this->folderPathStr = *outPath.get();
+	}
+	else if (result == NFD_CANCEL) {
+		GLog.add<FD::Log::Type::None>("Cancel file dialog.");
+	}
+	else {//NFD_ERROR
+		GLog.add<FD::Log::Type::Error>("Error file dialog.");
+		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+	}
 }
 
 void FS::Bar::ProjectForm::projectName() {
@@ -158,9 +176,6 @@ void FS::Bar::ProjectForm::bottom() {
 			Scene::deleteScene<ProjectForm>();
 			GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
 			Scene::deleteScene<Bar::NewProject>();
-			//TitleSceneÇ≈í«â¡Ç≥ÇÍÇΩÇÁTitleÇè¡ÇµÇƒÇ®Ç≠
-			GLog.add<FD::Log::Type::None>("try delete TitleScene.");
-			Scene::tryDeleteScene<Title>();
 		}
 	}
 	ImGui::PopStyleColor();
@@ -214,6 +229,11 @@ bool FS::Bar::ProjectForm::createProject() {
 			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
 			abort();
 		}
+	}
+	catch (const std::exception&) {
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		Scene::addScene<Utils::Message>(text.error_failedToCreate, pos.create);
+		return false;
 	}
 
 	GLog.add<FD::Log::Type::None>("Create new project. Project name \"{}\". Project folder path \"{}\".", projectNameStr, folderPathStr);

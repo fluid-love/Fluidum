@@ -39,7 +39,7 @@ namespace FS {
 
 	private:
 		std::once_flag once{};
-		const std::array<FD::Project::HistoryInfo, 50> recentProjectInfos;
+		std::array<FD::Project::HistoryInfo, 50> recentProjectInfos;
 
 		struct {
 			ImVec2 open{};

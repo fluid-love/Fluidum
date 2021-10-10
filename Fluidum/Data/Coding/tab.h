@@ -17,8 +17,9 @@ namespace FD::Internal::Coding {
 	private:
 		static inline std::vector<std::string> filePathes{};
 		static inline std::string displayFile{};
-		static inline bool change = false;
 		static inline std::mutex mtx{};
+
+		static inline std::atomic_bool save = false;
 	private:
 		friend ::FD::Coding::TabWrite;
 		friend ::FD::Coding::TabRead;
@@ -49,6 +50,8 @@ namespace FD::Coding {
 
 		//NotFound
 		void setDisplayFile(const char* path) const;
+
+		void save() const;
 
 	public:
 		enum class Exception : uint8_t {

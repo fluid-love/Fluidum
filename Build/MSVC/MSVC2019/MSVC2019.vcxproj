@@ -156,6 +156,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Left\layout.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Right\layout.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Title\title.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.h" />
@@ -256,6 +257,7 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Left\layout.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Right\layout.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\project.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Title\title.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\message.cpp" />
@@ -275,7 +277,6 @@
     <ClCompile Include="..\..\..\Libraries\imgui\misc\freetype\imgui_freetype.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Resources\Source\Lua\system.lua" />
     <None Include="..\..\..\Test\test.lua" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

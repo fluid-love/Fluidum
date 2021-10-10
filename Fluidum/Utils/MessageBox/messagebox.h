@@ -56,7 +56,6 @@ namespace FU::MB::Internal {
 
 	long iconToVal(const Icon type);
 
-	std::wstring utf8ToUtf16(const std::string& str);
 
 	void reset();
 }

@@ -157,6 +157,7 @@ namespace FD::Internal::Text {
 		GuiText error_emptyForm;
 		GuiText error_notFoundDirectory;
 		GuiText error_alreadyExist;
+		GuiText error_failedToCreate;
 
 
 
@@ -236,6 +237,23 @@ namespace FD::Internal::Text {
 
 	};
 
+	struct Project final {
+		Project();
+		~Project() = default;
+
+		GuiText sync;
+		GuiText add;
+		GuiText file;
+		GuiText folder;
+		GuiText rename;
+		GuiText remove;
+		GuiText displayCode;
+		GuiText error_openFile;
+		GuiText notice_removeFile;
+		GuiText notice_removeFolder;
+
+	};
+
 
 }
 
@@ -251,6 +269,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::TextEditor;
 	using ::FD::Internal::Text::CodingTab;
 	using ::FD::Internal::Text::ProjectSaveAs;
+	using ::FD::Internal::Text::Project;
 
 }
 

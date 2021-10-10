@@ -11,6 +11,8 @@ namespace FS {
 
 		~LeftLayout() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(LeftLayout)
+
 	public:
 		virtual void call() override;
 

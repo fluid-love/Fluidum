@@ -46,7 +46,7 @@ void FS::Utils::Message::call() {
 		;
 
 	ImGui::Begin("Message", nullptr, flag);
-	ImGui::TextUnformatted(message);
+	ImGui::Text(message);
 	ImGui::End();
 
 

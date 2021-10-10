@@ -1,22 +1,44 @@
 #include "project.h"
+#include <Windows.h>
+#undef max
+
 #include "../Coding/tab.h"
 
+void FD::ProjectWrite::save_thread() {
+	using namespace Internal::Coding;
+
+	bool request = this->saveThread.get_stop_token().stop_requested();
+
+	while (!request) {
+		request = this->saveThread.get_stop_token().stop_requested();
+		if (TabData::save) {
+			this->save_tab();
+			TabData::save.store(false);
+		}
+	}
+
+}
+
 namespace FD::Internal::Project {
+
+
+	struct SourceCodeFiles final {
+		std::string mainCodeFilePath{};//entry file
+		std::vector<std::string> includeCodeFilePathes{};//プロジェクトに含めるファイルのパス
+	}GFiles;
 
 	//現在のプロジェクトのデータ
 	struct Data final {
 	public:
-		std::string projectName{};//projectの名前
-		std::string projectFolderPath{};//projectのあるファイル
-
-		std::string mainCodeFilePath{};//開始するソースファイル
-		std::vector<std::string> includeCodeFilePathes{};//プロジェクトに含めるファイルのパス
-
-	public://保存しない情報
-		bool isDataChanged = false;
-		bool isDefaultProject = true;
+		std::string projectName{};
+		std::string projectFilePath{};
+		std::string projectFolderPath{};
 
 	public:
+		bool isTemp = true;
+
+	public:
+		//vector basic_stringともmove後は有効であることが保証されている
 		void reset() {
 			*this = Data();
 		}
@@ -25,10 +47,18 @@ namespace FD::Internal::Project {
 
 	std::mutex GMtx{};
 
-
 	constexpr std::size_t FluidumProjectFileIdentifier =
 		0b01110100'11011001'01100111'01011000'01010000'10110101'10011000'00111000;
 
+	using namespace ::FD::Internal::Coding;
+
+	struct BackUpInfo final {
+		Data data{};
+
+		//tab
+		std::string displayFilePath{};
+		std::vector<std::string> filePathes{};
+	};
 }
 
 namespace FD::Internal::Project {
@@ -48,7 +78,7 @@ namespace FD::Internal::Project {
 
 	//\を/にかえる
 	//正規化
-	std::string correctFilePath(const char* path) {
+	std::string correctFolderPath(const char* path) {
 		std::string result = std::filesystem::path(path).lexically_normal().generic_string();
 #ifdef BOOST_OS_WINDOWS
 		auto itr = result.begin();
@@ -61,93 +91,93 @@ namespace FD::Internal::Project {
 				break;
 		}
 #endif
+		if (result.back() != '/')
+			result.push_back('/');
 		return result;
 	}
 
 }
 
+//Constructor
 FD::ProjectWrite::ProjectWrite(Internal::PassKey) {
 	using namespace Internal::Project;
 
-	//仮のプロジェクトは消す．
-	//フォルダごと全て消して作り直す
+	//remove last temp project.
+	//create new temp project.
 	std::filesystem::remove_all(Internal::Resource::TempProjectFolderPath);
 	if (!std::filesystem::create_directory(Internal::Resource::TempProjectFolderPath))
 		throw std::runtime_error("Failed to create TempProject directory.");
 
-	//デフォルトで仮のプロジェクトを作成
+	//temp project name -> current time
 	std::string time = Internal::Project::getCurrentTime();
-
-	//仮のプロジェクトネームは時間にする
 	const std::string projectName = time;
 
+	//path -> Fluidum/Project/TempProject
 	std::string path = Internal::Resource::TempProjectFolderPath;
 	GCurrentData.projectFolderPath = path;
 
 	path += time += ".fproj";
+	GCurrentData.projectFilePath = path;
 
 	std::ofstream ofs(path, std::ios::out);
 	if (!ofs)
-		throw std::runtime_error("Failed to write backup file.");
+		throw std::runtime_error("Failed to create project file.");
 
 	GCurrentData.projectName = projectName;
 
-	//backup codeフォルダの作成
-	this->makeBackupFolder();
-	this->makeCodeFolder();
+	//create: backup code projectfiles
+	this->tryCreateBackupFolder();
+	this->tryCreateCodeFolder();
+	this->tryCreateProjectFilesFolder();
+	this->tryCreateFilesFile();
+	this->tryCreateTabFile();
+	this->tryCreateFunctionFile();
 
-	this->write(path.c_str());
+	this->writeProjectInfo(path.c_str());
 }
 
 //Utilsいき
-bool checkExtension(const std::string& path, const std::string& extension) {
-	if (path.size() < extension.size())
-		return false;
-
-	std::string compare;
-	compare.resize(extension.size());
-
-	std::copy(path.end() - extension.size(), path.end(), compare.begin());
-
-	return compare == extension;
-}
+//bool checkExtension(const std::string& path, const std::string& extension) {
+//	if (path.size() < extension.size())
+//		return false;
+//
+//	std::string compare;
+//	compare.resize(extension.size());
+//
+//	std::copy(path.end() - extension.size(), path.end(), compare.begin());
+//
+//	return compare == extension;
+//}
 
 void FD::ProjectWrite::createNewProject(const Project::CreateProjectInfo& info) const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
 	using namespace Internal::Project;
 
-	//例外がでた場合にもとの情報に戻す
 	Data temp{};
+
 	try {
 		temp = std::move(GCurrentData);
 	}
 	catch (...) {
-		abort();
+		throw Project::ExceptionType::Unexpected;
 	}
 
 	try {
-		//新しく入れ替える
 		GCurrentData.reset();
 
-		std::string projectFolderPath = correctFilePath(info.projectFolderPath);
-		GCurrentData.projectFolderPath = std::move(projectFolderPath);
-
+		GCurrentData.projectFolderPath = correctFolderPath(info.projectFolderPath);
 		GCurrentData.projectName = info.projectName;
 
-		//確認
+		//check
 		if (GCurrentData.projectFolderPath.back() != '/')
 			GCurrentData.projectFolderPath.push_back('/');
 		GCurrentData.projectFolderPath += (GCurrentData.projectName + '/');
 
-		//デフォルトではない
-		GCurrentData.isDefaultProject = false;
-
-		//ProjectFolderを作成
-		//既に存在する
+		//create ProjectFolder
 		if (std::filesystem::is_directory(GCurrentData.projectFolderPath))
 			throw Project::ExceptionType::AlreadyProjectFolderExist;
 	}
-	catch (const std::exception&) {
+	catch (...) {
 		GCurrentData = std::move(temp);
 		std::rethrow_exception(std::current_exception());
 	}
@@ -163,26 +193,37 @@ void FD::ProjectWrite::createNewProject(const Project::CreateProjectInfo& info) 
 	}
 
 	try {
-		//Backup Code Folderを作成
-		this->makeBackupFolder();
-		this->makeCodeFolder();
+		this->tryCreateBackupFolder();
+		this->tryCreateCodeFolder();
+		this->tryCreateProjectFilesFolder();
+		this->tryCreateFilesFile();
+		this->tryCreateTabFile();
+		this->tryCreateFunctionFile();
 
-		//.fprojを作成
+		this->save_files();
+		this->save_tab();
+
+
+		//.fproj
 		std::string path = GCurrentData.projectFolderPath;
 		path += (GCurrentData.projectName + ".fproj");
-		this->write(path.c_str());
+		GCurrentData.projectFilePath = path;
+		this->writeProjectInfo(path.c_str());
 		this->updateHistory();
 	}
-	//例外がでたらもとに戻す
-	catch (const std::exception&) {
+	catch (...) {
+		//remove project directory
+		try {
+			std::filesystem::remove_all(GCurrentData.projectFolderPath);
+		}
+		catch (...) {
+			std::cerr << "Serious Error" << std::endl;
+			abort();
+		}
 		GCurrentData = std::move(temp);
-
-		//project directory削除
-		std::filesystem::remove_all(info.projectFolderPath);
-
 		std::rethrow_exception(std::current_exception());
 	}
-
+	GCurrentData.isTemp = false;
 }
 
 void FD::ProjectWrite::loadExistProject(const char* path) const {
@@ -192,15 +233,17 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 
 	//例外がでた場合にもとの情報に戻す
 	Data temp{};
+	SourceCodeFiles tempF{};
+	TabData tempT{};
 	try {
 		temp = GCurrentData;
+		tempF = GFiles;
+		tempT.displayFile = TabData::displayFile;
+		tempT.filePathes = TabData::filePathes;
 	}
 	catch (...) {
-		abort();
+		throw Project::ExceptionType::Unexpected;
 	}
-
-	//新しく入れ替える
-	GCurrentData.reset();
 
 	std::ifstream ifs(path, std::ios::in | std::ios::binary);
 	if (!ifs) {
@@ -208,73 +251,35 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 		throw Project::ExceptionType::FailedToOpenProjectFile;
 	}
 
-	std::string data;
-
-	std::size_t identifier = 0;
-
 	try {
+		std::size_t identifier = 0;
 		ifs.read(reinterpret_cast<char*>(&identifier), 8);//識別する数値
 
 		if (identifier != FluidumProjectFileIdentifier)
 			throw Project::ExceptionType::IllegalFile;
 
-		std::getline(ifs, data);
-		std::getline(ifs, data);//Time
-		std::getline(ifs, data);
-		std::getline(ifs, data);//ProjectName
-
-		std::getline(ifs, data);
-		GCurrentData.projectName = data;
-
-		std::getline(ifs, data);
-		std::getline(ifs, data);
-		GCurrentData.projectFolderPath = data;
-
-		std::getline(ifs, data);
-		std::getline(ifs, data);
-		GCurrentData.mainCodeFilePath = data;
-
-		std::getline(ifs, data);
-		std::size_t counter = 0;
-		while (true) {
-			std::getline(ifs, data);
-			if (data == "Next")
-				break;
-			GCurrentData.includeCodeFilePathes.emplace_back(data);
-
-			counter++;
-			if (counter > 10000)
-				throw Project::ExceptionType::BrokenFile;
-		}
-
-		this->readTabInfo(ifs);
+		this->readProjectInfo(ifs);
+		this->readProjectFiles();
+		this->readTabInfo();
 
 		this->updateHistory();
 	}
-	catch (const std::exception&) {
+	catch (...) {
 		GCurrentData = std::move(temp);
+		GFiles = std::move(tempF);
+
+		TabData::displayFile = std::move(tempT.displayFile);
+		TabData::filePathes = std::move(tempT.filePathes);
+
 		std::rethrow_exception(std::current_exception());
 	}
-	catch (const Project::ExceptionType) {
-		GCurrentData = std::move(temp);
-		std::rethrow_exception(std::current_exception());
-	}
-
-
-	GCurrentData.isDataChanged = false;
-
-	//デフォルトではない
-	GCurrentData.isDefaultProject = false;
-
-
-
-
+	GCurrentData.isTemp = false;
 }
 
 void FD::ProjectWrite::saveAs(const char* newName, const char* dstProjectFolderPath) const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
 
-	std::string projectFolderPath = Internal::Project::correctFilePath(dstProjectFolderPath);
+	std::string projectFolderPath = Internal::Project::correctFolderPath(dstProjectFolderPath);
 
 	//まず，コピー先に同じ名前のフォルダがあるかチェック
 	if (!std::filesystem::is_directory(projectFolderPath))
@@ -282,11 +287,16 @@ void FD::ProjectWrite::saveAs(const char* newName, const char* dstProjectFolderP
 
 	//現在のフォルダが移動や削除されていないか
 	this->checkIsProjectFolderExist();
-
-	//copyする
-	std::filesystem::copy(Internal::Project::GCurrentData.projectFolderPath, projectFolderPath, std::filesystem::copy_options::recursive);
+	this->checkIsProjectFileExist();
 
 	using namespace Internal::Project;
+
+	if (std::filesystem::is_directory(projectFolderPath + newName))
+		throw Project::ExceptionType::AlreadyProjectFolderExist;
+
+	//create project folder
+	if (!std::filesystem::create_directory(projectFolderPath + newName))
+		throw std::runtime_error("Failed to create project folder");
 
 	//例外がでた場合にもとの情報に戻す
 	Data temp{};
@@ -297,69 +307,147 @@ void FD::ProjectWrite::saveAs(const char* newName, const char* dstProjectFolderP
 		abort();
 	}
 
+	//copy
 	try {
-		//copyしたら現在のプロジェクトを入れ替える
-		GCurrentData.projectName = newName;
+		std::string srcPath = GCurrentData.projectFolderPath + "ProjectFiles/";
 
-		GCurrentData.projectFolderPath = projectFolderPath;
-		if (GCurrentData.projectFolderPath.back() != '/')
-			GCurrentData.projectFolderPath.push_back('/');
+		//set new folder path
+		GCurrentData.projectFolderPath = projectFolderPath + newName + '/';
+
+		std::filesystem::copy(srcPath, GCurrentData.projectFolderPath + "ProjectFiles/", std::filesystem::copy_options::recursive);
+
+		GCurrentData.projectName = newName;
+		GCurrentData.projectFilePath = GCurrentData.projectFolderPath + newName + ".fproj";
 
 		this->updateHistory();
-
-		GCurrentData.isDataChanged = false;
-		GCurrentData.isDefaultProject = false;
 	}
-	catch (const std::exception&) {
-		GCurrentData = std::move(temp);
+	catch (...) {
+		std::filesystem::remove(GCurrentData.projectFolderPath);
+		GCurrentData = temp;
 		std::rethrow_exception(std::current_exception());
 	}
+
 
 }
 
 void FD::ProjectWrite::save() const {
+	//using namespace Internal::Project;
+	//std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
+	//assert(GCurrentData.projectFolderPath.back() == '/');
+
+	////プロジェクトフォルダがあるか確認
+	//this->checkIsProjectFolderExist();
+
+	////保存
+	//const std::string path = GCurrentData.projectFolderPath + GCurrentData.projectName + ".fproj";
+	//this->write(path.c_str());
+
+	//GCurrentData.isDataChanged = false;
+}
+
+void FD::ProjectWrite::save_tab() const {
 	using namespace Internal::Project;
-	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	assert(GCurrentData.projectFolderPath.back() == '/');
+	std::lock_guard<std::mutex> lockTab(Internal::Coding::TabData::mtx);
 
-	//プロジェクトフォルダがあるか確認
-	this->checkIsProjectFolderExist();
+	std::ofstream ofs(GCurrentData.projectFolderPath + "ProjectFiles/.tab", std::ios::trunc);
 
-	//保存
-	const std::string path = GCurrentData.projectFolderPath + GCurrentData.projectName + ".fproj";
-	this->write(path.c_str());
+	if (!ofs)
+		throw std::runtime_error("Failed to open .tab file.");
 
-	GCurrentData.isDataChanged = false;
+	ofs << "DisplayFile" << std::endl;
+	ofs << TabData::displayFile << std::endl;
+
+	ofs << "FilePathes" << std::endl;
+	for (const auto& x : TabData::filePathes) {
+		ofs << x << std::endl;
+	}
+}
+
+void FD::ProjectWrite::save_files() const {
+	using namespace Internal::Project;
+
+	std::ofstream ofs(GCurrentData.projectFolderPath + "ProjectFiles/.files", std::ios::trunc);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to open .files file.");
+
+	ofs << "MainCodeFilePath" << std::endl;
+	ofs << GFiles.mainCodeFilePath << std::endl;
+
+	ofs << "CodeFilePathes" << std::endl;
+	for (const auto& x : GFiles.includeCodeFilePathes) {
+		ofs << x << std::endl;
+	}
 }
 
 void FD::ProjectWrite::backup() const {
 	using namespace Internal::Project;
-	assert(GCurrentData.projectFolderPath.back() == '/');
+	//assert(GCurrentData.projectFolderPath.back() == '/');
 
-	std::string path = Internal::Project::GCurrentData.projectFolderPath + "Backup/";
-	path += Internal::Project::getCurrentTime() += ".backup";
+	//std::string path = Internal::Project::GCurrentData.projectFolderPath + "Backup/";
+	//path += Internal::Project::getCurrentTime() += ".backup";
 
-	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
+	//std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
 
-	//backupフォルダが消されていたら作る
-	this->makeBackupFolder();
+	////backupフォルダが消されていたら作る
+	//this->tryCreateBackupFolder();
 
-	this->write(path.c_str());
+	//this->write(path.c_str());
 }
 
 void FD::ProjectWrite::setMainCodePath(const char* path) const {
 	using namespace Internal::Project;
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	GCurrentData.mainCodeFilePath = path;
+	GFiles.mainCodeFilePath = path;
 }
 
 void FD::ProjectWrite::addIncludeCodePath(const char* path) const {
 	using namespace Internal::Project;
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	GCurrentData.includeCodeFilePathes.emplace_back(path);
+	GFiles.includeCodeFilePathes.emplace_back(path);
 }
 
-void FD::ProjectWrite::write(const char* path) const {
+bool FD::ProjectWrite::eraseProjectHistory(const std::string& fprojPath) {
+	using namespace Internal::Project;
+
+	std::ifstream ifs(Internal::Resource::RecentProjectHistoryFilePath);
+
+	std::vector<Project::HistoryInfo> temp(50);
+
+	uint16_t index = std::numeric_limits<uint16_t>::max();
+
+	//til 50
+	for (uint16_t i = 0; i < 50; i++) {
+		//projectname path time
+		std::getline(ifs, temp[i].projectName);
+		std::getline(ifs, temp[i].projectFilePath);
+		std::getline(ifs, temp[i].ymd_h);
+
+		if (temp[i].projectFilePath == fprojPath) {
+			index = i;
+		}
+	}
+
+	if (index == std::numeric_limits<uint16_t>::max())
+		return false;
+
+	temp.erase(temp.begin() + index);
+
+	//書き直す
+	std::ofstream ofs(Internal::Resource::RecentProjectHistoryFilePath, std::ios::trunc);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to update FluidumProject history.");
+
+	for (const auto& x : temp) {
+		ofs << x.projectName << std::endl;
+		ofs << x.projectFilePath << std::endl;
+		ofs << x.ymd_h << std::endl;
+	}
+	return true;
+}
+
+void FD::ProjectWrite::writeProjectInfo(const char* path) const {
 	std::ofstream ofs(path, std::ios::out | std::ios::binary);
 
 	if (!ofs)
@@ -369,8 +457,11 @@ void FD::ProjectWrite::write(const char* path) const {
 
 	//ullは64bit以上が約束されているので8byte固定で書き込む
 	ofs.write(reinterpret_cast<const char*>(&FluidumProjectFileIdentifier), 8);
+	ofs << std::endl;
+	ofs << "Fluidum" << std::endl;
 
-	ofs << "Fluidum: " << path << std::endl;
+	ofs << "ProjectFilePath" << std::endl;
+	ofs << GCurrentData.projectFilePath << std::endl;
 
 	ofs << "Time" << std::endl;
 	ofs << getCurrentTime() << std::endl;
@@ -378,57 +469,112 @@ void FD::ProjectWrite::write(const char* path) const {
 	ofs << "ProjectName" << std::endl;
 	ofs << GCurrentData.projectName << std::endl;
 
-	ofs << "ProjectFilePath" << std::endl;
+	ofs << "ProjectFolderPath" << std::endl;
 	ofs << GCurrentData.projectFolderPath << std::endl;
-
-	ofs << "MainSourceCodeFilePath" << std::endl;
-	ofs << GCurrentData.mainCodeFilePath << std::endl;
-
-	ofs << "IncludeFilePathes" << std::endl;
-	for (const auto& x : GCurrentData.includeCodeFilePathes) {
-		ofs << x << std::endl;
-	}
-	ofs << "Next" << std::endl;
-
-	ofs << "CodingTab" << std::endl;
-	{
-		std::lock_guard<std::mutex> lock(Internal::Coding::TabData::mtx);
-		for (const auto& x : Internal::Coding::TabData::filePathes) {
-			ofs << x << std::endl;
-		}
-		ofs << "Next" << std::endl;
-	}
-
-	ofs << "End" << std::endl;
-
 }
 
-void FD::ProjectWrite::makeBackupFolder() const {
+void FD::ProjectWrite::tryCreateBackupFolder() const {
 	using namespace Internal::Project;
 
 	std::string backupFolderPath = GCurrentData.projectFolderPath;
 	backupFolderPath += "Backup/";
 
-	//Backupディレクトリがなければ作る
-	//あるならそのまま
 	if (!std::filesystem::is_directory(backupFolderPath)) {
 		if (!std::filesystem::create_directory(backupFolderPath))
 			throw std::runtime_error("Failed to create Backup directory.");
 	}
 }
 
-void FD::ProjectWrite::makeCodeFolder() const {
+void FD::ProjectWrite::tryCreateCodeFolder() const {
 	using namespace Internal::Project;
 
 	std::string codeFolderPath = GCurrentData.projectFolderPath;
 	codeFolderPath += "Code/";
 
-	//Codeディレクトリがなければ作る
-	//あるならそのまま
 	if (!std::filesystem::is_directory(codeFolderPath)) {
 		if (!std::filesystem::create_directory(codeFolderPath))
 			throw std::runtime_error("Failed to create Code directory.");
 	}
+}
+
+void FD::ProjectWrite::tryCreateProjectFilesFolder() const {
+	using namespace Internal::Project;
+
+	std::string projectFilesPath = GCurrentData.projectFolderPath;
+	projectFilesPath += "ProjectFiles/";
+
+	if (!std::filesystem::is_directory(projectFilesPath)) {
+		if (!std::filesystem::create_directory(projectFilesPath))
+			throw std::runtime_error("Failed to create ProjectFiles directory.");
+	}
+
+#ifdef BOOST_OS_WINDOWS
+	//set attribute
+	const std::wstring wstr = FU::Text::utf8ToUtf16(projectFilesPath);
+	int att = GetFileAttributes(wstr.data());
+	if ((att & FILE_ATTRIBUTE_HIDDEN) == 0) {
+		SetFileAttributes(wstr.data(), att | FILE_ATTRIBUTE_HIDDEN);
+	}
+#else
+#error NotSupported
+#endif
+}
+
+void FD::ProjectWrite::tryCreateFilesFile() const {
+	using namespace Internal::Project;
+
+	if (!std::filesystem::is_directory(GCurrentData.projectFolderPath + "ProjectFiles/"))
+		throw Project::ExceptionType::NotFoundProjectFiles;
+
+	std::string path = GCurrentData.projectFolderPath;
+	path += "ProjectFiles/.files";
+
+	if (std::filesystem::exists(path))
+		return;
+
+	std::ofstream ofs(path);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to create .files file.");
+
+}
+
+void FD::ProjectWrite::tryCreateTabFile() const {
+	using namespace Internal::Project;
+
+	if (!std::filesystem::is_directory(GCurrentData.projectFolderPath + "ProjectFiles/"))
+		throw Project::ExceptionType::NotFoundProjectFiles;
+
+	std::string path = GCurrentData.projectFolderPath;
+	path += "/ProjectFiles/.tab";
+
+	if (std::filesystem::exists(path))
+		return;
+
+	std::ofstream ofs(path);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to create .tab file.");
+
+}
+
+void FD::ProjectWrite::tryCreateFunctionFile() const {
+	using namespace Internal::Project;
+
+	if (!std::filesystem::is_directory(GCurrentData.projectFolderPath + "ProjectFiles/"))
+		throw Project::ExceptionType::NotFoundProjectFiles;
+
+	std::string path = GCurrentData.projectFolderPath;
+	path += "/ProjectFiles/.func";
+
+	if (std::filesystem::exists(path))
+		return;
+
+	std::ofstream ofs(path);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to create .func file.");
+
 }
 
 void FD::ProjectWrite::checkIsProjectFolderExist() const {
@@ -437,6 +583,12 @@ void FD::ProjectWrite::checkIsProjectFolderExist() const {
 	if (!std::filesystem::is_directory(GCurrentData.projectFolderPath))
 		throw Project::ExceptionType::NotFoundProjectFolder;
 
+}
+
+void FD::ProjectWrite::checkIsProjectFileExist() const {
+	using namespace Internal::Project;
+	if (!std::filesystem::exists(GCurrentData.projectFilePath))
+		throw Project::ExceptionType::NotFoundProjectFile;
 }
 
 namespace FD::Internal::Project {
@@ -508,26 +660,124 @@ void FD::ProjectWrite::updateHistory() const {
 
 }
 
-void FD::ProjectWrite::readTabInfo(std::ifstream& ifs) const {
+void FD::ProjectWrite::readProjectInfo(std::ifstream& ifs) const {
 	using namespace Internal::Project;
+	using ExceptionType = ::FD::Project::ExceptionType;
+
+	std::string data{};
+
+	//Fluidum
+	std::getline(ifs, data);
+	std::getline(ifs, data);
+	if (data != "Fluidum")
+		throw ExceptionType::IllegalFile;
+
+	//ProjectFilePath
+	std::getline(ifs, data);
+	if (data != "ProjectFilePath")
+		throw ExceptionType::IllegalFile;
+	std::getline(ifs, data);
+	GCurrentData.projectFilePath = data;
+
+	//Time
+	std::getline(ifs, data);
+	if (data != "Time")
+		throw ExceptionType::IllegalFile;
+	std::getline(ifs, data);
+
+	//ProjectName
+	std::getline(ifs, data);
+	if (data != "ProjectName")
+		throw ExceptionType::IllegalFile;
+	std::getline(ifs, data);
+	GCurrentData.projectName = data;
+
+	//ProjectFolderPath
+	std::getline(ifs, data);
+	if (data != "ProjectFolderPath")
+		throw ExceptionType::IllegalFile;
+	std::getline(ifs, data);
+	GCurrentData.projectFolderPath = data;
+
+}
+
+void FD::ProjectWrite::readProjectFiles() const {
+	using namespace Internal::Project;
+
+	std::ifstream ifs(GCurrentData.projectFolderPath + "ProjectFiles/.files");
+	if (!ifs)
+		throw Project::ExceptionType::NotFoundProjectFiles;
+
+	std::string data{};
+
+	//MainCodeFilePath
+	std::getline(ifs, data);
+	if (data != "MainCodeFilePath")
+		throw Project::ExceptionType::IllegalFile;
+	std::getline(ifs, data);
+	GFiles.mainCodeFilePath = data;
+
+	//IncludeFilePathes
+	{
+		std::getline(ifs, data);
+		if (data != "CodeFilePathes")
+			throw Project::ExceptionType::IllegalFile;
+		std::size_t counter = 0;
+		while (true) {
+			std::getline(ifs, data);
+			if (data == "Next")
+				break;
+			GFiles.includeCodeFilePathes.emplace_back(data);
+
+			counter++;
+			if (counter > 10000)
+				throw Project::ExceptionType::BrokenFile;
+		}
+	}
+
+}
+
+void FD::ProjectWrite::readTabInfo() const {
+	using namespace Internal::Project;
+	using namespace Internal::Coding;
+	using ExceptionType = ::FD::Project::ExceptionType;
+
+	std::ifstream ifs(GCurrentData.projectFolderPath + "ProjectFiles/.tab");
+	if (!ifs)
+		throw Project::ExceptionType::NotFoundProjectFiles;
 
 	std::lock_guard<std::mutex> lock(Internal::Coding::TabData::mtx);
 
 	std::string data{};
-	std::size_t counter = 0;
 
-	while (true) {
+	//TabDisplayFile
+	{
 		std::getline(ifs, data);
-		if (data == "Next")
-			break;
-		Internal::Coding::TabData::filePathes.emplace_back(data);
+		if (data != "TabDisplayFile")
+			throw ExceptionType::IllegalFile;
+		std::getline(ifs, data);
+		TabData::displayFile = data;
+	}
 
-		counter++;
-		if (counter > 1000)
-			throw Project::ExceptionType::BrokenFile;
+	//TabFilePathes
+	{
+		std::getline(ifs, data);
+		if (data != "TabFilePathes")
+			throw ExceptionType::IllegalFile;
+
+		uint16_t counter = 0;
+		while (true) {
+			std::getline(ifs, data);
+			if (data == "Next")
+				break;
+			Internal::Coding::TabData::filePathes.emplace_back(data);
+
+			counter++;
+			if (counter > 1000)
+				throw Project::ExceptionType::BrokenFile;
+		}
 	}
 }
-
 
 std::array<FD::Project::HistoryInfo, 50> FD::ProjectRead::getProjectHistory() const {
 	using namespace Internal::Project;
@@ -553,17 +803,18 @@ std::array<FD::Project::HistoryInfo, 50> FD::ProjectRead::getProjectHistory() co
 
 bool FD::ProjectRead::isDataChanged() const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	return Internal::Project::GCurrentData.isDataChanged;
+	return false;
+	//eturn Internal::Project::GCurrentData.isDataChanged;
 }
 
 std::vector<std::string> FD::ProjectRead::getIncludeCodeFilePathes() const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	return Internal::Project::GCurrentData.includeCodeFilePathes;
+	return Internal::Project::GFiles.includeCodeFilePathes;
 }
 
 std::string FD::ProjectRead::getMainCodeFilePath() const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	return Internal::Project::GCurrentData.mainCodeFilePath;
+	return Internal::Project::GFiles.mainCodeFilePath;
 }
 
 std::string FD::ProjectRead::getProjectFolderPath() const {
@@ -588,19 +839,19 @@ std::string FD::ProjectRead::getProjectName() const {
 
 bool FD::ProjectRead::isDefaultProject() const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	return Internal::Project::GCurrentData.isDefaultProject;
+	return Internal::Project::GCurrentData.isTemp;
 }
 
 FD::Project::CodeType FD::ProjectRead::getCurrentMainCodeType() const {
 	using namespace Internal::Project;
 
-	if (GCurrentData.mainCodeFilePath.empty())
+	if (GFiles.mainCodeFilePath.empty())
 		return Project::CodeType::Empty;
 
 	std::string extension{};
 	(void)std::find_if(
-		GCurrentData.mainCodeFilePath.rbegin(),
-		GCurrentData.mainCodeFilePath.rend(),
+		GFiles.mainCodeFilePath.rbegin(),
+		GFiles.mainCodeFilePath.rend(),
 		[&](char x) {
 			extension.insert(extension.begin(), x);
 			return x == '.';

@@ -1,9 +1,9 @@
 ﻿#include "leftbar.h"
 
-//Coding
 #include "../../Coding/Select/select.h"
 #include "../../Coding/TextEditor/texteditor.h"
 #include "../../Coding/Tab/tab.h"
+#include "../../Project/project.h"
 
 using namespace FU::ImGui::Operators;
 
@@ -93,9 +93,7 @@ struct Dummy2 {
 struct Dummy3 {
 
 };
-struct Dummy4 {
 
-};
 struct Dummy5 {
 
 };
@@ -112,7 +110,7 @@ namespace FS::Internal {
 		FU::Class::ClassCode::GetClassCode<::FS::TextEditor>(),
 		FU::Class::ClassCode::GetClassCode<Dummy2>(),
 		FU::Class::ClassCode::GetClassCode<Dummy3>(),
-		FU::Class::ClassCode::GetClassCode<Dummy4>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Project>(),
 		FU::Class::ClassCode::GetClassCode<Dummy5>(),
 		FU::Class::ClassCode::GetClassCode<Dummy6>(),
 		FU::Class::ClassCode::GetClassCode<Dummy7>()
@@ -158,6 +156,9 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 	if (code == Internal::MainScenes[0]) {
 		this->addCodingScene();
 	}
+	else if (code == Internal::MainScenes[3]) {
+		this->addProjectScene();
+	}
 	else {
 		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
 		abort();
@@ -180,6 +181,11 @@ void FS::LeftBar::addCodingScene() {
 		GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");
 		Scene::addScene<TextEditor>(projectRead->getMainCodeFilePath());
 	}
+}
+
+void FS::LeftBar::addProjectScene() {
+	GLog.add<FD::Log::Type::None>("Request add ProjectScene.");
+	Scene::addScene<::FS::Project>();
 }
 
 void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {

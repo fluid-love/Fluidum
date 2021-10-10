@@ -2,6 +2,7 @@
 
 #include <string>
 #include "../Class/class.h"
+#include <boost/predef.h>
 
 namespace FU::GuiText{
 
@@ -24,4 +25,10 @@ namespace FU::GuiText{
 	};
 
 
+}
+
+namespace FU::Text {
+#ifdef BOOST_OS_WINDOWS
+	std::wstring utf8ToUtf16(const std::string& str);
+#endif
 }

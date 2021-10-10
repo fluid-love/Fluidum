@@ -5,6 +5,13 @@
 namespace FD::Internal::Text {
 	using Language = ::FD::Text::Language;
 
+	std::string newLine(std::ifstream& ifs, const std::string& src) {
+		std::string temp{};
+		temp.push_back('\n');
+		std::getline(ifs, temp);
+		return src + '\n' + temp;
+	}
+
 
 
 }
@@ -71,7 +78,7 @@ FD::Internal::Text::Title::Title() {
 	this->document = data;
 
 	std::getline(ifs, data);
-	this->error_openProjectFile = data;
+	this->error_openProjectFile = Internal::Text::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->error_illegalFile = data;
@@ -396,6 +403,8 @@ FD::Internal::Text::ProjectForm::ProjectForm() {
 	std::getline(ifs, data);
 	this->error_alreadyExist = data;
 
+	std::getline(ifs, data);
+	this->error_failedToCreate = data;
 }
 
 FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
@@ -573,7 +582,47 @@ FD::Internal::Text::CodingTab::CodingTab() {
 
 }
 
+FD::Internal::Text::Project::Project() {
+	std::ifstream ifs{};
 
+	if (Getter::get() == Language::Japanese)
+		ifs = std::ifstream(Internal::Resource::ProjectGuiTextJpnFilePath, std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open Project.jpn.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->sync = data;
+
+	std::getline(ifs, data);
+	this->add = data;
+
+	std::getline(ifs, data);
+	this->file = data;
+
+	std::getline(ifs, data);
+	this->folder = data;
+
+	std::getline(ifs, data);
+	this->rename = data;
+
+	std::getline(ifs, data);
+	this->remove = data;
+
+	std::getline(ifs, data);
+	this->displayCode = data;
+
+	std::getline(ifs, data);
+	this->error_openFile = data;
+
+	std::getline(ifs, data);
+	this->notice_removeFile = data;
+
+	std::getline(ifs, data);
+	this->notice_removeFolder = data;
+}
 
 
 

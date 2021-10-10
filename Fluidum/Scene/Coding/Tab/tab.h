@@ -15,6 +15,8 @@ namespace FS::Coding {
 
 		~Tab() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(Tab)
+
 	public:
 		virtual void call() override;
 

@@ -437,7 +437,7 @@ void FS::CodingSelect::createNewFileQuick() {
 	projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
 	tabWrite->addFile(quickInfo.fullPath.c_str());
 	tabWrite->setDisplayFile(quickInfo.fullPath.c_str());
-
+	tabWrite->save();
 }
 
 bool FS::CodingSelect::checkQuickInfo() {

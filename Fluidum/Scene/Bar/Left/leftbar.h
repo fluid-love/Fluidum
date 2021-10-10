@@ -73,6 +73,7 @@ namespace FS {
 		void imageGui();
 		void addScene(const ClassCode::CodeType code);
 		void addCodingScene();
+		void addProjectScene();
 		void deleteScene(const ClassCode::CodeType code);
 
 		//ImageButton‚ÌHoveredŽž

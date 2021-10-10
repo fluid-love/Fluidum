@@ -9,11 +9,14 @@ namespace FD::Project {
 	};
 
 	enum class ExceptionType {
+		NotFoundProjectFile,
 		NotFoundProjectFolder,
+		NotFoundProjectFiles,
 		AlreadyProjectFolderExist,
 		FailedToOpenProjectFile,
 		IllegalFile,
-		BrokenFile
+		BrokenFile,
+		Unexpected//e.g. when std::basic_string<char>::operator=() throw exception. 
 	};
 
 	struct HistoryInfo final {
@@ -56,6 +59,8 @@ namespace FD {
 		//現在のプロジェクトを保存
 		void save() const;
 
+
+
 		//現在の情報を新たにバックアップをとる
 		//アプリ終了時に最新のバックアップ以外は削除される
 		void backup() const;
@@ -64,20 +69,36 @@ namespace FD {
 		void addIncludeCodePath(const char* path) const;
 		void IncludeCodePath(const char* path) const;
 
+		bool eraseProjectHistory(const std::string& fprojPath);
 	private:
-		void write(const char* path) const;
+		void save_tab() const;
+		void save_files() const;
 
-		void makeBackupFolder() const;
-		void makeCodeFolder() const;
+		void writeProjectInfo(const char* path) const;
+
+		void tryCreateBackupFolder() const;
+		void tryCreateCodeFolder() const;
+		void tryCreateProjectFilesFolder() const;
+
+		void tryCreateFilesFile() const;
+		void tryCreateTabFile() const;
+		void tryCreateFunctionFile() const;
 
 		//ProjectFolderが消されたり移動したりしているか
 		void checkIsProjectFolderExist() const;
+		void checkIsProjectFileExist() const;
+
 
 		void updateHistory() const;
 
 	private://read
-		void readTabInfo(std::ifstream& ifs) const;
+		void readProjectInfo(std::ifstream& ifs) const;
+		void readProjectFiles() const;
+		void readTabInfo() const;
 
+	private:
+		void save_thread();
+		const std::jthread saveThread{ &ProjectWrite::save_thread,this };
 	};
 
 	//現在のプロジェクト

@@ -478,6 +478,9 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\container.h">
       <Filter>Fluidum\Data\Calc\Function</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\project.h">
+      <Filter>Fluidum\Scene\Project</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fluidum">
@@ -758,6 +761,9 @@
     </Filter>
     <Filter Include="Fluidum\Data\Calc\Function">
       <UniqueIdentifier>{14595f5a-1ba5-4db8-860f-ae8cd9ce346d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Project">
+      <UniqueIdentifier>{e7468bc3-fe34-4588-a6f9-94e357dec00f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1040,11 +1046,11 @@
     <ClCompile Include="..\..\..\Fluidum\Utils\MessageBox\messagebox.cpp">
       <Filter>Fluidum\Utils\MessageBox</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\project.cpp">
+      <Filter>Fluidum\Scene\Project</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Resources\Source\Lua\system.lua">
-      <Filter>Resources\Lua</Filter>
-    </None>
     <None Include="..\..\..\Test\test.lua">
       <Filter>Fluidum\Test</Filter>
     </None>

@@ -18,6 +18,8 @@ namespace FS {
 
 		~TextEditor() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(TextEditor)
+
 	public:
 		virtual void call() override;
 
