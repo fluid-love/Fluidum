@@ -1049,6 +1049,12 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\project.cpp">
       <Filter>Fluidum\Scene\Project</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Libraries\imgui\imgui_demo.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Utils\File\path.cpp">
+      <Filter>Fluidum\Utils\File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Test\test.lua">

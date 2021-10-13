@@ -622,6 +622,19 @@ FD::Internal::Text::Project::Project() {
 
 	std::getline(ifs, data);
 	this->notice_removeFolder = data;
+
+	std::getline(ifs, data);
+	{
+		std::string temp = ICON_MD_IMPORT_CONTACTS " ";
+		this->standardFluidumLibrary = (temp + data);
+	}
+
+	std::getline(ifs, data);
+	this->mainFile = data;
+
+	std::getline(ifs, data);
+	this->projectFolder = data;
+
 }
 
 

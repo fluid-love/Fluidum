@@ -72,10 +72,18 @@ namespace FS::Resource {
 #ifdef Fluidum_Path
 	constexpr inline const char* LuaMessagePath = Fluidum_Path "/Resources/Log/LuaMessage.jpn";
 	constexpr inline const char* LuaFolderPath = Fluidum_Path "/Resources/Source/Lua/";
+	constexpr inline const char* LuaSLLPlotPath = Fluidum_Path  "/Resources/Source/Lua/plot.lua";
+	constexpr inline const char* LuaSLLGenomePath = Fluidum_Path  "/Resources/Source/Lua/genome.lua";
+	constexpr inline const char* LuaSLLPianoPath = Fluidum_Path  "/Resources/Source/Lua/piano.lua";
+	constexpr inline const char* LuaSLLMathPath = Fluidum_Path  "/Resources/Source/Lua/math.lua";
 
 #else
 	constexpr inline const char* LuaMessagePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Log/LuaMessage.jpn")>();
 	constexpr inline const char* LuaFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/")>();
+	constexpr inline const char* LuaSLLPlotPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/plot.lua")>();
+	constexpr inline const char* LuaSLLGenomePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/genome.lua")>();
+	constexpr inline const char* LuaSLLPianoPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/piano.lua")>();
+	constexpr inline const char* LuaSLLMathPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/math.lua")>();
 
 #endif	
 

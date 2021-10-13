@@ -13,13 +13,19 @@ FS::TextEditor::TextEditor(
 
 	editor.SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 
-	std::ifstream ifs(tabRead->getDisplayFilePath());
+	std::string path_ = path.empty() ? tabRead->getDisplayFilePath() : path;
+	info.currentPath = path_;
+
+	std::ifstream ifs(path_);
 	std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
 	editor.SetText(str);
+
+	if (!path.empty())
+		return;
 
 	if (projectRead->getCurrentMainCodeType() == FD::Project::CodeType::Empty)
 		projectWrite->setMainCodePath(tabRead->getDisplayFilePath().c_str());
-
 }
 
 FS::TextEditor::~TextEditor() noexcept {
@@ -171,3 +177,17 @@ void FS::TextEditor::saveText() {
 
 	ofs << textToSave;
 }
+
+void FS::TextEditor::update() {
+	if (!tabRead->isDisplayFileChanged())
+		return;
+
+	auto textToSave = editor.GetText();
+
+	std::ofstream ofs(tabRead->getDisplayFilePath(), std::ios::trunc);
+
+	ofs << textToSave;
+}
+
+
+

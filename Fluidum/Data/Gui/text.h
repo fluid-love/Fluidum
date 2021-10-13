@@ -252,6 +252,11 @@ namespace FD::Internal::Text {
 		GuiText notice_removeFile;
 		GuiText notice_removeFolder;
 
+		GuiText standardFluidumLibrary;
+		GuiText mainFile;
+		GuiText projectFolder;
+
+
 	};
 
 

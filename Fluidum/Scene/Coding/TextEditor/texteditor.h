@@ -40,6 +40,9 @@ namespace FS {
 			ImVec2 windowSize = ImVec2();
 		}size;
 
+		struct {
+			std::string currentPath{};
+		}info;
 
 	private:
 		void textEditorMenu();
@@ -52,5 +55,7 @@ namespace FS {
 
 	private:
 		void saveText();
+
+		void update();
 	};
 }

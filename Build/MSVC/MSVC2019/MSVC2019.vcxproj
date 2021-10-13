@@ -263,6 +263,7 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\message.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.cpp" />
     <ClCompile Include="..\..\..\Fluidum\TextEditor\Source\texteditor.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Utils\File\path.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\imgui.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\operator.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\Log\messenger.cpp" />
@@ -271,6 +272,7 @@
     <ClCompile Include="..\..\..\Libraries\ImGuiColorTextEdit\TextEditor.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\..\Libraries\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui_widgets.cpp" />

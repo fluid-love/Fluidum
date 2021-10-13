@@ -77,7 +77,7 @@ namespace FD {
 		void writeProjectInfo(const char* path) const;
 
 		void tryCreateBackupFolder() const;
-		void tryCreateCodeFolder() const;
+		void tryCreateSrcFolder() const;
 		void tryCreateProjectFilesFolder() const;
 
 		void tryCreateFilesFile() const;
@@ -119,7 +119,7 @@ namespace FD {
 
 		_NODISCARD std::string getProjectFolderPath() const;
 		_NODISCARD std::string getBackupFolderPath() const;
-		_NODISCARD std::string getCodeFolderPath() const;
+		_NODISCARD std::string getSrcFolderPath() const;
 		_NODISCARD std::string getProjectName() const;
 
 		_NODISCARD bool isDefaultProject() const;

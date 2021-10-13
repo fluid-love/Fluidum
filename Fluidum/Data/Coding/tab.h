@@ -43,7 +43,11 @@ namespace FD::Coding {
 	public:
 		//LimitFileSizeMax == 1000
 		//AlreadyExist
+		//NotFound(file)
 		void addFile(const char* path) const;
+
+		void temp(const std::string& path, std::string&& code) const;
+		std::string getTemp(const std::string& path) const;
 
 		//NotFound
 		void eraseFile(const char* path) const;
@@ -75,6 +79,7 @@ namespace FD::Coding {
 	public:
 
 		_NODISCARD bool update() const;
+		_NODISCARD bool isDisplayFileChanged() const;
 
 		_NODISCARD std::vector<std::string> getFilePathes() const;
 		_NODISCARD std::string getDisplayFilePath() const;

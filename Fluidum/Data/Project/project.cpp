@@ -126,9 +126,9 @@ FD::ProjectWrite::ProjectWrite(Internal::PassKey) {
 	GCurrentData.projectName = projectName;
 
 	//create: backup code projectfiles
-	this->tryCreateBackupFolder();
-	this->tryCreateCodeFolder();
 	this->tryCreateProjectFilesFolder();
+	this->tryCreateBackupFolder();
+	this->tryCreateSrcFolder();
 	this->tryCreateFilesFile();
 	this->tryCreateTabFile();
 	this->tryCreateFunctionFile();
@@ -194,7 +194,7 @@ void FD::ProjectWrite::createNewProject(const Project::CreateProjectInfo& info) 
 
 	try {
 		this->tryCreateBackupFolder();
-		this->tryCreateCodeFolder();
+		this->tryCreateSrcFolder();
 		this->tryCreateProjectFilesFolder();
 		this->tryCreateFilesFile();
 		this->tryCreateTabFile();
@@ -477,7 +477,7 @@ void FD::ProjectWrite::tryCreateBackupFolder() const {
 	using namespace Internal::Project;
 
 	std::string backupFolderPath = GCurrentData.projectFolderPath;
-	backupFolderPath += "Backup/";
+	backupFolderPath += "ProjectFiles/Backup/";
 
 	if (!std::filesystem::is_directory(backupFolderPath)) {
 		if (!std::filesystem::create_directory(backupFolderPath))
@@ -485,15 +485,15 @@ void FD::ProjectWrite::tryCreateBackupFolder() const {
 	}
 }
 
-void FD::ProjectWrite::tryCreateCodeFolder() const {
+void FD::ProjectWrite::tryCreateSrcFolder() const {
 	using namespace Internal::Project;
 
 	std::string codeFolderPath = GCurrentData.projectFolderPath;
-	codeFolderPath += "Code/";
+	codeFolderPath += "Src/";
 
 	if (!std::filesystem::is_directory(codeFolderPath)) {
 		if (!std::filesystem::create_directory(codeFolderPath))
-			throw std::runtime_error("Failed to create Code directory.");
+			throw std::runtime_error("Failed to create Src directory.");
 	}
 }
 
@@ -827,9 +827,9 @@ std::string FD::ProjectRead::getBackupFolderPath() const {
 	return Internal::Project::GCurrentData.projectFolderPath + "Backup/";
 }
 
-std::string FD::ProjectRead::getCodeFolderPath() const {
+std::string FD::ProjectRead::getSrcFolderPath() const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	return Internal::Project::GCurrentData.projectFolderPath + "Code/";
+	return Internal::Project::GCurrentData.projectFolderPath + "Src/";
 }
 
 std::string FD::ProjectRead::getProjectName() const {

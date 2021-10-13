@@ -48,11 +48,11 @@ namespace FU::File {
 					if (result.at(i) == '/') {
 						result.at(i) = '\0';
 						break;
-				}
+					}
 #endif
 					result.at(i) = '\0';
+				}
 			}
-		}
 
 			for (uint32_t j = 0; j < addPathSize; j++) {
 				for (int32_t i = 0; i < result.size(); i++) {
@@ -66,7 +66,7 @@ namespace FU::File {
 			assert(result.back() == '\0');
 
 			return result;
-	}
+		}
 
 	private:
 		//auto == std::array<char,size>
@@ -78,7 +78,13 @@ namespace FU::File {
 		_NODISCARD constexpr operator const char* ()const noexcept {
 			return Path.data();
 		}
-};
+	};
 
+
+}
+
+namespace FU::File {
+
+	std::string directoryName(const std::string& path);
 
 }

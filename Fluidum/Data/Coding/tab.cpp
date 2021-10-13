@@ -3,6 +3,13 @@
 namespace FD::Internal::Coding {
 	constexpr inline uint16_t LimitMaxFileSize = 1000;
 	bool Update = false;
+	bool DisplayFileChanged = false;
+
+	struct FileInfo final {
+		std::string code{};
+	};
+
+	std::map<std::string, FileInfo> GData;
 }
 
 using namespace ::FD::Internal::Coding;
@@ -17,8 +24,12 @@ void FD::Coding::TabWrite::addFile(const char* path) const {
 	if (itr != TabData::filePathes.end())
 		throw Exception::AlreadyExist;
 
+	std::ifstream ifs(path);
+	if (!ifs)
+		throw Exception::NotFound;
+
 	TabData::filePathes.emplace_back(path);
-	
+
 	this->update();
 }
 
@@ -38,7 +49,27 @@ void FD::Coding::TabWrite::setDisplayFile(const char* path) const {
 	if (itr == TabData::filePathes.end())
 		throw Exception::NotFound;
 	TabData::displayFile = *itr;
+
+	DisplayFileChanged = true;
 	this->update();
+}
+
+void FD::Coding::TabWrite::temp(const std::string& path, std::string&& code) const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+
+	FileInfo info{
+		.code = std::move(code)
+	};
+	GData.insert({ path, std::move(info) });
+}
+
+std::string FD::Coding::TabWrite::getTemp(const std::string& path) const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+
+	std::string code = std::move(GData.at(path).code);
+	GData.erase(path);
+
+	return code;
 }
 
 void FD::Coding::TabWrite::update() const {
@@ -68,5 +99,11 @@ std::string FD::Coding::TabRead::getDisplayFilePath() const {
 	return TabData::displayFile;
 }
 
-
+bool FD::Coding::TabRead::isDisplayFileChanged() const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+	const bool result = DisplayFileChanged;
+	if (result)
+		DisplayFileChanged = false;
+	return result;
+}
 

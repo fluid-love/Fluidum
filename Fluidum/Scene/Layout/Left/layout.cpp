@@ -35,7 +35,7 @@ void FS::LeftLayout::call() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.006f, 0.005f, 0.005f, 1.000f));
+	ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, ImVec4(0.006f, 0.005f, 0.005f, 1.000f));
 	ImGui::PushStyleColor(ImGuiCol_ResizeGrip, 0);
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.266f, 0.200f, 0.200f, 1.000f));
 
@@ -66,7 +66,7 @@ void FS::LeftLayout::dockGui() {
 	
 
 	id = ImGui::GetID("LeftLayout");
-	ImGui::DockSpace(id, ImVec2(), ImGuiDockNodeFlags_PassthruCentralNode);
+	ImGui::DockSpace(id, ImVec2());
 
 	auto currentSizeX = ImGui::GetWindowSize().x;
 	if (static_cast<int32_t>(currentSizeX) != static_cast<int32_t>(style.windowSize.x)) {
