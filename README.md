@@ -58,3 +58,4 @@ Libraries Resourcesディレクトリ内はそれぞれのライセンスが適�
 - [boost](https://github.com/boostorg/boost)  
 - [freetype-2.10.0](https://www.freetype.org/)  
 - [lithash](https://github.com/fluid-love/Fluidum/tree/master/Libraries/lithash)  
+- [implot](https://github.com/epezent/implot)  
