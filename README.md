@@ -18,6 +18,10 @@
 
 <img src="https://github.com/fluid-love/Fluidum/blob/master/Document/Screenshots/title.jpg" width="500mm">
 
+# Build
+- c++20
+- Vulkan version 1.2
+
 # History Roadmap
 
 [Apr 2021]  
