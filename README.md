@@ -18,6 +18,10 @@
 
 <img src="https://github.com/fluid-love/Fluidum/blob/master/Document/Screenshots/title.jpg" width="500mm">
 
+# Build
+- c++20
+- Vulkan version 1.2
+
 # History Roadmap
 
 [Apr 2021]  
@@ -58,3 +62,4 @@ Libraries Resourcesディレクトリ内はそれぞれのライセンスが適�
 - [boost](https://github.com/boostorg/boost)  
 - [freetype-2.10.0](https://www.freetype.org/)  
 - [lithash](https://github.com/fluid-love/Fluidum/tree/master/Libraries/lithash)  
+- [implot](https://github.com/epezent/implot)  
