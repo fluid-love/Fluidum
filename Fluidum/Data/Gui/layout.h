@@ -10,10 +10,6 @@ namespace FD {
 		~GuiWrite() = default;
 		FluidumUtils_Class_Delete_CopyMove(GuiWrite)
 
-#ifdef FluidumData_DebugMode
-			GuiWrite() = default;
-#endif 
-
 	public:
 		void centerPos(const ImVec2& vec2) const noexcept;
 		void windowSize(const ImVec2& vec2) const noexcept;
@@ -47,16 +43,14 @@ namespace FD {
 		~LayoutWrite() = default;
 		FluidumUtils_Class_Delete_CopyMove(LayoutWrite)
 
-#ifdef FluidumData_DebugMode
-			LayoutWrite() = default;
-#endif 
-
 	public:
 		void leftLayoutPos(const ImVec2& vec2) const noexcept;
 		void leftLayoutSize(const ImVec2& vec2) const noexcept;
 		void rightLayoutPos(const ImVec2& vec2) const noexcept;
 		void rightLayoutSize(const ImVec2& vec2) const noexcept;
 
+		void leftDockSpaceID(const ImGuiID id) const noexcept;
+		void rightDockSpaceID(const ImGuiID id) const noexcept;
 
 	};
 
@@ -72,10 +66,42 @@ namespace FD {
 		_NODISCARD ImVec2 rightLayoutPos() const noexcept;
 		_NODISCARD ImVec2 rightLayoutSize() const noexcept;
 
+		_NODISCARD ImGuiID leftLayoutID() const noexcept;
+		_NODISCARD ImGuiID rightLayoutID() const noexcept;
+
+	};
+}
+
+namespace FD{
+
+	class ImGuiWindowWrite final {
+	public:
+		ImGuiWindowWrite(Internal::PassKey) {};
+		~ImGuiWindowWrite() = default;
+		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowWrite)
+
+	public:
+		//require: std::same_as<T, ImGuiWindow*>
+		//avoid #include <imgui_internal.h>
+		template<typename T>
+		void set(const FU::Class::ClassCode::CodeType classCode,T windowPtr) const;
+
+
+
 
 	};
 
+	class ImGuiWindowRead final {
+	public:
+		ImGuiWindowRead(Internal::PassKey) {};
+		~ImGuiWindowRead() = default;
+		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowRead)
 
+	public:
+		//return ImGuiWindow*
+		_NODISCARD auto get(const FU::Class::ClassCode::CodeType classCode) const;
+
+	};
 
 
 }

@@ -60,17 +60,20 @@ namespace FD {
 		using FData = Calc::Internal::FunctionData;
 
 
-		static inline Calc::Internal::FunctionContainer data{};
+		static inline Calc::Internal::FunctionContainer<FluidumData_Lua_ContainerTemplateArgs> data{};
 
 	public:
 		//puah_back
 		template<Calc::Lua::FunctionType FType, Calc::Lua::IsArgType... Arg>
-		void push(const Calc::Lua::FunctionType type, Arg&&...args) {
+		void push(Arg&&...args) {
 			std::lock_guard<std::mutex> lock(FData::mtx);
-			data.push(Calc::Lua::Internal::RetArgInfo<FType>{std::forward<Arg>(args)...});			
+			data.push(Calc::Lua::Internal::RetArgInfo<FType>{std::forward<Arg>(args)...});
 		}
 
-
+		_NODISCARD bool empty() {
+			std::lock_guard<std::mutex> lock(FData::mtx);
+			return data.empty();
+		}
 
 
 	private:

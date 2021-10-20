@@ -1,20 +1,20 @@
 #pragma once
 
 #include "../../Common/common.h"
-#include "../../../TextEditor/include.h"
 
 namespace FS {
 
 	class TextEditor final : public Scene {
 	public:
 		explicit TextEditor(
+			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
 			const FD::GuiRead* const guiRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			const std::string& path = {}
 		);
-		void Constructor(FD::Coding::TabRead, FD::GuiRead, FD::ProjectWrite, FD::ProjectRead);
+		void Constructor(FD::Coding::TabWrite, FD::Coding::TabRead, FD::GuiRead, FD::ProjectWrite, FD::ProjectRead);
 
 		~TextEditor() noexcept;
 
@@ -24,6 +24,7 @@ namespace FS {
 		virtual void call() override;
 
 	private://data
+		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
 		const FD::GuiRead* const guiRead;
 		FD::ProjectWrite* const projectWrite;
@@ -31,7 +32,6 @@ namespace FS {
 
 		FD::Text::TextEditor text{};
 
-		FTE::TextEditor editor{};
 
 	private://data
 
@@ -40,9 +40,13 @@ namespace FS {
 			ImVec2 windowSize = ImVec2();
 		}size;
 
-		struct {
-			std::string currentPath{};
-		}info;
+		struct Info final {
+			FTE::TextEditor* editor = nullptr;
+			std::string path{};
+		};
+		std::vector<Info> info{};
+
+		FTE::TextEditor* editor = nullptr;
 
 	private:
 		void textEditorMenu();
@@ -57,5 +61,8 @@ namespace FS {
 		void saveText();
 
 		void update();
+		void textChange();
+		std::string getCurrentEditorPath();
+
 	};
 }

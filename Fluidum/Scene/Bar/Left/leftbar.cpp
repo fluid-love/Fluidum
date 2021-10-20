@@ -4,6 +4,10 @@
 #include "../../Coding/TextEditor/texteditor.h"
 #include "../../Coding/Tab/tab.h"
 #include "../../Project/project.h"
+#include "../../Analysis/analysis.h"
+#include "../../Analysis/Func/function.h"
+#include "../../Analysis/Plot/plot.h"
+
 
 using namespace FU::ImGui::Operators;
 
@@ -30,6 +34,12 @@ FS::LeftBar::LeftBar(
 
 
 	guiWrite->leftBarWidth(style.windowSize.x);
+
+	//set analysis icons
+	for (uint16_t i = 0; i < 2; i++) {
+		sub.analysisImages.emplace_back(images.at(images.size() - 2 + i));
+	}
+
 }
 
 FS::LeftBar::~LeftBar() noexcept {
@@ -82,6 +92,7 @@ void FS::LeftBar::call() {
 
 
 	//subwindow
+
 	if (sub.isIconHovered)
 		this->subWindow();
 }
@@ -109,7 +120,7 @@ namespace FS::Internal {
 	constexpr inline std::array<FU::Class::ClassCode::CodeType, 7> MainScenes = {
 		FU::Class::ClassCode::GetClassCode<::FS::TextEditor>(),
 		FU::Class::ClassCode::GetClassCode<Dummy2>(),
-		FU::Class::ClassCode::GetClassCode<Dummy3>(),
+		FU::Class::ClassCode::GetClassCode<::FS::AnalysisOverview>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Project>(),
 		FU::Class::ClassCode::GetClassCode<Dummy5>(),
 		FU::Class::ClassCode::GetClassCode<Dummy6>(),
@@ -127,16 +138,7 @@ void FS::LeftBar::imageGui() {
 			if (ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.main)) {
 				this->deleteScene(Internal::MainScenes[i]);
 			}
-			//ImageButtonがHoveredである
-			if (ImGui::IsMouseHoveringRect(ImGui::GetItemRectMin(), { ImGui::GetItemRectMax().x + 20.0f,ImGui::GetItemRectMax().y })) {
-				sub.current = static_cast<SceneIndex>(i + 1);
-				sub.selectWindowPos = ImVec2(ImGui::GetItemRectMax().x + 1.0f, ImGui::GetItemRectMin().y);
-				sub.isIconHovered = true;
-			}
-			else {
-				if (!sub.isSubWindowHovered)
-					sub.isIconHovered = false;
-			}
+			this->hoveredIcon(i);
 		}
 		else {
 			//ボタンが押されたら == シーンの追加を要請
@@ -145,16 +147,30 @@ void FS::LeftBar::imageGui() {
 			}
 		}
 
-
 		//つめつめなので少し空ける
 		ImGui::Spacing(); ImGui::Spacing();
 	}
 
 }
 
+void FS::LeftBar::hoveredIcon(const std::size_t index) {
+	if (ImGui::IsMouseHoveringRect(ImGui::GetItemRectMin(), { ImGui::GetItemRectMax().x + 20.0f,ImGui::GetItemRectMax().y })) {
+		sub.current = static_cast<SceneIndex>(index + 1);
+		sub.selectWindowPos = ImVec2(ImGui::GetItemRectMax().x + 1.0f, ImGui::GetItemRectMin().y);
+		sub.isIconHovered = true;
+	}
+	else {
+		if (!sub.isSubWindowHovered)
+			sub.isIconHovered = false;
+	}
+}
+
 void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 	if (code == Internal::MainScenes[0]) {
 		this->addCodingScene();
+	}
+	else if (code == Internal::MainScenes[2]) {
+		this->addAnalysisScene();
 	}
 	else if (code == Internal::MainScenes[3]) {
 		this->addProjectScene();
@@ -183,6 +199,11 @@ void FS::LeftBar::addCodingScene() {
 	}
 }
 
+void FS::LeftBar::addAnalysisScene() {
+	GLog.add<FD::Log::Type::None>("Request add AnalysisScene.");
+	Scene::addScene<AnalysisOverview>();
+}
+
 void FS::LeftBar::addProjectScene() {
 	GLog.add<FD::Log::Type::None>("Request add ProjectScene.");
 	Scene::addScene<::FS::Project>();
@@ -190,9 +211,18 @@ void FS::LeftBar::addProjectScene() {
 
 void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 	if (code == Internal::MainScenes[0]) {
-		//画像の開放
+		GLog.add<FD::Log::Type::None>("Request tryDelete Coding::TabScene.");
+		Scene::tryDeleteScene<Coding::Tab>();
 		GLog.add<FD::Log::Type::None>("Request delete TextEditorScene.");
 		Scene::deleteScene<TextEditor>();
+	}
+	else if (code == Internal::MainScenes[2]) {
+		GLog.add<FD::Log::Type::None>("Request delete AnalysisScene.");
+		Scene::deleteScene<AnalysisOverview>();
+	}
+	else if (code == Internal::MainScenes[3]) {
+		GLog.add<FD::Log::Type::None>("Request delete ProjectScene.");
+		Scene::deleteScene<Project>();
 	}
 	else {
 		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
@@ -216,6 +246,8 @@ void FS::LeftBar::subWindow() {
 
 	if (sub.current == SceneIndex::Coding)
 		this->subWindowCoding();
+	else if (sub.current == SceneIndex::AnalysisOverview)
+		this->subWindowAnalysis();
 
 	this->subWindowHelpSetting();
 
@@ -241,7 +273,7 @@ void FS::LeftBar::subWindowCoding() {
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
 			const ImVec2 pos2 = ImGui::GetItemRectMax();
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pos1, pos2, false)) {
-				this->deleteCodingScene(scenes[i]);
+				this->deleteCodingSubScene(scenes[i]);
 			}
 		}
 		else {
@@ -252,14 +284,44 @@ void FS::LeftBar::subWindowCoding() {
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
 			const ImVec2 pos2 = ImGui::GetItemRectMax();
 			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pos1, pos2, false)) {
-				this->addCodingScene(scenes[i]);
+				this->addCodingSubScene(scenes[i]);
 			}
 
 		}
 	}
 }
 
-void FS::LeftBar::addCodingScene(const ClassCode::CodeType code) {
+void FS::LeftBar::subWindowAnalysis() {
+	constexpr std::array<ClassCode::CodeType, 2> scenes = {
+		ClassCode::GetClassCode<Analysis::Function>(),
+		ClassCode::GetClassCode<Analysis::Plot>()
+	};
+
+	for (std::size_t i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
+
+		if (sceneRead->isExist(scenes[i])) {
+			ImGui::ImageButton(sub.analysisImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
+
+			const ImVec2 pos1 = ImGui::GetItemRectMin();
+			const ImVec2 pos2 = ImGui::GetItemRectMax();
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pos1, pos2, false)) {
+				this->deleteAnalysisSubScene(scenes[i]);
+			}
+		}
+		else {
+			ImGui::ImageButton(sub.analysisImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.dummy);
+
+			const ImVec2 pos1 = ImGui::GetItemRectMin();
+			const ImVec2 pos2 = ImGui::GetItemRectMax();
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pos1, pos2, false)) {
+				this->addAnalysisSubScene(scenes[i]);
+			}
+
+		}
+	}
+}
+
+void FS::LeftBar::addCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
 		GLog.add<FD::Log::Type::None>("Request add Coding::TabScene.");
 		Scene::addScene<Coding::Tab>();
@@ -270,10 +332,41 @@ void FS::LeftBar::addCodingScene(const ClassCode::CodeType code) {
 	}
 }
 
-void FS::LeftBar::deleteCodingScene(const ClassCode::CodeType code) {
+void FS::LeftBar::addAnalysisSubScene(const ClassCode::CodeType code) {
+	if (code == ClassCode::GetClassCode<Analysis::Function>()) {
+		GLog.add<FD::Log::Type::None>("Request add Analysis::FunctionScene.");
+		Scene::addScene<Analysis::Function>();
+	}
+	else if (code == ClassCode::GetClassCode<Analysis::Plot>()) {
+		GLog.add<FD::Log::Type::None>("Request add Analysis::PlotScene.");
+		Scene::addScene<Analysis::Plot>();
+	}
+	else {
+		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		abort();
+	}
+
+}
+
+void FS::LeftBar::deleteCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
 		GLog.add<FD::Log::Type::None>("Request delete Coding::TabScene.");
 		Scene::deleteScene<Coding::Tab>();
+	}
+	else {
+		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		abort();
+	}
+}
+
+void FS::LeftBar::deleteAnalysisSubScene(const ClassCode::CodeType code) {
+	if (code == ClassCode::GetClassCode<Analysis::Function>()) {
+		GLog.add<FD::Log::Type::None>("Request delete Analysis::FunctionScene.");
+		Scene::deleteScene<Analysis::Function>();
+	}
+	else if (code == ClassCode::GetClassCode<Analysis::Plot>()) {
+		GLog.add<FD::Log::Type::None>("Request delete Analysis::PlotScene.");
+		Scene::deleteScene<Analysis::Plot>();
 	}
 	else {
 		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);

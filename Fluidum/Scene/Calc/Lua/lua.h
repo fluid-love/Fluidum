@@ -10,9 +10,18 @@ namespace FS::Lua {
 	public:
 		explicit Calc(
 			const FD::ProjectRead* const projectread,
-			FD::ConsoleWrite* const consoleWrite
+			FD::ConsoleWrite* const consoleWrite,
+			FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite,
+			FD::ImPlotWrite* const implotWrite,
+			const FD::ImPlotRead* const implotRead
 		);
-		void Constructor(FD::ProjectRead, FD::ConsoleWrite);
+		void Constructor(
+			FD::ProjectRead,
+			FD::ConsoleWrite,
+			FD::FunctionWrite<FD::Calc::Language::Lua>,
+			FD::ImPlotWrite,
+			FD::ImPlotRead
+		);
 
 		~Calc() noexcept;
 
@@ -23,12 +32,14 @@ namespace FS::Lua {
 
 	private:
 		using Type = FD::Calc::Lua::FunctionType;
-
 	private://data
 		const FD::ProjectRead* const projectread;
 		FD::ConsoleWrite* const consoleWrite;
+		FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite;
+		FD::ImPlotWrite* const implotWrite;
+		const FD::ImPlotRead* const implotRead;
 
-		Internal::Check check{consoleWrite};
+		Internal::Check check{ consoleWrite };
 
 		//lua state
 		lua_State* const state;
@@ -98,29 +109,24 @@ namespace FS::Lua {
 	//	引数：
 	//		一時的なgenomeのindex
 	//	*/
-	//	FLUIDUM_LUA_API Ret push_Genome(State L);
+	//	Fluidum_Lua_Api Ret push_Genome(State L);
 
 	//private://Math
-	//	FLUIDUM_LUA_API Ret hypot(State L);//距離を返す
-	//	FLUIDUM_LUA_API Ret randomInt(State L);//ランダムな整数値を返す
+	//	Fluidum_Lua_Api Ret hypot(State L);//距離を返す
+	//	Fluidum_Lua_Api Ret randomInt(State L);//ランダムな整数値を返す
 
-	//private://FPlot
+	private://FPlot
 
-	//	//plotのベースを作成してfigureを埋める．そしてそのplotの番号を返す．
-	//	FLUIDUM_LUA_API Ret create_Plot(State L);
+		Fluidum_Lua_Api Ret plot_create(State L);
+		Fluidum_Lua_Api Ret plot_pushBack(State L);
+		Fluidum_Lua_Api Ret plot_setMarker(State L);
 
-	//	FLUIDUM_LUA_API Ret push_Plot(State L);
+		//private://FDraw
 
-	//	FLUIDUM_LUA_API Ret marker_Plot(State L);
-
-	//private://FDraw
-
-	//	FLUIDUM_LUA_API Ret create_Draw(State L);
-	//	FLUIDUM_LUA_API Ret updateVertex(State L);
-	//	FLUIDUM_LUA_API Ret updateIndex(State L);
-	//	FLUIDUM_LUA_API Ret clear_Draw(State L);
-
-
+		//	Fluidum_Lua_Api Ret create_Draw(State L);
+		//	Fluidum_Lua_Api Ret updateVertex(State L);
+		//	Fluidum_Lua_Api Ret updateIndex(State L);
+		//	Fluidum_Lua_Api Ret clear_Draw(State L);
 
 	private://FSystem
 
@@ -134,8 +140,6 @@ namespace FS::Lua {
 
 			//private:
 			//	FLUIDUM_LUA_API Ret create_Piano(State L);
-
-
 
 	};
 

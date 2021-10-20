@@ -245,6 +245,7 @@ void FS::Bar::NewProject::bottom() {
 }
 
 #include <imgui_internal.h>
+
 bool FS::Bar::NewProject::button(const FDR::ImGuiImage& image, const char* label, const char* title, const char* description) {
 	ImGui::BeginChild(label, style.buttonSize, true);
 

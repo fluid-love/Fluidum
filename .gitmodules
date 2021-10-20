@@ -23,3 +23,6 @@
 [submodule "Libraries/ImGuiColorTextEdit"]
 	path = Libraries/ImGuiColorTextEdit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
+[submodule "Libraries/implot"]
+	path = Libraries/implot
+	url = https://github.com/epezent/implot.git

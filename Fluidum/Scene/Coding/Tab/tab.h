@@ -47,21 +47,19 @@ namespace FS::Coding {
 			std::size_t currentIndex = 0;
 		}files;
 
+		struct {
+			uint16_t index = 0;
+		}select;
+
 	private:
 		void checkWindowShouldClose();
 
-		void topBar();
-
-		void include();
-		void create();
-		void sync();
-		void code();
-		void save();
 
 	private:
 		void update();
 
 	private:
 		void fileList();
+		void display();
 	};
 }

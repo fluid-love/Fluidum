@@ -10,9 +10,16 @@ namespace FS {
 			const FD::ProjectRead* const projectRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
-			const FD::SceneRead* const sceneRead
+			const FD::SceneRead* const sceneRead,
+			const FD::TopBarRead* const topBarRead
 		);
-		void Constructor(FD::ProjectRead, FD::GuiRead, FD::GuiWrite, FD::SceneRead);
+		void Constructor(
+			FD::ProjectRead,
+			FD::GuiRead, 
+			FD::GuiWrite, 
+			FD::SceneRead, 
+			FD::TopBarRead
+		);
 
 		~TopBar() noexcept;
 
@@ -22,9 +29,9 @@ namespace FS {
 	private://data
 		const FD::ProjectRead* const projectRead;
 		const FD::GuiRead* const guiRead;
-		FD::GuiWrite* const guiWrite = nullptr;
-		const FD::SceneRead* const sceneRead = nullptr;
-
+		FD::GuiWrite* const guiWrite;
+		const FD::SceneRead* const sceneRead;
+		const FD::TopBarRead* const topBarRead;
 
 	private://data
 
@@ -73,6 +80,8 @@ namespace FS {
 
 		void playCheck();
 
-		void file();
+	private://left
+		void scene();
+		void combo();
 	};
 }

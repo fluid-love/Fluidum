@@ -1,31 +1,34 @@
 #include "texteditor.h"
 
 FS::TextEditor::TextEditor(
+	FD::Coding::TabWrite* const tabWrite,
 	const FD::Coding::TabRead* const tabRead,
 	const FD::GuiRead* const guiRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
 	const std::string& path
 )
-	: tabRead(tabRead), guiRead(guiRead), projectWrite(projectWrite), projectRead(projectRead)
+	: tabWrite(tabWrite), tabRead(tabRead), guiRead(guiRead), projectWrite(projectWrite), projectRead(projectRead)
 {
 	GLog.add<FD::Log::Type::None>("Construct TextEditorScene.");
 
-	editor.SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 
-	std::string path_ = path.empty() ? tabRead->getDisplayFilePath() : path;
-	info.currentPath = path_;
+	auto paths = tabRead->getDisplayFilePaths();
 
-	std::ifstream ifs(path_);
-	std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+	for (auto& x : paths) {
+		std::ifstream ifs(path);
+		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
-	editor.SetText(str);
+		auto info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,path });
+		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
+		info_.editor->SetText(str);
+	}
 
 	if (!path.empty())
 		return;
 
 	if (projectRead->getCurrentMainCodeType() == FD::Project::CodeType::Empty)
-		projectWrite->setMainCodePath(tabRead->getDisplayFilePath().c_str());
+		projectWrite->setMainCodePath(tabRead->getDisplayFilePaths().at(0).c_str());
 }
 
 FS::TextEditor::~TextEditor() noexcept {
@@ -56,18 +59,24 @@ void FS::TextEditor::call() {
 	ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(1024, 768), ImGuiCond_FirstUseEver);
 
+	for (uint16_t i = 0; auto & x : this->info) {
+		this->editor = x.editor;
+		std::string label = text.editor.operator const char* ();
+		(label += "##") += std::to_string(i++);
+		ImGui::Begin(label.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar);
 
-	ImGui::Begin(text.editor, nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar);
+		this->textEditorMenu();
+		this->textEditor();
+		this->textEditorInfo();
 
-
-	this->textEditorMenu();
-	this->textEditor();
-	this->textEditorInfo();
-
-	ImGui::End();
+		ImGui::End();
+	}
 
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor();
+
+	this->textChange();
+	this->update();
 }
 
 void FS::TextEditor::textEditorMenu() {
@@ -114,32 +123,32 @@ void FS::TextEditor::editMenu() {
 	if (!ImGui::BeginMenu(text.edit))
 		return;
 
-	bool ro = editor.IsReadOnly();
+	bool ro = editor->IsReadOnly();
 	if (ImGui::MenuItem(text.readOnly, nullptr, &ro))
-		editor.SetReadOnly(ro);
+		editor->SetReadOnly(ro);
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem(text.undo, "ALT-Backspace", nullptr, !ro && editor.CanUndo()))
-		editor.Undo();
-	if (ImGui::MenuItem(text.redo, "Ctrl-Y", nullptr, !ro && editor.CanRedo()))
-		editor.Redo();
+	if (ImGui::MenuItem(text.undo, "ALT-Backspace", nullptr, !ro && editor->CanUndo()))
+		editor->Undo();
+	if (ImGui::MenuItem(text.redo, "Ctrl-Y", nullptr, !ro && editor->CanRedo()))
+		editor->Redo();
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem(text.copy, "Ctrl-C", nullptr, editor.HasSelection()))
-		editor.Copy();
-	if (ImGui::MenuItem(text.cut, "Ctrl-X", nullptr, !ro && editor.HasSelection()))
-		editor.Cut();
-	if (ImGui::MenuItem(text.del, "Del", nullptr, !ro && editor.HasSelection()))
-		editor.Delete();
+	if (ImGui::MenuItem(text.copy, "Ctrl-C", nullptr, editor->HasSelection()))
+		editor->Copy();
+	if (ImGui::MenuItem(text.cut, "Ctrl-X", nullptr, !ro && editor->HasSelection()))
+		editor->Cut();
+	if (ImGui::MenuItem(text.del, "Del", nullptr, !ro && editor->HasSelection()))
+		editor->Delete();
 	if (ImGui::MenuItem(text.paste, "Ctrl-V", nullptr, !ro && ImGui::GetClipboardText() != nullptr))
-		editor.Paste();
+		editor->Paste();
 
 	ImGui::Separator();
 
 	if (ImGui::MenuItem(text.selectAll, nullptr, nullptr))
-		editor.SetSelection(FTE::TextEditor::Coordinates(), FTE::TextEditor::Coordinates(editor.GetTotalLines(), 0));
+		editor->SetSelection(FTE::TextEditor::Coordinates(), FTE::TextEditor::Coordinates(editor->GetTotalLines(), 0));
 
 	ImGui::EndMenu();
 
@@ -149,45 +158,80 @@ void FS::TextEditor::themeMenu() {
 	if (!ImGui::BeginMenu(text.theme))
 		return;
 
-	if (ImGui::MenuItem(text.dark))
-		editor.SetPalette(FTE::TextEditor::GetDarkPalette());
+	auto palette = editor->GetPalette();
+
+	if (ImGui::MenuItem(text.dark)) {
+		palette.at(static_cast<std::size_t>(FTE::TextEditor::PaletteIndex::Background)) = ImGui::ColorConvertFloat4ToU32({ 0.05f,0.05f,0.05f,1.0f });
+		palette.at(static_cast<std::size_t>(FTE::TextEditor::PaletteIndex::String)) = ImGui::ColorConvertFloat4ToU32({ 1.0f,1.0f,1.0f,1.0f });
+
+		editor->SetPalette(palette);
+	}
 	if (ImGui::MenuItem(text.light))
-		editor.SetPalette(FTE::TextEditor::GetLightPalette());
+		editor->SetPalette(FTE::TextEditor::GetLightPalette());
 	if (ImGui::MenuItem(text.blue))
-		editor.SetPalette(FTE::TextEditor::GetRetroBluePalette());
+		editor->SetPalette(FTE::TextEditor::GetRetroBluePalette());
 	ImGui::EndMenu();
 }
 
 void FS::TextEditor::textEditor() {
-	editor.Render("TextEditor");
+	editor->Render("TextEditor", { ImGui::GetWindowWidth(),ImGui::GetWindowHeight() * 0.93f });
 }
 
 void FS::TextEditor::textEditorInfo() {
-	auto cpos = editor.GetCursorPosition();
-	ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
-		editor.IsOverwrite() ? "Ovr" : "Ins",
-		editor.CanUndo() ? "*" : " ",
-		editor.GetLanguageDefinition().mName.c_str(), "test");
+	auto cpos = editor->GetCursorPosition();
+	ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor->GetTotalLines(),
+		editor->IsOverwrite() ? "Ovr" : "Ins",
+		editor->CanUndo() ? "*" : " ",
+		editor->GetLanguageDefinition().mName.c_str(), "test");
 }
 
 void FS::TextEditor::saveText() {
-	auto textToSave = editor.GetText();
-
-	std::ofstream ofs(tabRead->getDisplayFilePath(), std::ios::trunc);
-
+	auto textToSave = editor->GetText();
+	const std::string path = getCurrentEditorPath();
+	std::ofstream ofs(path, std::ios::trunc);
 	ofs << textToSave;
+
+	tabWrite->setIsTextChanged(path, false);
 }
 
 void FS::TextEditor::update() {
 	if (!tabRead->isDisplayFileChanged())
 		return;
 
-	auto textToSave = editor.GetText();
+	auto paths = tabRead->getDisplayFilePaths();
 
-	std::ofstream ofs(tabRead->getDisplayFilePath(), std::ios::trunc);
+	for (auto& x : paths) {
+		//not new file
+		auto itr = std::find_if(info.begin(), info.end(), [&](auto& y) {return y.path == x; });
+		if (itr != info.end()) {
+			continue;
+		}
 
-	ofs << textToSave;
+		std::ifstream ifs(x);
+		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+		auto info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,x });
+		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
+		info_.editor->SetText(str);
+	}
+
+	for (const auto& x : paths) {
+		auto itr = std::erase_if(info, [&](auto& y)
+			{
+				auto itr = std::find_if(info.begin(), info.end(), [&](auto&) {return y.path == x; });
+				return itr == info.end();
+			});
+	}
 }
 
+void FS::TextEditor::textChange() {
+	if (!editor->IsTextChanged())
+		return;
 
+	std::cout << "a";
+}
+
+std::string FS::TextEditor::getCurrentEditorPath() {
+	const auto itr = std::find_if(info.cbegin(), info.cend(), [&](auto& x) {return x.editor == this->editor; });
+	return itr->path;
+}
 

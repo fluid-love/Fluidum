@@ -20,13 +20,17 @@ namespace FD::Calc::Internal {
 	public:
 		template<typename T> requires(std::same_as<T, Data> || ...)
 			void push(T&& d) {
-			auto& dataRef = std::get<T>(this->data);
+			auto& dataRef = std::get<std::vector<T>>(this->data);
 			dataRef.emplace_back(std::forward<T>(d));
 			constexpr FU::Class::ClassCode::CodeType code = FU::Class::ClassCode::GetClassCode<T>();
 
 			assert(!dataRef.empty());
-			ref.emplace_back({ code,dataRef.size() - 1 });
+			ref.emplace_back(Ref{ code , static_cast<uint16_t>(dataRef.size() - 1) });
 			index++;
+		}
+
+		_NODISCARD bool empty() const noexcept {
+			return ref.empty();
 		}
 
 

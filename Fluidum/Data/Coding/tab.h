@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Common/common.h"
+#include "../../TextEditor/include.h"
 
 //forward
 namespace FD {
@@ -16,7 +17,7 @@ namespace FD::Internal::Coding {
 	class TabData final {
 	private:
 		static inline std::vector<std::string> filePathes{};
-		static inline std::string displayFile{};
+		static inline std::vector<std::string> displayFiles{};
 		static inline std::mutex mtx{};
 
 		static inline std::atomic_bool save = false;
@@ -44,18 +45,20 @@ namespace FD::Coding {
 		//LimitFileSizeMax == 1000
 		//AlreadyExist
 		//NotFound(file)
-		void addFile(const char* path) const;
+		void addFile(const std::string& path) const;
 
-		void temp(const std::string& path, std::string&& code) const;
-		std::string getTemp(const std::string& path) const;
-
-		//NotFound
-		void eraseFile(const char* path) const;
+		FTE::TextEditor* getEditor(const std::string& path) const;
 
 		//NotFound
-		void setDisplayFile(const char* path) const;
+		void eraseFile(const std::string& path) const;
+
+		//NotFound
+		void addDisplayFile(const std::string& path) const;
+		void eraseDisplayFile(const std::string& path) const;
 
 		void save() const;
+
+		void setIsTextChanged(const std::string& path,const bool val) const;
 
 	public:
 		enum class Exception : uint8_t {
@@ -82,7 +85,7 @@ namespace FD::Coding {
 		_NODISCARD bool isDisplayFileChanged() const;
 
 		_NODISCARD std::vector<std::string> getFilePathes() const;
-		_NODISCARD std::string getDisplayFilePath() const;
+		_NODISCARD std::vector<std::string> getDisplayFilePaths() const;
 
 	};
 

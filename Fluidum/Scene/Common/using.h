@@ -23,8 +23,14 @@ namespace FS {
 		FD::Coding::TabRead,
 		FD::ConsoleWrite,
 		FD::FunctionWrite<FD::Calc::Language::Lua>,
-		FD::FunctionRead<FD::Calc::Language::Lua>
-	>;
+		FD::FunctionRead<FD::Calc::Language::Lua>,
+		FD::ImPlotWrite,
+		FD::ImPlotRead,
+		FD::TopBarWrite,
+		FD::TopBarRead,
+		FD::ImGuiWindowWrite,
+		FD::ImGuiWindowRead
+	> ;
 
 	//ŠeƒV[ƒ“‚ÅpublicŒp³‚·‚é upcast‚·‚é‚Ì‚Åpublic
 	using Scene = MainFluidumScene::SceneBaseType;

@@ -32,7 +32,6 @@ namespace FS {
 
 
 	private://data
-		std::array<ClassCode::CodeType, 9> test;
 
 		const std::vector<FDR::ImGuiImage> images;
 
@@ -50,11 +49,13 @@ namespace FS {
 			ImVec4 dummy = { 0.0f, 0.0f, 0.0f, 0.0f };
 			ImVec4 main = { 0.02f, 0.02f, 0.5f, 0.9f };
 			ImVec4 sub = { 0.2f, 0.02f, 0.02f, 0.9f };
+			ImVec4 analysis = { 0.2f, 0.2f, 0.02f, 0.9f };
 		}color;
 
-		enum SceneIndex : uint8_t {
+		enum class SceneIndex : uint8_t {
 			None = 0,
-			Coding = 1
+			Coding = 1,
+			AnalysisOverview = 3,
 		};
 
 		struct SubWindow final {
@@ -64,25 +65,36 @@ namespace FS {
 			SceneIndex current = SceneIndex::None;
 
 			std::optional<std::array<FDR::ImGuiImage, 1>> codingImages = std::nullopt;
+			std::vector<FDR::ImGuiImage> analysisImages{};
+
 		}sub;
 
+		
 
 
 	private:
 
 		void imageGui();
+		void hoveredIcon(const std::size_t index);
+
 		void addScene(const ClassCode::CodeType code);
 		void addCodingScene();
+		void addAnalysisScene();
 		void addProjectScene();
+
 		void deleteScene(const ClassCode::CodeType code);
 
 		//ImageButton‚ÌHoveredŽž
 		void subWindow();
 
 		void subWindowCoding();
+		void subWindowAnalysis();
 
-		void addCodingScene(const ClassCode::CodeType code);
-		void deleteCodingScene(const ClassCode::CodeType code);
+		void addCodingSubScene(const ClassCode::CodeType code);
+		void addAnalysisSubScene(const ClassCode::CodeType code);
+
+		void deleteCodingSubScene(const ClassCode::CodeType code);
+		void deleteAnalysisSubScene(const ClassCode::CodeType code);
 
 
 

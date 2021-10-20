@@ -6,15 +6,16 @@ namespace FD::Internal::Coding {
 	bool DisplayFileChanged = false;
 
 	struct FileInfo final {
-		std::string code{};
+		FTE::TextEditor editor{};
+		bool isTextChanged = false;
 	};
 
-	std::map<std::string, FileInfo> GData;
+	std::map<std::string, std::unique_ptr<FileInfo>> GData;
 }
 
 using namespace ::FD::Internal::Coding;
 
-void FD::Coding::TabWrite::addFile(const char* path) const {
+void FD::Coding::TabWrite::addFile(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
 
 	if (TabData::filePathes.size() >= LimitMaxFileSize)
@@ -33,7 +34,7 @@ void FD::Coding::TabWrite::addFile(const char* path) const {
 	this->update();
 }
 
-void FD::Coding::TabWrite::eraseFile(const char* path) const {
+void FD::Coding::TabWrite::eraseFile(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
 	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
 	if (itr == TabData::filePathes.end())
@@ -43,33 +44,37 @@ void FD::Coding::TabWrite::eraseFile(const char* path) const {
 	this->update();
 }
 
-void FD::Coding::TabWrite::setDisplayFile(const char* path) const {
+void FD::Coding::TabWrite::addDisplayFile(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
 	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
 	if (itr == TabData::filePathes.end())
 		throw Exception::NotFound;
-	TabData::displayFile = *itr;
+
+	if (!GData.contains(path)) {
+		GData.insert({ path,std::make_unique<FileInfo>() });
+	}
+
+	TabData::displayFiles.emplace_back(*itr);
 
 	DisplayFileChanged = true;
 	this->update();
 }
 
-void FD::Coding::TabWrite::temp(const std::string& path, std::string&& code) const {
+void FD::Coding::TabWrite::eraseDisplayFile(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
+	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
+	if (itr == TabData::filePathes.end())
+		throw Exception::NotFound;
 
-	FileInfo info{
-		.code = std::move(code)
-	};
-	GData.insert({ path, std::move(info) });
+	TabData::displayFiles.erase(itr);
+
+	DisplayFileChanged = true;
+	this->update();
 }
 
-std::string FD::Coding::TabWrite::getTemp(const std::string& path) const {
+FTE::TextEditor* FD::Coding::TabWrite::getEditor(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
-
-	std::string code = std::move(GData.at(path).code);
-	GData.erase(path);
-
-	return code;
+	return &GData.at(path).get()->editor;
 }
 
 void FD::Coding::TabWrite::update() const {
@@ -78,6 +83,11 @@ void FD::Coding::TabWrite::update() const {
 
 void FD::Coding::TabWrite::save() const {
 	TabData::save.store(true);
+}
+
+void FD::Coding::TabWrite::setIsTextChanged(const std::string& path, const bool val) const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+	GData.at(path).get()->isTextChanged = val;
 }
 
 bool FD::Coding::TabRead::update() const {
@@ -94,9 +104,9 @@ std::vector<std::string> FD::Coding::TabRead::getFilePathes() const {
 	return TabData::filePathes;
 }
 
-std::string FD::Coding::TabRead::getDisplayFilePath() const {
+std::vector<std::string> FD::Coding::TabRead::getDisplayFilePaths() const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
-	return TabData::displayFile;
+	return TabData::displayFiles;
 }
 
 bool FD::Coding::TabRead::isDisplayFileChanged() const {

@@ -51,7 +51,7 @@ namespace FS {
 		void itemSave();
 		void itemSaveAs();
 		void saveAs(std::string path);
-		void itemTerminate();
+		void itemExit();
 
 		//edit
 		void editGui();

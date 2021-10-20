@@ -11,15 +11,21 @@ namespace FD::Calc::Lua {
 
 	template<typename T>
 	concept IsArgType =
-		std::same_as<T, Num> &&
-		std::same_as<T, Val> &&
-		std::same_as<T, String>;
+		std::same_as<FU::Concept::remove_all_t<T>, Num> ||
+		std::same_as<FU::Concept::remove_all_t<T>, Val> ||
+		std::same_as<FU::Concept::remove_all_t<T>, String>;
 
 	enum class FunctionType : uint16_t {
 		None = 0,
-		Terminate,
-		SleepSeconds,
-		SleepMilliSeconds
+
+		System_Terminate,
+		System_SleepSeconds,
+		System_SleepMilliSeconds,
+
+		Plot_Create,
+		Plot_SetMarker,
+		Plot_PushBack,
+		Plot_PushFront
 	};
 
 }
@@ -32,17 +38,24 @@ namespace FD::Calc::Lua::Internal {
 	};
 
 	template<>
-	struct RetArgInfo<FunctionType::Terminate> final {};
+	struct RetArgInfo<FunctionType::System_Terminate> final {};
 
 	template<>
-	struct RetArgInfo<FunctionType::SleepSeconds> final {
+	struct RetArgInfo<FunctionType::System_SleepSeconds> final {
 		Num seconds{};
 	};
 
 	template<>
-	struct RetArgInfo<FunctionType::SleepMilliSeconds> final {
+	struct RetArgInfo<FunctionType::System_SleepMilliSeconds> final {
 		Num milliSeconds{};
 	};
 
 
+
+
 }
+
+#define FluidumData_Lua_ContainerTemplateArgs \
+	::FD::Calc::Lua::Internal::RetArgInfo<::FD::Calc::Lua::FunctionType::System_Terminate>,\
+	::FD::Calc::Lua::Internal::RetArgInfo<::FD::Calc::Lua::FunctionType::System_SleepSeconds>,\
+	::FD::Calc::Lua::Internal::RetArgInfo<::FD::Calc::Lua::FunctionType::System_SleepMilliSeconds>\

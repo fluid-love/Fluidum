@@ -7,9 +7,10 @@ FS::TopBar::TopBar(
 	const FD::ProjectRead* const projectRead,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
-	const FD::SceneRead* const sceneRead
+	const FD::SceneRead* const sceneRead,
+	const FD::TopBarRead* const topBarRead
 )
-	: projectRead(projectRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead)
+	: projectRead(projectRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead), topBarRead(topBarRead)
 {
 	GLog.add<FD::Log::Type::None>("Construct TopBarScene.");
 
@@ -52,7 +53,8 @@ namespace FS::Internal::Bar {
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoScrollbar;
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoScrollWithMouse;
 }
 
 void FS::TopBar::call() {
@@ -72,7 +74,7 @@ void FS::TopBar::call() {
 
 	this->rightGui();
 	this->calc();
-	this->file();
+	this->scene();
 
 
 	ImGui::PopStyleVar(2);
@@ -286,17 +288,41 @@ void FS::TopBar::playCheck() {
 
 }
 
-void FS::TopBar::file() {
-	ImGui::SetNextWindowPos(ImVec2(style.windowSize.x * 0.05f, style.windowPos.y));
+#include <imgui_internal.h>
+
+void FS::TopBar::scene() {
+	ImGui::SetNextWindowPos(ImVec2(style.windowSize.x * 0.02f, style.windowPos.y));
 	ImGui::SetNextWindowSize(ImVec2(style.windowSize.x * 0.1f, style.windowSize.y));
 
-	ImGui::Begin("File", nullptr, Internal::Bar::commonWindowFlag | ImGuiWindowFlags_NoBackground);
+	ImGui::Begin("SceneFunc", nullptr, Internal::Bar::commonWindowFlag | ImGuiWindowFlags_NoBackground);
 
-	ImGui::Button(ICON_MD_ADD_BOX); 
-	//FU::ImGui::exclamationMarker();
-	ImGui::SameLine();
-	ImGui::Button(ICON_MD_NOTE_ADD); ImGui::SameLine();
-	ImGui::Button(ICON_MD_SAVE);
+	this->combo();
+
+
+	//for (const auto x : *indices) {
+	//	topBarRead->call(x);
+	//}
+
 
 	ImGui::End();
 }
+
+void FS::TopBar::combo() {
+	const auto* info = topBarRead->getInfo();
+	const auto* indices = topBarRead->getIndices();
+	if (!ImGui::BeginCombo("test", "hoge"))
+		return;
+
+	for (auto& x : *info) {
+
+		if (ImGui::Selectable(x.sceneName.c_str(), false)) {
+
+		}
+	}
+
+
+
+
+	ImGui::EndCombo();
+}
+

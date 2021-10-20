@@ -25,8 +25,8 @@ newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::cre
 	quickInfo.folderPath.reserve(200);
 	quickInfo.fileName.reserve(200);
 
-	//デフォルトでパスはプロジェクトフォルダ/Code
-	quickInfo.folderPath = projectRead->getProjectFolderPath() + "Code/";
+	//デフォルトでパスはプロジェクトフォルダ/Src
+	quickInfo.folderPath = projectRead->getProjectFolderPath() + "Src/";
 	quickInfo.fileName = "main";
 
 }
@@ -435,8 +435,8 @@ void FS::CodingSelect::createNewFileQuick() {
 
 	GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
 	projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
-	tabWrite->addFile(quickInfo.fullPath.c_str());
-	tabWrite->setDisplayFile(quickInfo.fullPath.c_str());
+	tabWrite->addFile(quickInfo.fullPath);
+	tabWrite->addDisplayFile(quickInfo.fullPath);
 	tabWrite->save();
 }
 

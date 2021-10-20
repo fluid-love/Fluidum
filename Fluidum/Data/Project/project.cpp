@@ -238,7 +238,7 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 	try {
 		temp = GCurrentData;
 		tempF = GFiles;
-		tempT.displayFile = TabData::displayFile;
+		tempT.displayFiles = TabData::displayFiles;
 		tempT.filePathes = TabData::filePathes;
 	}
 	catch (...) {
@@ -268,7 +268,7 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 		GCurrentData = std::move(temp);
 		GFiles = std::move(tempF);
 
-		TabData::displayFile = std::move(tempT.displayFile);
+		TabData::displayFiles = std::move(tempT.displayFiles);
 		TabData::filePathes = std::move(tempT.filePathes);
 
 		std::rethrow_exception(std::current_exception());
@@ -354,13 +354,18 @@ void FD::ProjectWrite::save_tab() const {
 	if (!ofs)
 		throw std::runtime_error("Failed to open .tab file.");
 
-	ofs << "DisplayFile" << std::endl;
-	ofs << TabData::displayFile << std::endl;
+	ofs << "DisplayFiles" << std::endl;
+	for (const auto& x : TabData::displayFiles) {
+		ofs << x << std::endl;
+	}
+	ofs << "Next" << std::endl;
 
 	ofs << "FilePathes" << std::endl;
 	for (const auto& x : TabData::filePathes) {
 		ofs << x << std::endl;
 	}
+	ofs << "Next" << std::endl;
+
 }
 
 void FD::ProjectWrite::save_files() const {
@@ -753,10 +758,20 @@ void FD::ProjectWrite::readTabInfo() const {
 	//TabDisplayFile
 	{
 		std::getline(ifs, data);
-		if (data != "TabDisplayFile")
+		if (data != "DisplayFiles")
 			throw ExceptionType::IllegalFile;
-		std::getline(ifs, data);
-		TabData::displayFile = data;
+
+		uint16_t counter = 0;
+		while (true) {
+			std::getline(ifs, data);
+			if (data == "Next")
+				break;
+			Internal::Coding::TabData::displayFiles.emplace_back(data);
+
+			counter++;
+			if (counter > 1000)
+				throw Project::ExceptionType::BrokenFile;
+		}
 	}
 
 	//TabFilePathes

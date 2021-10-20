@@ -8,6 +8,7 @@
 #include <deque>
 #include <variant>
 #include <map>
+#include <functional>
 
 //‘O•ûéŒ¾
 namespace FD {

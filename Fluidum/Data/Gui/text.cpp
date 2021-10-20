@@ -180,6 +180,11 @@ FD::Internal::Text::MenuBar::MenuBar() {
 	std::getline(ifs, data);
 	this->ignore = data;
 
+	std::getline(ifs, data);
+	this->saveAndExit = data;
+
+	std::getline(ifs, data);
+	this->exitWithoutSaving = data;
 }
 
 FD::Internal::Text::TopBar::TopBar() {

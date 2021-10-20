@@ -1,57 +1,7 @@
-#include "../FSlua.h"
+#include "../lua.h"
 
-using namespace FS::LuaType;
+namespace FS {
 
-template<>
-class FS::LuaCheck::Check<Plot::MARKER> final : private Common<> {
-public:
-	using Common::Common;
-
-private:
-	const char* const funcName = "Plot.Marker";
-
-public:
-	void arg() {
-		const auto types = LuaAssist::getCoreTypes(L);
-
-		//引数の数がおかしい
-		if (types.size() != 3) {
-			if (types.size() < 3) {
-				//関数{}の引数の数が少なすぎます．渡された引数の数:{}．正しい引数の数:{}．
-				LuaText::LuaLog<LuaText::LuaLogType::ARGUMENT_OVER_MIN> text;
-				log->add<FD::LogType::ERROR>(text, funcName, types.size(), 3);
-				throw std::runtime_error("");
-			}
-			else {
-				//関数{}の引数の数が多すぎます．渡された引数の数:{}．正しい引数の数:{}．
-				LuaText::LuaLog<LuaText::LuaLogType::ARGUMENT_OVER_MAX> text;
-				log->add<FD::LogType::ERROR>(text, funcName, types.size(), 3);
-				throw std::runtime_error("");
-			}
-		}
-
-		for (uint16_t i = 0; i < 2; i++) {
-			if (types[i] != CoreType::INTEGER && types[i] != CoreType::NUMBER) {
-				//関数{}の{}番目の引数に誤った型が渡されました．渡された引数の型:{}．正しい型:{}．
-				LuaText::LuaLog<LuaText::LuaLogType::WRONG_TYPE_ARGUMENT> text;
-				log->add<FD::LogType::ERROR>(text, funcName, i, LuaAssist::getCoreTypeName(types[i]), LuaAssist::getCoreTypeName(CoreType::INTEGER));
-				throw std::runtime_error("");
-			}
-		}
-
-
-		if (types[2] != CoreType::STRING) {
-			//関数{}の{}番目の引数に誤った型が渡されました．渡された引数の型:{}．正しい型:{}．
-			LuaText::LuaLog<LuaText::LuaLogType::WRONG_TYPE_ARGUMENT> text;
-			log->add<FD::LogType::ERROR>(text, funcName, 3, LuaAssist::getCoreTypeName(types[2]), LuaAssist::getCoreTypeName(CoreType::STRING));
-			throw std::runtime_error("");
-		}
-
-	}
-};
-
-
-FD::Plot::PlotMarker toMarker(const std::string str) {
 	constexpr const char* markers[] = {
 		"Circle","CIRCLE","circle",
 		"Square","SQUARE","square",
@@ -65,46 +15,83 @@ FD::Plot::PlotMarker toMarker(const std::string str) {
 		"Asterisk","ASTERISK","asterisk"
 	};
 
-	constexpr FD::Plot::PlotMarker results[] = {
-		FD::Plot::PlotMarker::CIRCLE,
-		FD::Plot::PlotMarker::SQUARE,
-		FD::Plot::PlotMarker::DIAMOND,
-		FD::Plot::PlotMarker::UP,
-		FD::Plot::PlotMarker::DOWN,
-		FD::Plot::PlotMarker::LEFT,
-		FD::Plot::PlotMarker::RIGHT,
-		FD::Plot::PlotMarker::CROSS,
-		FD::Plot::PlotMarker::PLUS,
-		FD::Plot::PlotMarker::ASTERISK
-	};
-
-	for (int16_t i = -2, j = 0; auto x : markers) {
-		if (str == x) {
-			return results[j];
+	std::string markerStr() {
+		std::string result{};
+		result.reserve(300);
+		for (auto x : markers) {
+			result += x += ',';
 		}
-		if (i % 3 == 0)
-			j++;
-		i++;
+		return result;
 	}
 
-	throw std::runtime_error("");
+	ImPlotMarker toMarker(const std::string& str) {
+
+		constexpr ImPlotMarker results[] = {
+			ImPlotMarker_Circle,
+			ImPlotMarker_Square,
+			ImPlotMarker_Diamond,
+			ImPlotMarker_Up,
+			ImPlotMarker_Down,
+			ImPlotMarker_Left,
+			ImPlotMarker_Right,
+			ImPlotMarker_Cross,
+			ImPlotMarker_Plus,
+			ImPlotMarker_Asterisk
+		};
+
+		for (int16_t i = -2, j = 0; auto x : markers) {
+			if (str == x) {
+				return results[j];
+			}
+			if (i % 3 == 0)
+				j++;
+			i++;
+		}
+
+
+		throw FS::Lua::Internal::Exception();
+	}
+
 }
 
-Ret FS::Lua::marker_Plot(State L) {
-	LuaCheck::Check<LuaType::Plot::MARKER> check(L, log);
-	check.arg();
+FS::Lua::Ret FS::Lua::Calc::plot_setMarker(State L) {
+	//figure index, data index, marker
+	check.argType<Type::Plot_SetMarker>(L, { CoreType::Integer,CoreType::Integer,CoreType::String });
 
-	const Val figureIndex = lua_tointeger(L, 1) - 1;
-	const Val dataIndex = lua_tointeger(L, 2) - 1;
+	const Val figureIndex = lua_tointeger(L, 1);
+	const Val plotIndex = lua_tointeger(L, 2) - 1;
 	String marker = lua_tostring(L, 3);
 
-	const FD::Plot::PlotMarker mkr = toMarker(marker);
+	assert(figureIndex >= 0);
 
-	auto result = plot->setPlotMarker(figureIndex, dataIndex, mkr);
+	if (plotIndex <= 0) {
+		//FPlot PlotIndexは1以上でなければなりません．指定した値{}．
+		Message message(LogType::Plot_PlotIndex_Min);
+		GLog.add<FD::Log::Type::None>(message, plotIndex);
+		throw Internal::Exception();
+	}
 
-	if (result != FD::Plot::Result::SUCCESS)
-		throw std::runtime_error("");
+	ImPlotMarker mkr{};
+	try {
+		mkr = toMarker(marker);
+	}
+	catch (const Internal::Exception) {
+		//FPlot SetMarkerの引数に無効な文字列が渡されました．渡された文字列{}．正しい文字列{}．
+		Message message(LogType::Plot_MarkerStr);
+		GLog.add<FD::Log::Type::None>(message, marker, markerStr());
 
-	LuaAssist::pop(L);
+		std::rethrow_exception(std::current_exception());
+	}
+
+	if (plotIndex > FD::Plot::Limit::PlotMax) {
+		//FPlot 1つの枠に描写できるグラフの最大値を超えたPlotIndexが設定されています．設定された値{}．最大値{}．
+		Message message(LogType::Plot_PlotIndex_Max);
+		GLog.add<FD::Log::Type::None>(message, plotIndex, FD::Plot::Limit::PlotMax);
+
+		std::rethrow_exception(std::current_exception());
+	}
+
+	implotWrite->setMarker(figureIndex, plotIndex, mkr);
+
 	return 0;
 }

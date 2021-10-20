@@ -69,6 +69,9 @@ namespace FD::Internal::Text {
 		GuiText saveAndOpen;
 		GuiText ignore;
 
+		GuiText saveAndExit;
+		GuiText exitWithoutSaving;
+
 	};
 
 	struct TopBar final {
@@ -259,6 +262,19 @@ namespace FD::Internal::Text {
 
 	};
 
+	struct AnalysisOverview final {
+		AnalysisOverview();
+		~AnalysisOverview() = default;
+
+		GuiText function;
+
+
+
+
+	};
+
+
+
 
 }
 
@@ -275,6 +291,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::CodingTab;
 	using ::FD::Internal::Text::ProjectSaveAs;
 	using ::FD::Internal::Text::Project;
+	using ::FD::Internal::Text::AnalysisOverview;
 
 }
 

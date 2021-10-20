@@ -104,7 +104,7 @@ void FS::MenuBar::fileGui() {
 		ImGui::Separator();
 		ImGui::Spacing();
 
-		this->itemTerminate();
+		this->itemExit();
 
 		ImGui::EndMenu();
 	}
@@ -236,13 +236,30 @@ void FS::MenuBar::saveAs(std::string path) {
 	Scene::addScene<Bar::SaveAs>();
 }
 
-void FS::MenuBar::itemTerminate() {
+void FS::MenuBar::itemExit() {
 	//ï¬Ç∂ÇÈÇÕê‘Ç≠Ç∑ÇÈ
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
-	if (ImGui::MenuItem(text.terminate)) {
-		GLog.add<FD::Log::Type::None>("Request Terminate.");
-		*windowWrite->getCloseFlag() = true;
+	if (!ImGui::MenuItem(text.terminate)) {
+		ImGui::PopStyleColor();
+		return;
 	}
+	GLog.add<FD::Log::Type::None>("Request Terminate.");
+
+	if (projectRead->isDefaultProject()) {
+		auto index = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.checkCurrentProject, text.saveAndExit, text.exitWithoutSaving, text.cancel);
+		if (index == 0) {//save
+
+		}
+		else if (index == 1) {//without saving
+
+		}
+		else {//cancel
+			ImGui::PopStyleColor();
+			return;
+		}
+	}
+
+	*windowWrite->getCloseFlag() = true;
 	ImGui::PopStyleColor();
 }
 

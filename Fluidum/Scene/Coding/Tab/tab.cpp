@@ -60,7 +60,6 @@ void FS::Coding::Tab::call() {
 	ImGui::Begin("CodingTab", &windowCloseFlag);
 	pos.center = ImGui::GetWindowPos() / 2.3f;
 
-	this->topBar();
 	this->fileList();
 
 	ImGui::End();
@@ -77,91 +76,57 @@ void FS::Coding::Tab::checkWindowShouldClose() {
 	}
 }
 
-void FS::Coding::Tab::topBar() {
-	ImGui::Separator();
-	ImGui::BeginChild("TabChild", style.topBarSize);
-
-	//open
-	if (ImGui::Button(ICON_MD_FOLDER_OPEN))
-		this->include();
-
-	ImGui::SameLine();
-
-	if (ImGui::Button(ICON_MD_NOTE_ADD))
-		this->create();
-
-	ImGui::SameLine();
-	ImGui::Spacing();
-	ImGui::SameLine();
-
-	if (ImGui::Button(ICON_MD_SAVE))
-		this->save();
-	ImGui::SameLine();
-
-	if (ImGui::Button(ICON_MD_SYNC))
-		this->sync();
-	ImGui::SameLine();
-
-	if (ImGui::Button(ICON_MD_CODE))
-		this->code();
-
-	ImGui::EndChild();
-
-	ImGui::Separator();
-	ImGui::Spacing();
-}
-
-void FS::Coding::Tab::include() {
-	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
-	GLog.add<FD::Log::Type::None>("Open file dialog.");
-	const nfdresult_t result = NFD_OpenDialog(".lua,.py,.as", NULL, outPath.get());
-	if (result == NFD_OKAY) {
-		GLog.add<FD::Log::Type::None>("Selected file path is {}.", *outPath.get());
-	}
-	else if (result == NFD_CANCEL) {
-		GLog.add<FD::Log::Type::None>("Cancel file dialog.");
-		return;
-	}
-	else {//NFD_ERROR
-		GLog.add<FD::Log::Type::Error>("Error file dialog.");
-		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
-	}
-
-	using enum FD::Coding::TabWrite::Exception;
-	try {
-		tabWrite->addFile(*outPath.get());
-	}
-	catch (const FD::Coding::TabWrite::Exception type) {
-		if (type == AlreadyExist) {
-			GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
-			Scene::addScene<Utils::Message>(text.error_alreadyExist, pos.center);
-		}
-		else if (type == LimitFileSizeMax) {
-			GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
-			Scene::addScene<Utils::Message>(text.error_limitMaxSize, pos.center);
-		}
-		else {
-			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-			abort();
-		}
-	}
-}
-
-void FS::Coding::Tab::create() {
-
-}
-
-void FS::Coding::Tab::sync() {
-
-}
-
-void FS::Coding::Tab::code() {
-
-}
-
-void FS::Coding::Tab::save() {
-
-}
+//void FS::Coding::Tab::include() {
+//	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
+//	GLog.add<FD::Log::Type::None>("Open file dialog.");
+//	const nfdresult_t result = NFD_OpenDialog(".lua,.py,.as", NULL, outPath.get());
+//	if (result == NFD_OKAY) {
+//		GLog.add<FD::Log::Type::None>("Selected file path is {}.", *outPath.get());
+//	}
+//	else if (result == NFD_CANCEL) {
+//		GLog.add<FD::Log::Type::None>("Cancel file dialog.");
+//		return;
+//	}
+//	else {//NFD_ERROR
+//		GLog.add<FD::Log::Type::Error>("Error file dialog.");
+//		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+//	}
+//
+//	using enum FD::Coding::TabWrite::Exception;
+//	try {
+//		tabWrite->addFile(*outPath.get());
+//	}
+//	catch (const FD::Coding::TabWrite::Exception type) {
+//		if (type == AlreadyExist) {
+//			GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+//			Scene::addScene<Utils::Message>(text.error_alreadyExist, pos.center);
+//		}
+//		else if (type == LimitFileSizeMax) {
+//			GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+//			Scene::addScene<Utils::Message>(text.error_limitMaxSize, pos.center);
+//		}
+//		else {
+//			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+//			abort();
+//		}
+//	}
+//}
+//
+//void FS::Coding::Tab::create() {
+//
+//}
+//
+//void FS::Coding::Tab::sync() {
+//
+//}
+//
+//void FS::Coding::Tab::code() {
+//
+//}
+//
+//void FS::Coding::Tab::save() {
+//
+//}
 
 void FS::Coding::Tab::update() {
 	if (!tabRead->update())
@@ -175,12 +140,38 @@ void FS::Coding::Tab::fileList() {
 	ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2());
 	const ImVec2 size = { ImGui::GetWindowSize().x - (2.0f * ImGui::GetStyle().WindowPadding.x) ,0.0f };
 
-	for (auto& x : this->files.fileNames) {
-		ImGui::Button(x.c_str(), size);
+	for (uint16_t i = 0; auto & x : this->files.fileNames) {
+		if (i == select.index) {
+			ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f,0.2f,0.9f,0.1f });
+			if (ImGui::Button(x.c_str(), size)) {
+				select.index = i;
+				this->display();
+			}
+			ImGui::PopStyleColor();
+		}
+		else {
+			if (ImGui::Button(x.c_str(), size)) {
+				select.index = i;
+				this->display();
+			}
+		}
+		i++;
 	}
 
 	ImGui::PopStyleVar();
 	ImGui::PopStyleColor();
 }
 
+void FS::Coding::Tab::display() {
+	const std::string path = files.fileNames.at(select.index);
+
+	if (tabRead->getDisplayFilePaths().at(0) == path)
+		return;
+
+	GLog.add<FD::Log::Type::None>("Erase display file {}.", path);
+	tabWrite->eraseDisplayFile(tabRead->getDisplayFilePaths().at(0));
+
+	GLog.add<FD::Log::Type::None>("Add display file {}.", tabRead->getDisplayFilePaths().at(0));
+	tabWrite->addDisplayFile(path);
+}
 

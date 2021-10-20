@@ -64,6 +64,12 @@ namespace FD {
 		ImVec2 rightLayoutPos;
 		ImVec2 rightLayoutSize;
 	};
+	struct ImGuiDockIDs final {
+		ImGuiID left{};
+		ImGuiID right{};
+	};
+
+	ImGuiDockIDs GImGuiDockIDs{};
 	Layout GLayout = {};
 }
 
@@ -83,6 +89,14 @@ void FD::LayoutWrite::rightLayoutSize(const ImVec2& vec2) const noexcept {
 	GLayout.rightLayoutSize = vec2;
 }
 
+void FD::LayoutWrite::leftDockSpaceID(const ImGuiID id) const noexcept {
+	GImGuiDockIDs.left = id;
+}
+
+void FD::LayoutWrite::rightDockSpaceID(const ImGuiID id) const noexcept {
+	GImGuiDockIDs.right = id;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ImVec2 FD::LayoutRead::leftLayoutPos() const noexcept {
@@ -99,4 +113,35 @@ ImVec2 FD::LayoutRead::rightLayoutPos() const noexcept {
 
 ImVec2 FD::LayoutRead::rightLayoutSize() const noexcept {
 	return GLayout.rightLayoutSize;
+}
+
+ImGuiID FD::LayoutRead::leftLayoutID() const noexcept {
+	return GImGuiDockIDs.left;
+}
+
+ImGuiID FD::LayoutRead::rightLayoutID() const noexcept {
+	return GImGuiDockIDs.right;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <imgui_internal.h>
+
+namespace FD {
+	std::map<FU::Class::ClassCode::CodeType, ImGuiWindow*> GImGuiWindows{};
+}
+
+template<typename T>
+void FD::ImGuiWindowWrite::set(const FU::Class::ClassCode::CodeType classCode, T windowPtr) const {
+	try {
+		GImGuiWindows.at(classCode) = windowPtr;
+	}
+	catch (const std::out_of_range&) {//!contains()
+		GImGuiWindows.insert({ classCode,windowPtr });
+	}
+}
+template void FD::ImGuiWindowWrite::set<ImGuiWindow*>(const FU::Class::ClassCode::CodeType, ImGuiWindow*) const;
+
+auto FD::ImGuiWindowRead::get(const FU::Class::ClassCode::CodeType classCode) const {
+	return GImGuiWindows.at(classCode);
 }

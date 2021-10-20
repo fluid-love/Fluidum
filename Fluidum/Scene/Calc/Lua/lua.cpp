@@ -2,9 +2,17 @@
 
 FS::Lua::Calc::Calc(
 	const FD::ProjectRead* const projectread,
-	FD::ConsoleWrite* const consoleWrite
+	FD::ConsoleWrite* const consoleWrite,
+	FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite,
+	FD::ImPlotWrite* const implotWrite,
+	const FD::ImPlotRead* const implotRead
 )
-	: projectread(projectread), consoleWrite(consoleWrite), state(luaL_newstate())
+	: projectread(projectread),
+	consoleWrite(consoleWrite),
+	functionWrite(functionWrite),
+	implotWrite(implotWrite),
+	implotRead(implotRead),
+	state(luaL_newstate())
 {
 	assert(this->state);
 	GLog.add<FD::Log::Type::None>("Construct LuaCalcScene.");
@@ -56,11 +64,14 @@ void FS::Lua::Calc::call() {
 		try {
 			error = lua_pcall(state, 0, 0, 0);
 		}
-		catch (std::exception& e) {//実行時エラー
-			//errorだが内部エラーではないのでType::Logで記録
-			GLog.add<FD::Log::Type::None>("LuaError: {}.", e.what());
+		catch (const std::exception& e) {//実行時エラー
+			GLog.add<FD::Log::Type::Error>("LuaInternalError: {}.", e.what());
+			std::rethrow_exception(std::current_exception());
 		}
-
+		catch (const Internal::Exception) {
+			//errorだが内部エラーではないのでType::Logで記録
+			GLog.add<FD::Log::Type::None>("Lua RuntimeError.");
+		}
 	}
 
 	GLog.add<FD::Log::Type::None>("Request delete LuaCalcScene.");
@@ -93,17 +104,7 @@ void FS::Lua::Calc::registerCppFunctions() {
 	//	luaL_newlib(state, mathRegs);
 	//	lua_setglobal(state, "Math");//Math.
 	//
-	//
-	//	const luaL_Reg plotRegs[] = {
-	//		{"Create" , &dispatch<&Lua::create_Plot>},
-	//		{"Push" , &dispatch<&Lua::push_Plot>},
-	//		//{"Type" , &dispatch<&Lua::type>},
-	//		{"Marker" , &dispatch<&Lua::marker_Plot>},
-	//
-	//		{nullptr,nullptr}
-	//	};
-	//	luaL_newlib(state, plotRegs);
-	//	lua_setglobal(state, "FPlot");//FPlot.
+
 	//
 	//
 	//	const luaL_Reg drawRegs[] = {
@@ -118,7 +119,7 @@ void FS::Lua::Calc::registerCppFunctions() {
 	//	lua_setglobal(state, "FDraw");//FDraw.
 	//
 
-	//_Internal_System
+	//FSystem direct
 	{
 		const luaL_Reg regs[] = {
 				{"SleepSeconds" , &dispatch<&Calc::sleepSeconds>},
@@ -131,18 +132,30 @@ void FS::Lua::Calc::registerCppFunctions() {
 		lua_setglobal(state, "FSystem");
 	}
 
-	//
-	//
+	//_Internal_Plot_
+	{
+		const luaL_Reg regs[] = {
+				{"Create" , &dispatch<&Calc::plot_create>},
+				{"SetMarker" , &dispatch<&Calc::plot_setMarker>},
+				{"PushBack" , &dispatch<&Calc::plot_pushBack>},
+
+				{nullptr,nullptr}
+		};
+		luaL_newlib(state, regs);
+		lua_setglobal(state, "_Internal_Plot_");
+	}
+
+
 }
 
 void FS::Lua::Calc::registerLuaLibraries() {
 	luaL_openlibs(state);//standard library
 
-	//Fluidum library
-	//std::string folderPath = Resource::LuaFolderPath;
-	//auto result = luaL_dofile(state, (folderPath + "system.lua").c_str());
+	//Fluidum Standard library
+	std::string folderPath = Resource::LuaFolderPath;
 
-	//assert(result == LUA_OK);
+	auto result = luaL_dofile(state, (folderPath + "plot.lua").c_str());
+	assert(result == LUA_OK);
 
 
 }
@@ -157,49 +170,3 @@ void FS::Lua::Calc::terminate() {
 	GLog.add<FD::Log::Type::None>("Close Lua.");
 
 }
-//
-//using namespace FS::LuaType;
-//
-//
-//#pragma region Plot
-//
-//Ret FS::Lua::create_Plot(State L) {
-//	LuaCheck::Check<LuaType::Plot::CREATE> check(L, log);
-//	check.arg();
-//
-//	String title = lua_tostring(L, 1);
-//	String axisX = lua_tostring(L, 2);
-//	String axisY = lua_tostring(L, 3);
-//
-//	auto index = plot->addFigure(title, axisX, axisY);
-//
-//	LuaAssist::pop(L);
-//	lua_pushinteger(L, index);
-//	return 1;
-//}
-
-//Ret FS::Lua::push_Plot(State L) {
-//	LuaCheck::Check<LuaType::Plot::PUSH> check(L, log);
-//	check.arg();
-//
-//	Val figureIndex = lua_tointeger(L, 1) - 1;
-//	Val dataIndex = lua_tointeger(L, 2) - 1;
-//	Num x = lua_tonumber(L, 3);
-//	Num y = lua_tonumber(L, 4);
-//
-//	auto result = plot->addPlot(figureIndex, dataIndex, x, y);
-//
-//	if (result != FD::Plot::Result::SUCCESS)
-//		throw std::runtime_error("");
-//
-//	LuaAssist::pop(L);
-//	return 0;
-//}
-//
-//
-//#pragma endregion
-//
-//
-//
-//
-//
