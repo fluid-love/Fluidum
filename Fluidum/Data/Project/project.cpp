@@ -1,23 +1,9 @@
 #include "project.h"
 #include <Windows.h>
-#undef max
+#undef max //collision std::numerical_limit<T>::max
 
 #include "../Coding/tab.h"
-
-void FD::ProjectWrite::save_thread() {
-	using namespace Internal::Coding;
-
-	bool request = this->saveThread.get_stop_token().stop_requested();
-
-	while (!request) {
-		request = this->saveThread.get_stop_token().stop_requested();
-		if (TabData::save) {
-			this->save_tab();
-			TabData::save.store(false);
-		}
-	}
-
-}
+#include "../Scene/scene.h"
 
 namespace FD::Internal::Project {
 
@@ -59,6 +45,27 @@ namespace FD::Internal::Project {
 		std::string displayFilePath{};
 		std::vector<std::string> filePathes{};
 	};
+}
+
+void FD::ProjectWrite::save_thread() {
+	using namespace Internal::Coding;
+
+	bool request = this->saveThread.get_stop_token().stop_requested();
+
+	while (!request) {
+		request = this->saveThread.get_stop_token().stop_requested();
+		if (TabData::save) {
+			std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
+			this->save_tab();
+			TabData::save.store(false);
+		}
+		if (Internal::Scene::Data::save) {
+			std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
+			this->save_scene();
+			Internal::Scene::Data::save.store(false);
+		}
+	}
+
 }
 
 namespace FD::Internal::Project {
@@ -131,6 +138,7 @@ FD::ProjectWrite::ProjectWrite(Internal::PassKey) {
 	this->tryCreateSrcFolder();
 	this->tryCreateFilesFile();
 	this->tryCreateTabFile();
+	this->tryCreateSceneFile();
 	this->tryCreateFunctionFile();
 
 	this->writeProjectInfo(path.c_str());
@@ -193,11 +201,12 @@ void FD::ProjectWrite::createNewProject(const Project::CreateProjectInfo& info) 
 	}
 
 	try {
-		this->tryCreateBackupFolder();
 		this->tryCreateSrcFolder();
 		this->tryCreateProjectFilesFolder();
+		this->tryCreateBackupFolder();
 		this->tryCreateFilesFile();
 		this->tryCreateTabFile();
+		this->tryCreateSceneFile();
 		this->tryCreateFunctionFile();
 
 		this->save_files();
@@ -226,7 +235,7 @@ void FD::ProjectWrite::createNewProject(const Project::CreateProjectInfo& info) 
 	GCurrentData.isTemp = false;
 }
 
-void FD::ProjectWrite::loadExistProject(const char* path) const {
+void FD::ProjectWrite::loadProject(const char* path) const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
 
 	using namespace Internal::Project;
@@ -234,12 +243,20 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 	//ó·äOÇ™Ç≈ÇΩèÍçáÇ…Ç‡Ç∆ÇÃèÓïÒÇ…ñﬂÇ∑
 	Data temp{};
 	SourceCodeFiles tempF{};
-	TabData tempT{};
+
+	//tab
+	std::vector<std::string> temp_tab_filePathes{};
+	std::vector<std::string> temp_tab_displayFiles{};
+
+	//scene
+	std::vector<FU::Class::ClassCode::CodeType> temp_scene_codes{};
+
 	try {
 		temp = GCurrentData;
 		tempF = GFiles;
-		tempT.displayFiles = TabData::displayFiles;
-		tempT.filePathes = TabData::filePathes;
+		temp_tab_displayFiles = TabData::displayFiles;
+		temp_tab_filePathes = TabData::filePathes;
+		temp_scene_codes = Internal::Scene::Data::codes;
 	}
 	catch (...) {
 		throw Project::ExceptionType::Unexpected;
@@ -261,6 +278,7 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 		this->readProjectInfo(ifs);
 		this->readProjectFiles();
 		this->readTabInfo();
+		this->readSceneInfo();
 
 		this->updateHistory();
 	}
@@ -268,8 +286,10 @@ void FD::ProjectWrite::loadExistProject(const char* path) const {
 		GCurrentData = std::move(temp);
 		GFiles = std::move(tempF);
 
-		TabData::displayFiles = std::move(tempT.displayFiles);
-		TabData::filePathes = std::move(tempT.filePathes);
+		TabData::displayFiles = std::move(temp_tab_displayFiles);
+		TabData::filePathes = std::move(temp_tab_filePathes);
+
+		Internal::Scene::Data::codes = std::move(temp_scene_codes);
 
 		std::rethrow_exception(std::current_exception());
 	}
@@ -362,6 +382,24 @@ void FD::ProjectWrite::save_tab() const {
 
 	ofs << "FilePathes" << std::endl;
 	for (const auto& x : TabData::filePathes) {
+		ofs << x << std::endl;
+	}
+	ofs << "Next" << std::endl;
+
+}
+
+void FD::ProjectWrite::save_scene() const {
+	using namespace Internal::Scene;
+
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	std::ofstream ofs(Internal::Project::GCurrentData.projectFolderPath + "ProjectFiles/.scene", std::ios::trunc);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to open .scene file.");
+
+	ofs << "SceneCodes" << std::endl;
+	for (const auto& x : Data::codes) {
 		ofs << x << std::endl;
 	}
 	ofs << "Next" << std::endl;
@@ -560,6 +598,25 @@ void FD::ProjectWrite::tryCreateTabFile() const {
 
 	if (!ofs)
 		throw std::runtime_error("Failed to create .tab file.");
+
+}
+
+void FD::ProjectWrite::tryCreateSceneFile() const {
+	using namespace Internal::Project;
+
+	if (!std::filesystem::is_directory(GCurrentData.projectFolderPath + "ProjectFiles/"))
+		throw Project::ExceptionType::NotFoundProjectFiles;
+
+	std::string path = GCurrentData.projectFolderPath;
+	path += "/ProjectFiles/.scene";
+
+	if (std::filesystem::exists(path))
+		return;
+
+	std::ofstream ofs(path);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to create .scene file.");
 
 }
 
@@ -794,6 +851,40 @@ void FD::ProjectWrite::readTabInfo() const {
 	}
 }
 
+void FD::ProjectWrite::readSceneInfo() const {
+	using namespace Internal::Project;
+
+	using ExceptionType = ::FD::Project::ExceptionType;
+
+	std::ifstream ifs(GCurrentData.projectFolderPath + "ProjectFiles/.scene");
+	if (!ifs)
+		throw Project::ExceptionType::NotFoundProjectFiles;
+
+	std::lock_guard<std::mutex> lock(Internal::Scene::Data::mtx);
+
+	std::string data{};
+
+	//SceneCodes
+	{
+		std::getline(ifs, data);
+		if (data != "SceneCodes")
+			throw ExceptionType::IllegalFile;
+
+		uint16_t counter = 0;
+		while (true) {
+			std::getline(ifs, data);
+			if (data == "Next")
+				break;
+			Internal::Scene::Data::codes.emplace_back(static_cast<FU::Class::ClassCode::CodeType>(std::stoul(data)));
+
+			counter++;
+			if (counter > 1000)
+				throw Project::ExceptionType::BrokenFile;
+		}
+	}
+
+}
+
 std::array<FD::Project::HistoryInfo, 50> FD::ProjectRead::getProjectHistory() const {
 	using namespace Internal::Project;
 	std::lock_guard<std::mutex> lock(GMtx);
@@ -830,6 +921,11 @@ std::vector<std::string> FD::ProjectRead::getIncludeCodeFilePathes() const {
 std::string FD::ProjectRead::getMainCodeFilePath() const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
 	return Internal::Project::GFiles.mainCodeFilePath;
+}
+
+bool FD::ProjectRead::isMainCodeFileExist() const {
+	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
+	return Internal::Project::GFiles.mainCodeFilePath.empty();
 }
 
 std::string FD::ProjectRead::getProjectFolderPath() const {
@@ -881,4 +977,26 @@ FD::Project::CodeType FD::ProjectRead::getCurrentMainCodeType() const {
 		return Project::CodeType::AngelScript;
 
 	return Project::CodeType::Error;
+}
+
+std::vector<FU::Class::ClassCode::CodeType> FD::ProjectRead::loadSceneFile() const {
+	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
+	std::lock_guard<std::mutex> lockScene(Internal::Scene::Data::mtx);
+
+	std::ifstream ifs(Internal::Project::GCurrentData.projectFolderPath + "ProjectFiles/.scene");
+
+	std::string data{};
+	std::getline(ifs, data);
+	if (data != "SceneCodes")
+		abort();
+
+	std::vector<FU::Class::ClassCode::CodeType> result{};
+	while(true) {
+		std::getline(ifs, data);
+		if (data == "Next")
+			break;
+		result.emplace_back(static_cast<FU::Class::ClassCode::CodeType>(std::stoll(data)));
+	};
+
+	return result;
 }

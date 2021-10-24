@@ -1,7 +1,9 @@
 #include "statusbar.h"
 
-FS::StatusBar::StatusBar(const FD::GuiRead* const guiRead)
-	: guiRead(guiRead)
+FS::StatusBar::StatusBar(
+	const FD::GuiRead* const guiRead,
+	const FD::TaskRead* const taskRead
+) : guiRead(guiRead), taskRead(taskRead)
 {
 	GLog.add<FD::Log::Type::None>("Construct StatusBarScene.");
 
@@ -90,8 +92,38 @@ void FS::StatusBar::call() {
 }
 
 void FS::StatusBar::taskGui() {
-	ImGui::Text(text.task); ImGui::SameLine();
-	ImGui::TextColored(ImVec4(0.87f, 0.87f, 0.87f, 0.9f), text.taskInfo);//­‚µ”–‚­
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+	bool clicked = ImGui::Button(text.task); ImGui::SameLine();
+	ImGui::PopStyleVar();
+
+	if (clicked)
+		ImGui::OpenPopup("TaskPopup");
+
+	const bool called = taskRead->notice([&](const FD::Task::Info* info)
+		{
+			ImGui::Text(info->message.c_str());
+		}
+	);
+
+	if (!called)
+		ImGui::TextColored(ImVec4(0.85f, 0.85f, 0.85f, 0.9f), text.taskInfo);
+
+	//if clicked
+	this->taskPopup();
+}
+
+void FS::StatusBar::taskPopup() {
+	if (!ImGui::BeginPopup("TaskPopup"))
+		return;
+
+	taskRead->for_each([&](FD::Task::Info* info) 
+		{
+			ImGui::Text(info->message.c_str());
+			ImGui::Separator();
+		}
+	);
+
+	ImGui::EndPopup();
 }
 
 void FS::StatusBar::infoGui() {

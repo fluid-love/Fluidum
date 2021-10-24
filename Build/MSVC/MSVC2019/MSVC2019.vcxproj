@@ -35,9 +35,11 @@
     <ClInclude Include="..\..\..\Fluidum\Data\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\console.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\log.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\file.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\project.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Project\selectproject.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\task.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Scene\scene.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Scene\window.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\include.h" />
@@ -153,6 +155,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\new.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\select.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Tab\tab.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.h" />
@@ -168,12 +171,14 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\message.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\add.h" />
     <ClInclude Include="..\..\..\Fluidum\TextEditor\include.h" />
     <ClInclude Include="..\..\..\Fluidum\TextEditor\Source\texteditor.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Class\class.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Class\classcode.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Concept\concept.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Container\container.h" />
+    <ClInclude Include="..\..\..\Fluidum\Utils\Cursor\cursor.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Debug\consolelog.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Debug\warning.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\File\path.h" />
@@ -195,7 +200,10 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\text.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\topbar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Log\log.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\file.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\project.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Project\project.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\task.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Scene\scene.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Scene\window.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Source\Api\api.cpp" />
@@ -267,6 +275,7 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.Terminate.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\new.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\select.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Tab\tab.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.cpp" />
@@ -277,7 +286,9 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\message.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Scene\add.cpp" />
     <ClCompile Include="..\..\..\Fluidum\TextEditor\Source\texteditor.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Utils\Cursor\cursor.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\File\path.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\imgui.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\operator.cpp" />

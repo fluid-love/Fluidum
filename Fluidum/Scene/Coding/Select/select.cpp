@@ -2,6 +2,7 @@
 #include <imgui_internal.h>
 #include "../TextEditor/texteditor.h"
 #include "../../Utils/Popup/message.h"
+#include <nfd.h>
 
 using namespace FU::ImGui::Operators;
 
@@ -66,6 +67,8 @@ void FS::CodingSelect::call() {
 	ImGui::OpenPopup("Select");
 	if (ImGui::BeginPopupModal("Select", nullptr, flag)) {
 
+		ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
+
 		this->create();
 		this->quick();
 		ImGui::SameLine();
@@ -77,6 +80,7 @@ void FS::CodingSelect::call() {
 
 		this->bottom();
 
+		ImAnime::PopStyleVar();
 		ImGui::EndPopup();
 	}
 
@@ -235,6 +239,38 @@ void FS::CodingSelect::open(const ImVec2& size) {
 
 	ImGui::EndChild();
 	ImGui::PopStyleColor();
+
+	//click button 
+	if (style.isOpenWindowHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		this->openDialog();
+}
+
+void FS::CodingSelect::openDialog() {
+	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
+	GLog.add<FD::Log::Type::None>("Open file dialog.");
+	const nfdresult_t result = NFD_OpenDialog("lua,py,as", NULL, outPath.get());
+	if (result == NFD_OKAY) {
+		GLog.add<FD::Log::Type::None>("Open file({}).", *outPath.get());
+	}
+	else if (result == NFD_CANCEL) {
+		GLog.add<FD::Log::Type::None>("Cancel file dialog.");
+		return;
+	}
+	else {//NFD_ERROR
+		GLog.add<FD::Log::Type::Error>("Error file dialog.");
+		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+	}
+
+	//NFD_OKAY
+	if (!projectRead->isMainCodeFileExist()) {
+		GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
+		projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
+	}
+
+	tabWrite->addDisplayFile(quickInfo.fullPath);
+	tabWrite->addFile(quickInfo.fullPath);
+	tabWrite->save();
+	this->close();
 }
 
 void FS::CodingSelect::newFile(const ImVec2& size) {
@@ -337,15 +373,14 @@ void FS::CodingSelect::bottom() {
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.7f, 0.1f, 1.0f));
 	if (ImGui::Button(text.select, buttonSize)) {//作成ボタン
+		//cursor wait
+		FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
+
 		pos.create = ImGui::GetItemRectMin();
 		//作成する前に確認する
 		if (checkQuickInfo()) {//問題なし
 			this->createNewFileQuick();
-			ImGui::CloseCurrentPopup();//popupを終了			
-			GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
-			Scene::deleteScene<CodingSelect>();//シーンを消す
-			GLog.add<FD::Log::Type::None>("Request add CodingScene.");
-			Scene::addScene<TextEditor>();
+			this->close();
 		}
 	}
 	ImGui::PopStyleColor();
@@ -433,8 +468,10 @@ void FS::CodingSelect::createNewFileQuick() {
 	else
 		abort();
 
-	GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
-	projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
+	if (!projectRead->isMainCodeFileExist()) {
+		GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
+		projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
+	}
 	tabWrite->addFile(quickInfo.fullPath);
 	tabWrite->addDisplayFile(quickInfo.fullPath);
 	tabWrite->save();
@@ -477,4 +514,12 @@ bool FS::CodingSelect::checkQuickInfo() {
 		error.errorPopupMessage = text.error_notFoundDirectory;
 	}
 	return false;
+}
+
+void FS::CodingSelect::close() {
+	ImGui::CloseCurrentPopup();//popupを終了			
+	GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
+	Scene::deleteScene<CodingSelect>();//シーンを消す
+	GLog.add<FD::Log::Type::None>("Request add CodingScene.");
+	Scene::addScene<TextEditor>();
 }

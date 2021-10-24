@@ -21,12 +21,22 @@ FS::AnalysisOverview::~AnalysisOverview() noexcept {
 }
 
 void FS::AnalysisOverview::call() {
-	ImGui::Begin("AnalysisOverview");
+	ImGui::Begin("AnalysisOverview",&windowShouldClose);
 	this->setWindowInfo();
 
 	this->function();
-
+	
 	ImGui::End();
+
+	this->closeWindow();
+}
+
+void FS::AnalysisOverview::closeWindow() {
+	if (windowShouldClose)
+		return;
+
+	GLog.add<FD::Log::Type::None>("Request delete AnalysisOverviewScene.");
+	Scene::deleteScene<AnalysisOverview>();
 }
 
 void FS::AnalysisOverview::setWindowInfo() {
@@ -35,7 +45,7 @@ void FS::AnalysisOverview::setWindowInfo() {
 }
 
 void FS::AnalysisOverview::function() {
-
+	//ImGui::LoadIniSettingsFromDisk();
 }
 
 void FS::AnalysisOverview::topBar() {

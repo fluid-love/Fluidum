@@ -1,5 +1,6 @@
 #include "topbar.h"
 #include "../../Calc/Lua/lua.h"
+#include <imgui_internal.h>
 
 using namespace FU::ImGui::Operators;
 
@@ -8,9 +9,10 @@ FS::TopBar::TopBar(
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::SceneRead* const sceneRead,
-	const FD::TopBarRead* const topBarRead
+	const FD::TopBarRead* const topBarRead,
+	FD::TopBarWrite* const topBarWrite
 )
-	: projectRead(projectRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead), topBarRead(topBarRead)
+	: projectRead(projectRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead), topBarRead(topBarRead), topBarWrite(topBarWrite)
 {
 	GLog.add<FD::Log::Type::None>("Construct TopBarScene.");
 
@@ -122,8 +124,12 @@ void FS::TopBar::layoutGui() {
 	ImGui::Text("Layout"); ImGui::SameLine();
 
 	int32_t layoutIndex = 0;
-	const char* layoutTemplateNames[4] = { ICON_MD_DASHBOARD " Standard",ICON_MD_SCHEDULE " Animation",ICON_MD_SHARE " Node" ,ICON_MD_VISIBILITY " View" };
+	const char* layoutTemplateNames[1] = { ICON_MD_DASHBOARD " Standard" };
+	//	const char* layoutTemplateNames[4] = { ICON_MD_DASHBOARD " Standard",ICON_MD_SCHEDULE " Animation",ICON_MD_SHARE " Node" ,ICON_MD_VISIBILITY " View" };
+
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.01f, 0.01f, 0.01f, 1.0f));
 	ImGui::Combo("##Layout", &layoutIndex, layoutTemplateNames, IM_ARRAYSIZE(layoutTemplateNames));
+	ImGui::PopStyleColor();
 }
 
 void FS::TopBar::templateGui() {
@@ -131,8 +137,26 @@ void FS::TopBar::templateGui() {
 	ImGui::Text("Template"); ImGui::SameLine();
 
 	int32_t layoutIndex = 0;
-	const char* layoutTemplateNames[4] = { ICON_MD_DASHBOARD " Standard",ICON_MD_SCHEDULE " Animation",ICON_MD_SHARE " Node" ,ICON_MD_VISIBILITY " View" };
-	ImGui::Combo("##Template", &layoutIndex, layoutTemplateNames, IM_ARRAYSIZE(layoutTemplateNames));
+	const char* layoutTemplateNames[2] = { 
+		ICON_MD_DASHBOARD " Clear",
+		ICON_MD_CODE " Coding"
+	};
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.01f, 0.01f, 0.01f, 1.0f));
+	if (ImGui::BeginCombo("##Template", "##TemplateP", ImGuiComboFlags_NoPreview)) {
+		for (uint16_t i = 0; i < std::extent_v<decltype(layoutTemplateNames), 0>; i++) {
+			if (ImGui::Selectable(layoutTemplateNames[i]))
+				this->setTemplate(i);
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::PopStyleColor();
+}
+
+void FS::TopBar::setTemplate(const uint16_t index) {
+	if (index == 0) {
+
+	}
 }
 
 void FS::TopBar::projectNameGui() {
@@ -185,10 +209,12 @@ void FS::TopBar::areaGui() {
 }
 
 void FS::TopBar::calc() {
-	ImGui::SetNextWindowPos(ImVec2(style.windowSize.x * 0.3f, style.windowPos.y));
+	ImGui::SetNextWindowPos(ImVec2(style.windowSize.x * 0.4f, style.windowPos.y));
 	ImGui::SetNextWindowSize(ImVec2(style.windowSize.x * 0.3f, style.windowSize.y));
 
 	ImGui::Begin("Calc", nullptr, Internal::Bar::commonWindowFlag | ImGuiWindowFlags_NoBackground);
+	this->separator(ImGui::GetWindowPos().x + 2.0f, { 0.3f,0.2f,0.2f,1.0f });
+	ImGui::Spacing(); ImGui::SameLine();
 
 	bool isRunning = sceneRead->isExist<Lua::Calc>();
 
@@ -288,41 +314,67 @@ void FS::TopBar::playCheck() {
 
 }
 
-#include <imgui_internal.h>
-
 void FS::TopBar::scene() {
-	ImGui::SetNextWindowPos(ImVec2(style.windowSize.x * 0.02f, style.windowPos.y));
-	ImGui::SetNextWindowSize(ImVec2(style.windowSize.x * 0.1f, style.windowSize.y));
+	ImGui::SetNextWindowPos(ImVec2(7.0f, style.windowPos.y - 2.0f));
+	ImGui::SetNextWindowSize(ImVec2(style.windowSize.x * 0.4f, style.windowSize.y));
 
 	ImGui::Begin("SceneFunc", nullptr, Internal::Bar::commonWindowFlag | ImGuiWindowFlags_NoBackground);
 
-	this->combo();
+	//combo button color
+	if (!topBarRead->getIndices()->empty())
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.01f, 0.01f, 1.0f));
+	else
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.02f, 0.02f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.01f, 0.01f, 0.01f, 1.0f));
 
+	this->combo();	ImGui::SameLine();
+	ImGui::PopStyleColor(2);
 
-	//for (const auto x : *indices) {
-	//	topBarRead->call(x);
-	//}
-
+	this->func();
 
 	ImGui::End();
 }
 
 void FS::TopBar::combo() {
 	const auto* info = topBarRead->getInfo();
-	const auto* indices = topBarRead->getIndices();
-	if (!ImGui::BeginCombo("test", "hoge"))
+
+	if (!ImGui::BeginCombo("##SceneFuncCombo", "##None", ImGuiComboFlags_NoPreview))
 		return;
 
 	for (auto& x : *info) {
 
-		if (ImGui::Selectable(x.sceneName.c_str(), false)) {
-
+		if (ImGui::Selectable(x.sceneName.c_str(), x.select)) {
+			if (!x.select)
+				topBarWrite->lock(x.code);
+			else
+				topBarWrite->unlock(x.code);
 		}
 	}
 
 
-
-
 	ImGui::EndCombo();
+
+}
+
+void FS::TopBar::func() {
+
+	const auto* indices = topBarRead->getIndices();
+
+	for (auto x : *indices) {
+		ImGui::Spacing(); ImGui::SameLine();
+		topBarRead->call(x);
+		ImGui::SameLine(); ImGui::Spacing();
+		this->separator(ImGui::GetItemRectMax().x + 10.0f);
+		ImGui::SameLine();
+	}
+
+}
+
+void FS::TopBar::separator(const float posX, const ImVec4& col4) {
+
+	ImDrawList* list = ImGui::GetWindowDrawList();
+	const ImU32 col = ImGui::ColorConvertFloat4ToU32(col4);
+	list->AddLine({ posX,style.windowPos.y + 2.0f }, { posX,style.windowPos.y + style.windowSize.y - 2.0f }, col);
+
 }
 

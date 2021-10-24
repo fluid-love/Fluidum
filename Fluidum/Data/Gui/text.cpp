@@ -12,7 +12,84 @@ namespace FD::Internal::Text {
 		return src + '\n' + temp;
 	}
 
+	enum class Type : uint8_t {
+		Analysis,
+		CodingNew,
+		CodingSelect,
+		CodingTab,
+		MenuBar,
+		NewProject,
+		PopupSelect,
+		Project,
+		ProjectForm,
+		ProjectSaveAs,
+		StatusBar,
+		TextEditor,
+		Title,
+		TopBar
+	};
 
+
+	template<Type T>
+	std::string makePath(const Language lang) {
+		using enum Type;
+		std::string path{};
+		if (lang == Language::Japanese)
+			path += Resource::JapaneseGuiTextFolderPath;
+		else if (lang == Language::English)
+			path += Resource::EnglishGuiTextFolderPath;
+		else if (lang == Language::Chinese)
+			path += Resource::ChineseGuiTextFolderPath;
+		else
+			abort();
+
+		if constexpr (T == Analysis) {
+			path += "Analysis";
+		}
+		else if constexpr (T == CodingNew) {
+			path += "CodingNew";
+		}
+		else if constexpr (T == CodingSelect) {
+			path += "CodingSelect";
+		}
+		else if constexpr (T == CodingTab) {
+			path += "CodingTab";
+		}
+		else if constexpr (T == MenuBar) {
+			path += "MenuBar";
+		}
+		else if constexpr (T == NewProject) {
+			path += "NewProject";
+		}
+		else if constexpr (T == PopupSelect) {
+			path += "PopupSelect";
+		}
+		else if constexpr (T == Project) {
+			path += "Project";
+		}
+		else if constexpr (T == ProjectForm) {
+			path += "ProjectForm";
+		}
+		else if constexpr (T == ProjectSaveAs) {
+			path += "ProjectSaveAs";
+		}
+		else if constexpr (T == StatusBar) {
+			path += "StatusBar";
+		}
+		else if constexpr (T == TextEditor) {
+			path += "TextEditor";
+		}
+		else if constexpr (T == TopBar) {
+			path += "TopBar";
+		}
+		else if constexpr (T == Title) {
+			path += "Title";
+		}
+		else {
+			static_assert(FU::Concept::DelayAssert_N<T>);
+		}
+		return path;
+	}
 
 }
 
@@ -57,11 +134,10 @@ FD::GuiTextRead::GuiTextRead(Internal::PassKey) {
 FD::Internal::Text::Title::Title() {
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::TitleGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::Title>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open Title.jpn.");
+		throw std::runtime_error("Failed to open Title.");
 
 	std::string data = "";
 
@@ -95,11 +171,9 @@ FD::Internal::Text::Title::Title() {
 FD::Internal::Text::StatusBar::StatusBar() {
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::StatusBarGuiTextJpnFilePath, std::ios::in);
-
+	ifs = std::ifstream(makePath<Type::StatusBar>(Getter::get()), std::ios::in);
 	if (!ifs)
-		throw std::runtime_error("Failed to open StatusBar.jpn.");
+		throw std::runtime_error("Failed to open StatusBar.");
 
 	std::string data = "";
 
@@ -118,11 +192,10 @@ FD::Internal::Text::StatusBar::StatusBar() {
 FD::Internal::Text::MenuBar::MenuBar() {
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::MenuBarGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::MenuBar>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open MenuBar.jpn.");
+		throw std::runtime_error("Failed to open MenuBar.");
 
 	std::string data = "";
 
@@ -190,11 +263,10 @@ FD::Internal::Text::MenuBar::MenuBar() {
 FD::Internal::Text::TopBar::TopBar() {
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::TopBarGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::TopBar>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open TopBar.jpn.");
+		throw std::runtime_error("Failed to open TopBar.");
 
 	std::string data = "";
 
@@ -226,11 +298,10 @@ FD::Internal::Text::CodingSelect::CodingSelect() {
 
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::CodingSelectGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::CodingSelect>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open CodingSelect.jpn.");
+		throw std::runtime_error("Failed to open CodingSelect.");
 
 	std::string data = "";
 
@@ -283,15 +354,28 @@ FD::Internal::Text::CodingSelect::CodingSelect() {
 	this->error_emptyForm = data;
 }
 
+FD::Internal::Text::CodingNew::CodingNew() {
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::CodingNew>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open CodingNew.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->title = data;
+}
+
 FD::Internal::Text::NewProject::NewProject() {
 
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::NewProjectGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::NewProject>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open NewProject.jpn.");
+		throw std::runtime_error("Failed to open NewProject.");
 
 	std::string data = "";
 
@@ -358,11 +442,10 @@ FD::Internal::Text::ProjectForm::ProjectForm() {
 
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::ProjectFormGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::ProjectForm>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open ProjectForm.jpn.");
+		throw std::runtime_error("Failed to open ProjectForm.");
 
 	std::string data = "";
 
@@ -416,11 +499,10 @@ FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
 
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::ProjectSaveAsGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::ProjectSaveAs>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open ProjectSaveAs.jpn.");
+		throw std::runtime_error("Failed to open ProjectSaveAs.");
 
 	std::string data = "";
 
@@ -465,11 +547,10 @@ FD::Internal::Text::PopupSelect::PopupSelect() {
 
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::PopupSelectGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::PopupSelect>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open PopupSelect.jpn.");
+		throw std::runtime_error("Failed to open PopupSelect.");
 
 	std::string data = "";
 
@@ -489,11 +570,10 @@ FD::Internal::Text::TextEditor::TextEditor() {
 
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::TextEditorGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::TextEditor>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open TextEditor.jpn.");
+		throw std::runtime_error("Failed to open TextEditor.");
 
 	std::string data = "";
 
@@ -570,11 +650,10 @@ FD::Internal::Text::CodingTab::CodingTab() {
 
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::CodingTabGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::CodingTab>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open CodingTab.jpn.");
+		throw std::runtime_error("Failed to open CodingTab.");
 
 	std::string data = "";
 
@@ -590,11 +669,10 @@ FD::Internal::Text::CodingTab::CodingTab() {
 FD::Internal::Text::Project::Project() {
 	std::ifstream ifs{};
 
-	if (Getter::get() == Language::Japanese)
-		ifs = std::ifstream(Internal::Resource::ProjectGuiTextJpnFilePath, std::ios::in);
+	ifs = std::ifstream(makePath<Type::Project>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open Project.jpn.");
+		throw std::runtime_error("Failed to open Project.");
 
 	std::string data = "";
 

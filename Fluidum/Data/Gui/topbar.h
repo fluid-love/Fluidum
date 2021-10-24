@@ -14,6 +14,7 @@ namespace FD {
 			std::function<void()> func = nullptr;
 			FU::Class::ClassCode::CodeType code{};
 			std::string sceneName{};
+			bool select = false;
 		};
 		class Data final {
 			static inline std::vector<Info> funcs{};
@@ -41,7 +42,7 @@ namespace FD {
 			constexpr auto code = FU::Class::ClassCode::GetClassCode<Scene>();
 
 			//already
-			if (this->find<Scene>() == Data::funcs.end())
+			if (this->find<Scene>() != Data::funcs.end())
 				return;
 
 			Info info{
@@ -77,10 +78,26 @@ namespace FD {
 		template<typename Scene>
 		void lock() {
 			using namespace TopBar::Internal;
-			const auto itr = this->find<Scene>();
+			auto itr = this->find<Scene>();
 			assert(itr != Data::funcs.end());
+			itr->select = true;
 			Data::indices.emplace_back(std::distance(Data::funcs.begin(), itr));
 		}
+
+		void lock(const FU::Class::ClassCode::CodeType code);
+
+		template<typename Scene>
+		void unlock() {
+			using namespace TopBar::Internal;
+			auto itr = this->find<Scene>();
+			itr->select = false;
+			assert(itr != Data::funcs.end());
+			auto erase = std::find(Data::indices.begin(), Data::indices.end(), std::distance(Data::funcs.begin(), itr));
+			Data::indices.erase(erase);
+		}
+
+		void unlock(const FU::Class::ClassCode::CodeType code);
+	
 
 	private:
 

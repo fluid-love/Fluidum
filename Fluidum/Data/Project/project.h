@@ -51,7 +51,7 @@ namespace FD {
 		void createNewProject(const Project::CreateProjectInfo& info) const;
 
 		//現在のプロジェクトを保存せずに，既存のプロジェクトを読み込む．
-		void loadExistProject(const char* path) const;
+		void loadProject(const char* path) const;
 
 		//現在のプロジェクトを保存して，現在のプロジェクトを新しいパスへcopyする.
 		void saveAs(const char* newName, const char* dstProjectFolderPath) const;
@@ -72,6 +72,7 @@ namespace FD {
 		bool eraseProjectHistory(const std::string& fprojPath);
 	private:
 		void save_tab() const;
+		void save_scene() const;
 		void save_files() const;
 
 		void writeProjectInfo(const char* path) const;
@@ -82,6 +83,7 @@ namespace FD {
 
 		void tryCreateFilesFile() const;
 		void tryCreateTabFile() const;
+		void tryCreateSceneFile() const;
 		void tryCreateFunctionFile() const;
 
 		//ProjectFolderが消されたり移動したりしているか
@@ -95,6 +97,7 @@ namespace FD {
 		void readProjectInfo(std::ifstream& ifs) const;
 		void readProjectFiles() const;
 		void readTabInfo() const;
+		void readSceneInfo() const;
 
 	private:
 		void save_thread();
@@ -116,6 +119,7 @@ namespace FD {
 
 		_NODISCARD std::vector<std::string> getIncludeCodeFilePathes() const;
 		_NODISCARD std::string getMainCodeFilePath() const;
+		_NODISCARD bool isMainCodeFileExist() const;
 
 		_NODISCARD std::string getProjectFolderPath() const;
 		_NODISCARD std::string getBackupFolderPath() const;
@@ -125,6 +129,8 @@ namespace FD {
 		_NODISCARD bool isDefaultProject() const;
 
 		_NODISCARD Project::CodeType getCurrentMainCodeType() const;
+
+		_NODISCARD std::vector<FU::Class::ClassCode::CodeType> loadSceneFile() const;
 	};
 
 }

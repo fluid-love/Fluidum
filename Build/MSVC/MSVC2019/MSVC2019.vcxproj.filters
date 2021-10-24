@@ -388,9 +388,6 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Project\project.h">
       <Filter>Fluidum\Data\Project</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Data\Project\selectproject.h">
-      <Filter>Fluidum\Data\Project</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Coding\tab.h">
       <Filter>Fluidum\Data\Coding</Filter>
     </ClInclude>
@@ -501,6 +498,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\topbar.h">
       <Filter>Fluidum\Data\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\add.h">
+      <Filter>Fluidum\Scene\Utils\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\task.h">
+      <Filter>Fluidum\Data\Project</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\project.h">
+      <Filter>Fluidum\Data\Log\Recent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\file.h">
+      <Filter>Fluidum\Data\Log\Recent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Cursor\cursor.h">
+      <Filter>Fluidum\Utils\Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\new.h">
+      <Filter>Fluidum\Scene\Coding\Select</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -803,6 +818,15 @@
     </Filter>
     <Filter Include="Fluidum\Data\Calc\Plot\ImPlot">
       <UniqueIdentifier>{ee7ca215-ce2f-49be-8ca3-00bca21368e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Utils\Scene">
+      <UniqueIdentifier>{889d9eca-759b-4f59-b5ea-c6cc29862d97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Data\Log\Recent">
+      <UniqueIdentifier>{ce5ca040-e313-4fec-9733-d12c882ca062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Utils\Cursor">
+      <UniqueIdentifier>{4efbf0a1-ded0-470a-860d-67b6f4013346}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1126,6 +1150,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\topbar.cpp">
       <Filter>Fluidum\Data\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Scene\add.cpp">
+      <Filter>Fluidum\Scene\Utils\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\task.cpp">
+      <Filter>Fluidum\Data\Project</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\project.cpp">
+      <Filter>Fluidum\Data\Log\Recent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\file.cpp">
+      <Filter>Fluidum\Data\Log\Recent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Utils\Cursor\cursor.cpp">
+      <Filter>Fluidum\Utils\Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\new.cpp">
+      <Filter>Fluidum\Scene\Coding\Select</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

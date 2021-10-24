@@ -36,6 +36,9 @@ namespace FS {
 		FD::ImGuiWindowWrite* const imguiWindowWrite;
 		FD::TopBarWrite* const topBarWrite;
 
+		bool windowShouldClose = true;
+	private:
+		void closeWindow();
 
 	private:
 

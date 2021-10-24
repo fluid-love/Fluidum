@@ -23,7 +23,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_pushBack(State L) {
 		std::rethrow_exception(std::current_exception());
 	}
 
-	implotWrite->pushBack(figureKey, plotIndex, x, y);
+	implotWrite->pushBack(static_cast<FD::Plot::FigureIndex>(figureKey), static_cast<FD::Plot::PlotIndex>(plotIndex), x, y);
 
 	return 0;
 }

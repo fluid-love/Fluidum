@@ -16,4 +16,5 @@
 #include "Log/type.h"
 #include "Tuple/tuple.h"
 #include "Text/guitext.h"
-
+#include "Cursor/cursor.h"
+#include "MessageBox/messagebox.h"

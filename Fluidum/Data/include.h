@@ -10,8 +10,12 @@
 
 #include "Log/console.h"
 #include "Log/log.h"
+#include "Log/Recent/file.h"
+#include "Log/Recent/project.h"
 
 #include "Project/project.h"
+#include "Project/task.h"
+
 #include "Coding/tab.h"
 
 #include "Calc/Function/function.h"

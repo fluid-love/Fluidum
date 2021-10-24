@@ -16,13 +16,16 @@ namespace FS::Bar::Internal {
 		return result;
 	}
 
+
+
 }
 
 FS::Bar::NewProject::NewProject(
 	const FD::SceneRead* const sceneRead,
 	FD::WindowWrite* const windowWrite,
 	const FD::GuiRead* const guiRead,
-	FD::GuiWrite* const guiWrite
+	FD::GuiWrite* const guiWrite,
+	const FD::Log::ProjectRead* const projectLogRead
 ) :
 	sceneRead(sceneRead),
 	windowWrite(windowWrite),
@@ -37,7 +40,8 @@ FS::Bar::NewProject::NewProject(
 		}),
 	algorithmTemplates({
 		ButtonInfo{ images.at(4), "_IT", text.interactive, text.interactiveDescription }
-		})
+		}),
+	recentTemplates(this->initRecentTempates(projectLogRead->recent()))
 
 {
 	GLog.add<FD::Log::Type::None>("Construct NewProjectScene.");
@@ -89,8 +93,10 @@ void FS::Bar::NewProject::call() {
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove;
 
-
 	ImGui::Begin("NewProject", nullptr, flag);
+
+	//animation
+	ImAnime::PushStyleVar(anime.counter,0.5f,0.0f,1.0f,ImAnimeType::LINEAR,ImGuiStyleVar_Alpha);
 
 	this->title();
 
@@ -103,8 +109,9 @@ void FS::Bar::NewProject::call() {
 	ImGui::Spacing(); ImGui::Spacing();
 	this->bottom();
 
-	ImGui::End();
+	ImAnime::PopStyleVar();
 
+	ImGui::End();
 
 	ImGui::PopStyleVar(3);
 }
@@ -138,7 +145,14 @@ void FS::Bar::NewProject::recent() {
 	ImGui::BeginChild("RecentInner");
 
 	ImGui::PushFont(FDR::getDefaultFontMiniSize());
-	ImGui::TextDisabled(text.NotApplicable);
+
+	if (recentTemplates.empty())
+		ImGui::TextDisabled(text.NotApplicable);
+	else {
+		for (auto& x : recentTemplates)
+			bool click = this->button(x.image, x.label, x.title, x.description);
+	}
+
 	ImGui::PopFont();
 
 	ImGui::EndChild();
@@ -188,7 +202,7 @@ void FS::Bar::NewProject::filter() {
 	ImGui::SetNextItemWidth(ImGui::GetWindowSize().x * 0.3f);
 
 
-	if (ImGui::BeginCombo("#filter", filter1[layoutIndex], ImGuiComboFlags_HeightLargest)) {
+	if (ImGui::BeginCombo("##filter", filter1[layoutIndex], ImGuiComboFlags_HeightLargest)) {
 		for (int n = 0; n < IM_ARRAYSIZE(filter1); n++) {
 			const bool is_selected = (layoutIndex == n);
 			if (ImGui::Selectable(filter1[n], is_selected))
@@ -280,6 +294,30 @@ bool FS::Bar::NewProject::button(const FDR::ImGuiImage& image, const char* label
 	ImGui::EndChild();
 
 	return click;
+}
+
+std::vector<FS::Bar::NewProject::ButtonInfo> FS::Bar::NewProject::initRecentTempates(const std::vector<FD::Log::Project::Type>& types) {
+	using enum FD::Log::Project::Type;
+
+	std::vector<ButtonInfo> result{};
+	for (const auto x : types) {
+		if (x == Empty)
+			result.emplace_back(ButtonInfo{ images.at(0), "_Empty", text.empty, text.emptyDescription });
+		else if (x == Empty_Lua)
+			result.emplace_back(ButtonInfo{ images.at(1), "_ELua", text.emptyLua, text.emptyLuaDescription });
+		else if (x == Empty_Python)
+			result.emplace_back(ButtonInfo{ images.at(2), "_EPy", text.emptyPython, text.emptyPythonDescription });
+		else if (x == Empty_Lua)
+			result.emplace_back(ButtonInfo{ images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScriptDescription });
+
+		else if (x == Interactive)
+			result.emplace_back(ButtonInfo{ images.at(4), "_IT", text.interactive, text.interactiveDescription });
+		else {
+			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+			abort();
+		}
+	}
+	return result;
 }
 
 

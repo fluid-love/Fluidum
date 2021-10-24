@@ -91,7 +91,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_setMarker(State L) {
 		std::rethrow_exception(std::current_exception());
 	}
 
-	implotWrite->setMarker(figureIndex, plotIndex, mkr);
+	implotWrite->setMarker(static_cast<FD::Plot::FigureIndex>(figureIndex), static_cast<FD::Plot::PlotIndex>(plotIndex), mkr);
 
 	return 0;
 }

@@ -38,6 +38,10 @@ namespace FS::Bar {
 		std::string projectNameStr{};
 
 		struct {
+			ImCounter<ImAnimeTime> counter{};
+		}anime;
+
+		struct {
 			ImVec2 windowPos{};
 			ImVec2 windowSize{};
 

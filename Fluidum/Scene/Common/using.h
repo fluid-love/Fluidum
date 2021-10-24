@@ -4,6 +4,8 @@
 #include "../../Data/include.h"
 #include "../../Draw/include.h"
 
+#include "../../Libraries/ImGuiAnimation/ImGuiAnimation.h"
+
 namespace FS {
 
 	using MainFluidumScene = ::FS::FluidumScene <
@@ -29,7 +31,13 @@ namespace FS {
 		FD::TopBarWrite,
 		FD::TopBarRead,
 		FD::ImGuiWindowWrite,
-		FD::ImGuiWindowRead
+		FD::ImGuiWindowRead,
+		FD::TaskWrite,
+		FD::TaskRead,
+		FD::Log::FileWrite,
+		FD::Log::FileRead,
+		FD::Log::ProjectWrite,
+		FD::Log::ProjectRead
 	> ;
 
 	//ŠeƒV[ƒ“‚ÅpublicŒp³‚·‚é upcast‚·‚é‚Ì‚Åpublic

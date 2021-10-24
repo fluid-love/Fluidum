@@ -12,37 +12,25 @@ namespace FD::Internal::Resource {
 	constexpr inline const char* GuiTextFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/.lang")>();
 #endif	
 
+}
+
+namespace FD::Internal::Resource {
 
 #ifdef Fluidum_Path
-	constexpr inline const char* TitleGuiTextFilePath = Fluidum_Path "/Resources/Gui/Text/Title.jpn";
-	constexpr inline const char* MenuBarGuiTextFilePath = Fluidum_Path "/Resources/Gui/Text/MenuBar.jpn";
-	constexpr inline const char* StatusBarGuiTextFilePath = Fluidum_Path "/Resources/Gui/Text/StatusBar.jpn";
-	constexpr inline const char* TopBarGuiTextFilePath = Fluidum_Path "/Resources/Gui/Text/TopBar.jpn";
-	constexpr inline const char* CodingSelectGuiTextFilePath = Fluidum_Path "/Resources/Gui/Text/CodingSelect.jpn";
-	constexpr inline const char* NewProjectGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/NewProject.jpn";
-	constexpr inline const char* ProjectFormGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/ProjectForm.jpn";
-	constexpr inline const char* ProjectFormGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/ProjectSaveAs.jpn";
-	constexpr inline const char* PopupSelectGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/PopupSelect.jpn";
-	constexpr inline const char* TextEditorGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/TextEditor.jpn";
-	constexpr inline const char* CodingTabGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/CodingTab.jpn";
-	constexpr inline const char* ProjectGuiTextJpnFilePath = Fluidum_Path "/Resources/Gui/Text/Project.jpn";
+	constexpr inline const char* JapaneseGuiTextFolderPath = Fluidum_Path "/Resources/Gui/Text/Japanese/";
+	constexpr inline const char* EnglishGuiTextFolderPath = Fluidum_Path "/Resources/Gui/Text/English/";
+	constexpr inline const char* ChineseGuiTextFolderPath = Fluidum_Path "/Resources/Gui/Text/Chinese/";
 
 #else
-	constexpr inline const char* TitleGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/Title.jpn")>();
-	constexpr inline const char* MenuBarGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/MenuBar.jpn")>();
-	constexpr inline const char* StatusBarGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/StatusBar.jpn")>();
-	constexpr inline const char* TopBarGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/TopBar.jpn")>();
-	constexpr inline const char* CodingSelectGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/CodingSelect.jpn")>();
-	constexpr inline const char* NewProjectGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/NewProject.jpn")>();
-	constexpr inline const char* ProjectFormGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/ProjectForm.jpn")>();
-	constexpr inline const char* PopupSelectGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/PopupSelect.jpn")>();
-	constexpr inline const char* ProjectSaveAsGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/ProjectSaveAs.jpn")>();
-	constexpr inline const char* TextEditorGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/TextEditor.jpn")>();
-	constexpr inline const char* CodingTabGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/CodingTab.jpn")>();
-	constexpr inline const char* ProjectGuiTextJpnFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/Project.jpn")>();
+	constexpr inline const char* JapaneseGuiTextFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/Japanese/")>();
+	constexpr inline const char* EnglishGuiTextFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/English/")>();
+	constexpr inline const char* ChineseGuiTextFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Gui/Text/Chinese/")>();
 
 #endif	
 
+}
+
+namespace FD::Internal::Resource {
 
 #ifdef Fluidum_Path
 	constexpr inline const char* TempProjectFolderPath = Fluidum_Path "/Resources/Project/TempProject/";
@@ -54,7 +42,18 @@ namespace FD::Internal::Resource {
 
 #endif	
 
-
-
 }
 
+namespace FD::Internal::Resource {
+
+#ifdef Fluidum_Path
+	constexpr inline const char* RecentProjectTemplateHistoryFilePath = Fluidum_Path "/Resources/Log/Recent/RecentTemplateProject.history";
+	constexpr inline const char* RecentFileHistoryFilePath = Fluidum_Path "/Resources/Log/Recent/RecentFile.history";
+
+#else
+	constexpr inline const char* RecentProjectTemplateHistoryFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Log/Recent/RecentTemplateProject.history")>();
+	constexpr inline const char* RecentFileHistoryFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Log/Recent/RecentFile.history")>();
+
+#endif	
+
+}

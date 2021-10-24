@@ -27,8 +27,8 @@ FS::TitleBar::TitleBar(
 	style.iconWindowPos = { 0.0f,windowHeight / 10.0f };
 	style.iconWindowSize = { (ImGui::GetStyle().WindowPadding.x * 2.0f + (ImGui::GetStyle().FramePadding.x * 2.0f)) + ImGui::CalcTextSize("   ").x ,windowHeight };
 
-
-	style.iconSize = { windowHeight ,windowHeight };
+	using namespace FU::ImGui::Operators;
+	style.iconSize = ImVec2{ windowHeight ,windowHeight } * 0.88f;
 
 	style.buttonSize = { style.windowSize.x / 3.0f, style.windowSize.y };
 }

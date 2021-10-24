@@ -2,27 +2,28 @@
 
 #include <imgui_internal.h>
 #include <cmath>
+#include <numbers>
 
 void FU::ImGui::helpTooltip(const char* desc) {
-    ::ImGui::TextDisabled("(?)");
-    if (::ImGui::IsItemHovered()) {
-        ::ImGui::BeginTooltip();
-        ::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
-        ::ImGui::TextUnformatted(desc);
-        ::ImGui::PopTextWrapPos();
-        ::ImGui::EndTooltip();
-    }
+	::ImGui::TextDisabled("(?)");
+	if (::ImGui::IsItemHovered()) {
+		::ImGui::BeginTooltip();
+		::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
+		::ImGui::TextUnformatted(desc);
+		::ImGui::PopTextWrapPos();
+		::ImGui::EndTooltip();
+	}
 }
 
 void FU::ImGui::exclamationTooltip(const char* desc) {
-    ::ImGui::TextDisabled("(!)");
-    if (::ImGui::IsItemHovered()) {
-        ::ImGui::BeginTooltip();
-        ::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
-        ::ImGui::TextUnformatted(desc);
-        ::ImGui::PopTextWrapPos();
-        ::ImGui::EndTooltip();
-    }
+	::ImGui::TextDisabled("(!)");
+	if (::ImGui::IsItemHovered()) {
+		::ImGui::BeginTooltip();
+		::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
+		::ImGui::TextUnformatted(desc);
+		::ImGui::PopTextWrapPos();
+		::ImGui::EndTooltip();
+	}
 }
 
 void FU::ImGui::exclamationFadeTooltip(const ImVec2& pos, const char* desc) {
@@ -30,13 +31,13 @@ void FU::ImGui::exclamationFadeTooltip(const ImVec2& pos, const char* desc) {
 }
 
 void FU::ImGui::hoveredMarker(const char* desc) {
-    if (::ImGui::IsItemHovered()) {
-        ::ImGui::BeginTooltip();
-        ::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
-        ::ImGui::TextUnformatted(desc);
-        ::ImGui::PopTextWrapPos();
-        ::ImGui::EndTooltip();
-    }
+	if (::ImGui::IsItemHovered()) {
+		::ImGui::BeginTooltip();
+		::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
+		::ImGui::TextUnformatted(desc);
+		::ImGui::PopTextWrapPos();
+		::ImGui::EndTooltip();
+	}
 }
 
 
@@ -67,44 +68,60 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 bool FU::ImGui::spinner(const char* label, float radius, float thickness, const ImU32& color) {
-    using namespace ::ImGui;
+	using namespace ::ImGui;
 
-    ImGuiWindow* window = GetCurrentWindow();
-    if (window->SkipItems)
-        return false;
+	ImGuiWindow* window = GetCurrentWindow();
+	if (window->SkipItems)
+		return false;
 
-    ImGuiContext& g = *GImGui;
-    const ImGuiStyle& style = g.Style;
-    const ImGuiID id = window->GetID(label);
+	ImGuiContext& g = *GImGui;
+	const ImGuiStyle& style = g.Style;
+	const ImGuiID id = window->GetID(label);
 
-    ImVec2 pos = window->DC.CursorPos;
-    ImVec2 size((radius) * 2, (radius + style.FramePadding.y) * 2);
+	ImVec2 pos = window->DC.CursorPos;
+	ImVec2 size((radius) * 2, (radius + style.FramePadding.y) * 2);
 
-    const ImRect bb(pos, ImVec2(pos.x + size.x, pos.y + size.y));
-    ItemSize(bb, style.FramePadding.y);
-    if (!ItemAdd(bb, id))
-        return false;
+	const ImRect bb(pos, ImVec2(pos.x + size.x, pos.y + size.y));
+	ItemSize(bb, style.FramePadding.y);
+	if (!ItemAdd(bb, id))
+		return false;
 
-    // Render
-    window->DrawList->PathClear();
+	// Render
+	window->DrawList->PathClear();
 
-    int num_segments = 30;
-    float start = std::abs(ImSin(static_cast<float>(g.Time) * 1.8f) * (num_segments - 5));
+	int num_segments = 30;
+	float start = std::abs(ImSin(static_cast<float>(g.Time) * 1.8f) * (num_segments - 5));
 
-    const float a_min = IM_PI * 2.0f * ((float)start) / (float)num_segments;
-    const float a_max = IM_PI * 2.0f * ((float)num_segments - 3) / (float)num_segments;
+	const float a_min = IM_PI * 2.0f * ((float)start) / (float)num_segments;
+	const float a_max = IM_PI * 2.0f * ((float)num_segments - 3) / (float)num_segments;
 
-    const ImVec2 centre = ImVec2(pos.x + radius, pos.y + radius + style.FramePadding.y);
+	const ImVec2 centre = ImVec2(pos.x + radius, pos.y + radius + style.FramePadding.y);
 
-    for (int i = 0; i < num_segments; i++) {
-        const float a = a_min + ((float)i / (float)num_segments) * (a_max - a_min);
-        window->DrawList->PathLineTo(ImVec2(centre.x + ImCos(a + static_cast<float>(g.Time) * 8) * radius,
-            centre.y + ImSin(a + static_cast<float>(g.Time) * 8) * radius));
-    }
+	for (int i = 0; i < num_segments; i++) {
+		const float a = a_min + ((float)i / (float)num_segments) * (a_max - a_min);
+		window->DrawList->PathLineTo(ImVec2(centre.x + ImCos(a + static_cast<float>(g.Time) * 8) * radius,
+			centre.y + ImSin(a + static_cast<float>(g.Time) * 8) * radius));
+	}
 
-    window->DrawList->PathStroke(color, false, thickness);
+	window->DrawList->PathStroke(color, false, thickness);
 
-    return true;
+	return true;
 }
 /***************************************************************************************************************************/
+
+void FU::ImGui::cursor_busy() {
+
+	static float val = 0.0f;
+	val += 0.02f;
+	if (val > std::numbers::pi)
+		val = 0.0f;
+
+	const float sin = std::abs(std::sinf(val));
+	const float cos = std::abs(std::cosf(val));
+
+	ImU32 col = ::ImGui::ColorConvertFloat4ToU32({ 0.1f, sin , cos, 1.0f });
+
+	::ImGui::GetForegroundDrawList()->AddCircle(::ImGui::GetMousePos(), 8.0f, col, 0, 3.0f);
+}

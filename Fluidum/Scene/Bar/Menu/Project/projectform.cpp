@@ -17,7 +17,6 @@ FS::Bar::ProjectForm::ProjectForm(
 {
 	GLog.add<FD::Log::Type::None>("Construct ProjectFormScene.");
 
-
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
 
@@ -69,6 +68,9 @@ void FS::Bar::ProjectForm::call() {
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove;
 
+	//animation
+	ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
+
 	ImGui::Begin("ProjectForm", nullptr, flag);
 
 	this->title();
@@ -87,6 +89,7 @@ void FS::Bar::ProjectForm::call() {
 
 	ImGui::End();
 
+	ImAnime::PopStyleVar();
 	ImGui::PopStyleVar(3);
 }
 
@@ -104,8 +107,6 @@ void FS::Bar::ProjectForm::title() {
 	ImGui::Text(text.fillPlease);
 
 	ImGui::EndChild();
-
-
 }
 
 void FS::Bar::ProjectForm::folderPath() {
@@ -184,6 +185,9 @@ void FS::Bar::ProjectForm::bottom() {
 }
 
 bool FS::Bar::ProjectForm::createProject() {
+	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
+
+	ImGui::GetForegroundDrawList()->AddCircle(ImGui::GetCursorPos(), 5.0f, 0x3399FF);
 	//現在のプロジェクトが保存されていない場合は
 	//保存して作成　保存せずに作成　キャンセル　
 	if (projectRead->isDataChanged()) {
@@ -230,9 +234,11 @@ bool FS::Bar::ProjectForm::createProject() {
 			abort();
 		}
 	}
-	catch (const std::exception&) {
+	catch (const std::exception& e) {
+		GLog.add<FD::Log::Type::None>(e.what());
 		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
 		Scene::addScene<Utils::Message>(text.error_failedToCreate, pos.create);
+
 		return false;
 	}
 

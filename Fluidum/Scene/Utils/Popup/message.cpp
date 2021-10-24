@@ -35,7 +35,7 @@ void FS::Utils::Message::call() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 4.0f);
 
 	ImGui::PushStyleColor(ImGuiCol_PopupBg, bgColor);
-
+	ImAnime::PushStyleVar(counter, 0.7f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
 	constexpr auto flag =
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoResize |
@@ -49,7 +49,7 @@ void FS::Utils::Message::call() {
 	ImGui::Text(message);
 	ImGui::End();
 
-
+	ImAnime::PopStyleVar();
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
 

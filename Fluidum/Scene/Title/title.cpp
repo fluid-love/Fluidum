@@ -16,6 +16,7 @@
 
 //utils
 #include "../Utils/Popup/message.h"
+#include "../Utils/Scene/add.h"
 
 //file dialog
 #include <nfd.h>
@@ -49,7 +50,7 @@ namespace FS::Internal {
 }
 
 void FS::Title::call() {
-
+	ImGui::ShowMetricsWindow();
 	std::call_once(this->once, &Title::writeGuiData, this);
 
 	//if IsMouseButton -> next scene
@@ -120,9 +121,9 @@ void FS::Title::writeGuiData() {
 void FS::Title::changeScene() {
 	if ((!isSelectProjectHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !sceneRead->isExist<Bar::NewProject>()) || !projectRead->isDefaultProject()) {
 		GLog.add<FD::Log::Type::None>("Request delete TitleScene.");
-		Scene::deleteScene<Title>();//このシーンを消す
+		Scene::deleteScene<Title>();//delete this
 
-		//Barを追加
+		//add Bar scenes
 		GLog.add<FD::Log::Type::None>("Request add MenuBarScene.");
 		Scene::addScene<MenuBar>();
 		GLog.add<FD::Log::Type::None>("Request add StatusBarScene.");
@@ -134,10 +135,15 @@ void FS::Title::changeScene() {
 		GLog.add<FD::Log::Type::None>("Request add TitleBarScene.");
 		Scene::addScene<TitleBar>();
 
+		//add Layout scenes
 		GLog.add<FD::Log::Type::None>("Request add LeftLayoutScene.");
 		Scene::addScene<LeftLayout>();
 		GLog.add<FD::Log::Type::None>("Request add RightLayoutScene.");
 		Scene::addScene<RightLayout>();
+
+		const auto codes = projectRead->loadSceneFile();
+		GLog.add<FD::Log::Type::None>("Request add Utils::AddScenesScene.");
+		Scene::addScene<Utils::AddScenes>(codes);
 	}
 }
 
@@ -160,7 +166,7 @@ void FS::Title::drawTitleImage() {
 	ImGui::Begin("TitleImage", nullptr, flag);
 	ImGui::PopStyleVar();//pop WindowPadding
 
-	//overload ImGui::Image FluidumDraw
+	//overload: ImGui::Image FluidumDraw
 	ImGui::Image(this->image.value(), ImVec2(this->style.imageHalfSize));
 
 	ImGui::End();
@@ -185,7 +191,7 @@ void FS::Title::selectProject() {
 	ImGui::Begin("SelectProject", nullptr, flag);
 	isSelectProjectHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
 
-	ImGui::BeginChild("SelectProjectL", { style.selectWindowSize.x * 0.65f,0.0f }, false);
+	ImGui::BeginChild("SelectProjectL", { style.selectWindowSize.x * 0.6f,0.0f }, false);
 
 	ImGui::BeginChild("HistoryTitle", { 0.0f ,style.selectWindowSize.y * 0.15f });
 	ImGui::Text(ICON_MD_HISTORY); ImGui::SameLine();
@@ -196,10 +202,10 @@ void FS::Title::selectProject() {
 	this->recentProject();
 
 	ImGui::EndChild();
-	ImGui::EndChild(); ImGui::SameLine();
+	ImGui::EndChild(); ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::BeginChild("SelectProjectR");
 
-	//create NewProject
+	//create project
 	if (ImGui::Button(ICON_MD_ADD))
 		this->newProject();
 	ImGui::SameLine();
@@ -276,7 +282,7 @@ void FS::Title::openProjectButton() {
 void FS::Title::openProject(const char* filePath, const ImVec2& pos) {
 	GLog.add<FD::Log::Type::None>("Request load .fproj file.");
 	try {
-		projectWrite->loadExistProject(filePath);
+		projectWrite->loadProject(filePath);
 	}
 	catch (const FD::Project::ExceptionType type) {
 		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");

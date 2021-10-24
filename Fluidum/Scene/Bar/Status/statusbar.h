@@ -6,8 +6,11 @@ namespace FS {
 
 	class StatusBar final :public Scene {
 	public:
-		explicit StatusBar(const FD::GuiRead* const guiRead);
-		void Constructor(FD::GuiRead);
+		explicit StatusBar(
+			const FD::GuiRead* const guiRead,
+			const FD::TaskRead* const taskRead
+		);
+		void Constructor(FD::GuiRead, FD::TaskRead);
 
 		~StatusBar() noexcept;
 
@@ -16,6 +19,7 @@ namespace FS {
 
 	private://data
 		const FD::GuiRead* const guiRead;
+		const FD::TaskRead* const taskRead;
 
 		FD::Text::StatusBar text{};
 
@@ -39,6 +43,7 @@ namespace FS {
 	private:
 		//ç∂â∫Ç…ç°ÇÃÉ^ÉXÉN
 		void taskGui();
+		void taskPopup();
 
 		//íÜâõ
 		void infoGui();

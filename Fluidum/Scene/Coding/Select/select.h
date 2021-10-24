@@ -36,6 +36,10 @@ namespace FS {
 		const FDR::ImGuiImage openImage;
 
 		struct {
+			ImCounter<ImAnimeTime> counter{};
+		}anime;
+
+		struct {
 			ImVec2 windowSize{};
 			ImVec2 windowPos{};
 
@@ -86,6 +90,7 @@ namespace FS {
 		//開く
 		void right();
 		void open(const ImVec2& size);
+		void openDialog();
 		void newFile(const ImVec2& size);
 
 		//右下(クイックにおけるパスとファイル名入力)
@@ -102,5 +107,8 @@ namespace FS {
 
 		//errroのポップアップ
 		void errorPopup();
+
+	private:
+		void close();
 	};
 }

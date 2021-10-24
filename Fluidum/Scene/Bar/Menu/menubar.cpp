@@ -55,7 +55,7 @@ void FS::MenuBar::call() {
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(0.017f, 0.017f, 0.017f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.087f, 0.087f, 0.087f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.087f, 0.087f, 0.087f, 0.7f));
-	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.07f, 0.07f, 0.14f, 0.9f));
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.16f, 0.16f, 0.24f, 0.9f));
 	ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.017f, 0.017f, 0.017f, 1.0f));
 
 	constexpr ImGuiWindowFlags flag =
@@ -117,7 +117,7 @@ void FS::MenuBar::itemCreateNewProject() {
 	GLog.add<FD::Log::Type::None>("Request add NewProjectScene.");
 	Scene::addScene<Bar::NewProject>();
 }
-#include "../../../Utils/MessageBox/messagebox.h"
+
 void FS::MenuBar::itemOpen() {
 	if (!ImGui::MenuItem(text.open))
 		return;
@@ -148,7 +148,7 @@ void FS::MenuBar::itemOpen() {
 	//}
 
 	//try {
-	//	projectWrite->loadExistProject(*outPath.get());
+	//	projectWrite->loadProject(*outPath.get());
 	//}
 	//catch (const FD::Project::ExceptionType type) {
 	//	GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");

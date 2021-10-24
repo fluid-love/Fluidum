@@ -4,8 +4,9 @@ namespace FDR::Internal {
 	void loop(auto& commands, auto function) {
 		using namespace FDR::Internal;
 
-		glfwPollEvents();
 		ImGui_ImplGlfw_NewFrame();
+		glfwPollEvents();
+
 		ImGui::NewFrame();
 
 		{
@@ -102,8 +103,7 @@ namespace FDR::Internal {
 			.pSwapchains = swapChainsVK,
 			.pImageIndices = &imageIndex,
 		};
-
-
+		
 		if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR/* || frameBufferResize*/) {
 			//data.framebufferResized = false;
 			//recreateswapchain

@@ -12,7 +12,19 @@ namespace FU::ImGui {
 
 	void hoveredMarker(const char* desc);
 
+	consteval ImU32 convertImVec4ToImU32(const float x, const float y, const float z, const float w) {
+		auto saturate = [](const float f) { return (f < 0.0f) ? 0.0f : (f > 1.0f) ? 1.0f : f; };
 
+		ImU32 out;
+		out = static_cast<ImU32>(saturate(x) * 255.0f + 0.5f) << IM_COL32_R_SHIFT;
+		out |= static_cast<ImU32>(saturate(y) * 255.0f + 0.5f) << IM_COL32_G_SHIFT;
+		out |= static_cast<ImU32>(saturate(z) * 255.0f + 0.5f) << IM_COL32_B_SHIFT;
+		out |= static_cast<ImU32>(saturate(w) * 255.0f + 0.5f) << IM_COL32_A_SHIFT;
+
+		return out;
+	}
+
+	void cursor_busy();
 
 	//https://github.com/ocornut/imgui/issues/1901
 	bool spinner(const char* label, float radius, float thickness, const ImU32& color);

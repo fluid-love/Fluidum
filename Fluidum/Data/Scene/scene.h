@@ -5,6 +5,8 @@
 //forward
 namespace FD {
 	class SceneRead;
+	class ProjectWrite;
+	class ProjectRead;
 }
 
 namespace FD {
@@ -17,9 +19,11 @@ namespace FD {
 		private:
 			static inline std::vector<FU::Class::ClassCode::CodeType> codes{};
 			static inline std::mutex mtx{};
-
+			static inline std::atomic_bool save = false;
 		private:
 			friend class SceneRead;
+			friend class ProjectWrite;
+			friend class ProjectRead;
 		};
 	}
 	namespace Scene {

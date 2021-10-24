@@ -8,6 +8,8 @@
 
 #ifdef BOOST_OS_WINDOWS
 #include <Windows.h>
+#undef max
+#undef min
 #else
 #error Not Supported
 #endif

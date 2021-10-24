@@ -11,14 +11,16 @@ namespace FS {
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
-			const FD::TopBarRead* const topBarRead
+			const FD::TopBarRead* const topBarRead,
+			FD::TopBarWrite* const topBarWrite
 		);
 		void Constructor(
 			FD::ProjectRead,
-			FD::GuiRead, 
-			FD::GuiWrite, 
-			FD::SceneRead, 
-			FD::TopBarRead
+			FD::GuiRead,
+			FD::GuiWrite,
+			FD::SceneRead,
+			FD::TopBarRead,
+			FD::TopBarWrite
 		);
 
 		~TopBar() noexcept;
@@ -32,6 +34,7 @@ namespace FS {
 		FD::GuiWrite* const guiWrite;
 		const FD::SceneRead* const sceneRead;
 		const FD::TopBarRead* const topBarRead;
+		FD::TopBarWrite* const topBarWrite;
 
 	private://data
 
@@ -67,8 +70,11 @@ namespace FS {
 
 		void layoutGui();
 
+	private:
 		void templateGui();
+		void setTemplate(const uint16_t index);
 
+	private:
 		void projectNameGui();
 
 		void rightGui();
@@ -83,5 +89,9 @@ namespace FS {
 	private://left
 		void scene();
 		void combo();
+		void func();
+
+	private:
+		void separator(const float posX, const ImVec4& col4 = { 0.2f, 0.2f, 0.2f, 1.0f });
 	};
 }

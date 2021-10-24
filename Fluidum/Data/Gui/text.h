@@ -5,7 +5,8 @@
 namespace FD::Text {
 	enum class Language : uint8_t {
 		Japanese,
-		English
+		English,
+		Chinese
 	};
 }
 
@@ -111,6 +112,14 @@ namespace FD::Internal::Text {
 		GuiText error_notFoundDirectory;
 		GuiText error_alreadyExistFile;
 		GuiText error_emptyForm;
+
+	};
+
+	struct CodingNew final {
+		CodingNew();
+		~CodingNew() = default;
+
+		GuiText title;
 
 	};
 
@@ -284,6 +293,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::MenuBar;
 	using ::FD::Internal::Text::TopBar;
 	using ::FD::Internal::Text::CodingSelect;
+	using ::FD::Internal::Text::CodingNew;
 	using ::FD::Internal::Text::NewProject;
 	using ::FD::Internal::Text::ProjectForm;
 	using ::FD::Internal::Text::PopupSelect;

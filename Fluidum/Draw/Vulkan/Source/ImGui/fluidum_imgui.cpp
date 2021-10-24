@@ -77,14 +77,14 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 
 	colors[ImGuiCol_Text] = ImVec4(1.000f, 1.000f, 1.000f, 1.000f);
 	colors[ImGuiCol_TextDisabled] = ImVec4(0.500f, 0.500f, 0.500f, 1.000f);
-	colors[ImGuiCol_WindowBg] = ImVec4(0.024f, 0.024f, 0.024f, 0.99f);
+	colors[ImGuiCol_WindowBg] = ImVec4(0.016f, 0.016f, 0.016f, 0.99f);
 	colors[ImGuiCol_ChildBg] = ImVec4(0.180f, 0.180f, 0.180f, 0.000f);
 	colors[ImGuiCol_PopupBg] = ImVec4(0.05f, 0.05f, 0.05f, 1.000f);
 	colors[ImGuiCol_Border] = ImVec4(0.26f, 0.200f, 0.200f, 1.000f);
 	colors[ImGuiCol_BorderShadow] = ImVec4(0.000f, 0.000f, 0.000f, 0.000f);
-	colors[ImGuiCol_FrameBg] = ImVec4(0.160f, 0.160f, 0.160f, 1.000f);
+	colors[ImGuiCol_FrameBg] = ImVec4(0.060f, 0.060f, 0.060f, 1.000f);
 	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.100f, 0.100f, 0.100f, 1.000f);
-	colors[ImGuiCol_FrameBgActive] = ImVec4(0.280f, 0.280f, 0.280f, 1.000f);
+	colors[ImGuiCol_FrameBgActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.000f);
 	colors[ImGuiCol_TitleBg] = ImVec4(0.025f, 0.025f, 0.025f, 1.0f);
 	colors[ImGuiCol_TitleBgActive] = ImVec4(0.148f, 0.148f, 0.148f, 1.000f);
 	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.148f, 0.148f, 0.148f, 1.000f);
