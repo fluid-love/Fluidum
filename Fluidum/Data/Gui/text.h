@@ -30,6 +30,17 @@ namespace FD::Internal::Text {
 
 	};
 
+	struct TitleBar final {
+		TitleBar();
+		~TitleBar() = default;
+
+		GuiText popupMessage;
+		GuiText saveAndExit;
+		GuiText withoutSaving;
+		GuiText cancel;
+
+	};
+
 	struct StatusBar final {
 		StatusBar();
 		~StatusBar() = default;
@@ -88,6 +99,8 @@ namespace FD::Internal::Text {
 		GuiText newProject;
 		GuiText includeFile;
 
+		GuiText error_mainfile;
+
 	};
 
 	struct CodingSelect final {
@@ -120,6 +133,26 @@ namespace FD::Internal::Text {
 		~CodingNew() = default;
 
 		GuiText title;
+		GuiText recent;
+		GuiText recent_empty;
+		GuiText cancel;
+		GuiText create;
+		GuiText folderPath;
+		GuiText fileName;
+
+		GuiText empty;
+		GuiText empty_Description;
+		GuiText emptyLua;
+		GuiText emptyLua_Description;
+		GuiText emptyPython;
+		GuiText emptyPython_Description;
+		GuiText emptyAngelScript;
+		GuiText emptyAngelScript_Description;
+
+		GuiText error_fill;
+		GuiText error_directoryNotFound;
+		GuiText error_fileAlreadyExist;
+
 
 	};
 
@@ -230,6 +263,7 @@ namespace FD::Internal::Text {
 		GuiText selectAll;
 
 		GuiText theme;
+		GuiText default_;
 		GuiText dark;
 		GuiText light;
 		GuiText blue;
@@ -289,6 +323,7 @@ namespace FD::Internal::Text {
 
 namespace FD::Text {
 	using ::FD::Internal::Text::Title;
+	using ::FD::Internal::Text::TitleBar;
 	using ::FD::Internal::Text::StatusBar;
 	using ::FD::Internal::Text::MenuBar;
 	using ::FD::Internal::Text::TopBar;

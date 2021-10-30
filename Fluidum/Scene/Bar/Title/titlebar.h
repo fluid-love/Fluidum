@@ -11,9 +11,19 @@ namespace FS {
 			FD::GuiWrite* const guiWrite,
 			const FD::WindowRead* const windowRead,
 			FD::WindowWrite* const windowWrite,
-			const FD::SceneRead* const sceneRead
+			const FD::SceneRead* const sceneRead,
+			const FD::ProjectRead* const projectRead,
+			FD::ExitWrite* const exitWrite
 		);
-		void Constructor(FD::GuiRead, FD::GuiWrite, FD::WindowRead, FD::WindowWrite, FD::SceneRead);
+		void Constructor(
+			FD::GuiRead,
+			FD::GuiWrite,
+			FD::WindowRead,
+			FD::WindowWrite,
+			FD::SceneRead,
+			FD::ProjectRead,
+			FD::ExitWrite
+		);
 
 		~TitleBar() noexcept;
 
@@ -22,13 +32,16 @@ namespace FS {
 
 	private://data
 		const FD::GuiRead* const guiRead;
-		FD::GuiWrite* const guiWrite = nullptr;
+		FD::GuiWrite* const guiWrite;
 		const FD::WindowRead* const windowRead;
 		FD::WindowWrite* const windowWrite;
-		const FD::SceneRead* const sceneRead = nullptr;
-
+		const FD::SceneRead* const sceneRead;
+		const FD::ProjectRead* const projectRead;
+		FD::ExitWrite* const exitWrite;
 
 	private://data
+
+		const FD::Text::TitleBar text{};
 
 		const FDR::ImGuiImage iconImage = FDR::createImGuiImage(Resource::TitleBarIconFilePath);
 
@@ -48,7 +61,8 @@ namespace FS {
 		void icon();
 		void bar();
 
-
+	private:
+		void exit();
 
 	};
 }

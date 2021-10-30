@@ -52,3 +52,25 @@ std::pair<int32_t, int32_t> FD::WindowRead::getSavedPos() const {
 	std::lock_guard<std::mutex> lock(WindowData::mtx);
 	return WindowData::savedPos;
 }
+
+namespace FD {
+	struct {
+		bool saveAsAndExit = false;
+		std::mutex mtx{};
+	}GExitData;
+}
+
+void FD::ExitWrite::saveAsAndExit() const {
+	using namespace Internal::Scene;
+	std::lock_guard<std::mutex> lock(GExitData.mtx);
+	GExitData.saveAsAndExit = true;
+}
+
+bool FD::ExitRead::saveAsAndExit() const {
+	using namespace Internal::Scene;
+	std::lock_guard<std::mutex> lock(GExitData.mtx);
+	const auto result = GExitData.saveAsAndExit;
+	if (GExitData.saveAsAndExit)
+		GExitData.saveAsAndExit = false;
+	return result;
+}

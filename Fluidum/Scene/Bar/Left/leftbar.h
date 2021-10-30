@@ -9,12 +9,19 @@ namespace FS {
 		//ŠÔ‚ª‚©‚©‚é‚Ì‚Åleftbar‚ÌƒAƒCƒRƒ“‚Í‚ ‚ç‚©‚¶‚ß€”õ‚µ‚Ä‚¨‚¢‚Ä‚à‚ç‚¤
 		explicit LeftBar(
 			const FD::ProjectRead* const projectRead,
+			const FD::ProjectFilesRead* const projectFilesRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
 			std::vector<FDR::ImGuiImage>&& images
 		);
-		void Constructor(FD::ProjectRead, FD::GuiRead, FD::GuiWrite, FD::SceneRead);
+		void Constructor(
+			FD::ProjectRead,
+			FD::ProjectFilesRead,
+			FD::GuiRead,
+			FD::GuiWrite,
+			FD::SceneRead
+		);
 
 		~LeftBar() noexcept;
 
@@ -26,6 +33,7 @@ namespace FS {
 
 	private://data
 		const FD::ProjectRead* const projectRead;
+		const FD::ProjectFilesRead* const projectFilesRead;
 		const FD::GuiRead* const  guiRead;
 		const FD::SceneRead* const  sceneRead;
 

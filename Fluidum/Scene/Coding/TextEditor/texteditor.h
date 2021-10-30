@@ -12,9 +12,18 @@ namespace FS {
 			const FD::GuiRead* const guiRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
-			const std::string& path = {}
+			FD::ProjectFilesWrite* const projectFilesWrite,
+			const FD::ProjectFilesRead* const projectFilesRead
 		);
-		void Constructor(FD::Coding::TabWrite, FD::Coding::TabRead, FD::GuiRead, FD::ProjectWrite, FD::ProjectRead);
+		void Constructor(
+			FD::Coding::TabWrite,
+			FD::Coding::TabRead,
+			FD::GuiRead,
+			FD::ProjectWrite,
+			FD::ProjectRead,
+			FD::ProjectFilesWrite,
+			FD::ProjectFilesRead
+		);
 
 		~TextEditor() noexcept;
 
@@ -43,10 +52,11 @@ namespace FS {
 		struct Info final {
 			FTE::TextEditor* editor = nullptr;
 			std::string path{};
+			FD::Calc::Language language{};
 		};
 		std::vector<Info> info{};
 
-		FTE::TextEditor* editor = nullptr;
+		Info* current = nullptr;
 
 	private:
 		void textEditorMenu();
@@ -64,5 +74,12 @@ namespace FS {
 		void textChange();
 		std::string getCurrentEditorPath();
 
+	private:
+		std::chrono::system_clock::time_point checkSyntaxTimePoint{};
+		void checkSyntaxError();
+		void checkLua();
+		void checkPython();
+		void checkAngelScript();
+		lua_State* luaState = nullptr;
 	};
 }

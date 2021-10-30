@@ -14,6 +14,7 @@
 #include "Log/Recent/project.h"
 
 #include "Project/project.h"
+#include "Project/project_files.h"
 #include "Project/task.h"
 
 #include "Coding/tab.h"

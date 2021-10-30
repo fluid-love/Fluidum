@@ -1,7 +1,9 @@
 ﻿#include "select.h"
 #include <imgui_internal.h>
 #include "../TextEditor/texteditor.h"
+#include "new.h"
 #include "../../Utils/Popup/message.h"
+#include "../../Utils/Popup/backwindow.h"
 #include <nfd.h>
 
 using namespace FU::ImGui::Operators;
@@ -10,8 +12,11 @@ FS::CodingSelect::CodingSelect(
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::ProjectRead* const projectRead,
 	FD::ProjectWrite* const projectWrite,
-	const FD::GuiRead* const guiRead
-) : tabWrite(tabWrite), projectRead(projectRead), projectWrite(projectWrite), guiRead(guiRead),
+	const FD::ProjectFilesRead* const projectFilesRead,
+	FD::ProjectFilesWrite* const projectFilesWrite,
+	const FD::GuiRead* const guiRead,
+	const FD::SceneRead* const sceneRead
+) : tabWrite(tabWrite), projectRead(projectRead), projectWrite(projectWrite), projectFilesRead(projectFilesRead), projectFilesWrite(projectFilesWrite), sceneRead(sceneRead),
 newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::createImGuiImage(Resource::CodingOpenFilePath))
 {
 	GLog.add<FD::Log::Type::None>("Construct CodingSelectScene.");
@@ -30,10 +35,15 @@ newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::cre
 	quickInfo.folderPath = projectRead->getProjectFolderPath() + "Src/";
 	quickInfo.fileName = "main";
 
+	GLog.add<FD::Log::Type::None>("Request add PopupBackWindowScene.");
+	Scene::addScene<PopupBackWindow>();
 }
 
 FS::CodingSelect::~CodingSelect() {
 	try {
+		GLog.add<FD::Log::Type::None>("Request delete PopupBackWindowScene.");
+		Scene::deleteScene<PopupBackWindow>();
+
 		GLog.add<FD::Log::Type::None>("Destruct CodingSelectScene.");
 	}
 	catch (const std::exception& e) {
@@ -52,6 +62,8 @@ FS::CodingSelect::~CodingSelect() {
 
 void FS::CodingSelect::call() {
 
+	if (!sceneRead->isExist<Coding::New>())
+		ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);
 
@@ -64,25 +76,24 @@ void FS::CodingSelect::call() {
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove;
 
-	ImGui::OpenPopup("Select");
-	if (ImGui::BeginPopupModal("Select", nullptr, flag)) {
+	ImGui::Begin("Select", nullptr, flag);
 
-		ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
+	ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
 
-		this->create();
-		this->quick();
-		ImGui::SameLine();
+	this->create();
+	this->quick();
+	ImGui::SameLine();
 
-		ImGui::BeginChild("Right", { 0.0f,style.windowSize.y * 0.8f });
-		this->right();
-		this->bottomRight();
-		ImGui::EndChild();
+	ImGui::BeginChild("Right", { 0.0f,style.windowSize.y * 0.8f });
+	this->right();
+	this->bottomRight();
+	ImGui::EndChild();
 
-		this->bottom();
+	this->bottom();
 
-		ImAnime::PopStyleVar();
-		ImGui::EndPopup();
-	}
+	ImAnime::PopStyleVar();
+
+	ImGui::End();
 
 	ImGui::PopStyleVar(3);
 
@@ -190,7 +201,7 @@ void FS::CodingSelect::right() {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
-	this->open(size);
+	this->open(size); ImGui::Spacing();
 	this->newFile(size);
 
 	ImGui::PopStyleVar();
@@ -262,9 +273,10 @@ void FS::CodingSelect::openDialog() {
 	}
 
 	//NFD_OKAY
-	if (!projectRead->isMainCodeFileExist()) {
+	if (!projectFilesRead->isMainCodeFileExist()) {
 		GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
-		projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
+		projectFilesWrite->setMainCodePath(quickInfo.fullPath.c_str());
+		projectFilesWrite->save();
 	}
 
 	tabWrite->addDisplayFile(quickInfo.fullPath);
@@ -314,17 +326,11 @@ void FS::CodingSelect::newFile(const ImVec2& size) {
 
 	ImGui::EndChild();
 	ImGui::PopStyleColor();
-}
 
-namespace FS {
-	int inputTextCallback(ImGuiInputTextCallbackData* data) {
-		std::string* str = static_cast<std::string*>(data->UserData);
-		if (str->size() == data->BufTextLen)
-			return 0;
-
-		str->resize(data->BufTextLen);
-
-		return 0;
+	//click button 
+	if (style.isNewFileWindowHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+		GLog.add<FD::Log::Type::None>("Request add Coding::NewScene.");
+		Scene::addScene<Coding::New>();
 	}
 }
 
@@ -386,14 +392,8 @@ void FS::CodingSelect::bottom() {
 	ImGui::PopStyleColor();
 }
 
-namespace FS::Internal::Coding {
-	constexpr const char* EmptyLua = "--EmptyFile";
-	constexpr const char* EmptyPy = "#EmptyFile";
-	constexpr const char* EmptyAS = "//EmptyFile";
-}
-
 void FS::CodingSelect::setEmptyFile() {
-	using namespace Internal::Coding;
+	using namespace FD::File::Template;
 
 	if (this->selectType == Template::Empty_Lua)
 		textEditor.SetText(EmptyLua);
@@ -405,53 +405,8 @@ void FS::CodingSelect::setEmptyFile() {
 		abort();
 }
 
-namespace FS {
-
-	enum class ErrorType : uint8_t {
-		None,
-		EmptyFileName,
-		EmptyFolderPath,
-		AlreadyExist,
-		NotFound
-	};
-
-	std::pair<ErrorType, std::string> checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
-		//空かどうか
-		if (folderPath.empty()) {
-			return { ErrorType::EmptyFolderPath,{} };
-		}
-
-		if (fileName.empty())
-			return { ErrorType::EmptyFileName,{} };
-
-		//フォルダーが存在するか
-		bool result = !std::filesystem::is_directory(folderPath);
-		if (result)
-			return { ErrorType::NotFound,{} };
-
-		std::string filePath = folderPath + fileName + extension;
-		result = std::filesystem::exists(filePath);
-		if (result)
-			return { ErrorType::AlreadyExist,filePath };
-
-
-		return { ErrorType::None,filePath };
-	}
-
-	//入力された文字列に'/'があればそのまま，なければつける
-	void tryAddSlash(std::string& path) {
-#ifdef BOOST_OS_WINDOWS
-		if (path.back() != '/' && path.back() != '\\')
-			path.push_back('/');
-#else
-		if (path.back() != '/')
-			path.push_back('/');
-#endif
-	}
-}
-
 void FS::CodingSelect::createNewFileQuick() {
-	using namespace Internal::Coding;
+	using namespace FD::File::Template;
 
 	std::ofstream ofs(quickInfo.fullPath, std::ios::out);
 
@@ -460,17 +415,17 @@ void FS::CodingSelect::createNewFileQuick() {
 
 	//コードを入れる
 	if (this->selectType == Template::Empty_Lua)
-		ofs << Internal::Coding::EmptyLua << std::endl;
+		ofs << EmptyLua << std::endl;
 	else if (this->selectType == Template::Empty_Py)
-		ofs << Internal::Coding::EmptyPy << std::endl;
+		ofs << EmptyPy << std::endl;
 	else if (this->selectType == Template::Empty_AS)
-		ofs << Internal::Coding::EmptyAS << std::endl;
+		ofs << EmptyAS << std::endl;
 	else
 		abort();
 
-	if (!projectRead->isMainCodeFileExist()) {
+	if (!projectFilesRead->isMainCodeFileExist()) {
 		GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
-		projectWrite->setMainCodePath(quickInfo.fullPath.c_str());
+		projectFilesWrite->setMainCodePath(quickInfo.fullPath);
 	}
 	tabWrite->addFile(quickInfo.fullPath);
 	tabWrite->addDisplayFile(quickInfo.fullPath);
@@ -478,48 +433,89 @@ void FS::CodingSelect::createNewFileQuick() {
 }
 
 bool FS::CodingSelect::checkQuickInfo() {
+	
 	GLog.add<FD::Log::Type::None>("Check QuickInfo.");
 
-	tryAddSlash(quickInfo.folderPath);
-	auto [err, path] = checkFile(quickInfo.folderPath, quickInfo.fileName, quickInfo.extension);
+	Check::tryPushSlash(quickInfo.folderPath);
+	auto [err, path] = Check::checkFile(quickInfo.folderPath, quickInfo.fileName, quickInfo.extension);
 
 	//問題なければtrue
-	if (err == ErrorType::None) {
+	if (err == Check::ErrorType::None) {
 		GLog.add<FD::Log::Type::None>("QuickInfo NoError.");
 		quickInfo.fullPath = std::move(path);
 		return true;
 	}
 
 	//問題があれば問題に応じて警告
-	if (err == ErrorType::EmptyFolderPath) {
+	if (err == Check::ErrorType::EmptyFolderPath) {
 		GLog.add<FD::Log::Type::None>("Error EmptyFolderPath.");
 		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
 		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.folderPath);
-		error.errorPopupMessage = text.error_emptyForm;
 	}
-	else if (err == ErrorType::EmptyFileName) {
+	else if (err == Check::ErrorType::EmptyFileName) {
 		GLog.add<FD::Log::Type::None>("Error EmptyFileName.");
 		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
 		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.fileName);
-		error.errorPopupMessage = text.error_emptyForm;
 	}
-	else if (err == ErrorType::NotFound) {
+	else if (err == Check::ErrorType::NotFound) {
 		GLog.add<FD::Log::Type::None>("Error NotFoundDirectory. Typed directory is {}.", quickInfo.folderPath);
-		error.errorPopupMessage = text.error_notFoundDirectory;
 	}
-	else if (err == ErrorType::AlreadyExist) {
+	else if (err == Check::ErrorType::AlreadyExist) {
 		GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", quickInfo.fileName, path);
 		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
 		Scene::addScene<Utils::Message>(text.error_alreadyExistFile, pos.create);
-		error.errorPopupMessage = text.error_notFoundDirectory;
 	}
 	return false;
 }
 
 void FS::CodingSelect::close() {
-	ImGui::CloseCurrentPopup();//popupを終了			
 	GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
 	Scene::deleteScene<CodingSelect>();//シーンを消す
 	GLog.add<FD::Log::Type::None>("Request add CodingScene.");
 	Scene::addScene<TextEditor>();
+}
+
+int FS::CodingSelect::inputTextCallback(ImGuiInputTextCallbackData* data) {
+	std::string* str = static_cast<std::string*>(data->UserData);
+	if (str->size() == data->BufTextLen)
+		return 0;
+
+	str->resize(data->BufTextLen);
+
+	return 0;
+}
+
+std::pair<FS::CodingSelect::Check::ErrorType, std::string> FS::CodingSelect::Check::checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
+	
+	//空かどうか
+	if (folderPath.empty()) {
+		return { ErrorType::EmptyFolderPath,{} };
+	}
+
+	if (fileName.empty())
+		return { ErrorType::EmptyFileName,{} };
+
+	//フォルダーが存在するか
+	bool result = !std::filesystem::is_directory(folderPath);
+	if (result)
+		return { ErrorType::NotFound,{} };
+
+	std::string filePath = folderPath + fileName + extension;
+	result = std::filesystem::exists(filePath);
+	if (result)
+		return { ErrorType::AlreadyExist,filePath };
+
+
+	return { ErrorType::None,filePath };
+}
+
+//入力された文字列に'/'があればそのまま，なければつける
+void FS::CodingSelect::Check::tryPushSlash(std::string& path) {
+#ifdef BOOST_OS_WINDOWS
+	if (path.back() != '/' && path.back() != '\\')
+		path.push_back('/');
+#else
+	if (path.back() != '/')
+		path.push_back('/');
+#endif
 }

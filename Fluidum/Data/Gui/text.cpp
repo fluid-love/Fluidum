@@ -26,6 +26,7 @@ namespace FD::Internal::Text {
 		StatusBar,
 		TextEditor,
 		Title,
+		TitleBar,
 		TopBar
 	};
 
@@ -85,11 +86,16 @@ namespace FD::Internal::Text {
 		else if constexpr (T == Title) {
 			path += "Title";
 		}
+		else if constexpr (T == TitleBar) {
+			path += "TitleBar";
+		}
 		else {
 			static_assert(FU::Concept::DelayAssert_N<T>);
 		}
 		return path;
 	}
+
+
 
 }
 
@@ -164,8 +170,28 @@ FD::Internal::Text::Title::Title() {
 
 	std::getline(ifs, data);
 	this->error_internal = data;
+}
 
+FD::Internal::Text::TitleBar::TitleBar() {
+	std::ifstream ifs{};
 
+	ifs = std::ifstream(makePath<Type::TitleBar>(Getter::get()), std::ios::in);
+	if (!ifs)
+		throw std::runtime_error("Failed to open TitleBar.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->popupMessage = Internal::Text::newLine(ifs, data);
+	
+	std::getline(ifs, data);
+	this->saveAndExit = data;	
+	
+	std::getline(ifs, data);
+	this->withoutSaving = data;
+
+	std::getline(ifs, data);
+	this->cancel = data;
 }
 
 FD::Internal::Text::StatusBar::StatusBar() {
@@ -186,7 +212,7 @@ FD::Internal::Text::StatusBar::StatusBar() {
 	this->fps = data;//FPS:
 
 	std::getline(ifs, data);
-	this->taskInfo = data;//実行中のタスクはありません．
+	this->taskInfo = data;
 }
 
 FD::Internal::Text::MenuBar::MenuBar() {
@@ -271,16 +297,16 @@ FD::Internal::Text::TopBar::TopBar() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->package = data;//パッケージ
+	this->package = data;
 
 	std::getline(ifs, data);
-	this->layout = data;//レイアウト
+	this->layout = data;
 
 	std::getline(ifs, data);
-	this->templates = data;//テンプレート
+	this->templates = data;
 
 	std::getline(ifs, data);
-	this->tempProject = data;//仮のプロジェクト
+	this->tempProject = data;
 
 	std::getline(ifs, data);
 	this->save = data;
@@ -291,6 +317,8 @@ FD::Internal::Text::TopBar::TopBar() {
 	std::getline(ifs, data);
 	this->includeFile = data;
 
+	std::getline(ifs, data);
+	this->error_mainfile = data;
 
 }
 
@@ -366,6 +394,57 @@ FD::Internal::Text::CodingNew::CodingNew() {
 
 	std::getline(ifs, data);
 	this->title = data;
+
+	std::getline(ifs, data);
+	this->recent = data;
+
+	std::getline(ifs, data);
+	this->recent_empty = data;
+
+	std::getline(ifs, data);
+	this->cancel = data;
+
+	std::getline(ifs, data);
+	this->create = data;
+
+	std::getline(ifs, data);
+	this->folderPath = data;
+
+	std::getline(ifs, data);
+	this->fileName = data;
+
+	std::getline(ifs, data);
+	this->empty = data;
+
+	std::getline(ifs, data);
+	this->empty_Description = data;
+
+	std::getline(ifs, data);
+	this->emptyLua = data;
+
+	std::getline(ifs, data);
+	this->emptyLua_Description = data;
+
+	std::getline(ifs, data);
+	this->emptyPython = data;
+
+	std::getline(ifs, data);
+	this->emptyPython_Description = data;
+
+	std::getline(ifs, data);
+	this->emptyAngelScript = data;
+
+	std::getline(ifs, data);
+	this->emptyAngelScript_Description = data;
+
+	std::getline(ifs, data);
+	this->error_fill = data;
+
+	std::getline(ifs, data);
+	this->error_directoryNotFound = data;
+
+	std::getline(ifs, data);
+	this->error_fileAlreadyExist = data;
 }
 
 FD::Internal::Text::NewProject::NewProject() {
@@ -627,6 +706,9 @@ FD::Internal::Text::TextEditor::TextEditor() {
 
 	std::getline(ifs, data);
 	this->theme = data;
+
+	std::getline(ifs, data);
+	this->default_ = data;
 
 	std::getline(ifs, data);
 	this->dark = data;

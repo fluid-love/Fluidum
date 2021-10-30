@@ -1,18 +1,20 @@
 #include "topbar.h"
 #include "../../Calc/Lua/lua.h"
+#include "../../Utils/Popup/message.h"
 #include <imgui_internal.h>
 
 using namespace FU::ImGui::Operators;
 
 FS::TopBar::TopBar(
 	const FD::ProjectRead* const projectRead,
+	const FD::ProjectFilesRead* const projectFilesRead,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::SceneRead* const sceneRead,
 	const FD::TopBarRead* const topBarRead,
 	FD::TopBarWrite* const topBarWrite
 )
-	: projectRead(projectRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead), topBarRead(topBarRead), topBarWrite(topBarWrite)
+	: projectRead(projectRead), projectFilesRead(projectFilesRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead), topBarRead(topBarRead), topBarWrite(topBarWrite)
 {
 	GLog.add<FD::Log::Type::None>("Construct TopBarScene.");
 
@@ -137,7 +139,7 @@ void FS::TopBar::templateGui() {
 	ImGui::Text("Template"); ImGui::SameLine();
 
 	int32_t layoutIndex = 0;
-	const char* layoutTemplateNames[2] = { 
+	const char* layoutTemplateNames[2] = {
 		ICON_MD_DASHBOARD " Clear",
 		ICON_MD_CODE " Coding"
 	};
@@ -242,8 +244,10 @@ void FS::TopBar::calc() {
 	else {
 
 		bool run = ImGui::Button(ICON_MD_PLAY_ARROW);
-		if (run)
+		if (run) {
+			pos.run = ImGui::GetItemRectMax();
 			this->run();
+		}
 	}
 
 	ImGui::SameLine();
@@ -273,14 +277,18 @@ void FS::TopBar::calc() {
 }
 
 void FS::TopBar::run() {
-	const FD::Project::CodeType type = projectRead->getCurrentMainCodeType();
+	const FD::Project::CodeType type = projectFilesRead->getCurrentMainCodeType();
 	using enum FD::Project::CodeType;
 
-	if (type == Empty) {
+	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
+	if (type == Empty) {
+		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		Scene::addScene<Utils::Message>(text.error_mainfile,pos.run);
 	}
 	else if (type == Error) {
-
+		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		abort();
 	}
 	else if (type == Lua) {
 		GLog.add<FD::Log::Type::None>("Request add LuaCalcScene(Async).");

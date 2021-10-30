@@ -8,6 +8,7 @@ namespace FS {
 	public:
 		explicit TopBar(
 			const FD::ProjectRead* const projectRead,
+			const FD::ProjectFilesRead* const projectFilesRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
@@ -16,6 +17,7 @@ namespace FS {
 		);
 		void Constructor(
 			FD::ProjectRead,
+			FD::ProjectFilesRead,
 			FD::GuiRead,
 			FD::GuiWrite,
 			FD::SceneRead,
@@ -30,6 +32,7 @@ namespace FS {
 
 	private://data
 		const FD::ProjectRead* const projectRead;
+		const FD::ProjectFilesRead* const projectFilesRead;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
 		const FD::SceneRead* const sceneRead;
@@ -52,6 +55,10 @@ namespace FS {
 			bool calc = false;
 
 		}state;
+
+		struct {
+			ImVec2 run{};
+		}pos;
 
 		FD::Text::TopBar text{};
 

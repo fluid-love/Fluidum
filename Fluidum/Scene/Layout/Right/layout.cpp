@@ -70,7 +70,7 @@ void FS::RightLayout::dockGui() {
 
 
 	id = ImGui::GetID("RightLayout");
-	ImGui::DockSpace(id, ImVec2(), ImGuiDockNodeFlags_PassthruCentralNode);
+	ImGui::DockSpace(id, ImVec2());
 
 	//auto currentSizeX = ImGui::GetWindowSize().x;
 	//if (static_cast<int32_t>(currentSizeX) != static_cast<int32_t>(style.windowSize.x)) {

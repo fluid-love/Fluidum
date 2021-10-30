@@ -517,6 +517,9 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\new.h">
       <Filter>Fluidum\Scene\Coding\Select</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\project_files.h">
+      <Filter>Fluidum\Data\Project</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fluidum">
@@ -827,6 +830,9 @@
     </Filter>
     <Filter Include="Fluidum\Utils\Cursor">
       <UniqueIdentifier>{4efbf0a1-ded0-470a-860d-67b6f4013346}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\GuiText">
+      <UniqueIdentifier>{4eeb8ccc-8938-4c46-9516-d44caaea49fd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1169,6 +1175,9 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\new.cpp">
       <Filter>Fluidum\Scene\Coding\Select</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\project_files.cpp">
+      <Filter>Fluidum\Data\Project</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Test\test.lua">
@@ -1176,6 +1185,51 @@
     </None>
     <None Include="..\..\..\Resources\Source\Lua\plot.lua">
       <Filter>Resources\Lua</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectForm">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectSaveAs">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\StatusBar">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\TextEditor">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Title">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\TopBar">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingSelect">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingTab">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\MenuBar">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\NewProject">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\PopupSelect">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Project">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\TitleBar">
+      <Filter>Resources\GuiText</Filter>
     </None>
   </ItemGroup>
 </Project>

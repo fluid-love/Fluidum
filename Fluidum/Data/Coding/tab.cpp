@@ -3,11 +3,12 @@
 namespace FD::Internal::Coding {
 	constexpr inline uint16_t LimitMaxFileSize = 1000;
 	bool Update = false;
+	bool Update_textSaved = false;
 	bool DisplayFileChanged = false;
 
 	struct FileInfo final {
 		FTE::TextEditor editor{};
-		bool isTextChanged = false;
+		bool isTextSaved = true;
 	};
 
 	std::map<std::string, std::unique_ptr<FileInfo>> GData;
@@ -85,9 +86,47 @@ void FD::Coding::TabWrite::save() const {
 	TabData::save.store(true);
 }
 
-void FD::Coding::TabWrite::setIsTextChanged(const std::string& path, const bool val) const {
+void FD::Coding::TabWrite::setIsTextSaved(const std::string& path, const bool val) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
-	GData.at(path).get()->isTextChanged = val;
+	auto* elm = GData.at(path).get();
+	if (elm->isTextSaved == val)
+		return;
+
+	elm->isTextSaved = val;
+	Update_textSaved = true;
+}
+
+void FD::Coding::TabWrite::save(const std::string& path) const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+	FileInfo* info = GData.at(path).get();
+
+	//already saved
+	if (info->isTextSaved)
+		return;
+
+	const std::string text = info->editor.GetText();
+	std::ofstream ofs(path);
+	ofs << text;
+
+	info->isTextSaved = true;
+}
+
+void FD::Coding::TabWrite::saveAll() const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+
+	for (auto& x : GData) {
+		FileInfo* info = x.second.get();
+
+		//already saved
+		if (info->isTextSaved)
+			continue;
+
+		const std::string text = info->editor.GetText();
+		std::ofstream ofs(x.first);
+		ofs << text;
+
+		info->isTextSaved = true;
+	}
 }
 
 bool FD::Coding::TabRead::update() const {
@@ -114,6 +153,25 @@ bool FD::Coding::TabRead::isDisplayFileChanged() const {
 	const bool result = DisplayFileChanged;
 	if (result)
 		DisplayFileChanged = false;
+	return result;
+}
+
+bool FD::Coding::TabRead::isTextSaved(const std::string& path) const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+	return GData.at(path).get()->isTextSaved;
+}
+
+bool FD::Coding::TabRead::isAllTextSaved() const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+	auto itr = std::find_if(GData.begin(), GData.end(), [](std::unique_ptr<FileInfo>& x) { return x.get()->isTextSaved; });
+	return itr == GData.end();
+}
+
+bool FD::Coding::TabRead::update_isTextSaved() const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+	const bool result = Update_textSaved;
+	if (result)
+		Update_textSaved = false;
 	return result;
 }
 

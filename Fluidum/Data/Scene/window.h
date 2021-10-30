@@ -6,6 +6,8 @@
 namespace FD {
 	class WindowWrite;
 	class WindowRead;
+	class ExitWrite;
+	class ExitRead;
 }
 
 namespace FD {
@@ -42,6 +44,7 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(WindowWrite)
 
 	public:
+		//true -> exit
 		bool* getCloseFlag() const noexcept;
 
 		void setIsMaximise(const bool flag) const;
@@ -66,4 +69,28 @@ namespace FD {
 
 	};
 
+}
+
+namespace FD {
+
+	class ExitWrite final {
+	public:
+		explicit ExitWrite(Internal::PassKey) noexcept {};
+		~ExitWrite() = default;
+		FluidumUtils_Class_Delete_CopyMove(ExitWrite)
+
+	public:
+		void saveAsAndExit() const;
+	};
+
+	class ExitRead final {
+	public:
+		explicit ExitRead(Internal::PassKey) noexcept {};
+		~ExitRead() = default;
+		FluidumUtils_Class_Delete_CopyMove(ExitRead)
+
+	public:
+		_NODISCARD bool saveAsAndExit() const;
+
+	};
 }

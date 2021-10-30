@@ -4,14 +4,9 @@
 
 #include "../Coding/tab.h"
 #include "../Scene/scene.h"
+#include "project_files.h"
 
 namespace FD::Internal::Project {
-
-
-	struct SourceCodeFiles final {
-		std::string mainCodeFilePath{};//entry file
-		std::vector<std::string> includeCodeFilePathes{};//プロジェクトに含めるファイルのパス
-	}GFiles;
 
 	//現在のプロジェクトのデータ
 	struct Data final {
@@ -35,8 +30,6 @@ namespace FD::Internal::Project {
 
 	constexpr std::size_t FluidumProjectFileIdentifier =
 		0b01110100'11011001'01100111'01011000'01010000'10110101'10011000'00111000;
-
-	using namespace ::FD::Internal::Coding;
 
 	struct BackUpInfo final {
 		Data data{};
@@ -63,6 +56,11 @@ void FD::ProjectWrite::save_thread() {
 			std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
 			this->save_scene();
 			Internal::Scene::Data::save.store(false);
+		}
+		if (Project::Internal::FileData::save) {
+			std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
+			this->save_files();
+			Project::Internal::FileData::save.store(false);
 		}
 	}
 
@@ -212,7 +210,6 @@ void FD::ProjectWrite::createNewProject(const Project::CreateProjectInfo& info) 
 		this->save_files();
 		this->save_tab();
 
-
 		//.fproj
 		std::string path = GCurrentData.projectFolderPath;
 		path += (GCurrentData.projectName + ".fproj");
@@ -242,7 +239,11 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 
 	//例外がでた場合にもとの情報に戻す
 	Data temp{};
-	SourceCodeFiles tempF{};
+
+	//files
+	std::string temp_files_mainCodeFilePath{};
+	std::vector<std::string> temp_files_includeCodeFilePaths{};
+	std::vector<std::string> temp_files_codeFilePaths{};
 
 	//tab
 	std::vector<std::string> temp_tab_filePathes{};
@@ -253,9 +254,11 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 
 	try {
 		temp = GCurrentData;
-		tempF = GFiles;
-		temp_tab_displayFiles = TabData::displayFiles;
-		temp_tab_filePathes = TabData::filePathes;
+		temp_files_mainCodeFilePath = Project::Internal::FileData::mainCodeFilePath;
+		temp_files_includeCodeFilePaths = Project::Internal::FileData::includeCodeFilePathes;
+		temp_files_codeFilePaths = Project::Internal::FileData::codeFilePathes;
+		temp_tab_displayFiles = Internal::Coding::TabData::displayFiles;
+		temp_tab_filePathes = Internal::Coding::TabData::filePathes;
 		temp_scene_codes = Internal::Scene::Data::codes;
 	}
 	catch (...) {
@@ -284,11 +287,12 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 	}
 	catch (...) {
 		GCurrentData = std::move(temp);
-		GFiles = std::move(tempF);
-
-		TabData::displayFiles = std::move(temp_tab_displayFiles);
-		TabData::filePathes = std::move(temp_tab_filePathes);
-
+	
+		Project::Internal::FileData::mainCodeFilePath = std::move(temp_files_mainCodeFilePath);
+		Project::Internal::FileData::includeCodeFilePathes = std::move(temp_files_includeCodeFilePaths);
+		Project::Internal::FileData::codeFilePathes = std::move(temp_files_codeFilePaths);
+		Internal::Coding::TabData::displayFiles = std::move(temp_tab_displayFiles);
+		Internal::Coding::TabData::filePathes = std::move(temp_tab_filePathes);
 		Internal::Scene::Data::codes = std::move(temp_scene_codes);
 
 		std::rethrow_exception(std::current_exception());
@@ -375,13 +379,13 @@ void FD::ProjectWrite::save_tab() const {
 		throw std::runtime_error("Failed to open .tab file.");
 
 	ofs << "DisplayFiles" << std::endl;
-	for (const auto& x : TabData::displayFiles) {
+	for (const auto& x : Internal::Coding::TabData::displayFiles) {
 		ofs << x << std::endl;
 	}
 	ofs << "Next" << std::endl;
 
-	ofs << "FilePathes" << std::endl;
-	for (const auto& x : TabData::filePathes) {
+	ofs << "TabFilePathes" << std::endl;
+	for (const auto& x : Internal::Coding::TabData::filePathes) {
 		ofs << x << std::endl;
 	}
 	ofs << "Next" << std::endl;
@@ -409,18 +413,28 @@ void FD::ProjectWrite::save_scene() const {
 void FD::ProjectWrite::save_files() const {
 	using namespace Internal::Project;
 
+	std::lock_guard<std::mutex> lock(Project::Internal::FileData::mtx);
+
 	std::ofstream ofs(GCurrentData.projectFolderPath + "ProjectFiles/.files", std::ios::trunc);
 
 	if (!ofs)
 		throw std::runtime_error("Failed to open .files file.");
 
 	ofs << "MainCodeFilePath" << std::endl;
-	ofs << GFiles.mainCodeFilePath << std::endl;
+	ofs << Project::Internal::FileData::mainCodeFilePath << std::endl;
 
-	ofs << "CodeFilePathes" << std::endl;
-	for (const auto& x : GFiles.includeCodeFilePathes) {
+	ofs << "IncludeCodeFilePathes" << std::endl;
+	for (const auto& x : Project::Internal::FileData::includeCodeFilePathes) {
 		ofs << x << std::endl;
 	}
+	ofs << "Next" << std::endl;
+
+	ofs << "CodeFilePathes" << std::endl;
+	for (const auto& x : Project::Internal::FileData::codeFilePathes) {
+		ofs << x << std::endl;
+	}
+	ofs << "Next" << std::endl;
+
 }
 
 void FD::ProjectWrite::backup() const {
@@ -436,18 +450,6 @@ void FD::ProjectWrite::backup() const {
 	//this->tryCreateBackupFolder();
 
 	//this->write(path.c_str());
-}
-
-void FD::ProjectWrite::setMainCodePath(const char* path) const {
-	using namespace Internal::Project;
-	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	GFiles.mainCodeFilePath = path;
-}
-
-void FD::ProjectWrite::addIncludeCodePath(const char* path) const {
-	using namespace Internal::Project;
-	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	GFiles.includeCodeFilePathes.emplace_back(path);
 }
 
 bool FD::ProjectWrite::eraseProjectHistory(const std::string& fprojPath) {
@@ -765,6 +767,9 @@ void FD::ProjectWrite::readProjectInfo(std::ifstream& ifs) const {
 
 void FD::ProjectWrite::readProjectFiles() const {
 	using namespace Internal::Project;
+	using namespace Project::Internal;
+
+	std::lock_guard<std::mutex> lock(FileData::mtx);
 
 	std::ifstream ifs(GCurrentData.projectFolderPath + "ProjectFiles/.files");
 	if (!ifs)
@@ -777,9 +782,28 @@ void FD::ProjectWrite::readProjectFiles() const {
 	if (data != "MainCodeFilePath")
 		throw Project::ExceptionType::IllegalFile;
 	std::getline(ifs, data);
-	GFiles.mainCodeFilePath = data;
 
-	//IncludeFilePathes
+	FileData::mainCodeFilePath = data;
+
+	//IncludeCodeFilePathes
+	{
+		std::getline(ifs, data);
+		if (data != "IncludeCodeFilePathes")
+			throw Project::ExceptionType::IllegalFile;
+		std::size_t counter = 0;
+		while (true) {
+			std::getline(ifs, data);
+			if (data == "Next")
+				break;
+			FileData::includeCodeFilePathes.emplace_back(data);
+
+			counter++;
+			if (counter > 1000)
+				throw Project::ExceptionType::BrokenFile;
+		}
+	}
+
+	//CodeFilePathes
 	{
 		std::getline(ifs, data);
 		if (data != "CodeFilePathes")
@@ -789,10 +813,10 @@ void FD::ProjectWrite::readProjectFiles() const {
 			std::getline(ifs, data);
 			if (data == "Next")
 				break;
-			GFiles.includeCodeFilePathes.emplace_back(data);
+		FileData::codeFilePathes.emplace_back(data);
 
 			counter++;
-			if (counter > 10000)
+			if (counter > 1000)
 				throw Project::ExceptionType::BrokenFile;
 		}
 	}
@@ -804,11 +828,11 @@ void FD::ProjectWrite::readTabInfo() const {
 	using namespace Internal::Coding;
 	using ExceptionType = ::FD::Project::ExceptionType;
 
+	std::lock_guard<std::mutex> lock(Internal::Coding::TabData::mtx);
+
 	std::ifstream ifs(GCurrentData.projectFolderPath + "ProjectFiles/.tab");
 	if (!ifs)
 		throw Project::ExceptionType::NotFoundProjectFiles;
-
-	std::lock_guard<std::mutex> lock(Internal::Coding::TabData::mtx);
 
 	std::string data{};
 
@@ -856,11 +880,12 @@ void FD::ProjectWrite::readSceneInfo() const {
 
 	using ExceptionType = ::FD::Project::ExceptionType;
 
+	std::lock_guard<std::mutex> lock(Internal::Scene::Data::mtx);
+
 	std::ifstream ifs(GCurrentData.projectFolderPath + "ProjectFiles/.scene");
 	if (!ifs)
 		throw Project::ExceptionType::NotFoundProjectFiles;
 
-	std::lock_guard<std::mutex> lock(Internal::Scene::Data::mtx);
 
 	std::string data{};
 
@@ -913,21 +938,6 @@ bool FD::ProjectRead::isDataChanged() const {
 	//eturn Internal::Project::GCurrentData.isDataChanged;
 }
 
-std::vector<std::string> FD::ProjectRead::getIncludeCodeFilePathes() const {
-	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	return Internal::Project::GFiles.includeCodeFilePathes;
-}
-
-std::string FD::ProjectRead::getMainCodeFilePath() const {
-	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	return Internal::Project::GFiles.mainCodeFilePath;
-}
-
-bool FD::ProjectRead::isMainCodeFileExist() const {
-	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
-	return Internal::Project::GFiles.mainCodeFilePath.empty();
-}
-
 std::string FD::ProjectRead::getProjectFolderPath() const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
 	return Internal::Project::GCurrentData.projectFolderPath;
@@ -953,32 +963,6 @@ bool FD::ProjectRead::isDefaultProject() const {
 	return Internal::Project::GCurrentData.isTemp;
 }
 
-FD::Project::CodeType FD::ProjectRead::getCurrentMainCodeType() const {
-	using namespace Internal::Project;
-
-	if (GFiles.mainCodeFilePath.empty())
-		return Project::CodeType::Empty;
-
-	std::string extension{};
-	(void)std::find_if(
-		GFiles.mainCodeFilePath.rbegin(),
-		GFiles.mainCodeFilePath.rend(),
-		[&](char x) {
-			extension.insert(extension.begin(), x);
-			return x == '.';
-		}
-	);
-
-	if (extension == ".py")
-		return Project::CodeType::Python;
-	else if (extension == ".lua")
-		return Project::CodeType::Lua;
-	else if (extension == ".as")
-		return Project::CodeType::AngelScript;
-
-	return Project::CodeType::Error;
-}
-
 std::vector<FU::Class::ClassCode::CodeType> FD::ProjectRead::loadSceneFile() const {
 	std::lock_guard<std::mutex> lock(Internal::Project::GMtx);
 	std::lock_guard<std::mutex> lockScene(Internal::Scene::Data::mtx);
@@ -991,7 +975,7 @@ std::vector<FU::Class::ClassCode::CodeType> FD::ProjectRead::loadSceneFile() con
 		abort();
 
 	std::vector<FU::Class::ClassCode::CodeType> result{};
-	while(true) {
+	while (true) {
 		std::getline(ifs, data);
 		if (data == "Next")
 			break;

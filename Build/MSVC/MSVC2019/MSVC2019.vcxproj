@@ -39,6 +39,7 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\project.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\project_files.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\task.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Scene\scene.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Scene\window.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\file.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\project.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Project\project.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\project_files.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Project\task.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Scene\scene.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Scene\window.cpp" />
@@ -308,6 +310,21 @@
     <ClCompile Include="..\..\..\Libraries\implot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingSelect" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingTab" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\MenuBar" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\NewProject" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\PopupSelect" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Project" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectForm" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectSaveAs" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\StatusBar" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\TextEditor" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Title" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\TitleBar" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\TopBar" />
     <None Include="..\..\..\Resources\Source\Lua\plot.lua" />
     <None Include="..\..\..\Test\test.lua" />
   </ItemGroup>

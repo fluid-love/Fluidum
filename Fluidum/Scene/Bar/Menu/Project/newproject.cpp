@@ -8,16 +8,13 @@ namespace FS::Bar::Internal {
 	std::vector<FDR::ImGuiImage> makeImages() {
 		std::vector<FDR::ImGuiImage> result;
 		for (uint16_t i = 0; i < 5; i++) {
-			std::string path = Resource::NewProjectIconFolderPath;
+			std::string path = Resource::NewProjectIconsFolderPath;
 			path += std::to_string(i + 1) += ".png";
 			result.emplace_back(FDR::createImGuiImage(path.c_str()));
 		}
 		assert(result.size() == 5);
 		return result;
 	}
-
-
-
 }
 
 FS::Bar::NewProject::NewProject(
@@ -307,7 +304,7 @@ std::vector<FS::Bar::NewProject::ButtonInfo> FS::Bar::NewProject::initRecentTemp
 			result.emplace_back(ButtonInfo{ images.at(1), "_ELua", text.emptyLua, text.emptyLuaDescription });
 		else if (x == Empty_Python)
 			result.emplace_back(ButtonInfo{ images.at(2), "_EPy", text.emptyPython, text.emptyPythonDescription });
-		else if (x == Empty_Lua)
+		else if (x == Empty_AngelScript)
 			result.emplace_back(ButtonInfo{ images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScriptDescription });
 
 		else if (x == Interactive)

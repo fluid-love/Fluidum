@@ -162,9 +162,6 @@ void FS::Lua::Calc::registerLuaLibraries() {
 
 void FS::Lua::Calc::terminate() {
 
-	//lua‚ð•Â‚¶‚é
-	int32_t num = lua_gettop(state);
-	lua_pop(state, num);
 	lua_close(state);
 
 	GLog.add<FD::Log::Type::None>("Close Lua.");

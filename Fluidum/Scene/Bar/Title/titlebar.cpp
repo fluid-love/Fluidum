@@ -1,4 +1,5 @@
 #include "titlebar.h"
+#include "../Menu/Project/saveas.h"
 
 using namespace FU::ImGui::Operators;
 
@@ -7,14 +8,18 @@ FS::TitleBar::TitleBar(
 	FD::GuiWrite* const guiWrite,
 	const FD::WindowRead* const windowRead,
 	FD::WindowWrite* const windowWrite,
-	const FD::SceneRead* const sceneRead
+	const FD::SceneRead* const sceneRead,
+	const FD::ProjectRead* const projectRead,
+	FD::ExitWrite* const exitWrite
 )
 	:
 	guiRead(guiRead),
 	guiWrite(guiWrite),
 	windowWrite(windowWrite),
 	windowRead(windowRead),
-	sceneRead(sceneRead)
+	sceneRead(sceneRead),
+	projectRead(projectRead),
+	exitWrite(exitWrite)
 {
 	GLog.add<FD::Log::Type::None>("Construct TitleBarScene.");
 
@@ -28,7 +33,7 @@ FS::TitleBar::TitleBar(
 	style.iconWindowSize = { (ImGui::GetStyle().WindowPadding.x * 2.0f + (ImGui::GetStyle().FramePadding.x * 2.0f)) + ImGui::CalcTextSize("   ").x ,windowHeight };
 
 	using namespace FU::ImGui::Operators;
-	style.iconSize = ImVec2{ windowHeight ,windowHeight } * 0.88f;
+	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.88f;
 
 	style.buttonSize = { style.windowSize.x / 3.0f, style.windowSize.y };
 }
@@ -110,7 +115,7 @@ void FS::TitleBar::bar() {
 	bool minimize = ImGui::Button(ICON_MD_REMOVE, style.buttonSize); ImGui::SameLine();
 	ImGui::Button(ICON_MD_LAYERS, style.buttonSize); ImGui::SameLine();
 
-	//ï¬Ç∂ÇÈÉ{É^ÉìÇÕê‘Ç≠Ç∑ÇÈ
+	//color: red
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	bool close = ImGui::Button(ICON_MD_CLOSE, style.buttonSize);
 
@@ -120,7 +125,7 @@ void FS::TitleBar::bar() {
 	}
 	else if (close) {
 		GLog.add<FD::Log::Type::None>("Request Terminate.");
-		*windowWrite->getCloseFlag() = true;
+		this->exit();
 	}
 
 	ImGui::PopStyleColor(2);
@@ -128,4 +133,26 @@ void FS::TitleBar::bar() {
 	ImGui::End();
 
 	ImGui::PopStyleVar(3);
+}
+
+void FS::TitleBar::exit() {
+
+	if (projectRead->isDefaultProject()) {
+		auto index = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popupMessage, text.saveAndExit, text.withoutSaving, text.cancel);
+		if (index == 0) {//save
+			GLog.add<FD::Log::Type::None>("Request add Bar::SaveAsScene.");
+			Scene::addScene<Bar::SaveAs>();
+			exitWrite->saveAsAndExit();
+			return;
+		}
+		else if (index == 1) {//without saving
+			;
+		}
+		else {//cancel
+			return;
+		}
+	}
+
+
+	*windowWrite->getCloseFlag() = true;
 }

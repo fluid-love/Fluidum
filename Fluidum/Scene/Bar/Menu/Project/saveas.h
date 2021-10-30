@@ -9,9 +9,17 @@ namespace FS::Bar {
 		explicit SaveAs(
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
-			const FD::GuiRead* const guiRead
+			const FD::GuiRead* const guiRead,
+			const FD::ExitRead* const exitRead,
+			FD::WindowWrite* const windowWrite
 		);
-		void Constructor(FD::ProjectWrite, FD::ProjectRead, FD::GuiRead);
+		void Constructor(
+			FD::ProjectWrite, 
+			FD::ProjectRead, 
+			FD::GuiRead,
+			FD::ExitRead,
+			FD::WindowWrite
+		);
 
 		~SaveAs() noexcept;
 
@@ -22,6 +30,7 @@ namespace FS::Bar {
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
 		const FD::GuiRead* const guiRead;
+		FD::WindowWrite* const windowWrite;
 
 		FD::Text::ProjectSaveAs text{};
 
@@ -43,6 +52,8 @@ namespace FS::Bar {
 			ImVec2 save{};
 		}pos;
 
+		const bool exit;
+
 	private:
 		void title();
 
@@ -52,5 +63,7 @@ namespace FS::Bar {
 		void bottom();
 
 		bool save();
+
+		void checkExit();
 	};
 }

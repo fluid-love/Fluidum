@@ -2,6 +2,11 @@
 
 void FD::Internal::Scene::Data::addSceneCallback(bool async, FU::Class::ClassCode::CodeType code) {
 	std::lock_guard<std::mutex> lock(mtx);
+
+	const auto itr = std::find(codes.cbegin(), codes.cend(), code);
+	if (itr != codes.cend())
+		return;
+
 	codes.emplace_back(code);
 	save.store(true);
 }
@@ -9,7 +14,8 @@ void FD::Internal::Scene::Data::addSceneCallback(bool async, FU::Class::ClassCod
 void FD::Internal::Scene::Data::deleteSceneCallback(bool async, FU::Class::ClassCode::CodeType code) {
 	std::lock_guard<std::mutex> lock(mtx);
 	const auto itr = std::find(codes.cbegin(), codes.cend(), code);
-	assert((itr != codes.cend())&& "FluidumSceneの設計に問題があります．");
+	assert((itr != codes.cend()) && "FluidumSceneの設計に問題があります．");
+
 	codes.erase(itr);
 	save.store(true);
 }

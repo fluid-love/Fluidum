@@ -13,11 +13,12 @@ using namespace FU::ImGui::Operators;
 
 FS::LeftBar::LeftBar(
 	const FD::ProjectRead* const projectRead,
+	const FD::ProjectFilesRead* const projectFilesRead,
 	const FD::GuiRead* const  guiRead,
 	FD::GuiWrite* const  guiWrite,
 	const FD::SceneRead* const  sceneRead,
 	std::vector<FDR::ImGuiImage>&& images
-) : projectRead(projectRead), guiRead(guiRead), sceneRead(sceneRead), images(images)
+) : projectRead(projectRead), projectFilesRead(projectFilesRead), guiRead(guiRead), sceneRead(sceneRead), images(images)
 {
 	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
 
@@ -31,7 +32,6 @@ FS::LeftBar::LeftBar(
 	auto imageWidth = windowSizeX - (ImGui::GetStyle().WindowPadding.x) - (ImGui::GetStyle().FramePadding.x * 2.0f);
 
 	style.imageSize = { imageWidth, imageWidth };
-
 
 	guiWrite->leftBarWidth(style.windowSize.x);
 
@@ -182,20 +182,19 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 }
 
 void FS::LeftBar::addCodingScene() {
-	//画像のロード
+	//set image
 	std::string path = Resource::LeftBarIconsFilePath;
 	path += "tab.png";
 	sub.codingImages = { FDR::createImGuiImage(path.c_str()) };
 
-	//現在のプロジェクトにmainファイルがない
-	if (projectRead->getMainCodeFilePath().empty()) {
-		GLog.add<FD::Log::Type::None>("Main file is empty.");
+	if (!projectFilesRead->isMainCodeFileExist()) {
+		GLog.add<FD::Log::Type::None>("Main file does not exist.");
 		GLog.add<FD::Log::Type::None>("Request add CodingSelectScene.");
 		Scene::addScene<CodingSelect>();
 	}
 	else {
 		GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");
-		Scene::addScene<TextEditor>(projectRead->getMainCodeFilePath());
+		Scene::addScene<TextEditor>();
 	}
 }
 

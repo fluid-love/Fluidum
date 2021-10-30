@@ -222,7 +222,8 @@ void FS::Project::Project::syncListOfFiles() {
 void FS::Project::displayCode(const Proj::Info& info) {
 	if (!sceneRead->isExist<TextEditor>()) {
 		GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");
-		Scene::addScene<TextEditor>(info.path);
+		tabWrite->addDisplayFile(info.path);
+		Scene::addScene<TextEditor>();
 	}
 	tabWrite->addFile(info.path.c_str());
 	if (!sceneRead->isExist<Coding::Tab>()) {

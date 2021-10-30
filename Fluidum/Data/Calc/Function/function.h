@@ -5,11 +5,24 @@
 
 namespace FD::Calc {
 	enum class Language : uint8_t {
+		None,
 		Lua,
 		Python,
 		AngelScript
 	};
 
+	//.lua .py .as 
+	inline Language pathToLanguageType(const std::string& path) {
+		std::filesystem::path p = path;
+		const std::string extension = p.extension().string();
+		if (extension == ".lua")
+			return Language::Lua;
+		else if (extension == ".py")
+			return Language::Python;
+		else if (extension == ".as" || extension == ".AS" )
+			return Language::AngelScript;
+		return Language::None;
+	}
 }
 
 //forward

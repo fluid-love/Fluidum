@@ -25,13 +25,6 @@ namespace FD::Project {
 		std::string ymd_h{};
 	};
 
-	enum class CodeType : uint8_t {
-		Empty,      //mainコードが設定されていない
-		Error,      //error 識別子が下記以外
-		Python,
-		Lua,
-		AngelScript
-	};
 }
 
 namespace FD {
@@ -56,20 +49,15 @@ namespace FD {
 		//現在のプロジェクトを保存して，現在のプロジェクトを新しいパスへcopyする.
 		void saveAs(const char* newName, const char* dstProjectFolderPath) const;
 
-		//現在のプロジェクトを保存
+		//save not-saved files.
 		void save() const;
-
-
 
 		//現在の情報を新たにバックアップをとる
 		//アプリ終了時に最新のバックアップ以外は削除される
 		void backup() const;
 
-		void setMainCodePath(const char* path) const;
-		void addIncludeCodePath(const char* path) const;
-		void IncludeCodePath(const char* path) const;
-
 		bool eraseProjectHistory(const std::string& fprojPath);
+
 	private:
 		void save_tab() const;
 		void save_scene() const;
@@ -117,18 +105,12 @@ namespace FD {
 		//保存されていない->true
 		_NODISCARD bool isDataChanged() const;
 
-		_NODISCARD std::vector<std::string> getIncludeCodeFilePathes() const;
-		_NODISCARD std::string getMainCodeFilePath() const;
-		_NODISCARD bool isMainCodeFileExist() const;
-
 		_NODISCARD std::string getProjectFolderPath() const;
 		_NODISCARD std::string getBackupFolderPath() const;
 		_NODISCARD std::string getSrcFolderPath() const;
 		_NODISCARD std::string getProjectName() const;
 
 		_NODISCARD bool isDefaultProject() const;
-
-		_NODISCARD Project::CodeType getCurrentMainCodeType() const;
 
 		_NODISCARD std::vector<FU::Class::ClassCode::CodeType> loadSceneFile() const;
 	};

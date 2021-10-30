@@ -11,9 +11,20 @@ namespace FS::Coding {
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::ProjectRead* const projectRead,
 			FD::ProjectWrite* const projectWrite,
-			const FD::GuiRead* const guiRead
+			const FD::ProjectFilesRead* const projectFilesRead,
+			FD::ProjectFilesWrite* const projectFilesWrite,
+			const FD::GuiRead* const guiRead,
+			const FD::Log::FileRead* const fileRead
 		);
-		void Constructor(FD::Coding::TabWrite, FD::ProjectRead, FD::ProjectWrite, FD::GuiRead);
+		void Constructor(
+			FD::Coding::TabWrite,
+			FD::ProjectRead,
+			FD::ProjectWrite,
+			FD::ProjectFilesRead,
+			FD::ProjectFilesWrite,
+			FD::GuiRead,
+			FD::Log::FileRead
+		);
 
 		~New() noexcept;
 
@@ -25,8 +36,9 @@ namespace FS::Coding {
 	private://data
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::ProjectRead* const projectRead;
+		const FD::ProjectFilesRead* const projectFilesRead;
 		FD::ProjectWrite* const projectWrite;
-
+		FD::ProjectFilesWrite* const projectFilesWrite;
 
 		FD::Text::CodingNew text{};
 
@@ -35,6 +47,8 @@ namespace FS::Coding {
 
 		std::string folderPath{};
 		std::string fileName{};
+		std::string extension{};
+		std::string fullPath{};
 
 		struct {
 			ImCounter<ImAnimeTime> counter{};
@@ -44,16 +58,56 @@ namespace FS::Coding {
 			ImVec2 windowPos{};
 			ImVec2 windowSize{};
 
+			ImVec2 buttonSize{};
+
 			float innerPosHeight = 0.0f;
 		}style;
 
 		struct {
-			ImVec2 projectFolder{};
-			ImVec2 projectName{};
+			ImVec2 folderPath{};
+			ImVec2 fileName{};
 			ImVec2 create{};
 		}pos;
 
+		struct ButtonInfo final {
+			FDR::ImGuiImage image;
+			const char* label;
+			const char* title;
+			const char* description;
+		};
+
+		const std::vector<ButtonInfo> recentButtons;
+		const std::vector<FDR::ImGuiImage> images;
+
+		const std::vector<ButtonInfo> emptyFiles;
+
+		struct {
+			ButtonInfo* ptr = nullptr;
+			FD::Log::File::Type type = FD::Log::File::Type::None;
+		}select;
+
 	private:
 		void title();
+
+	private:
+		void recent();
+
+	private:
+		void list();
+		void filter();
+		void buttons();
+
+	private:
+		void form();
+		void bottom();
+		bool check();
+		void create();
+
+	private:
+		bool button(const FDR::ImGuiImage& image, const char* label, const char* title, const char* description);
+
+	private:
+		std::vector<ButtonInfo> initRecentFileTypes(const std::vector<FD::Log::File::Type>& types);
+
 	};
 }

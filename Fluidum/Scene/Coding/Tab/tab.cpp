@@ -7,11 +7,8 @@ namespace FS::Coding {
 	std::vector<std::string> substring(const std::vector<std::string>& pathes) {
 		std::vector<std::string> result(pathes.size());
 		for (std::size_t i = 0, size = result.size(); i < size; i++) {
-			auto itr = std::find(pathes[i].rbegin(), pathes[i].rend(), '/');
-			assert(itr != pathes[i].rend() && itr != pathes[i].rbegin());
-			auto distance = std::distance(pathes[i].rbegin(), itr);
-			result[i].resize(distance);
-			std::copy(pathes[i].rbegin(), itr, result[i].rbegin());
+			std::filesystem::path path = pathes[i];
+			result[i] = path.filename().string();
 		}
 		return result;
 	}
@@ -28,8 +25,7 @@ FS::Coding::Tab::Tab(
 
 	style.topBarSize = { 0.0f,ImGui::CalcTextSize(ICON_MD_FOLDER_OPEN).y * 1.7f };
 
-	files.pathes = tabRead->getFilePathes();
-	files.fileNames = substring(files.pathes);
+	this->updateInfo();
 }
 
 FS::Coding::Tab::~Tab() noexcept {
@@ -54,10 +50,11 @@ void FS::Coding::Tab::call() {
 	using namespace FU::ImGui::Operators;
 
 	this->update();
+	this->updateTextSaved();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, 0.0f));
 
-	ImGui::Begin("CodingTab", &windowCloseFlag);
+	ImGui::Begin("CodingTab", &windowCloseFlag, ImGuiWindowFlags_NoDocking);
 	pos.center = ImGui::GetWindowPos() / 2.3f;
 
 	this->fileList();
@@ -70,10 +67,11 @@ void FS::Coding::Tab::call() {
 }
 
 void FS::Coding::Tab::checkWindowShouldClose() {
-	if (this->windowCloseFlag) {
-		GLog.add<FD::Log::Type::None>("Request delete Coding::Tab.");
-		Scene::deleteScene<Tab>();
-	}
+	if (!this->windowCloseFlag)
+		return;
+
+	GLog.add<FD::Log::Type::None>("Request delete Coding::Tab.");
+	Scene::deleteScene<Tab>();
 }
 
 //void FS::Coding::Tab::include() {
@@ -111,28 +109,38 @@ void FS::Coding::Tab::checkWindowShouldClose() {
 //		}
 //	}
 //}
-//
-//void FS::Coding::Tab::create() {
-//
-//}
-//
-//void FS::Coding::Tab::sync() {
-//
-//}
-//
-//void FS::Coding::Tab::code() {
-//
-//}
-//
-//void FS::Coding::Tab::save() {
-//
-//}
 
 void FS::Coding::Tab::update() {
 	if (!tabRead->update())
 		return;
+	this->updateInfo();
+}
 
+void FS::Coding::Tab::updateInfo() {
+	std::vector<std::string> paths = tabRead->getFilePathes();
+	std::vector<std::string> names = substring(paths);
+	info.files.resize(paths.size());
+	for (std::size_t i = 0, size = paths.size(); i < size; i++) {
+		info.files[i] = { std::move(paths[i]),std::move(names[i]) };
+	}
+}
 
+void FS::Coding::Tab::updateTextSaved() {
+	if (!tabRead->update_isTextSaved())
+		return;
+
+	for (auto& x : info.files) {
+		if (tabRead->isTextSaved(x.path)) {
+			if (x.asterisk)
+				x.name.pop_back();
+			x.asterisk = false;
+		}
+		else {
+			if (x.asterisk)
+				x.name += '*';
+			x.asterisk = true;
+		}
+	}
 }
 
 void FS::Coding::Tab::fileList() {
@@ -140,21 +148,25 @@ void FS::Coding::Tab::fileList() {
 	ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2());
 	const ImVec2 size = { ImGui::GetWindowSize().x - (2.0f * ImGui::GetStyle().WindowPadding.x) ,0.0f };
 
-	for (uint16_t i = 0; auto & x : this->files.fileNames) {
+	ImGui::Spacing();
+
+	for (uint16_t i = 0; auto & x : info.files) {
 		if (i == select.index) {
-			ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f,0.2f,0.9f,0.1f });
-			if (ImGui::Button(x.c_str(), size)) {
+			ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f,0.3f,0.9f,0.5f });
+
+			if (ImGui::Button(x.name.c_str(), size)) {
 				select.index = i;
 				this->display();
 			}
 			ImGui::PopStyleColor();
 		}
 		else {
-			if (ImGui::Button(x.c_str(), size)) {
+			if (ImGui::Button(x.name.c_str(), size)) {
 				select.index = i;
 				this->display();
 			}
 		}
+		ImGui::Spacing();
 		i++;
 	}
 
@@ -163,7 +175,7 @@ void FS::Coding::Tab::fileList() {
 }
 
 void FS::Coding::Tab::display() {
-	const std::string path = files.fileNames.at(select.index);
+	const std::string path = info.files.at(select.index).path;
 
 	if (tabRead->getDisplayFilePaths().at(0) == path)
 		return;

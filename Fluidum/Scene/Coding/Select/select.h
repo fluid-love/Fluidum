@@ -11,9 +11,20 @@ namespace FS {
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::ProjectRead* const projectRead,
 			FD::ProjectWrite* const projectWrite,
-			const FD::GuiRead* const guiRead
+			const FD::ProjectFilesRead* const projectFilesRead,
+			FD::ProjectFilesWrite* const projectFilesWrite,
+			const FD::GuiRead* const guiRead,
+			const FD::SceneRead* const sceneRead
 		);
-		void Constructor(FD::Coding::TabWrite, FD::ProjectRead, FD::ProjectWrite, FD::GuiRead);
+		void Constructor(
+			FD::Coding::TabWrite,
+			FD::ProjectRead,
+			FD::ProjectWrite,
+			FD::ProjectFilesRead,
+			FD::ProjectFilesWrite,
+			FD::GuiRead,
+			FD::SceneRead
+		);
 
 		~CodingSelect() noexcept;
 
@@ -26,7 +37,9 @@ namespace FS {
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::ProjectRead* const projectRead;
 		FD::ProjectWrite* const projectWrite;
-		const FD::GuiRead* const guiRead;
+		const FD::ProjectFilesRead* const projectFilesRead;
+		FD::ProjectFilesWrite* const projectFilesWrite;
+		const FD::SceneRead* const sceneRead;
 
 		FD::Text::CodingSelect text{};
 
@@ -74,9 +87,6 @@ namespace FS {
 			std::string fullPath{};
 		}quickInfo;
 
-		struct {
-			std::string errorPopupMessage{};
-		}error;
 
 	private:
 		//êVãKçÏê¨
@@ -110,5 +120,19 @@ namespace FS {
 
 	private:
 		void close();
+
+	private:
+		struct Check final {
+			enum class ErrorType : uint8_t {
+				None,
+				EmptyFileName,
+				EmptyFolderPath,
+				AlreadyExist,
+				NotFound
+			};
+			static std::pair<ErrorType, std::string> checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension);
+			static void tryPushSlash(std::string& path);
+		};
+		static int inputTextCallback(ImGuiInputTextCallbackData* data);
 	};
 }

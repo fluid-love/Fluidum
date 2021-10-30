@@ -38,14 +38,20 @@ namespace FS::Coding {
 			ImVec2 center{};
 		}pos;
 
-		struct {
-			std::vector<std::string> pathes;//full
+		struct File final {
+			std::string path;//full
 
 			// "C:/test/text.lua" -> "text.lua"
-			std::vector<std::string> fileNames;
+			std::string name;
 
+			//!isTextSaved
+			bool asterisk = false;
+		};
+
+		struct {
+			std::vector<File> files{};
 			std::size_t currentIndex = 0;
-		}files;
+		}info;
 
 		struct {
 			uint16_t index = 0;
@@ -57,9 +63,13 @@ namespace FS::Coding {
 
 	private:
 		void update();
+		void updateInfo();
+		void updateTextSaved();
 
 	private:
 		void fileList();
 		void display();
+
+
 	};
 }

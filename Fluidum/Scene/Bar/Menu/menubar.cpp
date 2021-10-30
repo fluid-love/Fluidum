@@ -122,30 +122,22 @@ void FS::MenuBar::itemOpen() {
 	if (!ImGui::MenuItem(text.open))
 		return;
 
-	//FU::MB::show(FU::MB::Icon::Warning, text.checkCurrentProject, text.cancel, text.ignore, text.saveAndOpen);
+	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
+	GLog.add<FD::Log::Type::None>("Open file dialog.");
+	const nfdresult_t result = NFD_OpenDialog(".fproj", nullptr, outPath.get());
+	if (result == NFD_OKAY) {
+		GLog.add<FD::Log::Type::None>("Load project file({}).", *outPath.get());
+	}
+	else if (result == NFD_CANCEL) {
+		GLog.add<FD::Log::Type::None>("Dialog has been canceled.");
+		return;
+	}
+	else {//NFD_ERROR
+		GLog.add<FD::Log::Type::Error>("Error file dialog.");
+		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+	}
 
-
-	//std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
-	//GLog.add<FD::Log::Type::None>("Open file dialog.");
-	//const nfdresult_t result = NFD_OpenDialog(".fproj", nullptr, outPath.get());
-	//if (result == NFD_OKAY) {
-	//	GLog.add<FD::Log::Type::None>("Load project file({}).", *outPath.get());
-	//}
-	//else if (result == NFD_CANCEL) {
-	//	GLog.add<FD::Log::Type::None>("Dialog has been canceled.");
-	//	return;
-	//}
-	//else {//NFD_ERROR
-	//	GLog.add<FD::Log::Type::Error>("Error file dialog.");
-	//	throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
-	//}
-
-	////not saved
-	//if (projectRead->isDataChanged()) {
-	//	GLog.add<FD::Log::Type::None>("Request add PopupSelectScene.");
-	//	Scene::addScene<Utils::PopupSelect>(Utils::PopupSelectIconType::Warning, text.checkCurrentProject, text.cancel, text.ignore, text.saveAndOpen);
-	//
-	//}
+	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
 	//try {
 	//	projectWrite->loadProject(*outPath.get());
@@ -181,33 +173,33 @@ void FS::MenuBar::itemOpen() {
 }
 
 void FS::MenuBar::itemSave() {
-	if (!ImGui::MenuItem(text.save))
-		return;
-
-	GLog.add<FD::Log::Type::None>("Request save project.");
-	try {
-		projectWrite->save();
-	}
-	catch (const FD::Project::ExceptionType type) {
-		using enum FD::Project::ExceptionType;
-		GLog.add<FD::Log::Type::None>("Failed to save project.");
-
-		//前回の読み込み(セーブ)からプロジェクトファイルが移動削除された場合
-		if (type == NotFoundProjectFolder) {
-			//表示して新しく作成させる//実装予定
-		}
-		else {
-			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-			abort();
-		}
-		abort();
-	}
-	//書き込みに失敗
-	catch (const std::exception&) {
-		//表示して新しく保存させる
-		abort();
-	}
-
+//	if (!ImGui::MenuItem(text.save))
+//		return;
+//
+//	GLog.add<FD::Log::Type::None>("Request save project.");
+//	try {
+//		projectWrite->save();
+//	}
+//	catch (const FD::Project::ExceptionType type) {
+//		using enum FD::Project::ExceptionType;
+//		GLog.add<FD::Log::Type::None>("Failed to save project.");
+//
+//		//前回の読み込み(セーブ)からプロジェクトファイルが移動削除された場合
+//		if (type == NotFoundProjectFolder) {
+//			//表示して新しく作成させる//実装予定
+//		}
+//		else {
+//			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+//			abort();
+//		}
+//		abort();
+//	}
+//	//書き込みに失敗
+//	catch (const std::exception&) {
+//		//表示して新しく保存させる
+//		abort();
+//	}
+//
 }
 
 void FS::MenuBar::itemSaveAs() {

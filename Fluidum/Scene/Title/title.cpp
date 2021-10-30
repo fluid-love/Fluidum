@@ -50,7 +50,7 @@ namespace FS::Internal {
 }
 
 void FS::Title::call() {
-	ImGui::ShowMetricsWindow();
+
 	std::call_once(this->once, &Title::writeGuiData, this);
 
 	//if IsMouseButton -> next scene
@@ -246,6 +246,7 @@ void FS::Title::recentProject() {
 		ImGui::Spacing();
 
 		if (clicked) {
+			FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 			this->openProject(x.projectFilePath.c_str(), pos.recentButton);
 		}
 	}

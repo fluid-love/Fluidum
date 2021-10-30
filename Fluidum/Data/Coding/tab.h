@@ -57,8 +57,11 @@ namespace FD::Coding {
 		void eraseDisplayFile(const std::string& path) const;
 
 		void save() const;
-
-		void setIsTextChanged(const std::string& path,const bool val) const;
+		void setIsTextSaved(const std::string& path,const bool val) const;
+	
+	public:
+		void save(const std::string& path) const;
+		void saveAll() const;
 
 	public:
 		enum class Exception : uint8_t {
@@ -86,6 +89,10 @@ namespace FD::Coding {
 
 		_NODISCARD std::vector<std::string> getFilePathes() const;
 		_NODISCARD std::vector<std::string> getDisplayFilePaths() const;
+
+		_NODISCARD bool update_isTextSaved() const;
+		_NODISCARD bool isTextSaved(const std::string& path) const;
+		_NODISCARD bool isAllTextSaved() const;
 
 	};
 

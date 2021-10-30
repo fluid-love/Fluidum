@@ -1,4 +1,5 @@
 #include "texteditor.h"
+#include "../../Calc/Lua/lua.h"
 
 FS::TextEditor::TextEditor(
 	FD::Coding::TabWrite* const tabWrite,
@@ -6,7 +7,8 @@ FS::TextEditor::TextEditor(
 	const FD::GuiRead* const guiRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
-	const std::string& path
+	FD::ProjectFilesWrite* const projectFilesWrite,
+	const FD::ProjectFilesRead* const projectFilesRead
 )
 	: tabWrite(tabWrite), tabRead(tabRead), guiRead(guiRead), projectWrite(projectWrite), projectRead(projectRead)
 {
@@ -16,23 +18,23 @@ FS::TextEditor::TextEditor(
 	auto paths = tabRead->getDisplayFilePaths();
 
 	for (auto& x : paths) {
-		std::ifstream ifs(path);
+		std::ifstream ifs(x);
 		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
-		auto info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,path });
+		auto info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,x, FD::Calc::pathToLanguageType(x) });
 		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 		info_.editor->SetText(str);
 	}
 
-	if (!path.empty())
-		return;
+	this->checkSyntaxTimePoint = std::chrono::system_clock::now() + std::chrono::seconds(3);
 
-	if (projectRead->getCurrentMainCodeType() == FD::Project::CodeType::Empty)
-		projectWrite->setMainCodePath(tabRead->getDisplayFilePaths().at(0).c_str());
+	this->luaState = luaL_newstate();
 }
 
 FS::TextEditor::~TextEditor() noexcept {
 	try {
+		lua_close(luaState);
+
 		GLog.add<FD::Log::Type::None>("Destruct TextEditorScene.");
 	}
 	catch (const std::exception& e) {
@@ -60,14 +62,18 @@ void FS::TextEditor::call() {
 	ImGui::SetNextWindowSize(ImVec2(1024, 768), ImGuiCond_FirstUseEver);
 
 	for (uint16_t i = 0; auto & x : this->info) {
-		this->editor = x.editor;
+		current = &info[i];
+
 		std::string label = text.editor.operator const char* ();
 		(label += "##") += std::to_string(i++);
 		ImGui::Begin(label.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar);
 
 		this->textEditorMenu();
 		this->textEditor();
+
 		this->textEditorInfo();
+
+		this->checkSyntaxError();
 
 		ImGui::End();
 	}
@@ -123,32 +129,32 @@ void FS::TextEditor::editMenu() {
 	if (!ImGui::BeginMenu(text.edit))
 		return;
 
-	bool ro = editor->IsReadOnly();
+	bool ro = current->editor->IsReadOnly();
 	if (ImGui::MenuItem(text.readOnly, nullptr, &ro))
-		editor->SetReadOnly(ro);
+		current->editor->SetReadOnly(ro);
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem(text.undo, "ALT-Backspace", nullptr, !ro && editor->CanUndo()))
-		editor->Undo();
-	if (ImGui::MenuItem(text.redo, "Ctrl-Y", nullptr, !ro && editor->CanRedo()))
-		editor->Redo();
+	if (ImGui::MenuItem(text.undo, "ALT-Backspace", nullptr, !ro && current->editor->CanUndo()))
+		current->editor->Undo();
+	if (ImGui::MenuItem(text.redo, "Ctrl-Y", nullptr, !ro && current->editor->CanRedo()))
+		current->editor->Redo();
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem(text.copy, "Ctrl-C", nullptr, editor->HasSelection()))
-		editor->Copy();
-	if (ImGui::MenuItem(text.cut, "Ctrl-X", nullptr, !ro && editor->HasSelection()))
-		editor->Cut();
-	if (ImGui::MenuItem(text.del, "Del", nullptr, !ro && editor->HasSelection()))
-		editor->Delete();
+	if (ImGui::MenuItem(text.copy, "Ctrl-C", nullptr, current->editor->HasSelection()))
+		current->editor->Copy();
+	if (ImGui::MenuItem(text.cut, "Ctrl-X", nullptr, !ro && current->editor->HasSelection()))
+		current->editor->Cut();
+	if (ImGui::MenuItem(text.del, "Del", nullptr, !ro && current->editor->HasSelection()))
+		current->editor->Delete();
 	if (ImGui::MenuItem(text.paste, "Ctrl-V", nullptr, !ro && ImGui::GetClipboardText() != nullptr))
-		editor->Paste();
+		current->editor->Paste();
 
 	ImGui::Separator();
 
 	if (ImGui::MenuItem(text.selectAll, nullptr, nullptr))
-		editor->SetSelection(FTE::TextEditor::Coordinates(), FTE::TextEditor::Coordinates(editor->GetTotalLines(), 0));
+		current->editor->SetSelection(FTE::TextEditor::Coordinates(), FTE::TextEditor::Coordinates(current->editor->GetTotalLines(), 0));
 
 	ImGui::EndMenu();
 
@@ -158,40 +164,42 @@ void FS::TextEditor::themeMenu() {
 	if (!ImGui::BeginMenu(text.theme))
 		return;
 
-	auto palette = editor->GetPalette();
-
+	//TextEditor::GetDarkPalette == defaut , FTE::getDarkPalette == dark
+	if (ImGui::MenuItem(text.default_)) {
+		current->editor->SetPalette(FTE::TextEditor::GetDarkPalette());
+	}
 	if (ImGui::MenuItem(text.dark)) {
-		palette.at(static_cast<std::size_t>(FTE::TextEditor::PaletteIndex::Background)) = ImGui::ColorConvertFloat4ToU32({ 0.05f,0.05f,0.05f,1.0f });
-		palette.at(static_cast<std::size_t>(FTE::TextEditor::PaletteIndex::String)) = ImGui::ColorConvertFloat4ToU32({ 1.0f,1.0f,1.0f,1.0f });
-
-		editor->SetPalette(palette);
+		current->editor->SetPalette(FTE::getDarkPalette());
 	}
 	if (ImGui::MenuItem(text.light))
-		editor->SetPalette(FTE::TextEditor::GetLightPalette());
+		current->editor->SetPalette(FTE::TextEditor::GetLightPalette());
 	if (ImGui::MenuItem(text.blue))
-		editor->SetPalette(FTE::TextEditor::GetRetroBluePalette());
+		current->editor->SetPalette(FTE::TextEditor::GetRetroBluePalette());
 	ImGui::EndMenu();
 }
 
 void FS::TextEditor::textEditor() {
-	editor->Render("TextEditor", { ImGui::GetWindowWidth(),ImGui::GetWindowHeight() * 0.93f });
+	current->editor->Render("TextEditor", { ImGui::GetWindowWidth(),ImGui::GetWindowHeight() * 0.86f });
 }
 
 void FS::TextEditor::textEditorInfo() {
-	auto cpos = editor->GetCursorPosition();
-	ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor->GetTotalLines(),
-		editor->IsOverwrite() ? "Ovr" : "Ins",
-		editor->CanUndo() ? "*" : " ",
-		editor->GetLanguageDefinition().mName.c_str(), "test");
+	ImGui::BeginChild("TextEditorInfo");
+	auto cpos = current->editor->GetCursorPosition();
+	ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, current->editor->GetTotalLines(),
+		current->editor->IsOverwrite() ? "Ovr" : "Ins",
+		current->editor->CanUndo() ? "*" : " ",
+		current->editor->GetLanguageDefinition().mName.c_str(), "test"
+	);
+	ImGui::EndChild();
 }
 
 void FS::TextEditor::saveText() {
-	auto textToSave = editor->GetText();
+	auto textToSave = current->editor->GetText();
 	const std::string path = getCurrentEditorPath();
 	std::ofstream ofs(path, std::ios::trunc);
 	ofs << textToSave;
 
-	tabWrite->setIsTextChanged(path, false);
+	tabWrite->setIsTextSaved(path, true);
 }
 
 void FS::TextEditor::update() {
@@ -224,14 +232,69 @@ void FS::TextEditor::update() {
 }
 
 void FS::TextEditor::textChange() {
-	if (!editor->IsTextChanged())
+	if (!current->editor->IsTextChanged())
 		return;
 
-	std::cout << "a";
+	tabWrite->setIsTextSaved(current->path, false);
 }
 
 std::string FS::TextEditor::getCurrentEditorPath() {
-	const auto itr = std::find_if(info.cbegin(), info.cend(), [&](auto& x) {return x.editor == this->editor; });
+	const auto itr = std::find_if(info.cbegin(), info.cend(), [&](auto& x) {return x.editor == current->editor; });
 	return itr->path;
 }
 
+void FS::TextEditor::checkSyntaxError() {
+	if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
+		return;
+	if (checkSyntaxTimePoint > std::chrono::system_clock::now())
+		return;
+
+	if (current->language == FD::Calc::Language::Lua)
+		this->checkLua();
+	else if (current->language == FD::Calc::Language::Python)
+		this->checkPython();
+	else if (current->language == FD::Calc::Language::AngelScript)
+		this->checkAngelScript();
+
+	//every 4 seconds
+	this->checkSyntaxTimePoint = std::chrono::system_clock::now() + std::chrono::seconds(4);
+}
+
+void FS::TextEditor::checkLua() {
+	const std::string code = current->editor->GetText();
+	const int err = luaL_loadstring(luaState, code.c_str());
+	FTE::TextEditor::ErrorMarkers markers{};
+
+	if (err == LUA_OK)
+		;
+	else if (err == LUA_ERRSYNTAX) {
+		const char* message = lua_tostring(luaState, -1);
+
+		std::cmatch match{};
+		const bool m = std::regex_search(message, match, std::regex(":[0123456789]:"));
+		if (m) {
+			std::string str = match.str();
+			str = str.at(1);
+			int line = std::stoi(str);
+			//over -> eof error
+			line > current->editor->GetTotalLines() ? line-- : line;
+
+			//message
+			std::string errMesssage = message;
+			auto itr = std::find(errMesssage.begin(), errMesssage.end(), str[0]);
+			errMesssage.erase(errMesssage.begin(), itr);
+			markers.insert(std::pair(line, errMesssage));
+		}
+	}
+
+	current->editor->SetErrorMarkers(markers);
+	Lua::pop(luaState);
+}
+
+void FS::TextEditor::checkPython() {
+
+}
+
+void FS::TextEditor::checkAngelScript() {
+
+}

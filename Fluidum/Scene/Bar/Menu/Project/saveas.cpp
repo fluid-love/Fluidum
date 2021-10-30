@@ -9,8 +9,15 @@ using namespace FU::ImGui::Operators;
 FS::Bar::SaveAs::SaveAs(
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
-	const FD::GuiRead* const guiRead
-) : projectWrite(projectWrite), projectRead(projectRead), guiRead(guiRead)
+	const FD::GuiRead* const guiRead,
+	const FD::ExitRead* const exitRead,
+	FD::WindowWrite* const windowWrite
+) :
+	projectWrite(projectWrite),
+	projectRead(projectRead),
+	guiRead(guiRead),
+	windowWrite(windowWrite),
+	exit(exitRead->saveAsAndExit())
 {
 	GLog.add<FD::Log::Type::None>("Construct Bar::SaveAsScene.");
 
@@ -207,7 +214,14 @@ bool FS::Bar::SaveAs::save() {
 	}
 
 	GLog.add<FD::Log::Type::None>("Project has been saved.");
+	this->checkExit();
 	return true;
 }
 
+void FS::Bar::SaveAs::checkExit() {
+	if (!this->exit)
+		return;
 
+	GLog.add<FD::Log::Type::None>("Request Terminate.");
+	*windowWrite->getCloseFlag() = true;
+}
