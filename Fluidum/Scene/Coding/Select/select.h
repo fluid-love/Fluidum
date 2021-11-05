@@ -11,8 +11,8 @@ namespace FS {
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::ProjectRead* const projectRead,
 			FD::ProjectWrite* const projectWrite,
-			const FD::ProjectFilesRead* const projectFilesRead,
-			FD::ProjectFilesWrite* const projectFilesWrite,
+			const FD::FluidumFilesRead* const fluidumFilesRead,
+			FD::FluidumFilesWrite* const fluidumFilesWrite,
 			const FD::GuiRead* const guiRead,
 			const FD::SceneRead* const sceneRead
 		);
@@ -20,8 +20,8 @@ namespace FS {
 			FD::Coding::TabWrite,
 			FD::ProjectRead,
 			FD::ProjectWrite,
-			FD::ProjectFilesRead,
-			FD::ProjectFilesWrite,
+			FD::FluidumFilesRead,
+			FD::FluidumFilesWrite,
 			FD::GuiRead,
 			FD::SceneRead
 		);
@@ -37,8 +37,8 @@ namespace FS {
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::ProjectRead* const projectRead;
 		FD::ProjectWrite* const projectWrite;
-		const FD::ProjectFilesRead* const projectFilesRead;
-		FD::ProjectFilesWrite* const projectFilesWrite;
+		const FD::FluidumFilesRead* const fluidumFilesRead;
+		FD::FluidumFilesWrite* const fluidumFilesWrite;
 		const FD::SceneRead* const sceneRead;
 
 		FD::Text::CodingSelect text{};

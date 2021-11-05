@@ -27,7 +27,7 @@ namespace FS::Coding {
 
 		FD::Text::CodingTab text{};
 
-
+	private:
 		bool windowCloseFlag = false;
 
 		struct {
@@ -55,6 +55,7 @@ namespace FS::Coding {
 
 		struct {
 			uint16_t index = 0;
+			int32_t hovered = -1;
 		}select;
 
 	private:
@@ -70,6 +71,12 @@ namespace FS::Coding {
 		void fileList();
 		void display();
 
+		void closeButton();
+		void close();
+
+	private:
+		void popup();
+		void popup_window();
 
 	};
 }

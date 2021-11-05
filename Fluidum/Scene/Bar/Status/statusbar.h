@@ -7,10 +7,15 @@ namespace FS {
 	class StatusBar final :public Scene {
 	public:
 		explicit StatusBar(
+			FD::GuiWrite* const guiWrite,
 			const FD::GuiRead* const guiRead,
 			const FD::TaskRead* const taskRead
 		);
-		void Constructor(FD::GuiRead, FD::TaskRead);
+		void Constructor(
+			FD::GuiWrite,
+			FD::GuiRead, 
+			FD::TaskRead
+		);
 
 		~StatusBar() noexcept;
 

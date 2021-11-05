@@ -17,6 +17,7 @@ namespace FD::Internal::Text {
 		CodingNew,
 		CodingSelect,
 		CodingTab,
+		LeftBar,
 		MenuBar,
 		NewProject,
 		PopupSelect,
@@ -55,6 +56,9 @@ namespace FD::Internal::Text {
 		}
 		else if constexpr (T == CodingTab) {
 			path += "CodingTab";
+		}
+		else if constexpr (T == LeftBar) {
+			path += "LeftBar";
 		}
 		else if constexpr (T == MenuBar) {
 			path += "MenuBar";
@@ -284,6 +288,18 @@ FD::Internal::Text::MenuBar::MenuBar() {
 
 	std::getline(ifs, data);
 	this->exitWithoutSaving = data;
+
+	std::getline(ifs, data);
+	this->error_openProjectFile = data;
+
+	std::getline(ifs, data);
+	this->error_illegalFile = data;
+
+	std::getline(ifs, data);
+	this->error_brokenFile = data;
+
+	std::getline(ifs, data);
+	this->error_internal = data;
 }
 
 FD::Internal::Text::TopBar::TopBar() {
@@ -320,6 +336,29 @@ FD::Internal::Text::TopBar::TopBar() {
 	std::getline(ifs, data);
 	this->error_mainfile = data;
 
+}
+
+FD::Internal::Text::LeftBar::LeftBar() {
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::LeftBar>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open LeftBar.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->popup_save = Internal::Text::newLine(ifs, data);;
+
+	std::getline(ifs, data);
+	this->popup_saveAndClose = data;
+
+	std::getline(ifs, data);
+	this->popup_withoutSaving = data;
+
+	std::getline(ifs, data);
+	this->popup_cancel = data;
 }
 
 FD::Internal::Text::CodingSelect::CodingSelect() {
@@ -745,6 +784,17 @@ FD::Internal::Text::CodingTab::CodingTab() {
 	std::getline(ifs, data);
 	this->error_alreadyExist = data;
 
+	std::getline(ifs, data);
+	this->popup_save = data;
+
+	std::getline(ifs, data);
+	this->popup_saveAndClose = data;
+
+	std::getline(ifs, data);
+	this->popup_withoutSaving = data;
+
+	std::getline(ifs, data);
+	this->popup_cancel = data;
 
 }
 

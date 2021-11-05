@@ -1,6 +1,7 @@
 #include "statusbar.h"
 
 FS::StatusBar::StatusBar(
+	FD::GuiWrite* const guiWrite,
 	const FD::GuiRead* const guiRead,
 	const FD::TaskRead* const taskRead
 ) : guiRead(guiRead), taskRead(taskRead)
@@ -21,6 +22,8 @@ FS::StatusBar::StatusBar(
 	//‰E‰º
 	style.versionWindowPos = { guiRead->windowSize().x - (1.5f * style.version), style.windowPos.y };
 	style.versionWindowSize = { 1.5f * style.version,style.barHeight };
+
+	guiWrite->statusBarHeight(style.barHeight);
 }
 
 FS::StatusBar::~StatusBar() noexcept {
@@ -116,7 +119,7 @@ void FS::StatusBar::taskPopup() {
 	if (!ImGui::BeginPopup("TaskPopup"))
 		return;
 
-	taskRead->for_each([&](FD::Task::Info* info) 
+	taskRead->for_each([&](FD::Task::Info* info)
 		{
 			ImGui::Text(info->message.c_str());
 			ImGui::Separator();

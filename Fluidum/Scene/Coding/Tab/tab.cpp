@@ -13,6 +13,10 @@ namespace FS::Coding {
 		return result;
 	}
 
+	constexpr const char* PopupLabel = "CodingTabPopup";
+	constexpr const char* PopupLabel_Window = "CodingTabPopupWindow";
+
+
 }
 
 FS::Coding::Tab::Tab(
@@ -59,9 +63,12 @@ void FS::Coding::Tab::call() {
 
 	this->fileList();
 
+	this->popup();
+	this->popup_window();
 	ImGui::End();
 
 	ImGui::PopStyleVar();
+
 
 	checkWindowShouldClose();
 }
@@ -146,9 +153,11 @@ void FS::Coding::Tab::updateTextSaved() {
 void FS::Coding::Tab::fileList() {
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4());
 	ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2());
-	const ImVec2 size = { ImGui::GetWindowSize().x - (2.0f * ImGui::GetStyle().WindowPadding.x) ,0.0f };
+	const ImVec2 size = { ImGui::GetWindowSize().x - (2.0f * ImGui::GetStyle().WindowPadding.x) ,ImGui::GetFontSize() };
 
 	ImGui::Spacing();
+
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f,0.4f,0.9f,0.4f });
 
 	for (uint16_t i = 0; auto & x : info.files) {
 		if (i == select.index) {
@@ -161,14 +170,30 @@ void FS::Coding::Tab::fileList() {
 			ImGui::PopStyleColor();
 		}
 		else {
+			if (i == select.hovered)
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f,0.4f,0.8f,0.5f });
+
 			if (ImGui::Button(x.name.c_str(), size)) {
 				select.index = i;
 				this->display();
 			}
+
+			if (i == select.hovered)
+				ImGui::PopStyleColor();
+
 		}
+
+		if (ImGui::IsItemHovered())
+			select.hovered = i;
+
+		//close button
+		this->closeButton();
+
 		ImGui::Spacing();
 		i++;
 	}
+
+	ImGui::PopStyleColor();//button hovered
 
 	ImGui::PopStyleVar();
 	ImGui::PopStyleColor();
@@ -186,4 +211,82 @@ void FS::Coding::Tab::display() {
 	GLog.add<FD::Log::Type::None>("Add display file {}.", tabRead->getDisplayFilePaths().at(0));
 	tabWrite->addDisplayFile(path);
 }
+
+void FS::Coding::Tab::closeButton() {
+	using namespace FU::ImGui::Operators;
+
+	if (!ImGui::IsItemHovered())
+		return;
+
+	ImGui::SameLine();
+
+	const auto min = ImGui::GetItemRectMin();
+	const auto max = ImGui::GetItemRectMax();
+
+	constexpr ImU32 hoveredCol = FU::ImGui::convertImVec4ToImU32(0.8f, 0.2f, 0.2f, 0.6f);
+	const ImVec2 pos = { max.x - ImGui::GetFontSize() - 3.0f,min.y };
+	const ImVec2 pos2 = pos + ImGui::CalcTextSize(ICON_MD_CLOSE);
+
+	if (ImGui::IsMouseHoveringRect(pos, pos2)) {
+		ImGui::GetWindowDrawList()->AddText(pos, hoveredCol, ICON_MD_CLOSE);
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+			this->close();
+	}
+	else
+		ImGui::GetWindowDrawList()->AddText(pos, IM_COL32_WHITE, ICON_MD_CLOSE);
+
+}
+
+void FS::Coding::Tab::close() {
+	auto& current = info.files.at(select.index);
+	if (tabRead->isTextSaved(current.path)) {
+		tabWrite->eraseFile(current.path);
+		tabWrite->save();
+		return;
+	}
+
+	GLog.add<FD::Log::Type::None>("Popup MessageBox.");
+	int32_t button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
+	if (button == 0) {//save close
+		tabWrite->saveText(current.path);
+		tabWrite->eraseFile(current.path);
+	}
+	else if (button == 1) {//without saving
+		tabWrite->eraseFile(current.path);
+	}
+	else if (button == 2)//cancel
+		return;
+	else {//unexpected
+		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		abort();
+	}
+
+	tabWrite->save();
+}
+
+//if mouse right button clicked 
+//popup menu
+void FS::Coding::Tab::popup() {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered() && ImGui::IsAnyItemHovered())
+		ImGui::OpenPopup(PopupLabel);
+	if (!ImGui::BeginPopup(PopupLabel))
+		return;
+
+	//ImGui::Selectable("test");
+
+	ImGui::EndPopup();
+}
+
+void FS::Coding::Tab::popup_window() {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
+		ImGui::OpenPopup(PopupLabel_Window);
+	if (!ImGui::BeginPopup(PopupLabel_Window))
+		return;
+
+	//ImGui::Selectable("test2");
+
+	ImGui::EndPopup();
+}
+
+
 

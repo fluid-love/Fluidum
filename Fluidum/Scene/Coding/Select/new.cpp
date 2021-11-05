@@ -28,19 +28,24 @@ FS::Coding::New::New(
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::ProjectRead* const projectRead,
 	FD::ProjectWrite* const projectWrite,
-	const FD::ProjectFilesRead* const projectFilesRead,
-	FD::ProjectFilesWrite* const projectFilesWrite,
+	const FD::FluidumFilesRead* const fluidumFilesRead,
+	FD::FluidumFilesWrite* const fluidumFilesWrite,
 	const FD::GuiRead* const guiRead,
 	const FD::Log::FileRead* const fileRead
-) : tabWrite(tabWrite), projectRead(projectRead), projectWrite(projectWrite), projectFilesRead(projectFilesRead), projectFilesWrite(projectFilesWrite),
-recentButtons(initRecentFileTypes(fileRead->recent())),
-emptyFiles({
-		ButtonInfo{images.at(0), "_Empty", text.empty, text.empty_Description},
-		ButtonInfo{images.at(1), "_ELua", text.emptyLua, text.emptyLua_Description},
-		ButtonInfo{images.at(2), "_EPy", text.emptyPython, text.emptyPython_Description},
-		ButtonInfo{images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScript_Description}
+) :
+	tabWrite(tabWrite),
+	projectRead(projectRead),
+	projectWrite(projectWrite),
+	fluidumFilesRead(fluidumFilesRead),
+	fluidumFilesWrite(fluidumFilesWrite),
+	recentButtons(initRecentFileTypes(fileRead->recent())),
+	emptyFiles({
+			ButtonInfo{images.at(0), "_Empty", text.empty, text.empty_Description},
+			ButtonInfo{images.at(1), "_ELua", text.emptyLua, text.emptyLua_Description},
+			ButtonInfo{images.at(2), "_EPy", text.emptyPython, text.emptyPython_Description},
+			ButtonInfo{images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScript_Description}
 
-	})
+		})
 {
 	GLog.add<FD::Log::Type::None>("Construct Coding::NewScene.");
 
@@ -309,10 +314,10 @@ void FS::Coding::New::create() {
 	}
 
 
-	if (!projectFilesRead->isMainCodeFileExist()) {
+	if (!fluidumFilesRead->isMainCodeFileExist()) {
 		GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", this->fullPath);
-		projectFilesWrite->setMainCodePath(fullPath);
-		projectFilesWrite->save();
+		fluidumFilesWrite->setMainCodePath(fullPath);
+		fluidumFilesWrite->save();
 	}
 	tabWrite->addFile(fullPath);
 	tabWrite->addDisplayFile(fullPath);
@@ -361,7 +366,7 @@ namespace FS {
 		if (path.back() != '/')
 			path.push_back('/');
 #endif
-	}
+}
 }
 
 bool FS::Coding::New::check() {

@@ -5,8 +5,8 @@ FS::LeftLayout::LeftLayout(const FD::LayoutRead* const layoutRead, FD::LayoutWri
 {
 	GLog.add<FD::Log::Type::None>("Construct LeftLayuotScene.");
 
-	style.windowPos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() };
-	style.windowSize = { guiRead->windowSize().x / 4.0f,guiRead->windowSize().y - style.windowPos.y };
+	style.windowPos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() - 4.0f };
+	style.windowSize = { guiRead->windowSize().x / 4.0f,guiRead->windowSize().y - style.windowPos.y - guiRead->statusBarHeight() + 6.0f };
 
 	layoutWrite->leftLayoutPos(style.windowPos);
 
@@ -63,10 +63,12 @@ void FS::LeftLayout::dockGui() {
 		ImGui::Begin("LeftLayout", nullptr, windowFlag);
 	else
 		ImGui::Begin("LeftLayout", nullptr, windowFlag | ImGuiWindowFlags_NoResize);
-	
+
 
 	id = ImGui::GetID("LeftLayout");
-	ImGui::DockSpace(id, ImVec2());
+
+	ImGui::Dummy({ 0.0f,1.0f });
+	ImGui::DockSpace(id, ImVec2{});
 
 	auto currentSizeX = ImGui::GetWindowSize().x;
 	if (static_cast<int32_t>(currentSizeX) != static_cast<int32_t>(style.windowSize.x)) {

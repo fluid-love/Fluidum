@@ -9,18 +9,22 @@ namespace FS {
 		//éûä‘Ç™Ç©Ç©ÇÈÇÃÇ≈leftbarÇÃÉAÉCÉRÉìÇÕÇ†ÇÁÇ©Ç∂ÇﬂèÄîıÇµÇƒÇ®Ç¢ÇƒÇ‡ÇÁÇ§
 		explicit LeftBar(
 			const FD::ProjectRead* const projectRead,
-			const FD::ProjectFilesRead* const projectFilesRead,
+			const FD::FluidumFilesRead* const fluidumFilesRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
+			const FD::Coding::TabRead* const tabRead,
+			FD::Coding::TabWrite* const tabWrite,
 			std::vector<FDR::ImGuiImage>&& images
 		);
 		void Constructor(
 			FD::ProjectRead,
-			FD::ProjectFilesRead,
+			FD::FluidumFilesRead,
 			FD::GuiRead,
 			FD::GuiWrite,
-			FD::SceneRead
+			FD::SceneRead,
+			FD::Coding::TabRead,
+			FD::Coding::TabWrite
 		);
 
 		~LeftBar() noexcept;
@@ -33,11 +37,13 @@ namespace FS {
 
 	private://data
 		const FD::ProjectRead* const projectRead;
-		const FD::ProjectFilesRead* const projectFilesRead;
+		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::GuiRead* const  guiRead;
 		const FD::SceneRead* const  sceneRead;
+		const FD::Coding::TabRead* const tabRead;
+		FD::Coding::TabWrite* const tabWrite;
 
-
+		FD::Text::LeftBar text{};
 
 	private://data
 
@@ -72,7 +78,7 @@ namespace FS {
 			ImVec2 selectWindowPos = ImVec2();
 			SceneIndex current = SceneIndex::None;
 
-			std::optional<std::array<FDR::ImGuiImage, 1>> codingImages = std::nullopt;
+			std::vector<FDR::ImGuiImage> codingImages{};
 			std::vector<FDR::ImGuiImage> analysisImages{};
 
 		}sub;
@@ -87,11 +93,18 @@ namespace FS {
 
 		void addScene(const ClassCode::CodeType code);
 		void addCodingScene();
+		void addFluScene();
 		void addAnalysisScene();
 		void addProjectScene();
+		void addAnimationScene();
+		void addGenomeScene();
+		void addConsoleScene();
 
+	private:
 		void deleteScene(const ClassCode::CodeType code);
+		void deleteCodingScene();
 
+	private:
 		//ImageButtonÇÃHoveredéû
 		void subWindow();
 

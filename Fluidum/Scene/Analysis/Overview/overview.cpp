@@ -1,9 +1,9 @@
-#include "analysis.h"
+#include "overview.h"
 #include <imgui_internal.h>
 
-FS::AnalysisOverview::~AnalysisOverview() noexcept {
+FS::Analysis::Overview::~Overview() noexcept {
 	try {
-		topBarWrite->erase<AnalysisOverview>();
+		topBarWrite->erase<Overview>();
 		GLog.add<FD::Log::Type::None>("Destruct AnalysisScene.");
 	}
 	catch (const std::exception& e) {
@@ -20,7 +20,7 @@ FS::AnalysisOverview::~AnalysisOverview() noexcept {
 	}
 }
 
-void FS::AnalysisOverview::call() {
+void FS::Analysis::Overview::call() {
 	ImGui::Begin("AnalysisOverview",&windowShouldClose);
 	this->setWindowInfo();
 
@@ -31,24 +31,24 @@ void FS::AnalysisOverview::call() {
 	this->closeWindow();
 }
 
-void FS::AnalysisOverview::closeWindow() {
+void FS::Analysis::Overview::closeWindow() {
 	if (windowShouldClose)
 		return;
 
 	GLog.add<FD::Log::Type::None>("Request delete AnalysisOverviewScene.");
-	Scene::deleteScene<AnalysisOverview>();
+	Scene::deleteScene<Overview>();
 }
 
-void FS::AnalysisOverview::setWindowInfo() {
-	constexpr auto code = FU::Class::ClassCode::GetClassCode<AnalysisOverview>();
+void FS::Analysis::Overview::setWindowInfo() {
+	constexpr auto code = FU::Class::ClassCode::GetClassCode<Overview>();
 	imguiWindowWrite->set(code,ImGui::GetCurrentWindow());
 }
 
-void FS::AnalysisOverview::function() {
+void FS::Analysis::Overview::function() {
 	//ImGui::LoadIniSettingsFromDisk();
 }
 
-void FS::AnalysisOverview::topBar() {
+void FS::Analysis::Overview::topBar() {
 	ImGui::Button("tes");
 }
 

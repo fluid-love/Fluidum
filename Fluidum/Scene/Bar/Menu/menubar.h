@@ -11,14 +11,18 @@ namespace FS {
 			const FD::ProjectRead* const projectRead,
 			FD::WindowWrite* const windowWrite,
 			const FD::GuiRead* const guiRead,
-			FD::GuiWrite* const guiWrite
+			FD::GuiWrite* const guiWrite,
+			FD::Coding::TabWrite* const tabWrite,
+			const FD::Coding::TabRead* const tabRead
 		);
 		void Constructor(
 			FD::ProjectWrite,
 			FD::ProjectRead,
 			FD::WindowWrite, 
 			FD::GuiRead, 
-			FD::GuiWrite
+			FD::GuiWrite,
+			FD::Coding::TabWrite,
+			FD::Coding::TabRead
 		);
 
 		~MenuBar() noexcept;
@@ -32,6 +36,8 @@ namespace FS {
 		FD::WindowWrite* const windowWrite;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
+		FD::Coding::TabWrite* const tabWrite;
+		const FD::Coding::TabRead* const tabRead;
 
 		FD::Text::MenuBar text{};
 
@@ -41,6 +47,9 @@ namespace FS {
 			ImVec2 offset{};
 		}style;
 
+		struct {
+			ImVec2 open{};
+		}pos;
 
 	private:
 
@@ -50,7 +59,6 @@ namespace FS {
 		void itemOpen();
 		void itemSave();
 		void itemSaveAs();
-		void saveAs(std::string path);
 		void itemExit();
 
 		//edit

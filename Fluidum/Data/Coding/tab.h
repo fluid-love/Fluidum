@@ -31,7 +31,6 @@ namespace FD::Internal::Coding {
 }
 
 
-
 namespace FD::Coding {
 
 	//tab ÇΩÇæÇÃçÏã∆èÍ
@@ -51,17 +50,21 @@ namespace FD::Coding {
 
 		//NotFound
 		void eraseFile(const std::string& path) const;
+		void clear() const;
 
 		//NotFound
 		void addDisplayFile(const std::string& path) const;
 		void eraseDisplayFile(const std::string& path) const;
 
 		void save() const;
-		void setIsTextSaved(const std::string& path,const bool val) const;
-	
+		void setIsTextSaved(const std::string& path, const bool val) const;
+		void setAllIsTextSaved(const bool val) const;
+
+		void releaseAllEditorData() const;
+
 	public:
-		void save(const std::string& path) const;
-		void saveAll() const;
+		void saveText(const std::string& path) const;
+		void saveAllTexts() const;
 
 	public:
 		enum class Exception : uint8_t {

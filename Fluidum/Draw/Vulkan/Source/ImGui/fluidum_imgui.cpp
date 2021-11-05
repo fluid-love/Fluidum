@@ -85,7 +85,7 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 	colors[ImGuiCol_FrameBg] = ImVec4(0.060f, 0.060f, 0.060f, 1.000f);
 	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.100f, 0.100f, 0.100f, 1.000f);
 	colors[ImGuiCol_FrameBgActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.000f);
-	colors[ImGuiCol_TitleBg] = ImVec4(0.025f, 0.025f, 0.025f, 1.0f);
+	colors[ImGuiCol_TitleBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
 	colors[ImGuiCol_TitleBgActive] = ImVec4(0.148f, 0.148f, 0.148f, 1.000f);
 	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.148f, 0.148f, 0.148f, 1.000f);
 	colors[ImGuiCol_MenuBarBg] = ImVec4(0.07f, 0.07f, 0.07f, 1.000f);
@@ -110,7 +110,7 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 	colors[ImGuiCol_ResizeGripActive] = ImVec4(1.000f, 0.391f, 0.000f, 1.000f);
 	colors[ImGuiCol_Tab] = ImVec4(0.098f, 0.098f, 0.098f, 1.000f);
 	colors[ImGuiCol_TabHovered] = ImVec4(0.352f, 0.352f, 0.352f, 1.000f);
-	colors[ImGuiCol_TabActive] = ImVec4(0.195f, 0.195f, 0.195f, 1.000f);
+	colors[ImGuiCol_TabActive] = ImVec4(0.165f, 0.165f, 0.165f, 1.000f);
 	colors[ImGuiCol_TabUnfocused] = ImVec4(0.098f, 0.098f, 0.098f, 1.000f);
 	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.195f, 0.195f, 0.195f, 1.000f);
 	colors[ImGuiCol_DockingPreview] = ImVec4(1.000f, 0.391f, 0.000f, 0.781f);

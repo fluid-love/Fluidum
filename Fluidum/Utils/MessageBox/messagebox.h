@@ -16,7 +16,8 @@
 
 namespace FU::MB {
 	enum class Icon : uint8_t {
-		Warning
+		Warning,
+		Error
 	};
 }
 
@@ -25,7 +26,7 @@ namespace FU::MB::Internal {
 	inline std::wstring Button1{};
 	inline std::wstring Button2{};
 	inline std::wstring Button3{};
-	inline wchar_t Title[] = TEXT("Fluidum");
+	constexpr inline wchar_t Title[] = TEXT("Fluidum");
 
 
 	inline LRESULT CALLBACK Proc3(int code, WPARAM wParam, LPARAM lParam) {
@@ -72,6 +73,10 @@ namespace FU::MB {
 		const char* cancelButton = nullptr
 	);
 
+	//Icon::Error message [IDOK]
+	void error(const char* message);
 
+	//Icon::Warning message [IDOK] [IDCANCEL]
+	void ok_cancel(const char* message);
 
 }

@@ -4,6 +4,7 @@
 
 namespace FD {
 
+	//single thread
 	class GuiWrite final {
 	public:
 		GuiWrite(Internal::PassKey) {};
@@ -16,7 +17,7 @@ namespace FD {
 		void leftBarWidth(const float width) const noexcept;
 		void menuBarHeight(const float height) const noexcept;
 		void topBarHeight(const float height) const noexcept;
-
+		void statusBarHeight(const float height) const noexcept;
 
 	};
 
@@ -32,6 +33,7 @@ namespace FD {
 		float leftBarWidth() const noexcept;
 		float menuBarHeight() const noexcept;
 		float topBarHeight() const noexcept;
+		float statusBarHeight() const noexcept;
 
 
 
@@ -61,10 +63,10 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(LayoutRead)
 
 	public:
-		_NODISCARD ImVec2 leftLayoutPos() const noexcept;
-		_NODISCARD ImVec2 leftLayoutSize() const noexcept;
-		_NODISCARD ImVec2 rightLayoutPos() const noexcept;
-		_NODISCARD ImVec2 rightLayoutSize() const noexcept;
+		_NODISCARD const ImVec2& leftLayoutPos() const noexcept;
+		_NODISCARD const ImVec2& leftLayoutSize() const noexcept;
+		_NODISCARD const ImVec2& rightLayoutPos() const noexcept;
+		_NODISCARD const ImVec2& rightLayoutSize() const noexcept;
 
 		_NODISCARD ImGuiID leftLayoutID() const noexcept;
 		_NODISCARD ImGuiID rightLayoutID() const noexcept;

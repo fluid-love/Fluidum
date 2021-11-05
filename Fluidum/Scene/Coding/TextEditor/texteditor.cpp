@@ -1,5 +1,6 @@
 #include "texteditor.h"
 #include "../../Calc/Lua/lua.h"
+#include <nfd.h>
 
 FS::TextEditor::TextEditor(
 	FD::Coding::TabWrite* const tabWrite,
@@ -14,7 +15,6 @@ FS::TextEditor::TextEditor(
 {
 	GLog.add<FD::Log::Type::None>("Construct TextEditorScene.");
 
-
 	auto paths = tabRead->getDisplayFilePaths();
 
 	for (auto& x : paths) {
@@ -24,11 +24,13 @@ FS::TextEditor::TextEditor(
 		auto info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,x, FD::Calc::pathToLanguageType(x) });
 		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 		info_.editor->SetText(str);
+		info_.editor->SetPalette(FTE::getDarkPalette());
 	}
 
 	this->checkSyntaxTimePoint = std::chrono::system_clock::now() + std::chrono::seconds(3);
 
 	this->luaState = luaL_newstate();
+
 }
 
 FS::TextEditor::~TextEditor() noexcept {
@@ -53,6 +55,10 @@ FS::TextEditor::~TextEditor() noexcept {
 
 void FS::TextEditor::call() {
 
+	if (info.empty()) {
+		return;
+	}
+
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(0.07f, 0.07f, 0.07f, 0.65f));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -70,6 +76,7 @@ void FS::TextEditor::call() {
 
 		this->textEditorMenu();
 		this->textEditor();
+		this->breakPoint();
 
 		this->textEditorInfo();
 
@@ -101,26 +108,10 @@ void FS::TextEditor::fileMenu() {
 	if (!ImGui::BeginMenu(text.file))
 		return;
 
-	if (ImGui::MenuItem(text.save)) {
+	if (ImGui::MenuItem(text.save))
 		this->saveText();
-	}
-	if (ImGui::MenuItem(text.saveAs)) {
-
-	}
-	ImGui::Separator();
-
-	if (ImGui::MenuItem(text.create)) {
-
-	}
-	if (ImGui::MenuItem(text.load)) {
-
-	}
-	ImGui::Spacing();
-
-	ImGui::Separator();
-
-	if (ImGui::MenuItem(text.quit))
-		;
+	if (ImGui::MenuItem(text.saveAs))
+		this->saveAs();
 
 	ImGui::EndMenu();
 }
@@ -194,12 +185,25 @@ void FS::TextEditor::textEditorInfo() {
 }
 
 void FS::TextEditor::saveText() {
-	auto textToSave = current->editor->GetText();
-	const std::string path = getCurrentEditorPath();
-	std::ofstream ofs(path, std::ios::trunc);
-	ofs << textToSave;
+	GLog.add<FD::Log::Type::None>("Save text {}.", current->path);
+	tabWrite->saveText(current->path);
+}
 
-	tabWrite->setIsTextSaved(path, true);
+void FS::TextEditor::saveAs() {
+	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
+	GLog.add<FD::Log::Type::None>("Save dialog.");
+	const nfdresult_t result = NFD_SaveDialog(nullptr, nullptr, outPath.get());
+	if (result == NFD_OKAY) {
+		GLog.add<FD::Log::Type::None>("Save file {}.", *outPath.get());
+	}
+	else if (result == NFD_CANCEL) {
+		GLog.add<FD::Log::Type::None>("Cancel save dialog.");
+		return;
+	}
+	else {//NFD_ERROR
+		GLog.add<FD::Log::Type::Error>("Error file dialog.");
+		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+	}
 }
 
 void FS::TextEditor::update() {
@@ -241,6 +245,23 @@ void FS::TextEditor::textChange() {
 std::string FS::TextEditor::getCurrentEditorPath() {
 	const auto itr = std::find_if(info.cbegin(), info.cend(), [&](auto& x) {return x.editor == current->editor; });
 	return itr->path;
+}
+
+void FS::TextEditor::breakPoint() {
+	if (!ImGui::IsWindowFocused())
+		return;
+	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		return;
+
+	const ImVec2 pos = ImGui::GetWindowPos();
+	const ImVec2 size = ImGui::GetWindowSize();
+
+	if (ImGui::IsMouseHoveringRect(pos, { pos.x + size.x,pos.y + size.y })) {
+		
+		//FTE::TextEditor::Breakpoints points = {1};
+		//current->editor->SetBreakpoints(points);
+	}
+		
 }
 
 void FS::TextEditor::checkSyntaxError() {

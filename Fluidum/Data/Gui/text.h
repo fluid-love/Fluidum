@@ -84,6 +84,13 @@ namespace FD::Internal::Text {
 		GuiText saveAndExit;
 		GuiText exitWithoutSaving;
 
+		GuiText error_openProjectFile;
+		GuiText error_illegalFile;
+		GuiText error_brokenFile;
+		GuiText error_internal;
+
+
+
 	};
 
 	struct TopBar final {
@@ -100,6 +107,17 @@ namespace FD::Internal::Text {
 		GuiText includeFile;
 
 		GuiText error_mainfile;
+
+	};
+
+	struct LeftBar final {
+		LeftBar();
+		~LeftBar() = default;
+
+		GuiText popup_save;
+		GuiText popup_saveAndClose;
+		GuiText popup_withoutSaving;
+		GuiText popup_cancel;
 
 	};
 
@@ -281,6 +299,11 @@ namespace FD::Internal::Text {
 		GuiText error_limitMaxSize;
 		GuiText error_alreadyExist;
 
+		GuiText popup_save;
+		GuiText popup_saveAndClose;
+		GuiText popup_withoutSaving;
+		GuiText popup_cancel;
+
 	};
 
 	struct Project final {
@@ -327,6 +350,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::StatusBar;
 	using ::FD::Internal::Text::MenuBar;
 	using ::FD::Internal::Text::TopBar;
+	using ::FD::Internal::Text::LeftBar;
 	using ::FD::Internal::Text::CodingSelect;
 	using ::FD::Internal::Text::CodingNew;
 	using ::FD::Internal::Text::NewProject;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Common/common.h"
+#include "../Files/container.h"
 
 namespace FD::Project {
 	struct CreateProjectInfo final {
@@ -24,7 +24,6 @@ namespace FD::Project {
 		std::string projectFilePath{};
 		std::string ymd_h{};
 	};
-
 }
 
 namespace FD {
@@ -49,9 +48,6 @@ namespace FD {
 		//現在のプロジェクトを保存して，現在のプロジェクトを新しいパスへcopyする.
 		void saveAs(const char* newName, const char* dstProjectFolderPath) const;
 
-		//save not-saved files.
-		void save() const;
-
 		//現在の情報を新たにバックアップをとる
 		//アプリ終了時に最新のバックアップ以外は削除される
 		void backup() const;
@@ -61,19 +57,22 @@ namespace FD {
 	private:
 		void save_tab() const;
 		void save_scene() const;
-		void save_files() const;
 
+	private:
+		void save_files_recursive(std::ofstream& ofs, const Project::List::FileInfo* info) const;
+		
+		void save_fluidumFiles() const;
+		void save_projectFiles() const;
+		void save_userFiles() const;
+
+	private:
 		void writeProjectInfo(const char* path) const;
 
-		void tryCreateBackupFolder() const;
-		void tryCreateSrcFolder() const;
-		void tryCreateProjectFilesFolder() const;
+	private:
+		void tryCreateFluidumFolder() const;
+		void tryCreateFluidumFiles() const;
 
-		void tryCreateFilesFile() const;
-		void tryCreateTabFile() const;
-		void tryCreateSceneFile() const;
-		void tryCreateFunctionFile() const;
-
+	private:
 		//ProjectFolderが消されたり移動したりしているか
 		void checkIsProjectFolderExist() const;
 		void checkIsProjectFileExist() const;
@@ -83,9 +82,16 @@ namespace FD {
 
 	private://read
 		void readProjectInfo(std::ifstream& ifs) const;
-		void readProjectFiles() const;
-		void readTabInfo() const;
-		void readSceneInfo() const;
+
+		Project::List::FileInfo readProjectFiles_element(std::ifstream& ifs) const;
+	
+		void read_files_recursive(std::ifstream& ifs, Project::List::FileInfo* parent) const;
+		void read_fluidumFiles() const;
+		void read_projectFiles() const;
+		void read_userFiles() const;
+
+		void read_tab() const;
+		void read_scene() const;
 
 	private:
 		void save_thread();

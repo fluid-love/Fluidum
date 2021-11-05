@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include <filesystem>
 
 #include <boost/predef.h>
 
@@ -85,6 +86,21 @@ namespace FU::File {
 
 namespace FU::File {
 
+	//C:/test/test/ -> test
+	//C:/test/test -> test
 	std::string directoryName(const std::string& path);
 
+	//C:/test/test/ -> C:/test/test/
+	//C:/test/test -> C:/test/
+	std::string directory(const std::string& path);
+
+	//C:/test/test.cpp -> test.cpp
+	std::string fileName(const std::string& path);
+
+	//Windows: '\\' -> '/'
+	//Back '/'
+	//lexically_normal
+	std::string consistentDirectory(const std::string& dir);
+
+	void hide(const std::string& path);
 }

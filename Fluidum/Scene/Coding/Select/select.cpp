@@ -12,12 +12,18 @@ FS::CodingSelect::CodingSelect(
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::ProjectRead* const projectRead,
 	FD::ProjectWrite* const projectWrite,
-	const FD::ProjectFilesRead* const projectFilesRead,
-	FD::ProjectFilesWrite* const projectFilesWrite,
+	const FD::FluidumFilesRead* const fluidumFilesRead,
+	FD::FluidumFilesWrite* const fluidumFilesWrite,
 	const FD::GuiRead* const guiRead,
 	const FD::SceneRead* const sceneRead
-) : tabWrite(tabWrite), projectRead(projectRead), projectWrite(projectWrite), projectFilesRead(projectFilesRead), projectFilesWrite(projectFilesWrite), sceneRead(sceneRead),
-newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::createImGuiImage(Resource::CodingOpenFilePath))
+) :
+	tabWrite(tabWrite),
+	projectRead(projectRead),
+	projectWrite(projectWrite),
+	fluidumFilesRead(fluidumFilesRead),
+	fluidumFilesWrite(fluidumFilesWrite),
+	sceneRead(sceneRead),
+	newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::createImGuiImage(Resource::CodingOpenFilePath))
 {
 	GLog.add<FD::Log::Type::None>("Construct CodingSelectScene.");
 
@@ -273,10 +279,10 @@ void FS::CodingSelect::openDialog() {
 	}
 
 	//NFD_OKAY
-	if (!projectFilesRead->isMainCodeFileExist()) {
+	if (!fluidumFilesRead->isMainCodeFileExist()) {
 		GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
-		projectFilesWrite->setMainCodePath(quickInfo.fullPath.c_str());
-		projectFilesWrite->save();
+		fluidumFilesWrite->setMainCodePath(quickInfo.fullPath.c_str());
+		fluidumFilesWrite->save();
 	}
 
 	tabWrite->addDisplayFile(quickInfo.fullPath);
@@ -423,9 +429,9 @@ void FS::CodingSelect::createNewFileQuick() {
 	else
 		abort();
 
-	if (!projectFilesRead->isMainCodeFileExist()) {
+	if (!fluidumFilesRead->isMainCodeFileExist()) {
 		GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", quickInfo.fullPath);
-		projectFilesWrite->setMainCodePath(quickInfo.fullPath);
+		fluidumFilesWrite->setMainCodePath(quickInfo.fullPath);
 	}
 	tabWrite->addFile(quickInfo.fullPath);
 	tabWrite->addDisplayFile(quickInfo.fullPath);
@@ -433,7 +439,7 @@ void FS::CodingSelect::createNewFileQuick() {
 }
 
 bool FS::CodingSelect::checkQuickInfo() {
-	
+
 	GLog.add<FD::Log::Type::None>("Check QuickInfo.");
 
 	Check::tryPushSlash(quickInfo.folderPath);
@@ -486,7 +492,7 @@ int FS::CodingSelect::inputTextCallback(ImGuiInputTextCallbackData* data) {
 }
 
 std::pair<FS::CodingSelect::Check::ErrorType, std::string> FS::CodingSelect::Check::checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
-	
+
 	//空かどうか
 	if (folderPath.empty()) {
 		return { ErrorType::EmptyFolderPath,{} };

@@ -58,6 +58,7 @@ namespace FS {
 
 		Info* current = nullptr;
 
+
 	private:
 		void textEditorMenu();
 		void fileMenu();
@@ -65,10 +66,12 @@ namespace FS {
 		void themeMenu();
 
 		void textEditor();
+		void breakPoint();
 		void textEditorInfo();
 
 	private:
 		void saveText();
+		void saveAs();
 
 		void update();
 		void textChange();

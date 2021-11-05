@@ -7,6 +7,7 @@ namespace FD {
 		float leftBarWidth = 0.0f;
 		float menuBarHeight = 0.0f;
 		float topBarHeight = 0.0f;
+		float statusBarHeight = 0.0f;
 	};
 	Gui GGui = {};
 
@@ -33,6 +34,10 @@ void FD::GuiWrite::topBarHeight(const float height) const noexcept {
 	GGui.topBarHeight = height;
 }
 
+void FD::GuiWrite::statusBarHeight(const float height) const noexcept {
+	GGui.statusBarHeight = height;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const ImVec2& FD::GuiRead::centerPos() const noexcept {
@@ -53,6 +58,10 @@ float FD::GuiRead::menuBarHeight() const noexcept {
 
 float FD::GuiRead::topBarHeight() const noexcept {
 	return GGui.topBarHeight;
+}
+
+float FD::GuiRead::statusBarHeight() const noexcept {
+	return GGui.statusBarHeight;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,19 +108,19 @@ void FD::LayoutWrite::rightDockSpaceID(const ImGuiID id) const noexcept {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ImVec2 FD::LayoutRead::leftLayoutPos() const noexcept {
+const ImVec2& FD::LayoutRead::leftLayoutPos() const noexcept {
 	return GLayout.leftLayoutPos;
 }
 
-ImVec2 FD::LayoutRead::leftLayoutSize() const noexcept {
+const ImVec2& FD::LayoutRead::leftLayoutSize() const noexcept {
 	return GLayout.leftLayoutSize;
 }
 
-ImVec2 FD::LayoutRead::rightLayoutPos() const noexcept {
+const ImVec2& FD::LayoutRead::rightLayoutPos() const noexcept {
 	return GLayout.rightLayoutPos;
 }
 
-ImVec2 FD::LayoutRead::rightLayoutSize() const noexcept {
+const ImVec2& FD::LayoutRead::rightLayoutSize() const noexcept {
 	return GLayout.rightLayoutSize;
 }
 

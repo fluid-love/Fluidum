@@ -8,14 +8,14 @@
 #include "Scene/scene.h"
 #include "Scene/window.h"
 
-#include "Log/console.h"
+#include "Console/console.h"
 #include "Log/log.h"
 #include "Log/Recent/file.h"
 #include "Log/Recent/project.h"
 
-#include "Project/project.h"
-#include "Project/project_files.h"
-#include "Project/task.h"
+#include "Project/Project/project.h"
+#include "Project/Files/files.h"
+#include "Task/task.h"
 
 #include "Coding/tab.h"
 

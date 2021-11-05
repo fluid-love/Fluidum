@@ -28,21 +28,25 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Coding\tab.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Common\common.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Common\resource.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Console\console.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\color.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\layout.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\text.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\topbar.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Limits\limits.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\console.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\log.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\file.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\type.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Project\project.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Project\project_files.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Project\task.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\container.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\files.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\name.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Scene\scene.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Scene\window.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Task\task.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Source\Api\api.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Source\Api\using.h" />
@@ -139,9 +143,10 @@
     <ClInclude Include="..\..\..\Fluidum\Manager\Scene\scene.h" />
     <ClInclude Include="..\..\..\Fluidum\Manager\Scene\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Manager\Scene\using.h" />
-    <ClInclude Include="..\..\..\Fluidum\Scene\Analysis\analysis.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Analysis\Func\function.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Analysis\Overview\overview.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Analysis\Plot\plot.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Animation\Animation\animation.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Left\leftbar.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Credit\credit.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\menubar.h" />
@@ -156,6 +161,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\new.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\select.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Tab\tab.h" />
@@ -164,6 +170,9 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\resource.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\using.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Console\Console\console.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Flu\Node\node.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Genome\Overview\overview.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Left\layout.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Right\layout.h" />
@@ -196,6 +205,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Coding\tab.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Console\console.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\color.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\layout.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\text.cpp" />
@@ -203,11 +213,12 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Log\log.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\file.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\project.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Data\Project\project.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Data\Project\project_files.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Data\Project\task.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\container.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\files.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Project\project.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Scene\scene.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Scene\window.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Task\task.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Source\Api\api.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Source\Vulkan\Base\mainloop.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Source\Vulkan\Image\imgui_image.cpp" />
@@ -257,9 +268,10 @@
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\swapchain.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\window.cpp" />
     <ClCompile Include="..\..\..\Fluidum\main.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Analysis\analysis.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Analysis\Func\function.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Analysis\Overview\overview.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Analysis\Plot\plot.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Animation\Animation\animation.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Left\leftbar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Credit\credit.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\menubar.cpp" />
@@ -277,10 +289,14 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.Terminate.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\new.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\select.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Tab\tab.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Console\Console\console.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Flu\Node\node.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Genome\Overview\overview.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Left\layout.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Right\layout.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\project.cpp" />
@@ -314,6 +330,7 @@
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingSelect" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingTab" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\LeftBar" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\MenuBar" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\NewProject" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\PopupSelect" />
@@ -325,7 +342,6 @@
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Title" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\TitleBar" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\TopBar" />
-    <None Include="..\..\..\Resources\Source\Lua\plot.lua" />
     <None Include="..\..\..\Test\test.lua" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -1,6 +1,6 @@
 #include "add.h"
 
-#include "../../Analysis/analysis.h"
+#include "../../Analysis/Overview/overview.h"
 
 #include "../../Coding/Tab/tab.h"
 #include "../../Coding/TextEditor/texteditor.h"
@@ -36,9 +36,9 @@ void FS::Utils::AddScenes::call() {
 	for (const auto x : this->codes) {
 
 
-		if (x == ClassCode::GetClassCode<::FS::AnalysisOverview>()) {
+		if (x == ClassCode::GetClassCode<::FS::Analysis::Overview>()) {
 			GLog.add<FD::Log::Type::None>("Request add AnalysisOverviewScene.");
-			Scene::addScene<::FS::AnalysisOverview>();
+			Scene::addScene<::FS::Analysis::Overview>();
 		}
 		else if (x == ClassCode::GetClassCode<::FS::TextEditor>()) {
 			GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");

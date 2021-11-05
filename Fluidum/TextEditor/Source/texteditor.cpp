@@ -27,10 +27,10 @@
 			0xffe0e0e0, // Cursor
 			0x80a06020, // Selection
 			0x800020ff, // ErrorMarker
-			0x40f08000, // Breakpoint
+			FU::ImGui::convertImVec4ToImU32(0.4f,0.8f,0.8f,0.08f), // Breakpoint
 			0xff707000, // Line number
 			0x40000000, // Current line fill
-			0x40808080, // Current line fill (inactive)
+			FU::ImGui::convertImVec4ToImU32(0.4f,0.4f,0.4f,0.08f), // Current line fill (inactive)
 			0x40a0a0a0, // Current line edge
 		} };
 	return p;

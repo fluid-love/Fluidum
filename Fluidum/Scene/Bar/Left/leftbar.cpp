@@ -3,22 +3,36 @@
 #include "../../Coding/Select/select.h"
 #include "../../Coding/TextEditor/texteditor.h"
 #include "../../Coding/Tab/tab.h"
+#include "../../Coding/Debug/debug.h"
 #include "../../Project/project.h"
-#include "../../Analysis/analysis.h"
+#include "../../Analysis/Overview/overview.h"
 #include "../../Analysis/Func/function.h"
 #include "../../Analysis/Plot/plot.h"
+#include "../../Flu/Node/node.h"
+#include "../../Console/Console/console.h"
+#include "../../Animation/Animation/animation.h"
+#include "../../Genome/Overview/overview.h"
 
 
 using namespace FU::ImGui::Operators;
 
 FS::LeftBar::LeftBar(
 	const FD::ProjectRead* const projectRead,
-	const FD::ProjectFilesRead* const projectFilesRead,
+	const FD::FluidumFilesRead* const fluidumFilesRead,
 	const FD::GuiRead* const  guiRead,
 	FD::GuiWrite* const  guiWrite,
 	const FD::SceneRead* const  sceneRead,
+	const FD::Coding::TabRead* const tabRead,
+	FD::Coding::TabWrite* const tabWrite,
 	std::vector<FDR::ImGuiImage>&& images
-) : projectRead(projectRead), projectFilesRead(projectFilesRead), guiRead(guiRead), sceneRead(sceneRead), images(images)
+) :
+	projectRead(projectRead),
+	fluidumFilesRead(fluidumFilesRead),
+	guiRead(guiRead),
+	sceneRead(sceneRead),
+	tabWrite(tabWrite),
+	tabRead(tabRead),
+	images(images)
 {
 	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
 
@@ -97,34 +111,16 @@ void FS::LeftBar::call() {
 		this->subWindow();
 }
 
-//まだ全てのシーンを作成していないのでダミーを準備する
-struct Dummy2 {
-
-};
-struct Dummy3 {
-
-};
-
-struct Dummy5 {
-
-};
-struct Dummy6 {
-
-};
-struct Dummy7 {
-
-};
-
 namespace FS::Internal {
-	//barに表示するmainのシーン
+	//main scenes
 	constexpr inline std::array<FU::Class::ClassCode::CodeType, 7> MainScenes = {
 		FU::Class::ClassCode::GetClassCode<::FS::TextEditor>(),
-		FU::Class::ClassCode::GetClassCode<Dummy2>(),
-		FU::Class::ClassCode::GetClassCode<::FS::AnalysisOverview>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Flu::Node>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Analysis::Overview>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Project>(),
-		FU::Class::ClassCode::GetClassCode<Dummy5>(),
-		FU::Class::ClassCode::GetClassCode<Dummy6>(),
-		FU::Class::ClassCode::GetClassCode<Dummy7>()
+		FU::Class::ClassCode::GetClassCode<::FS::Animation>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Genome::Overview>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Console>()
 	};
 }
 
@@ -135,16 +131,19 @@ void FS::LeftBar::imageGui() {
 		//シーンが存在するなら降ろす
 		if (sceneRead->isExist(Internal::MainScenes[i])) {
 			//シーンの削除
-			if (ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.main)) {
+			ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.main);
+
+			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
 				this->deleteScene(Internal::MainScenes[i]);
-			}
+
 			this->hoveredIcon(i);
 		}
 		else {
 			//ボタンが押されたら == シーンの追加を要請
-			if (ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.dummy)) {
+			ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.dummy);
+
+			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
 				this->addScene(Internal::MainScenes[i]);
-			}
 		}
 
 		//つめつめなので少し空ける
@@ -169,11 +168,23 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 	if (code == Internal::MainScenes[0]) {
 		this->addCodingScene();
 	}
+	else if (code == Internal::MainScenes[1]) {
+		this->addFluScene();
+	}
 	else if (code == Internal::MainScenes[2]) {
 		this->addAnalysisScene();
 	}
 	else if (code == Internal::MainScenes[3]) {
 		this->addProjectScene();
+	}
+	else if (code == Internal::MainScenes[4]) {
+		this->addAnimationScene();
+	}
+	else if (code == Internal::MainScenes[5]) {
+		this->addGenomeScene();
+	}
+	else if (code == Internal::MainScenes[6]) {
+		this->addConsoleScene();
 	}
 	else {
 		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
@@ -184,10 +195,10 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 void FS::LeftBar::addCodingScene() {
 	//set image
 	std::string path = Resource::LeftBarIconsFilePath;
-	path += "tab.png";
-	sub.codingImages = { FDR::createImGuiImage(path.c_str()) };
+	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "tab.png").c_str()));	
+	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "debug.png").c_str()));
 
-	if (!projectFilesRead->isMainCodeFileExist()) {
+	if (!fluidumFilesRead->isMainCodeFileExist()) {
 		GLog.add<FD::Log::Type::None>("Main file does not exist.");
 		GLog.add<FD::Log::Type::None>("Request add CodingSelectScene.");
 		Scene::addScene<CodingSelect>();
@@ -198,9 +209,14 @@ void FS::LeftBar::addCodingScene() {
 	}
 }
 
+void FS::LeftBar::addFluScene() {
+	GLog.add<FD::Log::Type::None>("Request add Flu::NodeScene.");
+	Scene::addScene<::FS::Flu::Node>();
+}
+
 void FS::LeftBar::addAnalysisScene() {
 	GLog.add<FD::Log::Type::None>("Request add AnalysisScene.");
-	Scene::addScene<AnalysisOverview>();
+	Scene::addScene<::FS::Analysis::Overview>();
 }
 
 void FS::LeftBar::addProjectScene() {
@@ -208,26 +224,83 @@ void FS::LeftBar::addProjectScene() {
 	Scene::addScene<::FS::Project>();
 }
 
+void FS::LeftBar::addAnimationScene() {
+	GLog.add<FD::Log::Type::None>("Request add AnimationScene.");
+	Scene::addScene<::FS::Animation>();
+}
+
+void FS::LeftBar::addGenomeScene() {
+	GLog.add<FD::Log::Type::None>("Request add Genome::OverviewScene.");
+	Scene::addScene<::FS::Genome::Overview>();
+}
+
+void FS::LeftBar::addConsoleScene() {
+	GLog.add<FD::Log::Type::None>("Request add ConsoleScene.");
+	Scene::addScene<::FS::Console>();
+}
+
 void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 	if (code == Internal::MainScenes[0]) {
-		GLog.add<FD::Log::Type::None>("Request tryDelete Coding::TabScene.");
-		Scene::tryDeleteScene<Coding::Tab>();
-		GLog.add<FD::Log::Type::None>("Request delete TextEditorScene.");
-		Scene::deleteScene<TextEditor>();
+		this->deleteCodingScene();
+	}
+	else if (code == Internal::MainScenes[1]) {
+		GLog.add<FD::Log::Type::None>("Request delete Flu::NodeScene.");
+		Scene::deleteScene<Flu::Node>();
 	}
 	else if (code == Internal::MainScenes[2]) {
 		GLog.add<FD::Log::Type::None>("Request delete AnalysisScene.");
-		Scene::deleteScene<AnalysisOverview>();
+		Scene::deleteScene<Analysis::Overview>();
 	}
 	else if (code == Internal::MainScenes[3]) {
 		GLog.add<FD::Log::Type::None>("Request delete ProjectScene.");
 		Scene::deleteScene<Project>();
 	}
+	else if (code == Internal::MainScenes[4]) {
+		GLog.add<FD::Log::Type::None>("Request delete AnimationScene.");
+		Scene::deleteScene<Animation>();
+	}
+	else if (code == Internal::MainScenes[5]) {
+		GLog.add<FD::Log::Type::None>("Request delete Genome::OverviewScene.");
+		Scene::deleteScene<Genome::Overview>();
+	}
+	else if (code == Internal::MainScenes[6]) {
+		GLog.add<FD::Log::Type::None>("Request delete ConsoleScene.");
+		Scene::deleteScene<Console>();
+	}
 	else {
 		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
 		abort();
 	}
-	sub.codingImages = std::nullopt;
+	sub.codingImages.clear();
+}
+
+void FS::LeftBar::deleteCodingScene() {
+	if (!tabRead->isAllTextSaved()) {
+		GLog.add<FD::Log::Type::None>("Popup MessageBox.");
+		int32_t button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
+		if (button == 0) {//save close
+			GLog.add<FD::Log::Type::None>("Save all tab texts.");
+			tabWrite->saveAllTexts();
+			tabWrite->clear();
+			tabWrite->save();
+		}
+		else if (button == 1) {//without saving
+			GLog.add<FD::Log::Type::None>("Clear tab texts.");
+			tabWrite->clear();
+			tabWrite->save();
+		}
+		else if (button == 2)//cancel
+			return;
+		else {//unexpected
+			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+			abort();
+		}
+	}
+
+	GLog.add<FD::Log::Type::None>("Request tryDelete Coding::TabScene.");
+	Scene::tryDeleteScene<Coding::Tab>();
+	GLog.add<FD::Log::Type::None>("Request delete TextEditorScene.");
+	Scene::deleteScene<TextEditor>();
 }
 
 void FS::LeftBar::subWindow() {
@@ -267,7 +340,7 @@ void FS::LeftBar::subWindowCoding() {
 		//選択されているなら
 		if (sceneRead->isExist(scenes[i])) {
 			//降ろす　シーンの削除
-			ImGui::ImageButton(sub.codingImages.value()[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
+			ImGui::ImageButton(sub.codingImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
 
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
 			const ImVec2 pos2 = ImGui::GetItemRectMax();
@@ -278,7 +351,7 @@ void FS::LeftBar::subWindowCoding() {
 		else {
 			//ボタンが押されたら == シーンの追加を要請
 			//ImageButtonは機能しないので，Rect + MouseEventでする
-			ImGui::ImageButton(sub.codingImages.value()[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.dummy);
+			ImGui::ImageButton(sub.codingImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.dummy);
 
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
 			const ImVec2 pos2 = ImGui::GetItemRectMax();
@@ -324,6 +397,10 @@ void FS::LeftBar::addCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
 		GLog.add<FD::Log::Type::None>("Request add Coding::TabScene.");
 		Scene::addScene<Coding::Tab>();
+	}
+	else if (code == ClassCode::GetClassCode<Coding::Debug>()){
+		GLog.add<FD::Log::Type::None>("Request add Coding::DebugScene.");
+		Scene::addScene<Coding::Debug>();
 	}
 	else {
 		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);

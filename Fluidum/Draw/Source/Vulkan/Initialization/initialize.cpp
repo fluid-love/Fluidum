@@ -731,7 +731,7 @@ void setupImGui() {
 	textConfig.PixelSnapH = true;
 	textConfig.RasterizerMultiply = 0.9f;
 	textConfig.GlyphExtraSpacing = { -0.65f,0.0f };
-	textConfig.GlyphOffset = { 0.0f,2.0f };
+	//textConfig.GlyphOffset = { 0.0f,2.0f };
 	textConfig.OversampleH = 3;
 	textConfig.OversampleV = 3;
 
@@ -747,7 +747,7 @@ void setupImGui() {
 	textConfig2.MergeMode = false;
 	textConfig2.PixelSnapH = true;
 	textConfig2.GlyphExtraSpacing = { -0.65f,0.0f };
-	textConfig2.GlyphOffset = { 0.0f,2.0f };
+	//textConfig2.GlyphOffset = { 0.0f,2.0f };
 	textConfig2.OversampleH = 3;
 	textConfig2.OversampleV = 3;
 	font2.filePath = ImGuiDefaultFontFilePath;

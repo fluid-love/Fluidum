@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../Common/common.h"
+#include "../../Common/common.h"
 
-namespace FS {
+namespace FS::Analysis {
 
-	class AnalysisOverview final : public Scene {
+	class Overview final : public Scene {
 	public:
 		template<FD::Calc::Language Lang>
-		explicit AnalysisOverview(
+		explicit Overview(
 			const FD::FunctionRead<Lang>* const functionRead,
 			FD::ImGuiWindowWrite* const imguiWindowWrite,
 			FD::TopBarWrite* const topBarWrite
@@ -17,14 +17,14 @@ namespace FS {
 
 			this->functionRead<Lang> = functionRead;
 
-			topBarWrite->add(&AnalysisOverview::topBar, this, "AnaOV");
+			topBarWrite->add(&Overview::topBar, this, "AnaOV");
 		}
 
 		void Constructor(FD::FunctionRead<FD::Calc::Language::Lua>, FD::ImGuiWindowWrite, FD::TopBarWrite);
 
-		~AnalysisOverview() noexcept;
+		~Overview() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(AnalysisOverview)
+		FluidumUtils_Class_Delete_CopyMove(Overview)
 
 	public:
 		virtual void call() override;

@@ -7,14 +7,14 @@ using namespace FU::ImGui::Operators;
 
 FS::TopBar::TopBar(
 	const FD::ProjectRead* const projectRead,
-	const FD::ProjectFilesRead* const projectFilesRead,
+	const FD::FluidumFilesRead* const fluidumFilesRead,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::SceneRead* const sceneRead,
 	const FD::TopBarRead* const topBarRead,
 	FD::TopBarWrite* const topBarWrite
 )
-	: projectRead(projectRead), projectFilesRead(projectFilesRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead), topBarRead(topBarRead), topBarWrite(topBarWrite)
+	: projectRead(projectRead), fluidumFilesRead(fluidumFilesRead), guiRead(guiRead), guiWrite(guiWrite), sceneRead(sceneRead), topBarRead(topBarRead), topBarWrite(topBarWrite)
 {
 	GLog.add<FD::Log::Type::None>("Construct TopBarScene.");
 
@@ -277,7 +277,7 @@ void FS::TopBar::calc() {
 }
 
 void FS::TopBar::run() {
-	const FD::Project::CodeType type = projectFilesRead->getCurrentMainCodeType();
+	const FD::Project::CodeType type = fluidumFilesRead->getCurrentMainCodeType();
 	using enum FD::Project::CodeType;
 
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);

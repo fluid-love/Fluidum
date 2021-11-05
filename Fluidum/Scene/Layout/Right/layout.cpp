@@ -5,8 +5,8 @@ FS::RightLayout::RightLayout(const FD::LayoutRead* const layoutRead, FD::LayoutW
 {
 	GLog.add<FD::Log::Type::None>("Construct RightLayuotScene.");
 
-	style.windowPos = { layoutRead->leftLayoutPos().x + layoutRead->leftLayoutSize().x,guiRead->menuBarHeight() + guiRead->topBarHeight() };
-	style.windowSize = { guiRead->windowSize().x - style.windowPos.x, guiRead->windowSize().y - style.windowPos.y };
+	style.windowPos = { layoutRead->leftLayoutPos().x + layoutRead->leftLayoutSize().x,guiRead->menuBarHeight() + guiRead->topBarHeight() - 4.0f };
+	style.windowSize = { guiRead->windowSize().x - style.windowPos.x, guiRead->windowSize().y - style.windowPos.y - guiRead->statusBarHeight() + 6.0f };
 
 	//ちょっとオーバーにして隠す
 	style.windowSize.x += 5.0f;
@@ -70,6 +70,8 @@ void FS::RightLayout::dockGui() {
 
 
 	id = ImGui::GetID("RightLayout");
+
+	ImGui::Dummy({ 0.0f,1.0f });
 	ImGui::DockSpace(id, ImVec2());
 
 	//auto currentSizeX = ImGui::GetWindowSize().x;

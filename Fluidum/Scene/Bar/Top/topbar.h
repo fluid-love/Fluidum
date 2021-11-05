@@ -8,7 +8,7 @@ namespace FS {
 	public:
 		explicit TopBar(
 			const FD::ProjectRead* const projectRead,
-			const FD::ProjectFilesRead* const projectFilesRead,
+			const FD::FluidumFilesRead* const fluidumFilesRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
@@ -17,7 +17,7 @@ namespace FS {
 		);
 		void Constructor(
 			FD::ProjectRead,
-			FD::ProjectFilesRead,
+			FD::FluidumFilesRead,
 			FD::GuiRead,
 			FD::GuiWrite,
 			FD::SceneRead,
@@ -32,7 +32,7 @@ namespace FS {
 
 	private://data
 		const FD::ProjectRead* const projectRead;
-		const FD::ProjectFilesRead* const projectFilesRead;
+		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
 		const FD::SceneRead* const sceneRead;
