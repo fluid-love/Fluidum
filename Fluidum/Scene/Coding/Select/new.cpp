@@ -109,6 +109,7 @@ void FS::Coding::New::call() {
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove;
 
+
 	//animation
 	ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
 
