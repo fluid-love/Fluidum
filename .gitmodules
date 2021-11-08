@@ -5,9 +5,6 @@
 	path = Libraries/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
-[submodule "Libraries/Vulkan-Headers"]
-	path = Libraries/Vulkan-Headers
-	url = https://github.com/KhronosGroup/Vulkan-Headers.git
 [submodule "Libraries/glm"]
 	path = Libraries/glm
 	url = https://github.com/g-truc/glm.git
