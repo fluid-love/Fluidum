@@ -2,74 +2,128 @@
 
 FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::add(const std::string& parent, const std::string& path, const Directory& info) {
 	directories.emplace_back(std::make_shared<Directory>(info));
+	Ref ref = this->makeRef(path, info);
 
-	Ref ref;
-	ref.type = Type::Directory;
-	ref.path = path;
-	ref.name = FU::File::directoryName(path);
-	ref.ptr = directories.back().get();
+	auto f = this->find(path);
 
-	if (parent.empty()) {
-		refs.emplace_back(ref);
-		return &refs.back();
+	//already exist
+	if (f != std::nullopt) {
+		bool res = this->tryReplaceExistElm(f.value(), ref);
+		if (res)
+			return f.value().operator->();
+		else
+			throw std::runtime_error("Failed to add directory. \"path\" already exists");
 	}
-	else {
-		//find parent
-		auto itr = this->find(parent);
-		assert(itr != std::nullopt);
-		return &itr.value()->dir_internal.emplace_back(ref);
-	}
+
+	return this->addRef(parent, ref);
 }
 
 FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::add(const std::string& parent, const std::string& path, const Code& info) {
 	codes.emplace_back(std::make_shared<Code>(info));
+	Ref ref = this->makeRef(path, info);
 
-	Ref ref;
-	ref.type = Type::Code;
-	ref.path = path;
-	ref.name = FU::File::fileName(path);
-	ref.ptr = codes.back().get();
+	auto f = this->find(path);
+	//already exist
+	if (f != std::nullopt) {
+		bool res = this->tryReplaceExistElm(f.value(), ref);
+		if (res)
+			return f.value().operator->();
+		else
+			throw std::runtime_error("Failed to add directory. \"path\" already exists");
+	}
 
-	if (parent.empty()) {
-		refs.emplace_back(ref);
-		return &refs.back();
-	}
-	else {
-		//find parent
-		auto itr = this->find(parent);
-		assert(itr != std::nullopt);
-		return &itr.value()->dir_internal.emplace_back(ref);
-	}
+	return this->addRef(parent, ref);
 }
 
 FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::add(const std::string& parent, const std::string& path, const Unsupported& info) {
 	unsupported.emplace_back(std::make_shared<Unsupported>(info));
+	Ref ref = this->makeRef(path, info);
 
-	Ref ref;
-	ref.type = Type::Unsupported;
-	ref.path = path;
-	ref.name = FU::File::fileName(path);
-	ref.ptr = unsupported.back().get();
+	auto f = this->find(path);
+	//already exist
+	//already exist
+	if (f != std::nullopt) {
+		bool res = this->tryReplaceExistElm(f.value(), ref);
+		if (res)
+			return f.value().operator->();
+		else
+			throw std::runtime_error("Failed to add directory. \"path\" already exists");
+	}
 
-	if (parent.empty()) {
-		refs.emplace_back(ref);
-		return &refs.back();
+	return this->addRef(parent, ref);
+}
+
+
+FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::tryAdd(const std::string& parent, const std::string& path, const Directory& info) {
+	auto f = this->find(path);
+
+	directories.emplace_back(std::make_shared<Directory>(info));
+	Ref ref = this->makeRef(path, info);
+
+	//already exist
+	if (f != std::nullopt) {
+		bool res = this->tryReplaceExistElm(f.value(), ref);
+		if (res)
+			return f.value().operator->();
+		else
+			nullptr;
 	}
-	else {
-		//find parent
-		auto itr = this->find(parent);
-		assert(itr != std::nullopt);
-		return &itr.value()->dir_internal.emplace_back(ref);
+
+	return this->addRef(parent, ref);
+}
+
+FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::tryAdd(const std::string& parent, const std::string& path, const Code& info) {
+	auto f = this->find(path);
+
+	codes.emplace_back(std::make_shared<Code>(info));
+	Ref ref = this->makeRef(path, info);
+
+	//already exist
+	if (f != std::nullopt) {
+		bool res = this->tryReplaceExistElm(f.value(), ref);
+		if (res)
+			return f.value().operator->();
+		else
+			nullptr;
 	}
+
+	return this->addRef(parent, ref);
+}
+
+FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::tryAdd(const std::string& parent, const std::string& path, const Unsupported& info) {
+	auto f = this->find(path);
+
+	unsupported.emplace_back(std::make_shared<Unsupported>(info));
+	Ref ref = this->makeRef(path, info);
+
+	//already exist
+	if (f != std::nullopt) {
+		bool res = this->tryReplaceExistElm(f.value(), ref);
+		if (res)
+			return f.value().operator->();
+		else
+			nullptr;
+	}
+
+	return this->addRef(parent, ref);
 }
 
 void FD::Project::Internal::FileList::erase(const std::string& path) {
 	auto itr = this->find(path);
+
 	auto parentItr = this->find_parent(path);
+	//parentItr == std::nullopt -> top
 
-	assert(itr != std::nullopt && parentItr != std::nullopt);
+	assert(itr != std::nullopt);
 
-	parentItr.value()->dir_internal.erase(itr.value());
+	this->deletePtr(itr.value());
+
+	if (parentItr == std::nullopt) {
+		auto f = std::find_if(refs.begin(), refs.end(), [&](auto& x) {return x.path == path; });
+		refs.erase(f);
+	}
+	else
+		parentItr.value()->dir_internal.erase(itr.value());
 }
 
 void FD::Project::Internal::FileList::changePath(const std::string& path, const std::string& newPath) {
@@ -94,6 +148,45 @@ void FD::Project::Internal::FileList::changePathAndName(const std::string& path,
 	std::string newPath = FU::File::directory(itr.value()->path) + newName;
 	itr.value()->path = std::move(newPath);
 	itr.value()->name = newName;
+}
+
+void FD::Project::Internal::FileList::sync() {
+	for (auto& x : refs) {
+		if (!std::filesystem::exists(x.path))
+			x.exist = false;
+		else
+			x.exist = true;
+
+		if (!x.dir_internal.empty())
+			this->sync(x.dir_internal);
+	}
+}
+
+void FD::Project::Internal::FileList::sync(std::vector<Ref>& info) {
+	for (auto& x : info) {
+		if (!std::filesystem::exists(x.path))
+			x.exist = false;
+		else
+			x.exist = true;
+
+		if (!x.dir_internal.empty())
+			this->sync(x.dir_internal);
+	}
+}
+
+void FD::Project::Internal::FileList::forEach_recursive(void(*function)(Ref&), Ref& ref) {
+	for (auto& x : ref.dir_internal) {
+		function(x);
+		if (!x.dir_internal.empty())
+			this->forEach_recursive(function, x);
+	}
+}
+
+void FD::Project::Internal::FileList::forEach(void(*function)(Ref&)) {
+	for (auto& x : refs) {
+		function(x);
+		this->forEach_recursive(function, x);
+	}
 }
 
 std::optional<FD::Project::Internal::FileList::RefIterator> FD::Project::Internal::FileList::find_recursive(RefIterator rec, const std::string& path) {
@@ -168,13 +261,72 @@ std::vector<FD::Project::Internal::FileList::Ref>* FD::Project::Internal::FileLi
 	return &refs;
 }
 
+void FD::Project::Internal::FileList::deletePtr(RefIterator itr) {
+	if (itr->type == Type::Directory) {
+		auto f = std::find_if(directories.begin(), directories.end(), [&](auto& x) {return x.get() == itr->ptr; });
+		assert(f != directories.end());
+		directories.erase(f);
+	}
+	else if (itr->type == Type::Code) {
+		auto f = std::find_if(codes.begin(), codes.end(), [&](auto& x) {return x.get() == itr->ptr; });
+		assert(f != codes.end());
+		codes.erase(f);
+	}
+	else if (itr->type == Type::Unsupported) {
+		auto f = std::find_if(unsupported.begin(), unsupported.end(), [&](auto& x) {return x.get() == itr->ptr; });
+		assert(f != unsupported.end());
+		unsupported.erase(f);
+	}
+}
 
+bool FD::Project::Internal::FileList::tryReplaceExistElm(RefIterator itr, Ref& ref) {
+	if (!itr->exist) {
+		this->deletePtr(itr);
+		*itr = ref;
+		return true;
+	}
 
+	return false;
+}
 
+FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::addRef(const std::string& parent, const Ref& ref) {
+	if (parent.empty()) {
+		refs.emplace_back(ref);
+		return &refs.back();
+	}
 
+	//find parent
+	auto itr = this->find(parent);
+	assert(itr != std::nullopt);
+	return &itr.value()->dir_internal.emplace_back(ref);
+}
 
+FD::Project::Internal::FileList::Ref FD::Project::Internal::FileList::makeRef(const std::string& path, const Directory& info) const {
+	return {
+		.type = Type::Directory,
+		.path = path,
+		.name = FU::File::directoryName(path),
+		.ptr = directories.back().get(),
+	};
+}
 
+FD::Project::Internal::FileList::Ref FD::Project::Internal::FileList::makeRef(const std::string& path, const Code& info) const {
+	return {
+		.type = Type::Code,
+		.path = path,
+		.name = FU::File::fileName(path),
+		.ptr = codes.back().get(),
+	};
+}
 
+FD::Project::Internal::FileList::Ref FD::Project::Internal::FileList::makeRef(const std::string& path, const Unsupported& info) const {
+	return {
+	.type = Type::Unsupported,
+	.path = path,
+	.name = FU::File::fileName(path),
+	.ptr = unsupported.back().get(),
+	};
+}
 
 
 

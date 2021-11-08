@@ -5,6 +5,9 @@
 namespace FD {
 	class ProjectWrite;
 
+	class LuaFilesWrite;
+	class LuaFilesRead;
+
 	class FluidumFilesWrite;
 	class FluidumFilesRead;
 
@@ -18,9 +21,23 @@ namespace FD {
 
 namespace FD::Project::Internal {
 
+	struct LibraryFilesData final {
+	private:
+		static inline FileList luaLibraries{};
+
+		static inline std::mutex mtx{};
+		static inline std::atomic_bool save = false;
+	private:
+		friend class ProjectWrite;
+		friend class LuaFilesWrite;
+		friend class LuaFilesRead;
+	};
+
 	struct FluidumFilesData final {
 	private:
 		static inline std::string mainCodeFilePath{};
+
+		static inline FileList luaLibraries{};
 
 		static inline std::mutex mtx{};
 		static inline std::atomic_bool save = false;
@@ -66,6 +83,39 @@ namespace FD::Project {
 }
 
 namespace FD {
+
+	class LuaFilesWrite final {
+	public:
+		explicit LuaFilesWrite(Internal::PassKey) {}
+		~LuaFilesWrite() = default;
+		FluidumUtils_Class_Delete_CopyMove(LuaFilesWrite)
+
+	public:
+		void closeAll();
+
+	public:
+		_NODISCARD std::vector<Project::List::FileInfo>* fileList();
+
+	public:
+		_NODISCARD std::unique_lock<std::mutex> getLock();
+
+	public:
+		void save() const;
+	};
+
+
+	class LuaFilesRead final {
+	public:
+		explicit LuaFilesRead(Internal::PassKey) {}
+		~LuaFilesRead() = default;
+		FluidumUtils_Class_Delete_CopyMove(LuaFilesRead)
+
+
+	};
+}
+
+namespace FD {
+
 	class FluidumFilesWrite final {
 	public:
 		explicit FluidumFilesWrite(Internal::PassKey) {}
@@ -100,6 +150,7 @@ namespace FD {
 
 namespace FD {
 
+	//lock
 	class ProjectFilesWrite final {
 	public:
 		explicit ProjectFilesWrite(Internal::PassKey) {}
@@ -113,7 +164,14 @@ namespace FD {
 			return ProjectFilesData::projectFiles.add(parent, path, info);
 		}
 
+		void changeName(const std::string& path, const std::string& newName);
+
 		void eraseFile(const std::string& path);
+
+		void sync(const std::string& top);
+
+		//.open = false
+		void closeAll();
 
 	public:
 		_NODISCARD std::vector<Project::List::FileInfo>* fileList();
@@ -123,6 +181,9 @@ namespace FD {
 
 	public:
 		void save() const;
+
+	private:
+		std::vector<std::string> findOpenPaths() const;
 
 	};
 
@@ -161,6 +222,11 @@ namespace FD {
 		void eraseFile(const std::string& path);
 
 		_NODISCARD std::string makeTempName();
+
+		void closeAll();
+
+		//not exist -> .exist = false
+		void sync();
 
 	public:
 		_NODISCARD std::vector<Project::List::FileInfo>* fileList();

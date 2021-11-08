@@ -14,6 +14,7 @@ namespace FD::Project::Internal {
 		};
 
 		struct Code final {
+			//element(uint32_t) -> line number
 			std::vector<uint32_t> breakpoints{};
 		};
 
@@ -53,6 +54,14 @@ namespace FD::Project::Internal {
 		Ref* add(const std::string& parent, const std::string& path, const Code& info);
 		Ref* add(const std::string& parent, const std::string& path, const Unsupported& info);
 
+		//samePath() && exist -> fail
+		//samePath() && !exist -> swap
+		//!samePath() -> add 
+		//fail -> return nullptr
+		Ref* tryAdd(const std::string& parent, const std::string& path, const Directory& info);
+		Ref* tryAdd(const std::string& parent, const std::string& path, const Code& info);
+		Ref* tryAdd(const std::string& parent, const std::string& path, const Unsupported& info);
+
 		void erase(const std::string& path);
 
 		void changePath(const std::string& path, const std::string& newPath);
@@ -63,7 +72,10 @@ namespace FD::Project::Internal {
 		//path:    C:/test/hoge
 		//name: hoge
 		void changePathAndName(const std::string& path, const std::string& newName);
-	
+
+		void sync();
+	private:
+		void sync(std::vector<Ref>& info);
 	public:
 		//all
 		_NODISCARD bool samePath(const std::string& path);
@@ -75,11 +87,27 @@ namespace FD::Project::Internal {
 		_NODISCARD std::vector<Ref>* get() noexcept;
 
 	private:
+		void forEach_recursive(void(*function)(Ref&), Ref& ref);
+	public:
+		void forEach(void(*function)(Ref&));
+
+	private:
 		std::optional<RefIterator> find_recursive(RefIterator rec, const std::string& path);
 		std::optional<RefIterator> find(const std::string& path);
 
 		std::optional<RefIterator> find_parent_recursive(RefIterator rec, const std::string& path);
 		std::optional<RefIterator> find_parent(const std::string& path);
+
+		void deletePtr(RefIterator itr);
+
+	private:
+		bool tryReplaceExistElm(RefIterator itr, Ref& ref);
+		Ref* addRef(const std::string& parent, const Ref& ref);
+
+	private:
+		Ref makeRef(const std::string& path, const Directory& info) const;
+		Ref makeRef(const std::string& path, const Code& info) const;
+		Ref makeRef(const std::string& path, const Unsupported& info) const;
 
 	};
 

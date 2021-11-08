@@ -689,7 +689,7 @@ FD::Project::List::FileInfo FD::ProjectWrite::readProjectFiles_element(std::ifst
 	info.name = data;
 
 	std::getline(ifs, data);
-	if (std::stoi(data) == true)
+	if (static_cast<bool>(std::stoi(data)) == true)
 		info.open = true;
 	else
 		info.open = false;

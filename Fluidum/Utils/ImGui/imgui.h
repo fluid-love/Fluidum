@@ -29,4 +29,13 @@ namespace FU::ImGui {
 	//https://github.com/ocornut/imgui/issues/1901
 	bool spinner(const char* label, float radius, float thickness, const ImU32& color);
 
+	//compiler bug
+	//issue https://github.com/fluid-love/Fluidum/issues/1
+	/*template<ImGuiCol... Colors>
+	requires((Colors < ImGuiCol_COUNT) && ...)
+		int32_t pushStyleColor(const ImVec4& col) {
+		for (ImGuiCol x : { Colors... })
+			::ImGui::PushStyleColor(x, col);
+		return sizeof...(Colors);
+	}*/
 }

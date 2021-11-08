@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Common/common.h"
+#include "../Coding/Select/new.h"
 
 namespace FS {
 
@@ -9,6 +10,7 @@ namespace FS {
 		explicit Project(
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
+			FD::LuaFilesWrite* const luaFilesWrite,
 			FD::FluidumFilesWrite* const fluidumFilesWrite,
 			const FD::FluidumFilesRead* const fluidumFilesRead,
 			FD::ProjectFilesWrite* const projectFilesWrite,
@@ -21,6 +23,7 @@ namespace FS {
 		void Constructor(
 			FD::ProjectWrite,
 			FD::ProjectRead,
+			FD::LuaFilesWrite,
 			FD::FluidumFilesWrite,
 			FD::FluidumFilesRead,
 			FD::ProjectFilesWrite,
@@ -40,6 +43,7 @@ namespace FS {
 
 	private:
 		FD::ProjectWrite* const projectWrite;
+		FD::LuaFilesWrite* const luaFilesWrite;
 		FD::FluidumFilesWrite* const fluidumFilesWrite;
 		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::ProjectRead* const projectRead;
@@ -71,7 +75,18 @@ namespace FS {
 
 		struct {
 			TabType tab = TabType::Fluidum;
+			FD::Project::List::FileInfo* fluidumFiles = nullptr;
+			FD::Project::List::FileInfo* projectFiles = nullptr;
 			FD::Project::List::FileInfo* userFiles = nullptr;
+
+			inline FD::Project::List::FileInfo* current() noexcept {
+				if (tab == TabType::Project)
+					return this->projectFiles;
+				else if (tab == TabType::User)
+					return this->userFiles;
+				else
+					return this->fluidumFiles;
+			}
 		}select;
 
 		struct {
@@ -97,28 +112,14 @@ namespace FS {
 			ImVec2 size{};
 		}changeName;
 
-	public:
-		struct Proj final {
-			std::string projectName{};
-
-			struct Info final {
-				std::vector<Info> dir_internal{};
-				bool isDirectory = false;
-				bool open = false;
-				std::string path{};
-				std::string name{};
-
-				std::size_t index;
-			};
-
-			//is directory,open,path str
-			std::vector<Info> listOfPaths{};
-		}project;
-
-		std::size_t selectedIndex = 0;
+		struct {
+			bool popup = false;
+			std::shared_ptr<Coding::New::SharedInfo> info{};
+		}newFile;
 
 	private:
 		void topBar();
+		void showCodeButton();
 
 	private:
 		void tab();
@@ -129,16 +130,22 @@ namespace FS {
 		void standardFluidumLibrary();
 
 	private:
+		std::pair<ImVec2, ImVec2> projectFilesTree(std::vector<FD::Project::List::FileInfo>* node, FD::Project::List::FileInfo* info);
 		void projectFiles();
+		void createDirectory();
 
 	private:
 		std::pair<ImVec2, ImVec2> userFilesTree(std::vector<FD::Project::List::FileInfo>* node, FD::Project::List::FileInfo* info);
 		void userFiles();
 		void addVirtualFolder();
 		void eraseVirtualFolder();
+		void eraseUserFile();
+		void showCode();
+		void flipOpen();
 
 	private:
 		void addFile();
+		void catchAddFile();
 
 	private:
 		void openPopup();
@@ -152,11 +159,8 @@ namespace FS {
 		_NODISCARD bool checkChangeName();
 
 	private:
-
-		void displayCode(const Proj::Info& info);
-
-		void syncListOfFiles();
-
+		void syncProjectFiles();
+		void collapseAll();
 	};
 
 }

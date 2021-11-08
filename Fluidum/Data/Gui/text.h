@@ -325,7 +325,31 @@ namespace FD::Internal::Text {
 		GuiText mainFile;
 		GuiText projectFolder;
 
+		GuiText project;
+		GuiText user;
+		GuiText mainFileDoesNotExist;
 
+		GuiText path;
+		GuiText name;
+		GuiText createFolder;
+		GuiText createVirtualFolder;
+		GuiText createFile;
+		GuiText addExistFolder;
+		GuiText addExistFile;
+		GuiText open;
+		GuiText close;
+		GuiText delete_release;
+
+		GuiText error_maxSize;
+
+		GuiText confirm_releaseVirtualFolder;
+		GuiText confirm_releaseFile;
+		GuiText confirm_deleteFolder;
+		GuiText confirm_deleteFile;
+
+		GuiText error_sameName;
+		GuiText error_emptyName;
+		GuiText error_forbiddenCharactor;
 	};
 
 	struct AnalysisOverview final {

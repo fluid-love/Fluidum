@@ -7,6 +7,13 @@ namespace FS::Coding {
 
 	class New final : public Scene {
 	public:
+		struct SharedInfo final {
+			std::string path{};
+
+			bool create = false;
+		};
+
+	public:
 		explicit New(
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::ProjectRead* const projectRead,
@@ -14,7 +21,8 @@ namespace FS::Coding {
 			const FD::FluidumFilesRead* const fluidumFilesRead,
 			FD::FluidumFilesWrite* const fluidumFilesWrite,
 			const FD::GuiRead* const guiRead,
-			const FD::Log::FileRead* const fileRead
+			const FD::Log::FileRead* const fileRead,
+			std::shared_ptr<SharedInfo> sharedInfo = {}
 		);
 		void Constructor(
 			FD::Coding::TabWrite,
@@ -43,6 +51,8 @@ namespace FS::Coding {
 		FD::Text::CodingNew text{};
 
 	private:
+		std::shared_ptr<SharedInfo> sharedInfo;
+
 		const std::string projectType;
 
 		std::string folderPath{};
@@ -101,6 +111,7 @@ namespace FS::Coding {
 		void form();
 		void bottom();
 		bool check();
+		void tryCreate();
 		void create();
 
 	private:

@@ -21,3 +21,5 @@
 
 #include "Calc/Function/function.h"
 #include "Calc/Plot/ImPlot/plot.h"
+
+#include "Limits/limits.h"

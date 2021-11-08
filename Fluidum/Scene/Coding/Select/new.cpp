@@ -9,6 +9,7 @@ using namespace FU::ImGui::Operators;
 namespace FS::Coding::Internal {
 	std::vector<FDR::ImGuiImage> makeImages() {
 		constexpr const char* names[] = {
+			"empty.png",
 			"lua.png",
 			"python.png",
 			"angelscript.png"
@@ -31,14 +32,17 @@ FS::Coding::New::New(
 	const FD::FluidumFilesRead* const fluidumFilesRead,
 	FD::FluidumFilesWrite* const fluidumFilesWrite,
 	const FD::GuiRead* const guiRead,
-	const FD::Log::FileRead* const fileRead
+	const FD::Log::FileRead* const fileRead,
+	std::shared_ptr<SharedInfo> sharedInfo
 ) :
 	tabWrite(tabWrite),
 	projectRead(projectRead),
 	projectWrite(projectWrite),
 	fluidumFilesRead(fluidumFilesRead),
 	fluidumFilesWrite(fluidumFilesWrite),
+	sharedInfo(sharedInfo),
 	recentButtons(initRecentFileTypes(fileRead->recent())),
+	images(Internal::makeImages()),
 	emptyFiles({
 			ButtonInfo{images.at(0), "_Empty", text.empty, text.empty_Description},
 			ButtonInfo{images.at(1), "_ELua", text.emptyLua, text.emptyLua_Description},
@@ -59,7 +63,16 @@ FS::Coding::New::New(
 	fileName.reserve(200);
 
 	//default
-	folderPath = projectRead->getProjectFolderPath() + "Src/";
+	if (sharedInfo)
+		folderPath = projectRead->getProjectFolderPath() + "Src/";
+	else {
+		if (sharedInfo->path.empty())
+			folderPath = projectRead->getProjectFolderPath() + "Src/";
+		else
+			folderPath = sharedInfo->path;
+	}
+
+
 
 }
 
@@ -283,12 +296,27 @@ void FS::Coding::New::bottom() {
 	if (ImGui::Button(text.create, buttonSize)) {
 		pos.create = ImGui::GetItemRectMin();
 
-		if (this->check()) {
-			FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
-			this->create();
-		}
+		this->tryCreate();
 	}
 	ImGui::PopStyleColor();
+}
+
+void FS::Coding::New::tryCreate() {
+	//failed
+	if (!this->check())
+		return;
+
+	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
+	this->create();
+
+	//shared
+	if (sharedInfo) {
+		sharedInfo->path = std::move(this->fullPath);
+		sharedInfo->create = true;
+	}
+
+	GLog.add<FD::Log::Type::None>("Request delete Coding::NewScene.");
+	Scene::deleteScene<New>();
 }
 
 void FS::Coding::New::create() {
@@ -366,7 +394,7 @@ namespace FS {
 		if (path.back() != '/')
 			path.push_back('/');
 #endif
-}
+	}
 }
 
 bool FS::Coding::New::check() {

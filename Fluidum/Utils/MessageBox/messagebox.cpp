@@ -91,7 +91,7 @@ void FU::MB::error(const char* message) {
 #endif
 }
 
-void FU::MB::ok_cancel(const char* message) {
+int32_t FU::MB::ok_cancel(const char* message) {
 #ifdef BOOST_OS_WINDOWS
 	using namespace Internal;
 
@@ -100,7 +100,12 @@ void FU::MB::ok_cancel(const char* message) {
 
 	long icon = MB_ICONWARNING;
 
-	MessageBox(NULL, wMessage.data(), Title, icon | MB_OKCANCEL | MB_TASKMODAL);
+	int result = MessageBox(NULL, wMessage.data(), Title, icon | MB_OKCANCEL | MB_TASKMODAL);
+
+	if (result == IDOK)
+		return 0;
+	else if (result == IDCANCEL)
+		return 1;
 
 #else
 #error Not Supported

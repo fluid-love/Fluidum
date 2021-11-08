@@ -850,6 +850,69 @@ FD::Internal::Text::Project::Project() {
 	std::getline(ifs, data);
 	this->projectFolder = data;
 
+	std::getline(ifs, data);
+	this->project = data;
+
+	std::getline(ifs, data);
+	this->user = data;
+
+	std::getline(ifs, data);
+	this->mainFileDoesNotExist = data;
+
+	std::getline(ifs, data);
+	this->path = data;
+
+	std::getline(ifs, data);
+	this->name = data;
+
+	std::getline(ifs, data);
+	this->createFolder = data;
+
+	std::getline(ifs, data);
+	this->createVirtualFolder = data;
+
+	std::getline(ifs, data);
+	this->createFile = data;
+
+	std::getline(ifs, data);
+	this->addExistFolder = data;
+
+	std::getline(ifs, data);
+	this->addExistFile = data;
+
+	std::getline(ifs, data);
+	this->open = data;
+
+	std::getline(ifs, data);
+	this->close = data;
+
+	std::getline(ifs, data);
+	this->delete_release = data;
+
+	std::getline(ifs, data);
+	this->error_maxSize = data;
+
+	std::getline(ifs, data);
+	this->confirm_releaseVirtualFolder = Internal::Text::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->confirm_releaseFile = Internal::Text::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->confirm_deleteFolder = Internal::Text::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->confirm_deleteFile = Internal::Text::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->error_sameName = data;
+
+	std::getline(ifs, data);
+	this->error_emptyName = data;
+
+	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
 }
 
 

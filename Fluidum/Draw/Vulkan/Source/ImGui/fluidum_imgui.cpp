@@ -79,7 +79,7 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 	colors[ImGuiCol_TextDisabled] = ImVec4(0.500f, 0.500f, 0.500f, 1.000f);
 	colors[ImGuiCol_WindowBg] = ImVec4(0.016f, 0.016f, 0.016f, 0.99f);
 	colors[ImGuiCol_ChildBg] = ImVec4(0.180f, 0.180f, 0.180f, 0.000f);
-	colors[ImGuiCol_PopupBg] = ImVec4(0.05f, 0.05f, 0.05f, 1.000f);
+	colors[ImGuiCol_PopupBg] = ImVec4(0.02f, 0.02f, 0.02f, 1.000f);
 	colors[ImGuiCol_Border] = ImVec4(0.26f, 0.200f, 0.200f, 1.000f);
 	colors[ImGuiCol_BorderShadow] = ImVec4(0.000f, 0.000f, 0.000f, 0.000f);
 	colors[ImGuiCol_FrameBg] = ImVec4(0.060f, 0.060f, 0.060f, 1.000f);
@@ -100,7 +100,7 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 	colors[ImGuiCol_ButtonHovered] = ImVec4(1.000f, 1.000f, 1.000f, 0.156f);
 	colors[ImGuiCol_ButtonActive] = ImVec4(1.000f, 1.000f, 1.000f, 0.391f);
 	colors[ImGuiCol_Header] = ImVec4(0.113f, 0.113f, 0.113f, 1.000f);
-	colors[ImGuiCol_HeaderHovered] = ImVec4(0.469f, 0.469f, 0.469f, 1.000f);
+	colors[ImGuiCol_HeaderHovered] = ImVec4(0.2f, 0.2f, 0.2f, 1.000f);
 	colors[ImGuiCol_HeaderActive] = ImVec4(0.469f, 0.469f, 0.469f, 1.000f);
 	colors[ImGuiCol_Separator] = colors[ImGuiCol_Border];
 	colors[ImGuiCol_SeparatorHovered] = ImVec4(0.391f, 0.391f, 0.391f, 1.000f);

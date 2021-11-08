@@ -23,6 +23,8 @@ namespace FS {
 		FD::LayoutRead,
 		FD::ProjectWrite,
 		FD::ProjectRead,
+		FD::LuaFilesWrite,
+		FD::LuaFilesRead,
 		FD::FluidumFilesWrite,
 		FD::FluidumFilesRead,
 		FD::ProjectFilesWrite,

@@ -81,3 +81,25 @@ void FU::File::hide(const std::string& path) {
 #error NotSupported
 #endif
 }
+
+bool FU::File::containForbiddenCharactor(const std::string& name) {
+#ifdef BOOST_OS_WINDOWS
+	auto itr = std::find_if(name.begin(), name.end(), [](char x)
+		{
+			return
+				(x == '\\') ||
+				(x == '/') ||
+				(x == ':') ||
+				(x == '*') ||
+				(x == '?') ||
+				(x == '\"') ||
+				(x == '<') ||
+				(x == '>"') ||
+				(x == '|');
+		}
+	);
+#else
+#error NotSupported
+#endif
+	return itr != name.end();
+}

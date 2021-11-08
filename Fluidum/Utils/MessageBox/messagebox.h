@@ -77,6 +77,8 @@ namespace FU::MB {
 	void error(const char* message);
 
 	//Icon::Warning message [IDOK] [IDCANCEL]
-	void ok_cancel(const char* message);
+	//ok     -> return 0
+	//cancel -> return 1
+	int32_t ok_cancel(const char* message);
 
 }
