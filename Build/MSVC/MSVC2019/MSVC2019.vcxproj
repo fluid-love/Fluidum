@@ -415,7 +415,7 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/boost/libs/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -435,7 +435,7 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/boost/libs/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -455,7 +455,7 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/boost/libs/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -474,7 +474,7 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/boost/libs/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>

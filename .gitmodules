@@ -17,12 +17,12 @@
 [submodule "Libraries/IconFontCppHeaders"]
 	path = Libraries/IconFontCppHeaders
 	url = https://github.com/juliettef/IconFontCppHeaders.git
-[submodule "Libraries/boost"]
-	path = Libraries/boost
-	url = https://github.com/boostorg/boost.git
 [submodule "Libraries/ImGuiColorTextEdit"]
 	path = Libraries/ImGuiColorTextEdit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
 [submodule "Libraries/implot"]
 	path = Libraries/implot
 	url = https://github.com/epezent/implot.git
+[submodule "Libraries/predef"]
+	path = Libraries/predef
+	url = https://github.com/boostorg/predef.git
