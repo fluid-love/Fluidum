@@ -1,0 +1,153 @@
+﻿  FluidumFilePath.cpp
+  FDobject.cpp
+C:\FluidumDataDetails\part\FluidumVK\FluidumVK\FluidumVK\part\FluidumKeyManager\FluidumKeyManager\FKMmanager.h(170,4): warning C4002: 関数に似たマクロ呼び出し 'assert' の引数が多すぎます
+  FDproperty.cpp
+C:\FluidumDataDetails\part\FluidumVK\FluidumVK\FluidumVK\part\FluidumKeyManager\FluidumKeyManager\FKMmanager.h(170,4): warning C4002: 関数に似たマクロ呼び出し 'assert' の引数が多すぎます
+  test.cpp
+C:\FluidumDataDetails\part\FluidumVK\FluidumVK\FluidumVK\part\FluidumKeyManager\FluidumKeyManager\FKMmanager.h(170,4): warning C4002: 関数に似たマクロ呼び出し 'assert' の引数が多すぎます
+  FDvertexlog.cpp
+C:\FluidumDataDetails\part\FluidumVK\FluidumVK\FluidumVK\part\FluidumKeyManager\FluidumKeyManager\FKMmanager.h(170,4): warning C4002: 関数に似たマクロ呼び出し 'assert' の引数が多すぎます
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xmemory(707,1): warning C4267: '初期化中': 'size_t' から '_Ty' に変換しました。データが失われているかもしれません。
+          with
+          [
+              _Ty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xutility(142): message : コンパイル対象の関数 テンプレート インスタンス化 '_Ty *std::construct_at<_Objty,unsigned __int64,void>(_Ty *const ,unsigned __int64 &&) noexcept(<expr>)' のリファレンスを確認してください
+          with
+          [
+              _Ty=unsigned short,
+              _Objty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\vector(721): message : コンパイル対象の関数 テンプレート インスタンス化 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned __int64>(_Alloc &,_Objty *const ,unsigned __int64 &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<FVK::Internal::ui16>,
+              _Ty=unsigned short,
+              _Objty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\vector(726): message : コンパイル対象の関数 テンプレート インスタンス化 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned __int64>(_Alloc &,_Objty *const ,unsigned __int64 &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<FVK::Internal::ui16>,
+              _Ty=unsigned short,
+              _Objty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\vector(739): message : コンパイル対象の関数 テンプレート インスタンス化 '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<unsigned __int64>(unsigned __int64 &&)' のリファレンスを確認してください
+          with
+          [
+              _Ty=FVK::Internal::ui16
+          ]
+C:\FluidumDataDetails\FluidumDataObject\VertexLog\FDvertexlog.cpp(17): message : コンパイル対象の関数 テンプレート インスタンス化 '_Ty &std::vector<_Ty,std::allocator<_Ty>>::emplace_back<unsigned __int64>(unsigned __int64 &&)' のリファレンスを確認してください
+          with
+          [
+              _Ty=FVK::Internal::ui16
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xmemory(707,1): warning C4267: '初期化中': 'size_t' から '_Objty' に変換しました。データが失われているかもしれません。
+          with
+          [
+              _Objty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xutility(143,1): warning C4267: '初期化中': 'size_t' から '_Ty' に変換しました。データが失われているかもしれません。
+          with
+          [
+              _Ty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xmemory(707): message : コンパイル対象の関数 テンプレート インスタンス化 '_Ty *std::construct_at<_Objty,unsigned __int64,void>(_Ty *const ,unsigned __int64 &&) noexcept' のリファレンスを確認してください
+          with
+          [
+              _Ty=unsigned short,
+              _Objty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\vector(721): message : コンパイル対象の関数 テンプレート インスタンス化 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned __int64>(_Alloc &,_Objty *const ,unsigned __int64 &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<FVK::Internal::ui16>,
+              _Ty=unsigned short,
+              _Objty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\vector(726): message : コンパイル対象の関数 テンプレート インスタンス化 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,unsigned __int64>(_Alloc &,_Objty *const ,unsigned __int64 &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<FVK::Internal::ui16>,
+              _Ty=unsigned short,
+              _Objty=unsigned short
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\utility(249,55): warning C4267: '初期化中': 'size_t' から '_Ty2' に変換しました。データが失われているかもしれません。
+          with
+          [
+              _Ty2=uint32_t
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xmemory(707): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<const std::string,uint32_t>::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64,0>(std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64> &&) noexcept(false)' のリファレンスを確認してください
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xmemory(714): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<const std::string,uint32_t>::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64,0>(std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64> &&) noexcept(false)' のリファレンスを確認してください
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xtree(811): message : コンパイル対象の関数 テンプレート インスタンス化 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>>(_Alloc &,_Objty *const ,std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64> &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<std::allocator<std::pair<const std::string,uint32_t>>>::void_pointer>>,
+              _Ty=std::pair<const std::string,uint32_t>,
+              _Objty=std::pair<const std::string,uint32_t>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xtree(812): message : コンパイル対象の関数 テンプレート インスタンス化 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>>(_Alloc &,_Objty *const ,std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64> &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<std::allocator<std::pair<const std::string,uint32_t>>>::void_pointer>>,
+              _Ty=std::pair<const std::string,uint32_t>,
+              _Objty=std::pair<const std::string,uint32_t>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xtree(1007): message : コンパイル対象の関数 テンプレート インスタンス化 'std::_Tree_temp_node<std::allocator<std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<_Alloc>::void_pointer>>>::_Tree_temp_node<_Ty>(_Alnode &,std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,_Ty &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::pair<const std::string,uint32_t>>,
+              _Ty=std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>,
+              _Alnode=std::allocator<std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<std::allocator<std::pair<const std::string,uint32_t>>>::void_pointer>>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xtree(1023): message : コンパイル対象の関数 テンプレート インスタンス化 'std::_Tree_temp_node<std::allocator<std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<_Alloc>::void_pointer>>>::_Tree_temp_node<_Ty>(_Alnode &,std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,_Ty &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::pair<const std::string,uint32_t>>,
+              _Ty=std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>,
+              _Alnode=std::allocator<std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<std::allocator<std::pair<const std::string,uint32_t>>>::void_pointer>>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xtree(1044): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,bool> std::_Tree<std::_Tmap_traits<_Kty,_Ty,_Pr,_Alloc,false>>::_Emplace<std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>>(std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64> &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::pair<const std::string,uint32_t>>,
+              _Kty=std::string,
+              _Ty=uint32_t,
+              _Pr=std::less<std::string>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\xtree(1045): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_node<std::pair<const std::string,uint32_t>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,bool> std::_Tree<std::_Tmap_traits<_Kty,_Ty,_Pr,_Alloc,false>>::_Emplace<std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>>(std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64> &&)' のリファレンスを確認してください
+          with
+          [
+              _Alloc=std::allocator<std::pair<const std::string,uint32_t>>,
+              _Kty=std::string,
+              _Ty=uint32_t,
+              _Pr=std::less<std::string>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\map(165): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,uint32_t>>>>,bool> std::_Tree<std::_Tmap_traits<_Kty,_Ty,_Pr,_Alloc,false>>::emplace<std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>>(std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64> &&)' のリファレンスを確認してください
+          with
+          [
+              _Kty=std::string,
+              _Ty=uint32_t,
+              _Pr=std::less<std::string>,
+              _Alloc=std::allocator<std::pair<const std::string,uint32_t>>
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\include\map(165): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,uint32_t>>>>,bool> std::_Tree<std::_Tmap_traits<_Kty,_Ty,_Pr,_Alloc,false>>::emplace<std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>>(std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64> &&)' のリファレンスを確認してください
+          with
+          [
+              _Kty=std::string,
+              _Ty=uint32_t,
+              _Pr=std::less<std::string>,
+              _Alloc=std::allocator<std::pair<const std::string,uint32_t>>
+          ]
+C:\FluidumDataDetails\FluidumDataObject\VertexLog\FDvertexlog.cpp(41): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,uint32_t>>>>,bool> std::map<std::string,uint32_t,std::less<std::string>,std::allocator<std::pair<const std::string,uint32_t>>>::insert<std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>,0>(_Valty &&)' のリファレンスを確認してください
+          with
+          [
+              _Valty=std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>
+          ]
+C:\FluidumDataDetails\FluidumDataObject\VertexLog\FDvertexlog.cpp(41): message : コンパイル対象の関数 テンプレート インスタンス化 'std::pair<std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const std::string,uint32_t>>>>,bool> std::map<std::string,uint32_t,std::less<std::string>,std::allocator<std::pair<const std::string,uint32_t>>>::insert<std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>,0>(_Valty &&)' のリファレンスを確認してください
+          with
+          [
+              _Valty=std::pair<FVK::Internal::Key<FVK::Internal::FvkType::VERTEX_BUFFER,std::string>,unsigned __int64>
+          ]
+  コードを生成中...
+  FluidumDataObject.vcxproj -> C:\FluidumDataDetails\x64\Debug\FluidumDataObject.exe
