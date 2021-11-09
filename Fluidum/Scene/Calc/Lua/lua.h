@@ -117,9 +117,12 @@ namespace FS::Lua {
 
 	private://FPlot
 
-		Fluidum_Lua_Api Ret plot_create(State L);
+		Fluidum_Lua_Api Ret plot_make(State L);
 		Fluidum_Lua_Api Ret plot_pushBack(State L);
 		Fluidum_Lua_Api Ret plot_setMarker(State L);
+		Fluidum_Lua_Api Ret plot_makePlot(State L);
+		Fluidum_Lua_Api Ret plot_plot(State L);
+
 
 		//private://FDraw
 

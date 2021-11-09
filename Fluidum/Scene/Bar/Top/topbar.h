@@ -89,6 +89,7 @@ namespace FS {
 		void areaGui();
 
 		void calc();
+		void mode();
 		void run();
 
 		void playCheck();

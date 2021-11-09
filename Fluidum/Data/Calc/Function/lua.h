@@ -22,7 +22,9 @@ namespace FD::Calc::Lua {
 		System_SleepSeconds,
 		System_SleepMilliSeconds,
 
-		Plot_Create,
+		Plot_Make,
+		Plot_makePlot,
+		Plot_Plot,
 		Plot_SetMarker,
 		Plot_PushBack,
 		Plot_PushFront

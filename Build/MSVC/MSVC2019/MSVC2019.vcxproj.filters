@@ -481,9 +481,6 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\type.h">
       <Filter>Fluidum\Scene\Calc\Lua</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\limit.h">
-      <Filter>Fluidum\Data\Calc\Plot\ImPlot</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.h">
       <Filter>Fluidum\Data\Calc\Plot\ImPlot</Filter>
     </ClInclude>
@@ -546,6 +543,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\project.h">
       <Filter>Fluidum\Data\Project\Project</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Common\log.h">
+      <Filter>Fluidum\Scene\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\table.h">
+      <Filter>Fluidum\Scene\Calc\Lua\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -810,9 +813,6 @@
     <Filter Include="Resources">
       <UniqueIdentifier>{08178a90-3343-484d-b450-cb21a61f5355}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources\Lua">
-      <UniqueIdentifier>{b18c7184-b42a-4278-bc00-f5a50ed4c859}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\Test">
       <UniqueIdentifier>{79f99298-f27b-4886-897c-fd7da31f8a04}</UniqueIdentifier>
     </Filter>
@@ -905,6 +905,27 @@
     </Filter>
     <Filter Include="Fluidum\Data\Project\Project">
       <UniqueIdentifier>{9da47c23-f848-4b26-adfa-dcbc45200f4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Language">
+      <UniqueIdentifier>{80d7c69f-b276-4d18-bfd1-70db214e88a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Language\Lua">
+      <UniqueIdentifier>{128e173d-3d17-41b0-b683-9d62b0603805}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Language\Lua\FluidumStandardLibrary">
+      <UniqueIdentifier>{29bf948e-bebe-4d81-b413-8aa9f2924a8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Calc\Lua\Functions\Plot">
+      <UniqueIdentifier>{9f1c54d4-7cd9-4b35-b0ab-ec94ce704b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Calc\Lua\Functions\System">
+      <UniqueIdentifier>{301ae62e-81f1-4833-92d5-59d89ba921a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Log">
+      <UniqueIdentifier>{2788d7c5-d15a-4d7b-9ad1-65bcfbfc574a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Log\Lua">
+      <UniqueIdentifier>{b18c7184-b42a-4278-bc00-f5a50ed4c859}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1133,15 +1154,6 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp">
       <Filter>Fluidum\Scene\Calc\Lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.SleepMilliSeconds.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.SleepSeconds.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.Terminate.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Left\leftbar.cpp">
       <Filter>Fluidum\Scene\Bar\Left</Filter>
     </ClCompile>
@@ -1208,17 +1220,8 @@
     <ClCompile Include="..\..\..\Libraries\implot\implot_items.cpp">
       <Filter>Libraries\implot</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot.Create.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.cpp">
       <Filter>Fluidum\Data\Calc\Plot\ImPlot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot.PushBack.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot.Marker.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\topbar.cpp">
       <Filter>Fluidum\Data\Gui</Filter>
@@ -1270,6 +1273,33 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Project\project.cpp">
       <Filter>Fluidum\Data\Project\Project</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Marker.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.PushBack.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Make.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.SleepSeconds.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.Terminate.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.SleepMilliSeconds.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Plot.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.MakePlot.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\table.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1323,6 +1353,12 @@
     </None>
     <None Include="..\..\..\Resources\Gui\Text\Japanese\LeftBar">
       <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Fluidum\Language\Lua\FluidumStandardLibrary\plot.lua">
+      <Filter>Fluidum\Language\Lua\FluidumStandardLibrary</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Log\Lua\LuaMessage.jpn">
+      <Filter>Resources\Log\Lua</Filter>
     </None>
   </ItemGroup>
 </Project>

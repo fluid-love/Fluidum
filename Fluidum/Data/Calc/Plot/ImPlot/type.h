@@ -5,9 +5,23 @@
 
 namespace FD::Plot {
 
-	enum class PlotType :uint16_t {
+	using FigureIndex = uint16_t;
+	using PlotIndex = uint16_t;
+
+	using Val = double;
+
+}
+
+namespace FD::Plot {
+
+	enum class PlotType : uint8_t {
+		Plot
+	};
+
+	enum class ImPlotType :uint8_t {
 		None,
 		Line,
+		Point,
 		Bar,
 	};
 
@@ -18,16 +32,17 @@ namespace FD::Plot {
 	};
 
 	struct Data final {
-		Plot::PlotType type = Plot::PlotType::Line;//line ,point,bar...
+		PlotType type = PlotType::Plot;
+		Plot::ImPlotType imPlotType = Plot::ImPlotType::Point;//line ,point,bar...
 		ImPlotMarker marker = ImPlotMarker_Circle;//circle,up,down...
 
-		std::vector<Plot::Val> valuesX = {};
-		std::vector<Plot::Val> valuesY = {};
+		std::vector<Plot::Val> values1 = {};
+		std::vector<Plot::Val> values2 = {};
 	};
 
 	struct PlotData final {
 		Figure figure;
-		std::vector<Data> data;//ï`é Ç∑ÇÈê¸
+		std::vector<Data> plots;//ï`é Ç∑ÇÈê¸
 	};
 
 }

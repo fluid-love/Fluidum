@@ -9,9 +9,8 @@ namespace FS::Lua {
 		Type,
 
 		Plot_Figure_Max,
+		Plot_Plot_Max,
 		Plot_MarkerStr,
-		Plot_PlotIndex_Min,
-		Plot_PlotIndex_Max
 	};
 
 	using Message = FU::File::Text<::FS::Resource::LuaMessagePath,LogType>;

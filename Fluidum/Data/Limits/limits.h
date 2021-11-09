@@ -20,3 +20,17 @@ namespace FD::Project::Limits {
 
 
 }
+
+namespace FD::Plot::Limits {
+
+	//ImPlot
+	struct Plot final {
+		FluidumUtils_Class_Delete_ConDestructor(Plot)
+	public:
+		static constexpr uint8_t PlotMax = 20;
+		static constexpr uint8_t FigureMax = 20;
+	};
+
+
+
+}
