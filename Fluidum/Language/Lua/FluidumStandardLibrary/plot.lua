@@ -1,38 +1,50 @@
 FPlot = {
 
-    --Create
-	Create = function(title ,labelX ,labelY)
+    --figure
+	Make = function(title ,labelX ,labelY)
 
-		--Default
-		if( type(title) == "nil")
+		--default
+		if type(title) == "nil" then
 			title = "NoName"
-		if( type(labelX) == "nil")
+		end
+		if type(labelX) == "nil" then
 			labelX = "x"
-		if( type(labelY) == "nil")
+		end
+		if type(labelY) == "nil" then
 			labelY = "y"
+		end
 		
-		local number<const> = FPlot.Create(title,labelX,labelY)
+		--identify
+		local number<const> = _Internal_Plot_.Make(title,labelX,labelY)
 			    
 		local plotIndex = 1
 
+		
 	    return --return table
 	    {
+			--plot
+			MakePlot = function(valuesX ,valuesY)
+			
+				local plotNumber<const> = _Internal_Plot_.MakePlot(number)
+
+			    if type(valuesX) ~= "nil" then
+			    	_Internal_Plot_.Plot(valuesX ,valuesY)
+			    end
+			    
+			    	
+			    return --return table
+			    {
+			        
+			    }
+			end,
+
 			SetMarker = function(marker)	
 				_Internal_Plot_.SetMarker(number ,plotIndex, marker)
 			end,
 
 			PushBack = function(x ,y)
 				_Internal_Plot_.PushBack(number ,plotIndex ,x ,y)
-			end,
-
-			SetPlotIndex = function(index)
-				plotIndex = index
-			end,
-
-			GetPlotIndex = function()
-				return plotIndex
 			end
-
 	    
 	    }
 

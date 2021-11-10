@@ -214,9 +214,12 @@ void FS::TopBar::calc() {
 	ImGui::SetNextWindowPos(ImVec2(style.windowSize.x * 0.4f, style.windowPos.y));
 	ImGui::SetNextWindowSize(ImVec2(style.windowSize.x * 0.3f, style.windowSize.y));
 
-	ImGui::Begin("Calc", nullptr, Internal::Bar::commonWindowFlag | ImGuiWindowFlags_NoBackground);
+	ImGui::Begin("Run", nullptr, Internal::Bar::commonWindowFlag | ImGuiWindowFlags_NoBackground);
 	this->separator(ImGui::GetWindowPos().x + 2.0f, { 0.3f,0.2f,0.2f,1.0f });
 	ImGui::Spacing(); ImGui::SameLine();
+
+	this->mode();
+	ImGui::SameLine();
 
 	bool isRunning = sceneRead->isExist<Lua::Calc>();
 
@@ -274,6 +277,18 @@ void FS::TopBar::calc() {
 	ImGui::End();
 
 	this->playCheck();
+}
+
+void FS::TopBar::mode() {
+	ImGui::SetNextItemWidth(ImGui::GetWindowWidth()*0.275f);
+	if (!ImGui::BeginCombo("##Mode", "Debug"))
+		return;
+
+	if (ImGui::Selectable("Standard"))
+		std::cout << "a";
+
+
+	ImGui::EndCombo();
 }
 
 void FS::TopBar::run() {

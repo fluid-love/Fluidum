@@ -17,6 +17,7 @@ namespace FD::Internal::Log {
 		static inline std::uint16_t currentIndex = 0;
 
 		static void insert(std::string&& message);
+		static void insert(const std::string& message);
 
 		static inline std::atomic_bool writeFlag = false;
 		static inline std::mutex mtx{};
@@ -38,7 +39,7 @@ namespace FD {
 
 	public:
 		template<Log::Type Ty, typename... U>
-		void add(const std::string& message, U&&... values) {
+		std::string add(const std::string& message, U&&... values) {
 
 			std::string type = FU::Log::getTypeText<Ty>();
 
@@ -54,7 +55,8 @@ namespace FD {
 			std::cout << result << std::endl;
 #endif
 
-			Internal::Log::Data::insert(std::move(result));
+			Internal::Log::Data::insert(result);
+			return result;
 		}
 
 	private:

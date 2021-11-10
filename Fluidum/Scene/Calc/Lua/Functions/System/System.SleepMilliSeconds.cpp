@@ -1,4 +1,4 @@
-#include "../lua.h"
+#include "../../lua.h"
 
 FS::Lua::Ret FS::Lua::Calc::sleepMilliSeconds(State L) {
 	check.numOfArgs_min<Type::System_SleepMilliSeconds>(L, 1);

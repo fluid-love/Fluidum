@@ -209,6 +209,8 @@ bool FS::Bar::SaveAs::save() {
 		}
 	}
 	catch (const std::exception& e) {
+		GLog.add<FD::Log::Type::Error>("Catch std::exception \"{}\".", e.what());
+
 		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
 		Scene::addScene<Utils::Message>(text.error_failed, pos.save);
 	}

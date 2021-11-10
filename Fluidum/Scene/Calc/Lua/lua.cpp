@@ -72,6 +72,9 @@ void FS::Lua::Calc::call() {
 			//errorÇæÇ™ì‡ïîÉGÉâÅ[Ç≈ÇÕÇ»Ç¢ÇÃÇ≈Type::LogÇ≈ãLò^
 			GLog.add<FD::Log::Type::None>("Lua RuntimeError.");
 		}
+		catch (const Internal::InternalError& e) {
+			GLog.add<FD::Log::Type::Error>("Lua Fluidum InternalError. File {}.", e.file);
+		}
 	}
 
 	GLog.add<FD::Log::Type::None>("Request delete LuaCalcScene.");
@@ -122,9 +125,9 @@ void FS::Lua::Calc::registerCppFunctions() {
 	//FSystem direct
 	{
 		const luaL_Reg regs[] = {
-				{"SleepSeconds" , &dispatch<&Calc::sleepSeconds>},
-				{"SleepMilliSeconds" , &dispatch<&Calc::sleepMilliSeconds>},
-				{"Terminate" , &dispatch<&Calc::terminate>},
+				{"SleepSeconds"      , &dispatch<&Calc::sleepSeconds>      },
+				{"SleepMilliSeconds" , &dispatch<&Calc::sleepMilliSeconds> },
+				{"Terminate"         , &dispatch<&Calc::terminate>         },
 
 				{nullptr,nullptr}
 		};
@@ -135,9 +138,11 @@ void FS::Lua::Calc::registerCppFunctions() {
 	//_Internal_Plot_
 	{
 		const luaL_Reg regs[] = {
-				{"Create" , &dispatch<&Calc::plot_create>},
-				{"SetMarker" , &dispatch<&Calc::plot_setMarker>},
-				{"PushBack" , &dispatch<&Calc::plot_pushBack>},
+				{"Make"      , &dispatch<&Calc::plot_make>      },
+				{"MakePlot"  , &dispatch<&Calc::plot_makePlot>  },
+				{"Plot"      , &dispatch<&Calc::plot_plot>      },
+				{"SetMarker" , &dispatch<&Calc::plot_setMarker> },
+				{"PushBack"  , &dispatch<&Calc::plot_pushBack>  },
 
 				{nullptr,nullptr}
 		};

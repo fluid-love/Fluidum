@@ -61,10 +61,10 @@
 //
 //			for (const auto& y : x.data) {
 //				ImPlot::SetNextMarkerStyle(static_cast<ImPlotMarker>(y.marker));
-//				if (y.type == FD::Plot::PlotType::LINE)
-//					ImPlot::PlotLine(x.figure.title.c_str(), y.valuesX.data(), y.valuesY.data(), static_cast<int>(y.valuesX.size()));
-//				//	else if (data.type == PlotType::BAR)
-//				//		ImPlot::PlotBars(x.figure.name.c_str(), data.valuesY.data(), 2);
+//				if (y.type == FD::Plot::ImPlotType::LINE)
+//					ImPlot::PlotLine(x.figure.title.c_str(), y.values1.data(), y.values2.data(), static_cast<int>(y.values1.size()));
+//				//	else if (data.type == ImPlotType::BAR)
+//				//		ImPlot::PlotBars(x.figure.name.c_str(), data.values2.data(), 2);
 //			}
 //			ImPlot::EndPlot();
 //		}

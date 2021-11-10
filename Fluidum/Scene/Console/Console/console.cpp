@@ -49,7 +49,7 @@ void FS::Console::console() {
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, { 0.01f,0.01f,0.01f,1.0f });
 
 	const auto size = ImGui::GetWindowSize();
-	ImGui::BeginChild("Console", { size.x * 0.98f,size.y * 0.8f }, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+	ImGui::BeginChild("Console", { size.x * 0.98f,size.y * 0.8f },false,ImGuiWindowFlags_AlwaysVerticalScrollbar);
 	ImGui::SetWindowFontScale(style.fontSizeScale);
 
 	ImGuiListClipper clipper;

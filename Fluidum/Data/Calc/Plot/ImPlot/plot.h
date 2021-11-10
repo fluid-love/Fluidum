@@ -1,6 +1,5 @@
 #pragma once
 
-#include "limit.h"
 #include "type.h"
 
 namespace FD {
@@ -12,16 +11,57 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(ImPlotWrite)
 
 	public:
+		enum class Exception : uint8_t {
+			FigureSize,
+			PlotSize,
+			SameSize
+		};
 
-		//–ß‚è’l‚ÍŒ»Ý‚ÌPlot‚ÌŒÂ”-1 == index
-		_NODISCARD Plot::FigureIndex addFigure(const char* title, const char* axisLabelX, const char* axisLabelY);
+	public:
 
-		//void setPlotType(const Plot::FigureIndex figureIndex, const Plot::PlotIndex dataIndex, const Plot::PlotType type);
+		//return fogure index
+		/*
+		Exception:
+			FigureSize -> MaxSize
+		*/
+		_NODISCARD Plot::FigureIndex addFigure(const char* title, const char* axisLabelX, const char* axisLabelY) const;
 
-		void setMarker(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const ImPlotMarker marker) const noexcept;
+		//return plot index
+		/*
+		Exception:
+			FigureSize -> figureIndex >= GPlot.size()
+			PlotSize   -> MaxSize
+		*/
+		_NODISCARD Plot::PlotIndex addPlot(const Plot::FigureIndex figureIndex) const;
 
-		void pushBack(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const double x, const double y);
 
+		/*
+		Exception:
+			FigureSize -> figureIndex >= GPlot.size()
+			PlotSize   -> MaxSize
+			SameSize   -> dataX != dataY
+		*/
+		void addPlot(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, std::vector<Plot::Val>&& valuesX, std::vector<Plot::Val>&& valuesY) const;
+
+		//void setPlotType(const Plot::FigureIndex figureIndex, const Plot::PlotIndex dataIndex, const Plot::ImPlotType type);
+
+		/*
+		Exception:
+			FigureSize -> figureIndex >= GPlot.size()
+			PlotSize   -> plotIndex >= plots size
+		*/
+		void setMarker(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const ImPlotMarker marker) const;
+
+		void pushBack(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const double x, const double y) const;
+
+	public:
+		void clear() const;
+
+	public:
+		void reset() const;
+
+	private:
+		void checkFigureAndPlotSize(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex) const;
 
 	};
 
@@ -34,7 +74,7 @@ namespace FD {
 	public:
 		_NODISCARD Plot::FigureIndex figureSize() const;
 
-		_NODISCARD const std::map<Plot::FigureIndex, FD::Plot::PlotData>* get() const;
+		_NODISCARD const std::vector<FD::Plot::PlotData>* get() const;
 
 		std::unique_lock<std::mutex> getLock() const;
 

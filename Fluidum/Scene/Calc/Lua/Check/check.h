@@ -8,6 +8,12 @@ namespace FS::Lua::Internal {
 
 	class Exception final {};
 
+	class InternalError final {
+	public:
+		explicit InternalError(const char* const file) : file(file) {}
+		const char* const file;
+	};
+
 	class Check {
 	public:
 		explicit Check(FD::ConsoleWrite* const consoleWrite) : consoleWrite(consoleWrite) {}
@@ -28,7 +34,7 @@ namespace FS::Lua::Internal {
 				Message message(LogType::NumOfArgs_Min);
 				GLog.add<FD::Log::Type::None>(message, magic_enum::enum_name<Type>(), size, correctSize);
 				//consoleWrite->add
-				throw Exception();;
+				throw Exception();
 			}
 
 

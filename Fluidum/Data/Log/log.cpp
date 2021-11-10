@@ -11,6 +11,17 @@ void FD::Internal::Log::Data::insert(std::string&& message) {
 	}
 }
 
+void FD::Internal::Log::Data::insert(const std::string& message) {
+	std::lock_guard<std::mutex> lock(mtx);
+	data[currentIndex] = message;
+
+	currentIndex++;
+	if (currentIndex >= LogArraySize) {
+		writeFlag.store(true);
+		currentIndex = 0;
+	}
+}
+
 void FD::LogWrite::file(const bool all) {
 
 	//ì‚Á‚½‚Í‚¸‚Ìdirectory‚ª‚È‚¢

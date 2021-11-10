@@ -22,7 +22,6 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\container.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\function.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\lua.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\limit.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Coding\tab.h" />
@@ -160,6 +159,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Log\log.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\type.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\table.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\new.h" />
@@ -168,6 +168,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\common.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Common\log.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\resource.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\using.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Console\Console\console.h" />
@@ -281,13 +282,16 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Status\statusbar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot.Create.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot.Marker.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot.PushBack.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.SleepMilliSeconds.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.SleepSeconds.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System.Terminate.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.MakePlot.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Make.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Marker.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Plot.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.PushBack.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.SleepMilliSeconds.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.SleepSeconds.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.Terminate.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\table.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\new.cpp" />
@@ -326,6 +330,7 @@
     <ClCompile Include="..\..\..\Libraries\implot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Fluidum\Language\Lua\FluidumStandardLibrary\plot.lua" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingSelect" />
@@ -342,6 +347,7 @@
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Title" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\TitleBar" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\TopBar" />
+    <None Include="..\..\..\Resources\Log\Lua\LuaMessage.jpn" />
     <None Include="..\..\..\Test\test.lua" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

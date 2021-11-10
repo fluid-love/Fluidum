@@ -1,54 +1,29 @@
 #include "plot.h"
-
-//FD::Plot::Result operator|(const FD::Plot::Result l, const FD::Plot::Result r) {
-//	return static_cast<FD::Plot::Result>(static_cast<std::underlying_type_t<FD::Plot::Result>>(l) | static_cast<std::underlying_type_t<FD::Plot::Result>>(r));
-//}
-//
-//void operator|=(FD::Plot::Result& l, const FD::Plot::Result r) {
-//	l = l | r;
-//}
+#include "../../../Limits/limits.h"
 
 namespace FD {
-	class Index final {
-	public:
-		void operator++(int) noexcept {
-			i++;
-		}
-
-		Plot::FigureIndex get() const noexcept {
-			return this->i;
-		}
-
-		void reset() noexcept {
-			this->i = 0;
-		}
-	private:
-		Plot::FigureIndex i = 0;
-	}GIndex;
 
 	//GPlot
-	std::map<Plot::FigureIndex, FD::Plot::PlotData> GPlot = {};
+	std::vector<FD::Plot::PlotData> GPlot = {};
 	std::mutex GMtx;
 }
 
-
-FD::Plot::FigureIndex FD::ImPlotWrite::addFigure(const char* title, const char* axisLabelX, const char* axisLabelY) {
+FD::Plot::FigureIndex FD::ImPlotWrite::addFigure(const char* title, const char* axisLabelX, const char* axisLabelY) const {
 	std::lock_guard<std::mutex> lock(GMtx);
 
-	assert(FD::Plot::Limit::FigureMax >= GPlot.size());
+	if (FD::Plot::Limits::Plot::FigureMax >= GPlot.size())
+		throw Exception::FigureSize;
 
 	Plot::PlotData plot = {};
 	plot.figure.axisLabelX = axisLabelX;
 	plot.figure.axisLabelY = axisLabelY;
 	plot.figure.title = title;
 
-	GIndex++;
-	GPlot.insert({ GIndex.get(),std::move(plot) });
-
-	return GIndex.get();
+	GPlot.emplace_back(std::move(plot));
+	return static_cast<Plot::FigureIndex>(GPlot.size() - 1);
 }
 
-//void FD::ImPlotWrite::setPlotType(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const Plot::PlotType type) {
+//void FD::ImPlotWrite::setPlotType(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const Plot::ImPlotType type) {
 //	std::lock_guard<std::mutex> lock(GMtx);
 //
 //	Plot::Result result = Plot::Result::SUCCESS;
@@ -67,36 +42,76 @@ FD::Plot::FigureIndex FD::ImPlotWrite::addFigure(const char* title, const char* 
 //	return result;
 //}
 
-void FD::ImPlotWrite::setMarker(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const ImPlotMarker marker) const noexcept {
+FD::Plot::PlotIndex FD::ImPlotWrite::addPlot(const Plot::FigureIndex figureIndex)const {
 	std::lock_guard<std::mutex> lock(GMtx);
 
-	if (!GPlot.contains(figureIndex))
-		throw std::runtime_error("Failed to set ImPlotMarker.");
+	if (figureIndex >= GPlot.size())
+		throw Exception::FigureSize;
 
-	GPlot.at(figureIndex).data[plotIndex].marker = marker;
+	if (FD::Plot::Limits::Plot::PlotMax >= GPlot[figureIndex].plots.size())
+		throw Exception::PlotSize;
+
+	GPlot[figureIndex].plots.emplace_back();
+
+	return static_cast<Plot::PlotIndex>(GPlot[figureIndex].plots.size() - 1);
 }
 
-void FD::ImPlotWrite::pushBack(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const double x, const double y) {
+void FD::ImPlotWrite::addPlot(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, std::vector<Plot::Val>&& valuesX, std::vector<Plot::Val>&& valuesY) const {
+	std::lock_guard<std::mutex> lock(GMtx);
+
+	this->checkFigureAndPlotSize(figureIndex, plotIndex);
+
+	if (valuesX.size() != valuesY.size())
+		Exception::SameSize;
+
+	GPlot[figureIndex].plots[plotIndex].values1 = std::move(valuesX);
+	GPlot[figureIndex].plots[plotIndex].values2 = std::move(valuesY);
+
+}
+
+void FD::ImPlotWrite::setMarker(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const ImPlotMarker marker) const {
+	std::lock_guard<std::mutex> lock(GMtx);
+
+	this->checkFigureAndPlotSize(figureIndex, plotIndex);
+
+	GPlot[figureIndex].plots[plotIndex].marker = marker;
+}
+
+void FD::ImPlotWrite::pushBack(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const double x, const double y) const {
 	std::lock_guard<std::mutex> lock(GMtx);
 
 	assert(GPlot.size() > plotIndex);
 
 	auto& plot = GPlot.at(plotIndex);
 
-	assert(FD::Plot::Limit::PlotMax >= plot.data.size());
+	//assert(FD::Plot::Limit::PlotMax >= plot.data.size());
 
-	if (plot.data.size() <= plotIndex) {
-		plot.data.resize(plotIndex + 1);
+	//if (plot.data.size() <= plotIndex) {
+	//	plot.data.resize(plotIndex + 1);
 
-		plot.data[plotIndex].valuesX.reserve(1000);
-		plot.data[plotIndex].valuesY.reserve(1000);
-	}
+	//	plot.data[plotIndex].values1.reserve(1000);
+	//	plot.data[plotIndex].values2.reserve(1000);
+	//}
 
-	plot.data[plotIndex].valuesX.emplace_back(x);
-	plot.data[plotIndex].valuesY.emplace_back(y);
+
+	//plot.data[plotIndex].values1.emplace_back(x);
+	//plot.data[plotIndex].values2.emplace_back(y);
 }
 
-const std::map<FD::Plot::FigureIndex, FD::Plot::PlotData>* FD::ImPlotRead::get() const {
+void FD::ImPlotWrite::reset() const {
+	std::lock_guard<std::mutex> lock(GMtx);
+	GPlot.clear();
+	GPlot.shrink_to_fit();
+}
+
+void FD::ImPlotWrite::checkFigureAndPlotSize(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex) const {
+	if (figureIndex >= GPlot.size())
+		throw Exception::FigureSize;
+	if (plotIndex >= GPlot[figureIndex].plots.size())
+		throw Exception::PlotSize;
+}
+
+const std::vector<FD::Plot::PlotData>* FD::ImPlotRead::get() const {
 	return &GPlot;
 }
 
@@ -106,5 +121,5 @@ std::unique_lock<std::mutex> FD::ImPlotRead::getLock() const {
 
 FD::Plot::FigureIndex FD::ImPlotRead::figureSize() const {
 	std::lock_guard<std::mutex> lock(GMtx);
-	return GPlot.size();
+	return static_cast<Plot::FigureIndex>(GPlot.size());
 }
