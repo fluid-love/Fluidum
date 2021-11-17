@@ -38,6 +38,46 @@ namespace FD {
 
 
 	};
+}
+
+//forward
+namespace FD {
+	class LayoutWrite;
+	class LayoutRead;
+	class ProjectWrite;
+}
+
+namespace FD::Layout {
+
+	struct DockSpaceWindow final {
+		ImVec2 pos = ImVec2();
+		ImVec2 size = ImVec2();
+	private:
+		DockSpaceWindow* identifier = nullptr;
+	private:
+		friend class LayoutWrite;
+	};
+
+	namespace Internal {
+		struct LayoutData final {
+			FluidumUtils_Class_Delete_ConDestructor(LayoutData)
+		private:
+			static inline ImVec2 leftPos{};
+			static inline ImVec2 rightPos{};
+			static inline std::vector<std::shared_ptr<DockSpaceWindow>> windows{};
+
+		private:
+			static inline std::mutex mtx{};
+			static inline std::atomic_bool save = false;
+		private:
+			friend class LayoutWrite;
+			friend class LayoutRead;
+			friend class ProjectWrite;
+		};
+	}
+}
+
+namespace FD {
 
 	class LayoutWrite final {
 	public:
@@ -46,13 +86,31 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(LayoutWrite)
 
 	public:
-		void leftLayoutPos(const ImVec2& vec2) const noexcept;
-		void leftLayoutSize(const ImVec2& vec2) const noexcept;
-		void rightLayoutPos(const ImVec2& vec2) const noexcept;
-		void rightLayoutSize(const ImVec2& vec2) const noexcept;
+		void leftPos(const ImVec2& vec2) const;
+		void rightPos(const ImVec2& vec2) const;
 
-		void leftDockSpaceID(const ImGuiID id) const noexcept;
-		void rightDockSpaceID(const ImGuiID id) const noexcept;
+	public:
+		void push(Layout::DockSpaceWindow& window) const;
+
+		void splitVertical(const Layout::DockSpaceWindow& window, const float posX);
+		void splitHorizonal(const Layout::DockSpaceWindow& window, const float posY);
+		void splitCross(const Layout::DockSpaceWindow& window, const ImVec2& pos);
+
+
+	public:
+		void update(const Layout::DockSpaceWindow& window);
+
+
+	public:
+		void save() const noexcept;
+
+	private:
+		std::vector<std::shared_ptr<Layout::DockSpaceWindow>>::iterator find(const Layout::DockSpaceWindow& window) const;
+		void checkItrEnd(const std::vector<std::shared_ptr<Layout::DockSpaceWindow>>::iterator itr) const;
+
+		bool isRightMost(const Layout::DockSpaceWindow& window) const;
+		bool isBottomMost(const Layout::DockSpaceWindow& window) const;
+
 
 	};
 
@@ -63,18 +121,20 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(LayoutRead)
 
 	public:
-		_NODISCARD const ImVec2& leftLayoutPos() const noexcept;
-		_NODISCARD const ImVec2& leftLayoutSize() const noexcept;
-		_NODISCARD const ImVec2& rightLayoutPos() const noexcept;
-		_NODISCARD const ImVec2& rightLayoutSize() const noexcept;
+		[[nodiscard]] const ImVec2& leftPos() const;
+		[[nodiscard]] const ImVec2& rightPos() const;
 
-		_NODISCARD ImGuiID leftLayoutID() const noexcept;
-		_NODISCARD ImGuiID rightLayoutID() const noexcept;
+	public:
+		[[nodiscard]] Layout::DockSpaceWindow get(const uint16_t index) const;
+
+	public:
+		[[nodiscard]] bool empty() const;
+		[[nodiscard]] uint16_t size() const;
 
 	};
 }
 
-namespace FD{
+namespace FD {
 
 	class ImGuiWindowWrite final {
 	public:
@@ -86,7 +146,7 @@ namespace FD{
 		//require: std::same_as<T, ImGuiWindow*>
 		//avoid #include <imgui_internal.h>
 		template<typename T>
-		void set(const FU::Class::ClassCode::CodeType classCode,T windowPtr) const;
+		void set(const FU::Class::ClassCode::CodeType classCode, T windowPtr) const;
 
 
 
@@ -101,7 +161,8 @@ namespace FD{
 
 	public:
 		//return ImGuiWindow*
-		_NODISCARD auto get(const FU::Class::ClassCode::CodeType classCode) const;
+		template<typename T>
+		[[nodiscard]] T get(const FU::Class::ClassCode::CodeType classCode) const;
 
 	};
 

@@ -3,7 +3,7 @@
 FS::Lua::Ret FS::Lua::Calc::sleepSeconds(State L) {
 
 	check.numOfArgs_min<Type::System_SleepSeconds>(L, 1);
-	check.argType_intNum<Type::System_SleepSeconds>(L, { CoreType::Number });
+	check.argType_intNum<Type::System_SleepSeconds>(L, { LuAssist::Type::Number });
 
 	const Num sleepTimeSeconds = lua_tonumber(L, 1);
 	auto time = std::chrono::duration<Num>(sleepTimeSeconds);

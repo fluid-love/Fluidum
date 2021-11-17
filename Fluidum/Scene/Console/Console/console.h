@@ -26,6 +26,8 @@ namespace FS {
 		FD::ConsoleWrite* const consoleWrite;
 		const FD::ConsoleRead* const consoleRead;
 
+		bool windowFlag = true;
+
 	private:
 		std::string inputText{};
 
@@ -41,10 +43,14 @@ namespace FS {
 		}style;
 
 	private:
+		void closeWindow();
+
+	private:
 		void console();
 
 	private:
 		void input();
+		void push();
 
 	private:
 		void changeFontSize();

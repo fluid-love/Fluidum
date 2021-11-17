@@ -30,14 +30,40 @@ namespace FD::Internal::Text {
 
 	};
 
+	struct Layout final {
+		Layout();
+		~Layout() = default;
+
+		GuiText splitVerticalCurrentPos;
+		GuiText splitHorizonalCurrentPos;
+		GuiText splitCrossCurrentPos;
+
+		GuiText splitVerticalCenterLine;
+		GuiText splitHorizonalCenterLine;
+		GuiText splitCrossCenterLine;
+
+
+		GuiText merge;
+
+
+	};
+
 	struct TitleBar final {
 		TitleBar();
 		~TitleBar() = default;
 
-		GuiText popupMessage;
-		GuiText saveAndExit;
-		GuiText withoutSaving;
-		GuiText cancel;
+	};
+
+	struct BarExit final {
+		BarExit();
+		~BarExit() = default;
+
+		GuiText popup_projectMessage;
+		GuiText popup_codingTabMessage;
+
+		GuiText popup_saveAndExit;
+		GuiText popup_withoutSaving;
+		GuiText popup_cancel;
 
 	};
 
@@ -67,11 +93,31 @@ namespace FD::Internal::Text {
 		GuiText edit;
 
 		GuiText calc;
-		GuiText run;
-		GuiText runIgnoreStep;
+		GuiText run_debug;
+		GuiText run_nomal;
 		GuiText calcInfo;
 
 		GuiText view;
+		GuiText coding;
+		GuiText tab;
+		GuiText debugInfo;
+		GuiText flu;
+		GuiText analysis;
+		GuiText function;
+		GuiText plot;
+		GuiText genome;
+		GuiText animation;
+		GuiText project;
+		GuiText console;
+
+		GuiText project_;
+
+		GuiText extension;
+		GuiText manage;
+
+		GuiText window;
+		GuiText layoutTemplates;
+		GuiText clear;
 
 		GuiText help;
 		GuiText document;
@@ -89,6 +135,7 @@ namespace FD::Internal::Text {
 		GuiText error_brokenFile;
 		GuiText error_internal;
 
+		GuiText confirm_changeLayout;
 
 
 	};
@@ -370,6 +417,7 @@ namespace FD::Internal::Text {
 
 namespace FD::Text {
 	using ::FD::Internal::Text::Title;
+	using ::FD::Internal::Text::Layout;
 	using ::FD::Internal::Text::TitleBar;
 	using ::FD::Internal::Text::StatusBar;
 	using ::FD::Internal::Text::MenuBar;
@@ -385,6 +433,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::ProjectSaveAs;
 	using ::FD::Internal::Text::Project;
 	using ::FD::Internal::Text::AnalysisOverview;
+	using ::FD::Internal::Text::BarExit;
 
 }
 

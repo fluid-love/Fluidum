@@ -309,7 +309,7 @@ void FS::TextEditor::checkLua() {
 	}
 
 	current->editor->SetErrorMarkers(markers);
-	Lua::pop(luaState);
+	LuAssist::Utils::popAll(luaState);
 }
 
 void FS::TextEditor::checkPython() {

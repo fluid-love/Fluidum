@@ -1,37 +1,3 @@
-//#pragma once
-//
-//#include "../../common/FSusing.h"
-//
-//#include <implot/implot.h>
-//#include <imgui_internal.h>
-//
-//namespace FS {
-//
-//	class Plot final :public Scene {
-//	public:
-//		explicit Plot(Manager* manager,FD::ImPlotRead* plot);
-//		void Constructor(FD::ImPlotRead);
-//
-//		~Plot();
-//
-//	public:
-//		virtual void update() override;
-//		virtual void draw() override;
-//
-//	private://data
-//		FD::ImPlotRead* plot = nullptr;
-//
-//	private://data
-//		ImGuiID dockID = {};
-//		std::vector<ImGuiWindow*> plotWindows = {};
-//
-//	private:
-//		void dockSpaceGui();
-//		void plotGui();
-//
-//	};
-//}
-
 #pragma once
 
 #include "../../Common/common.h"
@@ -40,9 +6,15 @@ namespace FS::Analysis {
 
 	class Plot final : public Scene {
 	public:
-		explicit Plot();
+		explicit Plot(
+			const FD::ImPlotRead_Lock* const implotRead,
+			FD::ImPlotWrite* const implotWrite
+		);
 
-		void Constructor();
+		void Constructor(
+			FD::ImPlotRead_Lock,
+			FD::ImPlotWrite
+		);
 
 		~Plot() noexcept;
 
@@ -51,7 +23,17 @@ namespace FS::Analysis {
 	public:
 		virtual void call() override;
 
+	private:
+		const FD::ImPlotRead_Lock* const implotRead;
+		FD::ImPlotWrite* const implotWrite;
 
+	private:
+		ImGuiID dockSpaceID{};
+
+	private:
+		void dockSpace();
+		void empty();
+		void plot();
 
 	};
 }

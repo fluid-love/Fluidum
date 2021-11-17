@@ -11,32 +11,3 @@ namespace FS::Lua {
 	using State = FD::Calc::Lua::State;
 
 }
-
-namespace FS::Lua {
-	enum class CoreType :uint16_t {
-		Integer,
-		Number,
-		String,
-		Function,
-		Table,
-		Boolean,
-		Nil,
-	};
-
-	enum class Type : uint16_t {
-		Integer,
-		Number,
-		String,
-		Function,
-		CppFunctionN,
-		Table,
-		Userdata,
-		LightUserData,
-		Bpplean,
-		Thread,
-		None,
-		Nil,
-		NoneOrNil
-	};
-
-}

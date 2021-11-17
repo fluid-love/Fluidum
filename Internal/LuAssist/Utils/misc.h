@@ -1,20 +1,36 @@
 #pragma once
 
-#include "table.h"
+#include "../Common/type.h"
 
-namespace FS::Lua {
+namespace LuAssist::Utils {
 
 	void printStack(State L);
-	void pop(State L);
-	void popAndPushFalse(State L);
-	void popAndPushTrue(State L);
 
-	//integer > number
-	std::vector<CoreType> getCoreTypes(State L);
+	void popAll(State L);
+	void popAllAndPushFalse(State L);
+	void popAllAndPushTrue(State L);
 
-	_NODISCARD std::size_t getArgSize(State L);
+	[[nodiscard]] std::vector<BasicType> basicTypes(State L);
 
-	const char* getCoreTypeName(const CoreType type) noexcept;
+	//integer       > number
+	//cfnction      > function
+	//lightuserdata > userdata
+	[[nodiscard]] Type type(State L,const int32_t index);
+	[[nodiscard]] std::vector<Type> types(State L);
+
+
+	[[nodiscard]] std::size_t numOfArgs(State L);
+
+
+	const char* typeName(const Type type) noexcept;
+
+	//[Source {},Line {}]
+	[[nodiscard]] std::string getSrcCurrentLine(State L,const int32_t depth);
+
+	[[nodiscard]] int32_t lineDefined(State L);
+	[[nodiscard]] int32_t currentLine(State L);
+
+	[[nodiscard]] int32_t size(State L);
 
 	//void setPosColorVerticesAndListIndices(LuaType::State L, FD::Object::Vertices* vertices, FD::Object::Indices* indices);
 	//void setPosColorVertices(LuaType::State L, FD::Object::Vertices* vertices,const std::vector<uint32_t>& changedIndices);

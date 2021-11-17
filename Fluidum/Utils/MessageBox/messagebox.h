@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <boost/predef.h>
-#include <GLFW/glfw3native.h>
 #include "../Concept/concept.h"
 #include <string>
 #include <array>
@@ -80,5 +79,18 @@ namespace FU::MB {
 	//ok     -> return 0
 	//cancel -> return 1
 	int32_t ok_cancel(const char* message);
+
+}
+
+namespace FU::MB {
+
+	int32_t child_button_button_cancel(
+		const Icon iconType,
+		const char* message,
+		const char* childMessage,
+		const char* button1,
+		const char* button2,
+		const char* cancelButton = nullptr
+	);
 
 }

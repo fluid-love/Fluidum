@@ -208,3 +208,14 @@ bool FD::Coding::TabRead::update_isTextSaved() const {
 	return result;
 }
 
+std::vector<std::string> FD::Coding::TabRead::notSavedTexts() const {
+	std::lock_guard<std::mutex> lock(TabData::mtx);
+
+	std::vector<std::string> ret{};
+
+	for (auto& x : GData) {
+		if (!x.second.get()->isTextSaved)
+			ret.emplace_back(x.first);
+	}
+	return ret;
+}

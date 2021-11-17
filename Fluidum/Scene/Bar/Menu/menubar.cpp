@@ -1,12 +1,20 @@
 #include "menubar.h"
 #include <nfd.h>
 
+#include "../Title/Exit/exit.h"
+
 #include "Project/newproject.h"
 #include "Project/saveas.h"
 
 #include "../../Utils/Popup/backwindow.h"
 #include "../../Utils/Popup/popupselect.h"
 #include "../../Utils/Popup/message.h"
+#include "../../Utils/Popup/internal_error.h"
+#include "../../Utils/Scene/deleteAll.h"
+
+#include "../../Calc/Run/run.h"
+
+#include "../../Utils/Scene/include.h"
 
 using namespace FU::ImGui::Operators;
 
@@ -17,7 +25,11 @@ FS::MenuBar::MenuBar(
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
 	FD::Coding::TabWrite* const tabWrite,
-	const FD::Coding::TabRead* const tabRead
+	const FD::Coding::TabRead* const tabRead,
+	const FD::FluidumFilesRead* const fluidumFilesRead,
+	const FD::CalcRead* const calcRead,
+	FD::CalcWrite* const calcWrite,
+	const FD::SceneRead* const sceneRead
 ) :
 	projectWrite(projectWrite),
 	projectRead(projectRead),
@@ -25,13 +37,17 @@ FS::MenuBar::MenuBar(
 	guiRead(guiRead),
 	guiWrite(guiWrite),
 	tabWrite(tabWrite),
-	tabRead(tabRead)
+	tabRead(tabRead),
+	fluidumFilesRead(fluidumFilesRead),
+	calcRead(calcRead),
+	calcWrite(calcWrite),
+	sceneRead(sceneRead)
 {
 	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
 
 	const auto size = ImGui::GetFontSize() * 0.45f;
 	style.offset = { size ,size };
-
+	style.itemSpacing = { 0.0f ,size };
 	guiWrite->menuBarHeight(ImGui::GetFontSize() + size * 2.0f);
 
 }
@@ -55,6 +71,7 @@ FS::MenuBar::~MenuBar() {
 }
 
 void FS::MenuBar::call() {
+
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, style.offset);//å˙Ç›ÇÇ‡ÇΩÇπÇÈ
 
 	//MenuBarÇÃÉTÉCÉYÇÕImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2
@@ -78,15 +95,17 @@ void FS::MenuBar::call() {
 
 	ImGui::Begin("MenuBar", nullptr, flag);
 	if (ImGui::BeginMenuBar()) {
-		//dummy for icon
+		//dummy: for Fluidum icon
 		if (ImGui::BeginMenu("   "))
 			ImGui::EndMenu();
 
-
 		this->fileGui();
 		this->editGui();
-		this->calc();
+		this->calcGui();
 		this->viewGui();
+		this->projectGui();
+		this->extensionGui();
+		this->windowGui();
 		this->helpGui();
 
 		ImGui::EndMenuBar();
@@ -100,24 +119,24 @@ void FS::MenuBar::call() {
 
 void FS::MenuBar::fileGui() {
 
-	if (ImGui::BeginMenu(text.file)) {
+	if (!ImGui::BeginMenu(text.file))
+		return;
 
-		this->itemCreateNewProject();
-		ImGui::Spacing();
-		this->itemOpen();
-		ImGui::Spacing();
-		this->itemSave();
-		ImGui::Spacing();
-		this->itemSaveAs();
+	this->pushItemSpacing();
 
-		ImGui::Spacing();
-		ImGui::Separator();
-		ImGui::Spacing();
+	this->itemCreateNewProject();
+	this->itemOpen();
+	this->itemSave();
+	this->itemSaveAs();
 
-		this->itemExit();
+	ImGui::Separator();
+	ImGui::Spacing();
 
-		ImGui::EndMenu();
-	}
+	this->itemExit();
+
+	ImGui::EndMenu();
+
+	ImGui::PopStyleVar();
 }
 
 void FS::MenuBar::itemCreateNewProject() {
@@ -202,70 +221,357 @@ void FS::MenuBar::itemSaveAs() {
 }
 
 void FS::MenuBar::itemExit() {
-	//ï¬Ç∂ÇÈÇÕê‘Ç≠Ç∑ÇÈ
+	//red
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
+
 	if (!ImGui::MenuItem(text.terminate)) {
 		ImGui::PopStyleColor();
 		return;
 	}
-	GLog.add<FD::Log::Type::None>("Request Terminate.");
 
-	if (projectRead->isDefaultProject()) {
-		auto index = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.checkCurrentProject, text.saveAndExit, text.exitWithoutSaving, text.cancel);
-		if (index == 0) {//save
+	GLog.add<FD::Log::Type::None>("Request Exit.");
 
-		}
-		else if (index == 1) {//without saving
+	GLog.add<FD::Log::Type::None>("Request Add Bar::ExitScene.");
+	Scene::addScene<Bar::Exit>();
 
-		}
-		else {//cancel
-			ImGui::PopStyleColor();
-			return;
-		}
-	}
-
-	*windowWrite->getCloseFlag() = true;
 	ImGui::PopStyleColor();
 }
 
 void FS::MenuBar::editGui() {
-	if (ImGui::BeginMenu(text.edit)) {
+	if (!ImGui::BeginMenu(text.edit))
+		return;
 
-		ImGui::EndMenu();
-	}
+	this->pushItemSpacing();
+
+
+	ImGui::EndMenu();
+
+	ImGui::PopStyleVar();
 }
 
-void FS::MenuBar::calc() {
-	if (ImGui::BeginMenu(text.calc)) {
+void FS::MenuBar::calcGui() {
+	if (!ImGui::BeginMenu(text.calc))
+		return;
 
-		ImGui::Spacing();
-		if (ImGui::MenuItem(text.run)) {
+	bool exist = fluidumFilesRead->isMainCodeFileExist();
 
-		}
-		ImGui::Spacing();
-		if (ImGui::MenuItem(text.runIgnoreStep)) {
+	this->pushItemSpacing();
 
-		}
-		ImGui::Spacing();
-		if (ImGui::MenuItem(text.calcInfo)) {
-
-		}
-
-		ImGui::EndMenu();
+	if (ImGui::MenuItem(text.run_debug, nullptr, false, exist)) {
+		this->itemRunDebugMode();
 	}
 
+	if (ImGui::MenuItem(text.run_nomal, nullptr, false, exist)) {
+		this->itemRunNormalMode();
+	}
+
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	if (ImGui::MenuItem(text.calcInfo)) {
+
+	}
+
+	ImGui::EndMenu();
+
+	ImGui::PopStyleVar();
+}
+
+void FS::MenuBar::itemRunDebugMode() {
+	if (calcRead->mode() != FD::Calc::Mode::Debug) {
+		calcWrite->mode(FD::Calc::Mode::Debug);
+		calcWrite->save();
+	}
+
+	GLog.add<FD::Log::Type::None>("Request add Calc::RunScene.");
+	Scene::addScene<Calc::Run>();
+}
+
+void FS::MenuBar::itemRunNormalMode() {
+	if (calcRead->mode() != FD::Calc::Mode::Normal) {
+		calcWrite->mode(FD::Calc::Mode::Normal);
+		calcWrite->save();
+	}
+
+	GLog.add<FD::Log::Type::None>("Request add Calc::RunScene.");
+	Scene::addScene<Calc::Run>();
 }
 
 void FS::MenuBar::viewGui() {
-	if (ImGui::BeginMenu(text.view)) {
+	if (!ImGui::BeginMenu(text.view))
+		return;
 
+	//once
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered()) {
+		this->updateView();
+	}
+
+	this->pushItemSpacing();
+
+	if (ImGui::BeginMenu(text.coding)) {
+		this->itemCoding();
 		ImGui::EndMenu();
 	}
+
+	if (ImGui::BeginMenu(text.flu)) {
+		this->itemFlu();
+		ImGui::EndMenu();
+	}
+
+	if (ImGui::BeginMenu(text.analysis)) {
+		this->itemAnalysis();
+		ImGui::EndMenu();
+	}
+
+	if (ImGui::BeginMenu(text.genome)) {
+		this->itemGenome();
+		ImGui::EndMenu();
+	}
+
+	if (ImGui::BeginMenu(text.animation)) {
+		this->itemAnimation();
+		ImGui::EndMenu();
+	}
+
+	if (ImGui::BeginMenu(text.project)) {
+		this->itemProject();
+		ImGui::EndMenu();
+	}
+
+	if (ImGui::BeginMenu(text.console)) {
+		this->itemConsole();
+		ImGui::EndMenu();
+	}
+
+	ImGui::PopStyleVar();
+
+	ImGui::EndMenu();
+}
+
+void FS::MenuBar::updateView() {
+	view.coding = sceneRead->isExist<TextEditor>();
+	view.tab = sceneRead->isExist<Coding::Tab>();
+	view.debug = sceneRead->isExist<Coding::Debug>();
+
+	view.flu = sceneRead->isExist<Flu::Node>();
+
+	view.analysis = sceneRead->isExist<Analysis::Overview>();
+	view.plot = sceneRead->isExist<Analysis::Plot>();
+	view.function = sceneRead->isExist<Analysis::Function>();
+
+	view.genome = sceneRead->isExist<Genome::Overview>();
+
+	view.animation = sceneRead->isExist<Animation>();
+
+	view.project = sceneRead->isExist<Project>();
+
+	view.console = sceneRead->isExist<Console>();
+}
+
+void FS::MenuBar::windowGui() {
+	if (!ImGui::BeginMenu(text.window))
+		return;
+
+	if (ImGui::BeginMenu(text.layoutTemplates)) {
+		this->itemLayoutTemplates();
+	}
+
+	ImGui::EndMenu();
+}
+
+void FS::MenuBar::itemLayoutTemplates() {
+	if (!ImGui::MenuItem(text.clear, nullptr)) {
+		if (this->layoutConfirm())
+			this->setLayoutEmpty();
+	}
+
+	if (!ImGui::MenuItem(text.coding, nullptr)) {
+		if (this->layoutConfirm())
+			this->setLayoutCoding();
+	}
+}
+
+bool FS::MenuBar::layoutConfirm() {
+	GLog.add<FD::Log::Type::None>("Set layout template.");
+
+	const auto clicked = FU::MB::ok_cancel(text.confirm_changeLayout);
+	if (clicked == 0) {//ok
+		return true;
+	}
+	else if (clicked == 1) {//cancel
+		return false;;
+	}
+
+	//else
+	FluidumScene_Log_InternalError();
+	FluidumScene_Log_CallSceneConstructor("Utils::InternalError");
+	Scene::callConstructor<Utils::InternalError>();
+	return false;
+}
+
+void FS::MenuBar::setLayoutEmpty() {
+	FluidumScene_Log_CallSceneConstructor("Utils::DeleteAllScenes");
+	Scene::callConstructor<Utils::DeleteAllScenes>();
+}
+
+void FS::MenuBar::setLayoutCoding() {
+	
+}
+
+void FS::MenuBar::extensionGui() {
+	if (!ImGui::BeginMenu(text.extension))
+		return;
+
+	if (ImGui::MenuItem(text.manage, nullptr, false, false)) {
+
+	}
+
+
+	ImGui::EndMenu();
+}
+
+void FS::MenuBar::itemCoding() {
+
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+		FluidumScene_Log_RequestTryAddScene("TextEditor");
+		Scene::tryAddScene<TextEditor>();
+		ImGui::CloseCurrentPopup();
+	}
+
+	if (ImGui::MenuItem(text.tab, nullptr, view.tab, view.coding)) {
+		FluidumScene_Log_RequestAddScene("Coding::Tab");
+		Scene::addScene<Coding::Tab>();
+	}
+
+	if (ImGui::MenuItem(text.debugInfo, nullptr, view.debug, view.coding)) {
+		FluidumScene_Log_RequestAddScene("Coding::Debug");
+		Scene::addScene<Coding::Debug>();
+	}
+}
+
+void FS::MenuBar::itemFlu() {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+		if (view.flu) {
+			FluidumScene_Log_RequestDeleteScene("Flu::Node");
+			Scene::deleteScene<Flu::Node>();
+		}
+		else {
+			FluidumScene_Log_RequestAddScene("Flu::Node");
+			Scene::addScene<Flu::Node>();
+		}
+		ImGui::CloseCurrentPopup();
+	}
+}
+
+void FS::MenuBar::itemAnalysis() {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+		if (view.analysis) {
+			FluidumScene_Log_RequestDeleteScene("Analysis::Plot");
+			Scene::deleteScene<Analysis::Plot>();
+			FluidumScene_Log_RequestDeleteScene("Analysis::Function");
+			Scene::deleteScene<Analysis::Function>();
+			FluidumScene_Log_RequestDeleteScene("Analysis::Overview");
+			Scene::deleteScene<Analysis::Overview>();
+		}
+		else {
+			FluidumScene_Log_RequestAddScene("Analysis::Overview");
+			Scene::addScene<Analysis::Overview>();
+		}
+
+		ImGui::CloseCurrentPopup();
+	}
+
+	if (ImGui::MenuItem(text.plot, nullptr, view.plot, view.analysis)) {
+		if (view.plot) {
+			FluidumScene_Log_RequestDeleteScene("Analysis::Plot");
+			Scene::deleteScene<Analysis::Plot>();
+		}
+		else {
+			FluidumScene_Log_RequestAddScene("Analysis::Plot");
+			Scene::addScene<Analysis::Plot>();
+		}
+	}
+
+	if (ImGui::MenuItem(text.function, nullptr, view.function, view.analysis)) {
+		if (view.function) {
+			FluidumScene_Log_RequestDeleteScene("Analysis::Function");
+			Scene::deleteScene<Analysis::Function>();
+		}
+		else {
+			FluidumScene_Log_RequestAddScene("Analysis::Function");
+			Scene::addScene<Analysis::Function>();
+		}
+	}
+}
+
+void FS::MenuBar::itemGenome() {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+		if (view.genome) {
+			FluidumScene_Log_RequestDeleteScene("Genome::Overview");
+			Scene::deleteScene<Genome::Overview>();
+		}
+		else {
+			FluidumScene_Log_RequestAddScene("Genome::Overview");
+			Scene::addScene<Genome::Overview>();
+		}
+		ImGui::CloseCurrentPopup();
+	}
+}
+
+void FS::MenuBar::itemAnimation() {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+		if (view.animation) {
+			FluidumScene_Log_RequestDeleteScene("Animation");
+			Scene::deleteScene<Animation>();
+		}
+		else {
+			FluidumScene_Log_RequestAddScene("Animation");
+			Scene::addScene<Animation>();
+		}
+		ImGui::CloseCurrentPopup();
+	}
+}
+
+void FS::MenuBar::itemProject() {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+		if (view.project) {
+			FluidumScene_Log_RequestDeleteScene("Project");
+			Scene::deleteScene<Project>();
+		}
+		else {
+			FluidumScene_Log_RequestAddScene("Project");
+			Scene::addScene<Project>();
+		}
+		ImGui::CloseCurrentPopup();
+	}
+}
+
+void FS::MenuBar::itemConsole() {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+		if (view.console) {
+			FluidumScene_Log_RequestDeleteScene("Console");
+			Scene::deleteScene<Console>();
+		}
+		else {
+			FluidumScene_Log_RequestAddScene("Console");
+			Scene::addScene<Console>();
+		}
+		ImGui::CloseCurrentPopup();
+	}
+}
+
+void FS::MenuBar::projectGui() {
+	if (!ImGui::BeginMenu(text.project_))
+		return;
+
+	ImGui::EndMenu();
 }
 
 void FS::MenuBar::helpGui() {
 	if (!ImGui::BeginMenu(text.help))
 		return;
+
+	this->pushItemSpacing();
 
 	if (ImGui::MenuItem("github")) {
 #ifdef BOOST_OS_WINDOWS
@@ -289,18 +595,12 @@ void FS::MenuBar::helpGui() {
 
 	ImGui::EndMenu();
 
+	ImGui::PopStyleVar();
 }
 
-
-
-
-
-
-
-
-
-
-
+void FS::MenuBar::pushItemSpacing() {
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f ,ImGui::GetStyle().ItemSpacing.y * 2.2f });
+}
 
 
 

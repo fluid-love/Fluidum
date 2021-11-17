@@ -1,7 +1,7 @@
 #include "../../lua.h"
 
 FS::Lua::Ret FS::Lua::Calc::plot_make(State L) {
-	check.argType<Type::Plot_Make>(L, { CoreType::String,CoreType::String,CoreType::String });
+	check.argType<Type::Plot_Make>(L, { LuAssist::Type::String,LuAssist::Type::String,LuAssist::Type::String });
 
 	String title = lua_tostring(L, 1);
 	String axisX = lua_tostring(L, 2);
@@ -17,7 +17,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_make(State L) {
 		if (value == FigureSize) {
 			//ŠÖ”FPlot.Create‚ªŒÄ‚Î‚ê‚Ü‚µ‚½‚ªì¬‚Å‚«‚éFigure‚ÌÅ‘å”‚ğ’´‚¦‚Ü‚µ‚½DÅ‘å”{}D
 			Message message(LogType::Plot_Figure_Max);
-			std::string log = GLog.add<FD::Log::Type::None>(message, FD::Plot::Limits::Plot::FigureMax);
+			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), FD::Plot::Limits::Plot::FigureMax);
 			consoleWrite->add(std::move(log));
 			throw Internal::Exception();
 		}
@@ -26,7 +26,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_make(State L) {
 		throw Lua::Internal::InternalError(__FILE__);
 	}
 
-	Lua::pop(L);
+	LuAssist::Utils::popAll(L);
 	lua_pushinteger(L, index);
 	return 1;
 }

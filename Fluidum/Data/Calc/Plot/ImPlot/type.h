@@ -43,6 +43,8 @@ namespace FD::Plot {
 	struct PlotData final {
 		Figure figure;
 		std::vector<Data> plots;//•`Ê‚·‚éü
+
+		bool display = true;
 	};
 
 }

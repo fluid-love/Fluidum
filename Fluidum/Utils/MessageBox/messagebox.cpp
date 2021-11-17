@@ -112,3 +112,55 @@ int32_t FU::MB::ok_cancel(const char* message) {
 #endif
 
 }
+
+int32_t FU::MB::child_button_button_cancel(
+	const Icon iconType,
+	const char* message,
+	const char* childMessage,
+	const char* button1,
+	const char* button2,
+	const char* cancelButton
+) {
+#ifdef BOOST_OS_WINDOWS
+/*
+	const GLFWvidmode* screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+	auto hwnd = CreateWindow(
+		TEXT("STATIC"), TEXT("Fluidum"),
+		WS_SYSMENU | WS_BORDER | WS_CAPTION & WS_MINIMIZEBOX,
+		screen->width /3.0f, screen->height / 3.0f, screen->width / 3.0f, screen->height / 3.0f, NULL, NULL,
+		GetModuleHandle(NULL), NULL
+	);
+	SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	ShowWindow(hwnd, SW_SHOW);
+
+
+	auto message = CreateWindow(
+		TEXT("STATIC"), TEXT("Kitty on your lap"),
+		WS_BORDER,
+		10, 10, 100, 100, hwnd, NULL,
+		GetModuleHandle(NULL), NULL
+	);
+
+	CreateWindowEx(
+		WS_EX_LEFT, TEXT("BUTTON"), TEXT("Stand by Ready!!"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		100, 100, 100, 40,
+		hwnd, NULL, GetModuleHandle(NULL), NULL
+	);
+
+	MSG msg{};
+	while (TRUE) {
+		GetMessage(&msg, NULL, 0, 0);
+		if (msg.message == WM_LBUTTONUP) break;
+		DispatchMessage(&msg);
+	}
+
+	DestroyWindow(hwnd);
+*/
+#else
+#error Not Supported
+#endif
+
+	return 0;
+}

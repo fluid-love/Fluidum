@@ -8,8 +8,7 @@
 #include "../Bar/Title/titlebar.h"
 
 //layout
-#include "../Layout/Left/layout.h"
-#include "../Layout/Right/layout.h"
+#include "../Layout/layout.h"
 
 //project
 #include "../Bar/Menu/Project/newproject.h"
@@ -120,29 +119,27 @@ void FS::Title::writeGuiData() {
 
 void FS::Title::changeScene() {
 	if ((!isSelectProjectHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !sceneRead->isExist<Bar::NewProject>()) || !projectRead->isDefaultProject()) {
-		GLog.add<FD::Log::Type::None>("Request delete TitleScene.");
+		FluidumScene_Log_RequestDeleteScene("Title");
 		Scene::deleteScene<Title>();//delete this
 
-		//add Bar scenes
-		GLog.add<FD::Log::Type::None>("Request add MenuBarScene.");
+		//Bar scenes
+		FluidumScene_Log_RequestAddScene("MenuBar");
 		Scene::addScene<MenuBar>();
-		GLog.add<FD::Log::Type::None>("Request add StatusBarScene.");
+		FluidumScene_Log_RequestAddScene("StatusBar");
 		Scene::addScene<StatusBar>();
-		GLog.add<FD::Log::Type::None>("Request add TopBarScene.");
+		FluidumScene_Log_RequestAddScene("TopBar");
 		Scene::addScene<TopBar>();
-		GLog.add<FD::Log::Type::None>("Request add LeftBarScene.");
+		FluidumScene_Log_RequestAddScene("LeftBar");
 		Scene::addScene<LeftBar>(std::move(this->leftBarImages.value()));
-		GLog.add<FD::Log::Type::None>("Request add TitleBarScene.");
+		FluidumScene_Log_RequestAddScene("TitleBar");
 		Scene::addScene<TitleBar>();
 
-		//add Layout scenes
-		GLog.add<FD::Log::Type::None>("Request add LeftLayoutScene.");
-		Scene::addScene<LeftLayout>();
-		GLog.add<FD::Log::Type::None>("Request add RightLayoutScene.");
-		Scene::addScene<RightLayout>();
+		//Layout scene
+		FluidumScene_Log_RequestAddScene("Layout");
+		Scene::addScene<Layout>();
 
 		const auto codes = projectRead->loadSceneFile();
-		GLog.add<FD::Log::Type::None>("Request add Utils::AddScenesScene.");
+		FluidumScene_Log_RequestAddScene("Utils::AddScenes");
 		Scene::addScene<Utils::AddScenes>(codes);
 	}
 }

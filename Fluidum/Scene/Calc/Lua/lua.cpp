@@ -157,10 +157,13 @@ void FS::Lua::Calc::registerLuaLibraries() {
 	luaL_openlibs(state);//standard library
 
 	//Fluidum Standard library
-	std::string folderPath = Resource::LuaFolderPath;
+	std::string folderPath = Resource::LuaFluidumStandardLibraryFolderPath;
 
 	auto result = luaL_dofile(state, (folderPath + "plot.lua").c_str());
-	assert(result == LUA_OK);
+	if (result != LUA_OK) {
+		std::string log = GLog.add<FD::Log::Type::Error>("lual_doFile(plot.lua) return value was not LUA_OK.");
+		throw std::runtime_error(log);
+	}
 
 
 }

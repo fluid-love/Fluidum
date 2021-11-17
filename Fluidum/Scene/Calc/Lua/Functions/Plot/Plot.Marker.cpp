@@ -56,7 +56,7 @@ namespace FS {
 
 FS::Lua::Ret FS::Lua::Calc::plot_setMarker(State L) {
 	//figure index, data index, marker
-	check.argType<Type::Plot_SetMarker>(L, { CoreType::Integer,CoreType::Integer,CoreType::String });
+	check.argType<Type::Plot_SetMarker>(L, { LuAssist::Type::Integer,LuAssist::Type::Integer,LuAssist::Type::String });
 
 	const Val figureIndex = lua_tointeger(L, 1);
 	const Val plotIndex = lua_tointeger(L, 2) - 1;
@@ -70,9 +70,9 @@ FS::Lua::Ret FS::Lua::Calc::plot_setMarker(State L) {
 		mkr = toMarker(marker);
 	}
 	catch (const Internal::Exception) {
-		//FPlot SetMarkerの引数に無効な文字列が渡されました．渡された文字列{}．正しい文字列{}．
+		//{}関数SetMarkerの引数に無効な文字列が渡されました．渡された文字列{}．正しい文字列{}．
 		Message message(LogType::Plot_MarkerStr);
-		std::string log = GLog.add<FD::Log::Type::None>(message, marker, markerStr());
+		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), marker, markerStr());
 		consoleWrite->add(std::move(log));
 		std::rethrow_exception(std::current_exception());
 	}
@@ -86,7 +86,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_setMarker(State L) {
 		if (value == FigureSize || value == PlotSize) {
 			FluidumScene_Log_EnumClass_Error(value);
 		}
-		
+
 		FluidumScene_Console_InternalError;
 		throw Lua::Internal::InternalError(__FILE__);
 	}

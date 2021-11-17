@@ -394,9 +394,6 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.h">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Left\layout.h">
-      <Filter>Fluidum\Scene\Layout\Left</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.h">
       <Filter>Fluidum\Scene\Coding\TextEditor</Filter>
     </ClInclude>
@@ -405,9 +402,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\select.h">
       <Filter>Fluidum\Scene\Coding\Select</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.h">
-      <Filter>Fluidum\Scene\Calc\Lua\Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h">
       <Filter>Fluidum\Scene\Calc\Lua</Filter>
@@ -438,9 +432,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.h">
       <Filter>Fluidum\Scene\Bar\Menu\Project</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Right\layout.h">
-      <Filter>Fluidum\Scene\Layout\Right</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\TextEditor\include.h">
       <Filter>Fluidum\TextEditor</Filter>
@@ -547,8 +538,47 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\log.h">
       <Filter>Fluidum\Scene\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\table.h">
-      <Filter>Fluidum\Scene\Calc\Lua\Utils</Filter>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.h">
+      <Filter>Fluidum\Scene\Bar\Title\Exit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Calc\calc.h">
+      <Filter>Fluidum\Data\Calc\Calc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Run\run.h">
+      <Filter>Fluidum\Scene\Calc\Run</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Data\reset.h">
+      <Filter>Fluidum\Scene\Utils\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Internal\LuAssist\Utils\table.h">
+      <Filter>Fluidum\Internal\LuAssist\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Internal\LuAssist\Utils\misc.h">
+      <Filter>Fluidum\Internal\LuAssist\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Internal\LuAssist\Common\type.h">
+      <Filter>Fluidum\Internal\LuAssist\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Internal\LuAssist\type.h">
+      <Filter>Fluidum\Internal\LuAssist</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Internal\LuAssist\utils.h">
+      <Filter>Fluidum\Internal\LuAssist</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\internal_error.h">
+      <Filter>Fluidum\Scene\Utils\Popup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\deleteAll.h">
+      <Filter>Fluidum\Scene\Utils\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\delete.h">
+      <Filter>Fluidum\Scene\Utils\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\include.h">
+      <Filter>Fluidum\Scene\Utils\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Layout\layout.h">
+      <Filter>Fluidum\Scene\Layout</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -747,12 +777,6 @@
     <Filter Include="Fluidum\Scene\Utils\Popup">
       <UniqueIdentifier>{6e259c61-3218-468e-ad70-3a27621b7187}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\Scene\Layout\Left">
-      <UniqueIdentifier>{f3a6b268-5460-4a9f-baf7-a31b59df6162}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fluidum\Scene\Layout\Right">
-      <UniqueIdentifier>{05e71de4-dde6-427c-b088-550bc724aa99}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\Scene\Coding\Tab">
       <UniqueIdentifier>{a2fa313b-7a09-4ded-a08d-a5308af474af}</UniqueIdentifier>
     </Filter>
@@ -770,9 +794,6 @@
     </Filter>
     <Filter Include="Fluidum\Scene\Calc\Lua\Functions">
       <UniqueIdentifier>{e122e0e9-3d68-4217-989f-77d306a30981}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fluidum\Scene\Calc\Lua\Utils">
-      <UniqueIdentifier>{eb21a6d8-e757-4a95-929f-1f3950547f9d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Fluidum\Scene\Bar">
       <UniqueIdentifier>{4daf10b2-223e-40ef-97ff-ac170fa34e3b}</UniqueIdentifier>
@@ -926,6 +947,30 @@
     </Filter>
     <Filter Include="Resources\Log\Lua">
       <UniqueIdentifier>{b18c7184-b42a-4278-bc00-f5a50ed4c859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Bar\Title\Exit">
+      <UniqueIdentifier>{416911c9-7b1a-44c7-8500-741162cd3d69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Data\Calc\Calc">
+      <UniqueIdentifier>{3dc72f19-0aa8-4e9e-b963-17f4c0253a65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Calc\Run">
+      <UniqueIdentifier>{5e0eb6ee-4f81-449b-a44c-190e72e18525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Utils\Data">
+      <UniqueIdentifier>{23e84ab5-67a8-4edc-a728-9d9bdb70b133}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Internal">
+      <UniqueIdentifier>{c813ce84-2b4a-44f6-9d95-7a43dde6296a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Internal\LuAssist">
+      <UniqueIdentifier>{8ce698fb-8307-4b5d-81eb-8c169687d8e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Internal\LuAssist\Utils">
+      <UniqueIdentifier>{f33b695b-134c-464f-96ca-cdb6713682a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Internal\LuAssist\Common">
+      <UniqueIdentifier>{4af7f0d4-9b78-4cff-a199-4dd603dd1e79}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1136,9 +1181,6 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.cpp">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Left\layout.cpp">
-      <Filter>Fluidum\Scene\Layout\Left</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.cpp">
       <Filter>Fluidum\Scene\Coding\TextEditor</Filter>
     </ClCompile>
@@ -1147,9 +1189,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\select.cpp">
       <Filter>Fluidum\Scene\Coding\Select</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp">
       <Filter>Fluidum\Scene\Calc\Lua</Filter>
@@ -1177,9 +1216,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.cpp">
       <Filter>Fluidum\Scene\Bar\Menu\Project</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Right\layout.cpp">
-      <Filter>Fluidum\Scene\Layout\Right</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\TextEditor\Source\texteditor.cpp">
       <Filter>Fluidum\TextEditor\Source</Filter>
@@ -1298,8 +1334,38 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.MakePlot.cpp">
       <Filter>Fluidum\Scene\Calc\Lua\Functions\Plot</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\table.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Utils</Filter>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.cpp">
+      <Filter>Fluidum\Scene\Bar\Title\Exit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Calc\Calc\calc.cpp">
+      <Filter>Fluidum\Data\Calc\Calc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Run\run.cpp">
+      <Filter>Fluidum\Scene\Calc\Run</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Data\reset.cpp">
+      <Filter>Fluidum\Scene\Utils\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Internal\LuAssist\Utils\table.cpp">
+      <Filter>Fluidum\Internal\LuAssist\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Internal\LuAssist\Utils\misc.cpp">
+      <Filter>Fluidum\Internal\LuAssist\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Hide.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Display.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\internal_error.cpp">
+      <Filter>Fluidum\Scene\Utils\Popup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Scene\deleteAll.cpp">
+      <Filter>Fluidum\Scene\Utils\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Layout\layout.cpp">
+      <Filter>Fluidum\Scene\Layout</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1357,8 +1423,14 @@
     <None Include="..\..\..\Fluidum\Language\Lua\FluidumStandardLibrary\plot.lua">
       <Filter>Fluidum\Language\Lua\FluidumStandardLibrary</Filter>
     </None>
-    <None Include="..\..\..\Resources\Log\Lua\LuaMessage.jpn">
+    <None Include="..\..\..\Resources\Log\Lua\jpn">
       <Filter>Resources\Log\Lua</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\BarExit">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Layout">
+      <Filter>Resources\GuiText</Filter>
     </None>
   </ItemGroup>
 </Project>

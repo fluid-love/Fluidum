@@ -21,11 +21,11 @@ FS::Analysis::Overview::~Overview() noexcept {
 }
 
 void FS::Analysis::Overview::call() {
-	ImGui::Begin("AnalysisOverview",&windowShouldClose);
+	ImGui::Begin("AnalysisOverview", &windowShouldClose);
 	this->setWindowInfo();
 
-	this->function();
-	
+	this->tab();
+
 	ImGui::End();
 
 	this->closeWindow();
@@ -41,7 +41,52 @@ void FS::Analysis::Overview::closeWindow() {
 
 void FS::Analysis::Overview::setWindowInfo() {
 	constexpr auto code = FU::Class::ClassCode::GetClassCode<Overview>();
-	imguiWindowWrite->set(code,ImGui::GetCurrentWindow());
+	imguiWindowWrite->set(code, ImGui::GetCurrentWindow());
+}
+
+void FS::Analysis::Overview::tab() {
+	if (!ImGui::BeginTabBar("AnaOverview"))
+		return;
+
+	ImGui::Spacing();
+
+	ImGui::PushStyleColor(ImGuiCol_TabActive, { 0.2f,0.3f,0.75f,0.3f });
+
+	if (ImGui::BeginTabItem("plot")) {
+		this->plot();
+		ImGui::EndTabItem();
+	}
+	if (ImGui::BeginTabItem("func")) {
+		this->function();
+		ImGui::EndTabItem();
+	}
+
+	ImGui::PopStyleColor();
+
+	ImGui::EndTabBar();
+}
+
+void FS::Analysis::Overview::empty() {
+	ImGui::Text("表示可能なデータがありません．");
+}
+
+void FS::Analysis::Overview::plot() {
+	if (implotRead->empty()) {
+		this->empty();
+		return;
+	}
+
+	if (!ImGui::BeginTable("table2", 2,ImGuiTableFlags_Borders))
+		return;
+
+	ImGui::TableNextRow();
+	ImGui::TableNextColumn();
+	ImGui::Text("FigureSize %d", implotRead->figureSize());
+	ImGui::TableNextColumn();
+	ImGui::Text("Some contents");
+
+	ImGui::EndTable();
+
 }
 
 void FS::Analysis::Overview::function() {

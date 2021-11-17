@@ -19,6 +19,7 @@
 
 #include "Coding/tab.h"
 
+#include "Calc/Calc/calc.h"
 #include "Calc/Function/function.h"
 #include "Calc/Plot/ImPlot/plot.h"
 

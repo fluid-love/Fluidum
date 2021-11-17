@@ -24,7 +24,7 @@ namespace FD {
 		Exception:
 			FigureSize -> MaxSize
 		*/
-		_NODISCARD Plot::FigureIndex addFigure(const char* title, const char* axisLabelX, const char* axisLabelY) const;
+		[[nodiscard]] Plot::FigureIndex addFigure(const char* title, const char* axisLabelX, const char* axisLabelY) const;
 
 		//return plot index
 		/*
@@ -32,8 +32,13 @@ namespace FD {
 			FigureSize -> figureIndex >= GPlot.size()
 			PlotSize   -> MaxSize
 		*/
-		_NODISCARD Plot::PlotIndex addPlot(const Plot::FigureIndex figureIndex) const;
+		[[nodiscard]] Plot::PlotIndex addPlot(const Plot::FigureIndex figureIndex) const;
 
+		/*
+		Exception:
+			FigureSize -> figureIndex >= GPlot.size()
+		*/
+		void popBackPlot(const Plot::FigureIndex figureIndex) const;
 
 		/*
 		Exception:
@@ -41,9 +46,8 @@ namespace FD {
 			PlotSize   -> MaxSize
 			SameSize   -> dataX != dataY
 		*/
-		void addPlot(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, std::vector<Plot::Val>&& valuesX, std::vector<Plot::Val>&& valuesY) const;
+		void setPlot(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, std::vector<Plot::Val>&& valuesX, std::vector<Plot::Val>&& valuesY) const;
 
-		//void setPlotType(const Plot::FigureIndex figureIndex, const Plot::PlotIndex dataIndex, const Plot::ImPlotType type);
 
 		/*
 		Exception:
@@ -54,6 +58,13 @@ namespace FD {
 
 		void pushBack(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex, const double x, const double y) const;
 
+		/*
+		Exception:
+			FigureSize -> figureIndex >= GPlot.size()
+		*/
+		void figureDisplay(const Plot::FigureIndex figureIndex) const;
+		void figureHide(const Plot::FigureIndex figureIndex) const;
+
 	public:
 		void clear() const;
 
@@ -61,7 +72,23 @@ namespace FD {
 		void reset() const;
 
 	private:
+		void checkFigureSize(const Plot::FigureIndex figureIndex) const;
 		void checkFigureAndPlotSize(const Plot::FigureIndex figureIndex, const Plot::PlotIndex plotIndex) const;
+
+	};
+
+	class ImPlotRead_Lock final {
+	public:
+		explicit ImPlotRead_Lock(Internal::PassKey) noexcept {};
+		~ImPlotRead_Lock() = default;
+		FluidumUtils_Class_Delete_CopyMove(ImPlotRead_Lock)
+
+	public:
+		[[nodiscard]] Plot::FigureIndex figureSize() const;
+
+		[[nodiscard]] const std::vector<FD::Plot::PlotData>* get() const;
+
+		std::unique_lock<std::mutex> getLock() const;
 
 	};
 
@@ -72,14 +99,12 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(ImPlotRead)
 
 	public:
-		_NODISCARD Plot::FigureIndex figureSize() const;
+		[[nodiscard]] Plot::FigureIndex figureSize() const;
 
-		_NODISCARD const std::vector<FD::Plot::PlotData>* get() const;
+		[[nodiscard]] bool empty() const;
 
-		std::unique_lock<std::mutex> getLock() const;
 
 	};
-
 
 
 }

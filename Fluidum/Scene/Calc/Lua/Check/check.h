@@ -1,7 +1,8 @@
 #pragma once
 
+#include <LuAssist/utils.h>
+
 #include "../type.h"
-#include "../Utils/utils.h"
 #include "../Log/log.h"
 
 namespace FS::Lua::Internal {
@@ -24,7 +25,7 @@ namespace FS::Lua::Internal {
 			assert(min != 0);
 			assert(max != 0);
 
-			const std::size_t size = getArgSize(L);
+			const std::size_t size = LuAssist::Utils::numOfArgs(L);
 
 			if (size == correctSize)
 				return;
@@ -48,7 +49,7 @@ namespace FS::Lua::Internal {
 
 		template<FD::Calc::Lua::FunctionType Type>
 		void numOfArgs_min(State L, const std::size_t correctSize) {
-			const std::size_t size = getArgSize(L);
+			const std::size_t size = LuAssist::Utils::numOfArgs(L);
 
 			if (size >= correctSize)
 				return;
@@ -59,14 +60,14 @@ namespace FS::Lua::Internal {
 		}
 
 		template<FD::Calc::Lua::FunctionType Type>
-		void argType(State L, const std::vector<CoreType>& correctTypes) {
+		void argType(State L, const std::vector<LuAssist::Type>& correctTypes) {
 			assert(!correctTypes.empty());
 
-			const auto types = getCoreTypes(L);
+			const auto types = LuAssist::Utils::types(L);
 
 			//numOfArgs
 			if (correctTypes.size() != types.size())
-				throw std::runtime_error("Internal Error.");
+				throw Internal::InternalError(__FILE__);
 
 
 			for (std::size_t i = 0, size = types.size(); i < size; i++) {
@@ -74,7 +75,7 @@ namespace FS::Lua::Internal {
 				if (!same) {
 					//ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
 					Message message(LogType::Type);
-					GLog.add<FD::Log::Type::None>(message, magic_enum::enum_name<Type>(), i + 1, getCoreTypeName(types[i]), getCoreTypeName(correctTypes[i]));
+					GLog.add<FD::Log::Type::None>(message, magic_enum::enum_name<Type>(), i + 1, LuAssist::Utils::typeName(types[i]), LuAssist::Utils::typeName(correctTypes[i]));
 					throw Exception();
 				}
 			}
@@ -82,24 +83,24 @@ namespace FS::Lua::Internal {
 		}
 
 		template<FD::Calc::Lua::FunctionType Type>
-		void argType_intNum(State L, const std::vector<CoreType>& correctTypes) {
+		void argType_intNum(State L, const std::vector<LuAssist::Type>& correctTypes) {
 			assert(!correctTypes.empty());
 
-			const auto types = getCoreTypes(L);
+			const auto types = LuAssist::Utils::types(L);
 
 			//numOfArgs
 			if (correctTypes.size() != types.size())
-				throw std::runtime_error("Internal Error.");
+				throw Internal::InternalError(__FILE__);
 
 			for (std::size_t i = 0, size = types.size(); i < size; i++) {
 				bool same = (correctTypes[i] == types[i]);
 				if (!same) {
-					if (correctTypes[i] == CoreType::Number && types[i] == CoreType::Integer)
+					if (correctTypes[i] == LuAssist::Type::Number && types[i] == LuAssist::Type::Integer)
 						;
 					else {
 						//ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
 						Message message(LogType::Type);
-						GLog.add<FD::Log::Type::None>(message, magic_enum::enum_name<Type>(), i + 1, getCoreTypeName(types[i]), getCoreTypeName(correctTypes[i]));
+						GLog.add<FD::Log::Type::None>(message, magic_enum::enum_name<Type>(), i + 1, LuAssist::Utils::typeName(types[i]), LuAssist::Utils::typeName(correctTypes[i]));
 						throw Exception();
 					}
 				}

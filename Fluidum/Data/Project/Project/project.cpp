@@ -38,29 +38,29 @@ void FD::ProjectWrite::save_thread() {
 	while (!request) {
 		request = this->saveThread.get_stop_token().stop_requested();
 		if (Internal::Coding::TabData::save) {
+			Internal::Coding::TabData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 			this->save_tab();
-			Internal::Coding::TabData::save.store(false);
 		}
 		if (Internal::Scene::Data::save) {
+			Internal::Scene::Data::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 			this->save_scene();
-			Internal::Scene::Data::save.store(false);
 		}
 		if (Project::Internal::FluidumFilesData::save) {
+			Project::Internal::FluidumFilesData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 			this->save_fluidumFiles();
-			Project::Internal::FluidumFilesData::save.store(false);
 		}
 		if (Project::Internal::ProjectFilesData::save) {
+			Project::Internal::ProjectFilesData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 			this->save_projectFiles();
-			Project::Internal::ProjectFilesData::save.store(false);
 		}
 		if (Project::Internal::UserFilesData::save) {
+			Project::Internal::UserFilesData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 			this->save_userFiles();
-			Project::Internal::UserFilesData::save.store(false);
 		}
 	}
 

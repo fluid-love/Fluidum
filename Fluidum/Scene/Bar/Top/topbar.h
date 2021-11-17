@@ -13,7 +13,9 @@ namespace FS {
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
 			const FD::TopBarRead* const topBarRead,
-			FD::TopBarWrite* const topBarWrite
+			FD::TopBarWrite* const topBarWrite,
+			const FD::ImGuiWindowRead* const imguiWindowRead,
+			const FD::LayoutRead* const layoutRead
 		);
 		void Constructor(
 			FD::ProjectRead,
@@ -22,7 +24,9 @@ namespace FS {
 			FD::GuiWrite,
 			FD::SceneRead,
 			FD::TopBarRead,
-			FD::TopBarWrite
+			FD::TopBarWrite,
+			FD::ImGuiWindowRead,
+			FD::LayoutRead
 		);
 
 		~TopBar() noexcept;
@@ -38,15 +42,14 @@ namespace FS {
 		const FD::SceneRead* const sceneRead;
 		const FD::TopBarRead* const topBarRead;
 		FD::TopBarWrite* const topBarWrite;
+		const FD::ImGuiWindowRead* const imguiWindowRead;
+		const FD::LayoutRead* const layoutRead;
 
 	private://data
 
 		struct {
 			ImVec2 windowPos = ImVec2();
 			ImVec2 windowSize = ImVec2();
-
-			ImVec2 packageWindowPos = ImVec2();
-			ImVec2 packageWindowSize = ImVec2();
 
 			const ImVec4 disableButtonColor = { 0.02f,0.02f,0.02f,0.4f };
 		}style;
@@ -72,20 +75,12 @@ namespace FS {
 		//}wait;
 		//FS::Parameter::Loading<> loadingParam = {};
 
-	private:
-		void packageGui();
-
-		void layoutGui();
-
-	private:
-		void templateGui();
-		void setTemplate(const uint16_t index);
 
 	private:
 		void projectNameGui();
 
 		void rightGui();
-		void backColorGui();
+
 		void areaGui();
 
 		void calc();

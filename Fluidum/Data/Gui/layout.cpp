@@ -1,5 +1,6 @@
 #include "layout.h"
-
+#include "../Limits/limits.h"
+// number of divisions
 namespace FD {
 	struct Gui final {
 		ImVec2 centerPos{};
@@ -66,71 +67,220 @@ float FD::GuiRead::statusBarHeight() const noexcept {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace FD {
-	struct Layout final {
-		ImVec2 leftLayoutPos;
-		ImVec2 leftLayoutSize;
-		ImVec2 rightLayoutPos;
-		ImVec2 rightLayoutSize;
+namespace FD::Layout {
+	struct AdjacentInfo final {
+		enum class Type : uint8_t {
+			Left,
+			Right,
+			Top,
+			Bottom
+		}type;
+		bool most = false;
+		DockSpaceWindow* window{};
 	};
-	struct ImGuiDockIDs final {
-		ImGuiID left{};
-		ImGuiID right{};
-	};
+	std::map<DockSpaceWindow*, std::vector<AdjacentInfo>> GAdjacent{};
 
-	ImGuiDockIDs GImGuiDockIDs{};
-	Layout GLayout = {};
+	[[nodiscard]] ImVec2 getRightPos(DockSpaceWindow* identifier) {
+		auto& vec = GAdjacent.at(identifier);
+		for (auto& x : vec) {
+			if (x.type == AdjacentInfo::Type::Right)
+				return x.window->pos;
+		}
+		assert(false);
+		ImVec2{};
+	}
 }
 
-void FD::LayoutWrite::leftLayoutPos(const ImVec2& vec2) const noexcept {
-	GLayout.leftLayoutPos = vec2;
+void FD::LayoutWrite::leftPos(const ImVec2& vec2) const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+	LayoutData::leftPos = vec2;
 }
 
-void FD::LayoutWrite::leftLayoutSize(const ImVec2& vec2) const noexcept {
-	GLayout.leftLayoutSize = vec2;
+void FD::LayoutWrite::rightPos(const ImVec2& vec2) const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+	LayoutData::rightPos = vec2;
 }
 
-void FD::LayoutWrite::rightLayoutPos(const ImVec2& vec2) const noexcept {
-	GLayout.rightLayoutPos = vec2;
+void FD::LayoutWrite::push(Layout::DockSpaceWindow& window) const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+
+	assert(LayoutData::windows.empty());
+
+	std::shared_ptr<Layout::DockSpaceWindow> ptr = std::make_shared<Layout::DockSpaceWindow>(window);
+	window.identifier = ptr.get();
+	LayoutData::windows.emplace_back(std::move(ptr));
+	LayoutData::windows.back()->identifier = LayoutData::windows.back().get();
+
+	Layout::GAdjacent.insert({ LayoutData::windows.back().get(), {} });
 }
 
-void FD::LayoutWrite::rightLayoutSize(const ImVec2& vec2) const noexcept {
-	GLayout.rightLayoutSize = vec2;
+void FD::LayoutWrite::splitVertical(const Layout::DockSpaceWindow& window, const float posX) {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+
+	auto itr = this->find(window);
+	this->checkItrEnd(itr);
+
+	std::vector<Layout::AdjacentInfo>& parentAdjacent = Layout::GAdjacent.at(window.identifier);
+
+	Layout::DockSpaceWindow newWindow{};
+	newWindow.pos = { posX, itr->get()->pos.y };
+	newWindow.size = itr->get()->size;
+
+	Layout::AdjacentInfo adjacent{};
+	adjacent.type = Layout::AdjacentInfo::Type::Left;
+	adjacent.most = this->isRightMost(window);//if parent == rightmost -> splitted window(new window) == rightmost
+	adjacent.window = window.identifier;
+
+	std::shared_ptr<Layout::DockSpaceWindow> ptr = std::make_shared<Layout::DockSpaceWindow>(newWindow);
+	LayoutData::windows.emplace_back(std::move(ptr));
+	LayoutData::windows.back()->identifier = LayoutData::windows.back().get();
+
+	//new window
+	Layout::GAdjacent.insert({ LayoutData::windows.back().get(), { adjacent } });
+
+	//update
+	{
+		Layout::AdjacentInfo info{};
+		info.type = Layout::AdjacentInfo::Type::Right;
+		info.most = adjacent.most;
+		info.window = LayoutData::windows.back().get();
+		parentAdjacent.emplace_back(info);
+	}
 }
 
-void FD::LayoutWrite::leftDockSpaceID(const ImGuiID id) const noexcept {
-	GImGuiDockIDs.left = id;
+void FD::LayoutWrite::splitHorizonal(const Layout::DockSpaceWindow& window, const float posY) {
+
 }
 
-void FD::LayoutWrite::rightDockSpaceID(const ImGuiID id) const noexcept {
-	GImGuiDockIDs.right = id;
+void FD::LayoutWrite::splitCross(const Layout::DockSpaceWindow& window, const ImVec2& pos) {
+
+}
+
+void FD::LayoutWrite::update(const Layout::DockSpaceWindow& window) {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+
+	auto itr = this->find(window);
+
+	if (itr == LayoutData::windows.end())
+		throw std::runtime_error("itr == end.");
+
+	Layout::DockSpaceWindow* old = itr->get();
+	if (
+		static_cast<uint32_t>(old->pos.x) == static_cast<uint32_t>(window.pos.x) &&
+		static_cast<uint32_t>(old->pos.y) == static_cast<uint32_t>(window.pos.y) &&
+		static_cast<uint32_t>(old->size.x) == static_cast<uint32_t>(window.size.x) &&
+		static_cast<uint32_t>(old->size.y) == static_cast<uint32_t>(window.size.y)
+		)
+	{
+		return;
+	}
+	*old = window;
+
+	std::vector<Layout::AdjacentInfo>& adjacent = Layout::GAdjacent.at(window.identifier);
+	for (auto& x : adjacent) {
+		using enum Layout::AdjacentInfo::Type;
+
+		if (x.type == Left) {
+			x.window->size.x = window.pos.x - x.window->pos.x;
+		}
+		else if (x.type == Right) {
+			x.window->pos.x = window.pos.x + window.size.x;
+
+			if (x.most) //rightmost
+				x.window->size.x = LayoutData::rightPos.x - x.window->pos.x;
+			else
+				x.window->size.x = Layout::getRightPos(window.identifier).x;
+		}
+		else if (x.type == Top) {
+
+		}
+		else {
+			assert(x.type == Bottom);
+		}
+
+	}
+
+
+}
+
+void FD::LayoutWrite::save() const noexcept {
+	using namespace Layout::Internal;
+	LayoutData::save.store(true);
+}
+
+std::vector<std::shared_ptr<FD::Layout::DockSpaceWindow>>::iterator FD::LayoutWrite::find(const Layout::DockSpaceWindow& window) const {
+	using namespace Layout::Internal;
+	return std::find_if(LayoutData::windows.begin(), LayoutData::windows.end(), [&](auto& x)
+		{
+			return window.identifier == x.get();
+		}
+	);
+}
+
+void FD::LayoutWrite::checkItrEnd(const std::vector<std::shared_ptr<Layout::DockSpaceWindow>>::iterator itr) const {
+	if (itr == Layout::Internal::LayoutData::windows.end())
+		throw std::runtime_error("itr == end().");
+}
+
+bool FD::LayoutWrite::isRightMost(const Layout::DockSpaceWindow& window) const {
+	auto& vec = Layout::GAdjacent.at(window.identifier);
+
+	for (auto& x : vec) {
+		if (x.type == Layout::AdjacentInfo::Type::Right)
+			return false;
+	}
+
+	return true;
+}
+
+bool FD::LayoutWrite::isBottomMost(const Layout::DockSpaceWindow& window) const {
+	auto& vec = Layout::GAdjacent.at(window.identifier);
+
+	for (auto& x : vec) {
+		if (x.type == Layout::AdjacentInfo::Type::Bottom)
+			return false;
+	}
+
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const ImVec2& FD::LayoutRead::leftLayoutPos() const noexcept {
-	return GLayout.leftLayoutPos;
+const ImVec2& FD::LayoutRead::leftPos() const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+	return LayoutData::leftPos;
 }
 
-const ImVec2& FD::LayoutRead::leftLayoutSize() const noexcept {
-	return GLayout.leftLayoutSize;
+const ImVec2& FD::LayoutRead::rightPos() const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+	return LayoutData::rightPos;
 }
 
-const ImVec2& FD::LayoutRead::rightLayoutPos() const noexcept {
-	return GLayout.rightLayoutPos;
+FD::Layout::DockSpaceWindow FD::LayoutRead::get(const uint16_t index) const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+	return *LayoutData::windows.at(index).get();
 }
 
-const ImVec2& FD::LayoutRead::rightLayoutSize() const noexcept {
-	return GLayout.rightLayoutSize;
+bool FD::LayoutRead::empty() const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+	return LayoutData::windows.empty();
 }
 
-ImGuiID FD::LayoutRead::leftLayoutID() const noexcept {
-	return GImGuiDockIDs.left;
+uint16_t FD::LayoutRead::size() const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+	return static_cast<uint16_t>(LayoutData::windows.size());
 }
 
-ImGuiID FD::LayoutRead::rightLayoutID() const noexcept {
-	return GImGuiDockIDs.right;
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -142,15 +292,15 @@ namespace FD {
 
 template<typename T>
 void FD::ImGuiWindowWrite::set(const FU::Class::ClassCode::CodeType classCode, T windowPtr) const {
-	try {
+	if (GImGuiWindows.contains(classCode))
 		GImGuiWindows.at(classCode) = windowPtr;
-	}
-	catch (const std::out_of_range&) {//!contains()
+	else
 		GImGuiWindows.insert({ classCode,windowPtr });
-	}
 }
 template void FD::ImGuiWindowWrite::set<ImGuiWindow*>(const FU::Class::ClassCode::CodeType, ImGuiWindow*) const;
 
-auto FD::ImGuiWindowRead::get(const FU::Class::ClassCode::CodeType classCode) const {
+template<typename T>
+T FD::ImGuiWindowRead::get(const FU::Class::ClassCode::CodeType classCode) const {
 	return GImGuiWindows.at(classCode);
 }
+template ImGuiWindow* FD::ImGuiWindowRead::get<ImGuiWindow*>(const FU::Class::ClassCode::CodeType) const;

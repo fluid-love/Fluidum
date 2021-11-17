@@ -1,6 +1,7 @@
 #include "text.h"
 
 #include "../../../Libraries/IconFontCppHeaders/IconsMaterialDesign.h"
+#include "../../../Libraries/IconFontCppHeaders/IconsFontAwesome5.h"
 
 namespace FD::Internal::Text {
 	using Language = ::FD::Text::Language;
@@ -14,9 +15,11 @@ namespace FD::Internal::Text {
 
 	enum class Type : uint8_t {
 		Analysis,
+		BarExit,
 		CodingNew,
 		CodingSelect,
 		CodingTab,
+		Layout,
 		LeftBar,
 		MenuBar,
 		NewProject,
@@ -48,6 +51,9 @@ namespace FD::Internal::Text {
 		if constexpr (T == Analysis) {
 			path += "Analysis";
 		}
+		else if constexpr (T == BarExit) {
+			path += "BarExit";
+		}
 		else if constexpr (T == CodingNew) {
 			path += "CodingNew";
 		}
@@ -56,6 +62,9 @@ namespace FD::Internal::Text {
 		}
 		else if constexpr (T == CodingTab) {
 			path += "CodingTab";
+		}
+		else if constexpr (T == Layout) {
+			path += "Layout";
 		}
 		else if constexpr (T == LeftBar) {
 			path += "LeftBar";
@@ -183,19 +192,63 @@ FD::Internal::Text::TitleBar::TitleBar() {
 	if (!ifs)
 		throw std::runtime_error("Failed to open TitleBar.");
 
+}
+
+FD::Internal::Text::Layout::Layout() {
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::Layout>(Getter::get()), std::ios::in);
+	if (!ifs)
+		throw std::runtime_error("Failed to open Layout.");
+
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->popupMessage = Internal::Text::newLine(ifs, data);
-	
-	std::getline(ifs, data);
-	this->saveAndExit = data;	
-	
-	std::getline(ifs, data);
-	this->withoutSaving = data;
+	this->splitVerticalCurrentPos = ICON_MD_BORDER_VERTICAL "  " + data;
 
 	std::getline(ifs, data);
-	this->cancel = data;
+	this->splitHorizonalCurrentPos = ICON_MD_BORDER_HORIZONTAL "  " + data;
+
+	std::getline(ifs, data);
+	this->splitCrossCurrentPos = ICON_MD_BORDER_INNER "  " + data;
+
+	std::getline(ifs, data);
+	this->splitVerticalCenterLine = ICON_MD_BORDER_VERTICAL "  " + data;
+
+	std::getline(ifs, data);
+	this->splitHorizonalCenterLine = ICON_MD_BORDER_HORIZONTAL "  " + data;
+
+	std::getline(ifs, data);
+	this->splitCrossCenterLine = ICON_MD_BORDER_INNER "  " + data;
+
+	std::getline(ifs, data);
+	this->merge = ICON_MD_HEALING "  " + data;
+
+}
+
+FD::Internal::Text::BarExit::BarExit() {
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::BarExit>(Getter::get()), std::ios::in);
+	if (!ifs)
+		throw std::runtime_error("Failed to open BarExit.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->popup_projectMessage = Internal::Text::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->popup_codingTabMessage = Internal::Text::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->popup_saveAndExit = data;
+
+	std::getline(ifs, data);
+	this->popup_withoutSaving = data;
+
+	std::getline(ifs, data);
+	this->popup_cancel = data;
 }
 
 FD::Internal::Text::StatusBar::StatusBar() {
@@ -230,22 +283,22 @@ FD::Internal::Text::MenuBar::MenuBar() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->file = data;//ファイル
+	this->file = data;
 
 	std::getline(ifs, data);
-	this->create = data;//新規作成
+	this->create = ICON_FA_PLUS "   " + data;;
 
 	std::getline(ifs, data);
-	this->open = data;//開く
+	this->open = ICON_FA_FOLDER_OPEN "   " + data;
 
 	std::getline(ifs, data);
-	this->save = data;//保存
+	this->save = ICON_FA_SAVE "   " + data;
 
 	std::getline(ifs, data);
-	this->saveFileAs = data;//名前を付けて保存
+	this->saveFileAs = ICON_FA_COPY "   " + data;
 
 	std::getline(ifs, data);
-	this->terminate = data;
+	this->terminate = ICON_FA_SIGN_OUT_ALT "   " + data;
 
 	std::getline(ifs, data);
 	this->edit = data;
@@ -254,16 +307,71 @@ FD::Internal::Text::MenuBar::MenuBar() {
 	this->calc = data;
 
 	std::getline(ifs, data);
-	this->run = data;
+	this->run_debug = ICON_FA_BUG "   " + data;
 
 	std::getline(ifs, data);
-	this->runIgnoreStep = data;
+	this->run_nomal = ICON_FA_RUNNING "   " + data;
 
 	std::getline(ifs, data);
 	this->calcInfo = data;
 
 	std::getline(ifs, data);
 	this->view = data;
+
+	std::getline(ifs, data);
+	this->coding = ICON_MD_CODE "   " + data;
+
+	std::getline(ifs, data);
+	this->tab = ICON_MD_LIST "   " + data;
+
+	std::getline(ifs, data);
+	this->debugInfo = ICON_MD_BUG_REPORT "   " + data;
+
+	std::getline(ifs, data);
+	//Account Tree: code point = e97a
+	this->flu = "\xee\xa5\xba" "   " + data;
+
+	std::getline(ifs, data);
+	this->analysis = ICON_MD_DONUT_LARGE "   " + data;
+
+	std::getline(ifs, data);
+	this->function = ICON_MD_YOUTUBE_SEARCHED_FOR "   " + data;
+
+	std::getline(ifs, data);
+	this->plot = ICON_MD_MULTILINE_CHART "   " + data;
+
+	std::getline(ifs, data);
+	//Biotech: code point = ea3a
+	this->genome = "\xee\xa8\xba" "   " + data;
+
+	std::getline(ifs, data);
+	//Animation: code point = e71c
+	this->animation = "\xee\x9c\x9c" "   " + data;
+
+	std::getline(ifs, data);
+	//Category: code point = e861
+	this->project = "\xee\xa1\xa1" "   " + data;
+
+	std::getline(ifs, data);
+	this->console = ICON_MD_RATE_REVIEW "   " + data;
+
+	std::getline(ifs, data);
+	this->project_ = data;
+
+	std::getline(ifs, data);
+	this->extension = data;
+
+	std::getline(ifs, data);
+	this->manage = ICON_FA_ARCHIVE "   " + data;
+
+	std::getline(ifs, data);
+	this->window = data;
+
+	std::getline(ifs, data);
+	this->layoutTemplates = ICON_MD_DASHBOARD "   " + data;
+
+	std::getline(ifs, data);
+	this->clear = ICON_MD_CHECK_BOX_OUTLINE_BLANK "   " + data;
 
 	std::getline(ifs, data);
 	this->help = data;
@@ -300,6 +408,10 @@ FD::Internal::Text::MenuBar::MenuBar() {
 
 	std::getline(ifs, data);
 	this->error_internal = data;
+
+	std::getline(ifs, data);
+	this->confirm_changeLayout = Internal::Text::newLine(ifs, data);
+
 }
 
 FD::Internal::Text::TopBar::TopBar() {

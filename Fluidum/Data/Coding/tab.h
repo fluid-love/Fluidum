@@ -87,15 +87,17 @@ namespace FD::Coding {
 
 	public:
 
-		_NODISCARD bool update() const;
-		_NODISCARD bool isDisplayFileChanged() const;
+		[[nodiscard]] bool update() const;
+		[[nodiscard]] bool isDisplayFileChanged() const;
 
-		_NODISCARD std::vector<std::string> getFilePathes() const;
-		_NODISCARD std::vector<std::string> getDisplayFilePaths() const;
+		[[nodiscard]] std::vector<std::string> getFilePathes() const;
+		[[nodiscard]] std::vector<std::string> getDisplayFilePaths() const;
 
-		_NODISCARD bool update_isTextSaved() const;
-		_NODISCARD bool isTextSaved(const std::string& path) const;
-		_NODISCARD bool isAllTextSaved() const;
+		[[nodiscard]] bool update_isTextSaved() const;
+		[[nodiscard]] bool isTextSaved(const std::string& path) const;
+		[[nodiscard]] bool isAllTextSaved() const;
+
+		[[nodiscard]] std::vector<std::string> notSavedTexts() const;
 
 	};
 

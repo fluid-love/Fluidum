@@ -1,4 +1,5 @@
 #include "table.h"
+#include "misc.h"
 
 //void FS::LuaAssist::setPosColorVerticesAndListIndices(LuaType::State L, FD::Object::Vertices* vertices, FD::Object::Indices* indices) {
 //	assert(getCoreTypes(L).size() == 1);
@@ -88,9 +89,25 @@
 //
 //}
 
-//std::vector<FD::Plot::Val> FS::Lua::Table::getArrayOfNumbers(State L, const int32_t tableIndex) {
-//	if (lua_istable(L, tableIndex))
-//		throw Exception::Info(Exception::Type::NotTable);
-//
-//	return {};
-//}
+std::vector<LuAssist::Num> LuAssist::Utils::Table::convertTableToArrayOfNumbers(State L, const int32_t tableIndex) {
+
+	if (lua_istable(L, tableIndex))
+		throw Exception::NotTable();
+
+	std::vector<Num> result{};
+	result.reserve(1000);
+
+	std::size_t i = 1;
+	while (!lua_isnone(L, i++)) {
+		//push back
+		lua_rawgeti(L, tableIndex, -1);
+
+		if (!lua_isnumber(L, -1))
+			throw Exception::NotNumber{ i - 1,typeName(type(L,-1)) };
+
+		result.emplace_back(lua_tonumber(L, -1));
+		lua_pop(L, 1);
+	}
+
+	return result;
+}

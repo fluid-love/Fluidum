@@ -1,6 +1,6 @@
-#include "utils.h"
+#include "misc.h"
 
-void FS::Lua::printStack(State L) {
+void LuAssist::Utils::printStack(State L) {
 	/*参考：http://marupeke296.com/LUA_No2_Begin.html　*/
 	/*
 	　「○×（まるぺけ）つくろーどっとコム」をお訪ね頂きまして真にありがとうございます。
@@ -10,7 +10,6 @@ void FS::Lua::printStack(State L) {
 		(2005.5.28 管理人 IKD)
 	*/
 
-	// スタック数を取得
 	const int num = lua_gettop(L);
 	if (num == 0) {
 		printf("No stack.\n");
@@ -52,43 +51,44 @@ void FS::Lua::printStack(State L) {
 	printf("-----------------------------\n\n");
 }
 
-void FS::Lua::pop(State L) {
+void LuAssist::Utils::popAll(State L) {
 	int32_t num = lua_gettop(L);
 	lua_pop(L, num);
 }
 
-void FS::Lua::popAndPushFalse(State L) {
-	int32_t num = lua_gettop(L);
-	lua_pop(L, num);
+void LuAssist::Utils::popAllAndPushFalse(State L) {
+	popAll(L);
 	lua_pushboolean(L, false);
 }
 
-void FS::Lua::popAndPushTrue(State L) {
-	int32_t num = lua_gettop(L);
-	lua_pop(L, num);
+void LuAssist::Utils::popAllAndPushTrue(State L) {
+	popAll(L);
 	lua_pushboolean(L, true);
 }
 
-std::vector<FS::Lua::CoreType> FS::Lua::getCoreTypes(State L) {
+std::vector<LuAssist::BasicType> LuAssist::Utils::basicTypes(State L) {
 	int32_t i = 1;
-	std::vector<CoreType> types = {};
+	std::vector<BasicType> types = {};
 
-	//全ての引数
 	while (!lua_isnone(L, i)) {
-		if (lua_isinteger(L, i))
-			types.emplace_back(CoreType::Integer);
-		else if (lua_isnumber(L, i))
-			types.emplace_back(CoreType::Number);
+		if (lua_isnumber(L, i))
+			types.emplace_back(BasicType::Number);
 		else if (lua_isstring(L, i))
-			types.emplace_back(CoreType::String);
-		else if (lua_isfunction(L, i))
-			types.emplace_back(CoreType::Function);
-		else if (lua_istable(L, i))
-			types.emplace_back(CoreType::Table);
-		else if (lua_isboolean(L, i))
-			types.emplace_back(CoreType::Boolean);
+			types.emplace_back(BasicType::String);
 		else if (lua_isnil(L, i))
-			types.emplace_back(CoreType::Nil);
+			types.emplace_back(BasicType::Nil);
+		else if (lua_isboolean(L, i))
+			types.emplace_back(BasicType::Boolean);
+		else if (lua_istable(L, i))
+			types.emplace_back(BasicType::Table);
+		else if (lua_isfunction(L, i))
+			types.emplace_back(BasicType::Function);
+		else if (lua_isuserdata(L, i))
+			types.emplace_back(BasicType::UserData);
+		else if (lua_isthread(L, i))
+			types.emplace_back(BasicType::Thread);
+		else
+			assert(false);
 
 		i++;
 	}
@@ -96,9 +96,51 @@ std::vector<FS::Lua::CoreType> FS::Lua::getCoreTypes(State L) {
 	return types;
 }
 
-std::size_t FS::Lua::getArgSize(State L) {
-	int32_t i = 0;
-	int32_t count = 0;
+LuAssist::Type LuAssist::Utils::type(State L, const int32_t index) {
+	if (lua_isinteger(L, index))
+		return Type::Integer;
+	if (lua_isnumber(L, index))
+		return Type::Number;
+	else if (lua_isstring(L, index))
+		return Type::String;
+	else if (lua_isnil(L, index))
+		return Type::Nil;
+	else if (lua_isboolean(L, index))
+		return Type::Boolean;
+	else if (lua_istable(L, index))
+		return Type::Table;
+	else if (lua_iscfunction(L, index))
+		return Type::CFunction;
+	else if (lua_isfunction(L, index))
+		return Type::Function;
+	else if (lua_islightuserdata(L, index))
+		return Type::LightUserData;
+	else if (lua_isuserdata(L, index))
+		return Type::UserData;
+	else if (lua_isthread(L, index))
+		return Type::Thread;
+	else
+		return Type::None;
+}
+
+std::vector<LuAssist::Type> LuAssist::Utils::types(State L) {
+	int32_t i = 1;
+	std::vector<Type> types = {};
+
+	while (!lua_isnone(L, i)) {
+		types.emplace_back(type(L, i));
+
+		assert(types.back() != Type::None);
+
+		i++;
+	}
+
+	return types;
+}
+
+std::size_t LuAssist::Utils::numOfArgs(State L) {
+	std::size_t i = 0;
+	std::size_t count = 0;
 	while (!lua_isnone(L, i)) {
 		i++;
 		count++;
@@ -106,23 +148,75 @@ std::size_t FS::Lua::getArgSize(State L) {
 	return count;
 }
 
-const char* FS::Lua::getCoreTypeName(const CoreType type) noexcept {
-	if (type == CoreType::Integer)
+const char* LuAssist::Utils::typeName(const Type type) noexcept {
+	if (type == Type::Integer)
 		return "Integer";
-	else if (type == CoreType::Number)
+	else if (type == Type::Number)
 		return "Number";
-	else if (type == CoreType::String)
+	else if (type == Type::String)
 		return "String";
-	else if (type == CoreType::Function)
+	else if (type == Type::Nil)
 		return "Function";
-	else if (type == CoreType::Table)
-		return "Table";
-	else if (type == CoreType::Boolean)
+	else if (type == Type::Boolean)
 		return "Boolean";
+	else if (type == Type::Table)
+		return "Table";
+	else if (type == Type::CFunction)
+		return "CFunction";
+	else if (type == Type::Function)
+		return "Function";
+	else if (type == Type::LightUserData)
+		return "LightUserData";
+	else if (type == Type::UserData)
+		return "UserData";
+	else if (type == Type::Thread)
+		return "Thread";
 	else
-		return "Nil";
+		return "None";
 }
 
+std::string LuAssist::Utils::getSrcCurrentLine(State L,const int32_t depth) {
+	lua_Debug info;
+
+	//depth err -> return 0 
+	//else      -> return 1
+	if (lua_getstack(L, depth, &info) == 0)
+		return std::string();
+	
+	lua_getinfo(L, "Sl", &info);
+
+	return std::format("[Source\"{}\". Line\"{}\"] ", info.short_src, info.currentline);
+}
+
+int32_t LuAssist::Utils::lineDefined(State L) {
+	lua_Debug info;
+
+	//depth err -> return 0 
+	//else      -> return 1
+	if (lua_getstack(L, 1, &info) == 0)
+		return -1;
+
+	lua_getinfo(L, "l", &info);
+
+	return info.linedefined;
+}
+
+int32_t LuAssist::Utils::currentLine(State L) {
+	lua_Debug info;
+
+	//depth err -> return 0 
+	//else      -> return 1
+	if (lua_getstack(L, 1, &info) == 0)
+		return -1;
+
+	lua_getinfo(L, "l", &info);
+
+	return info.currentline;
+}
+
+int32_t LuAssist::Utils::size(State L) {
+	return lua_gettop(L);
+}
 //void FS::LuaAssist::setPosColorVerticesAndListIndices(LuaType::State L, FD::Object::Vertices* vertices, FD::Object::Indices* indices) {
 //	assert(getCoreTypes(L).size() == 1);
 //
@@ -243,8 +337,6 @@ const char* FS::Lua::getCoreTypeName(const CoreType type) noexcept {
 //	lua_pop(L, 1);
 //	return false;
 //}
-//
-//
 //
 //
 //

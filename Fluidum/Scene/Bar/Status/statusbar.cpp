@@ -45,7 +45,7 @@ FS::StatusBar::~StatusBar() noexcept {
 }
 
 namespace FS::Internal::Bar {
-	constexpr ImGuiWindowFlags commonWindowFlag =
+	constexpr ImGuiWindowFlags CommonWindowFlag =
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoSavedSettings |
@@ -75,7 +75,7 @@ void FS::StatusBar::call() {
 	ImGui::SetNextWindowSize(ImVec2(guiRead->windowSize().x, style.barHeight));
 
 
-	ImGui::Begin("StatusBar", nullptr, Internal::Bar::commonWindowFlag | ImGuiWindowFlags_NoBringToFrontOnFocus);//アンダーバーの背景
+	ImGui::Begin("StatusBar", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBringToFrontOnFocus);//アンダーバーの背景
 
 
 
@@ -133,7 +133,7 @@ void FS::StatusBar::infoGui() {
 	ImGui::SetNextWindowPos(style.infoWindowPos);
 	ImGui::SetNextWindowSize(style.infoWindowSize);
 
-	ImGui::Begin("Info", nullptr, Internal::Bar::commonWindowFlag);
+	ImGui::Begin("Info", nullptr, Internal::Bar::CommonWindowFlag);
 
 	//fps
 	ImGui::Text(text.fps); ImGui::SameLine();
@@ -146,7 +146,7 @@ void FS::StatusBar::versionGui() {
 	ImGui::SetNextWindowPos(style.versionWindowPos);
 	ImGui::SetNextWindowSize(style.versionWindowSize);
 
-	ImGui::Begin("Version", nullptr, Internal::Bar::commonWindowFlag);
+	ImGui::Begin("Version", nullptr, Internal::Bar::CommonWindowFlag);
 
 	ImGui::Text(text.version);
 

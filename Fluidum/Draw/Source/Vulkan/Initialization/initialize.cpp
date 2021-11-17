@@ -761,6 +761,7 @@ void setupImGui() {
 	iconConfig.GlyphOffset = { 0.0f,9.0f };
 	iconConfig.OversampleH = 3;
 	iconConfig.OversampleV = 3;
+	iconConfig.GlyphMinAdvanceX = 40.0f;
 	////iconConfig.GlyphExtraSpacing = { -0.65f,0.0f };
 	FVK::ImGuiFontInfo iconFont;
 	static const ImWchar iconsRanges[] = { ICON_MIN_MD, ICON_MAX_MD, 0 };
@@ -774,11 +775,13 @@ void setupImGui() {
 	ImFontConfig iconConfig2;
 	iconConfig2.MergeMode = true;
 	iconConfig2.PixelSnapH = true;
-	iconConfig2.GlyphOffset = { 6.0f,6.0f };
-	iconConfig2.GlyphExtraSpacing = { 0.60f,0.0f };
+	iconConfig2.GlyphOffset = { 6.0f, 1.0f };
+	//iconConfig2.GlyphExtraSpacing = { 0.60f, -0.60f };
 
-	iconConfig2.OversampleH = 3;
-	iconConfig2.OversampleV = 3;
+	iconConfig2.OversampleH = 3;//FreeType -> ignore
+	iconConfig2.OversampleV = 3;//FreeType -> ignore
+
+	iconConfig2.GlyphMinAdvanceX = 40.0f;
 	FVK::ImGuiFontInfo iconFont2;
 	static const ImWchar iconsRanges2[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 	iconFont2.filePath = ImGuiDefaultIconFont2FilePath;
@@ -796,7 +799,7 @@ void setupImGui() {
 	param.fontInfoCount = std::extent_v<decltype(fonts), 0>;
 
 	FVK::createImGui(BaseImGuiKey, param);
-	ImGui::GetIO().FontGlobalScale = 0.57f;
+	ImGui::GetIO().FontGlobalScale = 0.525f;
 
 }
 

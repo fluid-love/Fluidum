@@ -2,7 +2,7 @@
 
 #include "resource.h"
 #include <boost/predef.h>
-#include "../../Libraries/lua-5.4.3/src/lua.hpp"
+#include <lua.hpp>
 
 #include <filesystem>
 #include <deque>
@@ -22,7 +22,7 @@ namespace FD::Internal {
 		template<typename...T>
 		friend class ::FD::Manager;
 
-#ifdef FluidumUtils_DebugMode
+#ifdef FluidumData_DebugMode
 	public:
 #else
 	private:

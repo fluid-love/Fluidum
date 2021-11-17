@@ -7,10 +7,13 @@ namespace FS::Lua {
 		NumOfArgs_Min,
 		NumOfArgs_Max,
 		Type,
+		TableType,
 
 		Plot_Figure_Max,
 		Plot_Plot_Max,
 		Plot_MarkerStr,
+		Plot_SameSize,
+
 	};
 
 	using Message = FU::File::Text<::FS::Resource::LuaMessagePath,LogType>;

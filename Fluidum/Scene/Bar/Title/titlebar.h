@@ -13,7 +13,9 @@ namespace FS {
 			FD::WindowWrite* const windowWrite,
 			const FD::SceneRead* const sceneRead,
 			const FD::ProjectRead* const projectRead,
-			FD::ExitWrite* const exitWrite
+			FD::ExitWrite* const exitWrite,
+			const FD::Coding::TabRead* const tabRead,
+			FD::Coding::TabWrite* const tabWrite
 		);
 		void Constructor(
 			FD::GuiRead,
@@ -22,7 +24,9 @@ namespace FS {
 			FD::WindowWrite,
 			FD::SceneRead,
 			FD::ProjectRead,
-			FD::ExitWrite
+			FD::ExitWrite,
+			FD::Coding::TabRead,
+			FD::Coding::TabWrite
 		);
 
 		~TitleBar() noexcept;
@@ -38,6 +42,8 @@ namespace FS {
 		const FD::SceneRead* const sceneRead;
 		const FD::ProjectRead* const projectRead;
 		FD::ExitWrite* const exitWrite;
+		const FD::Coding::TabRead* const tabRead;
+		FD::Coding::TabWrite* const tabWrite;
 
 	private://data
 

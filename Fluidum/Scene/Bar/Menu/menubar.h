@@ -13,16 +13,24 @@ namespace FS {
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			FD::Coding::TabWrite* const tabWrite,
-			const FD::Coding::TabRead* const tabRead
+			const FD::Coding::TabRead* const tabRead,
+			const FD::FluidumFilesRead* const fluidumFilesRead,
+			const FD::CalcRead* const calcRead,
+			FD::CalcWrite* const calcWrite,
+			const FD::SceneRead* const sceneRead
 		);
 		void Constructor(
 			FD::ProjectWrite,
 			FD::ProjectRead,
-			FD::WindowWrite, 
-			FD::GuiRead, 
+			FD::WindowWrite,
+			FD::GuiRead,
 			FD::GuiWrite,
 			FD::Coding::TabWrite,
-			FD::Coding::TabRead
+			FD::Coding::TabRead,
+			FD::FluidumFilesRead,
+			FD::CalcRead,
+			FD::CalcWrite,
+			FD::SceneRead
 		);
 
 		~MenuBar() noexcept;
@@ -38,6 +46,10 @@ namespace FS {
 		FD::GuiWrite* const guiWrite;
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
+		const FD::FluidumFilesRead* const fluidumFilesRead;
+		const FD::CalcRead* const calcRead;
+		FD::CalcWrite* const calcWrite;
+		const FD::SceneRead* const sceneRead;
 
 		FD::Text::MenuBar text{};
 
@@ -45,11 +57,33 @@ namespace FS {
 
 		struct {
 			ImVec2 offset{};
+			ImVec2 itemSpacing{};
 		}style;
 
 		struct {
 			ImVec2 open{};
 		}pos;
+
+		struct {
+		public:
+			bool coding{};
+			bool tab{};
+			bool debug{};
+
+			bool flu{};
+
+			bool analysis{};
+			bool plot{};
+			bool function{};
+
+			bool genome{};
+
+			bool animation{};
+
+			bool project{};
+
+			bool console{};
+		}view;
 
 	private:
 
@@ -64,13 +98,39 @@ namespace FS {
 		//edit
 		void editGui();
 
-		//calc
-		void calc();
+	private://calc
+		void calcGui();
+		void itemRunDebugMode();
+		void itemRunNormalMode();
 
-		//view
+	private://view
 		void viewGui();
+		void updateView();
+		void itemCoding();
+		void itemFlu();
+		void itemAnalysis();
+		void itemGenome();
+		void itemAnimation();
+		void itemProject();
+		void itemConsole();
 
-		//help
+	private://project
+		void projectGui();
+
+	private://extention
+		void extensionGui();
+
+	private://window
+		void windowGui();
+		void itemLayoutTemplates();
+		[[nodiscard]] bool layoutConfirm();
+		void setLayoutEmpty();
+		void setLayoutCoding();
+
+	private://help
 		void helpGui();
+
+	private:
+		void pushItemSpacing();
 	};
 }

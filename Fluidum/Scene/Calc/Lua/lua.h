@@ -122,9 +122,11 @@ namespace FS::Lua {
 		Fluidum_Lua_Api Ret plot_setMarker(State L);
 		Fluidum_Lua_Api Ret plot_makePlot(State L);
 		Fluidum_Lua_Api Ret plot_plot(State L);
+		Fluidum_Lua_Api Ret plot_display(State L);
+		Fluidum_Lua_Api Ret plot_hide(State L);
 
 
-		//private://FDraw
+	private://FDraw
 
 		//	Fluidum_Lua_Api Ret create_Draw(State L);
 		//	Fluidum_Lua_Api Ret updateVertex(State L);

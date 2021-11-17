@@ -11,7 +11,8 @@ namespace FS::Internal {
 
 namespace FS::Internal {
 
-	//このクラスをpublic継承する
+	//inherit this class
+	//access-specifier: public
 	template<typename... Data>
 	class SceneBase {
 	public:
@@ -95,7 +96,7 @@ namespace FS::Internal {
 		//constなデータポインタを返す
 		//変更したい場合はコンストラクタでデータを取得すること
 		template<FD::IsDataAble T>
-		_NODISCARD const auto* getData() {
+		[[nodiscard]] const auto* getData() {
 			static_assert(std::is_pointer_v<T>);
 			//pointerにしてunique_ptrを確認．違うのであれば戻す
 			constexpr auto index = FU::Tuple::getSameTypeIndex<std::tuple<Data...>, T>();
@@ -104,10 +105,16 @@ namespace FS::Internal {
 
 		//dataが作成されているか
 		template<FD::IsDataAble T>
-		_NODISCARD bool isDataCreated() const {
+		[[nodiscard]] bool isDataCreated() const {
 			static_assert(std::is_pointer_v<T>);
 			constexpr auto index = FU::Tuple::getSameTypeIndex<std::tuple<Data...>, T>();
 			return GManager<Data...>->data.isDataCreated<index>();
+		}
+
+	public:
+		template<IsSceneAble<Data...> Scene, typename... Args>
+		void callConstructor(Args&&... args) {
+			GManager<Data...>->callConstructor<Scene>(args...);
 		}
 
 	};

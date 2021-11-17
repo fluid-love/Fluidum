@@ -1,5 +1,6 @@
 #include "titlebar.h"
 #include "../Menu/Project/saveas.h"
+#include "Exit/exit.h"
 
 using namespace FU::ImGui::Operators;
 
@@ -10,7 +11,9 @@ FS::TitleBar::TitleBar(
 	FD::WindowWrite* const windowWrite,
 	const FD::SceneRead* const sceneRead,
 	const FD::ProjectRead* const projectRead,
-	FD::ExitWrite* const exitWrite
+	FD::ExitWrite* const exitWrite,
+	const FD::Coding::TabRead* const tabRead,
+	FD::Coding::TabWrite* const tabWrite
 )
 	:
 	guiRead(guiRead),
@@ -19,7 +22,9 @@ FS::TitleBar::TitleBar(
 	windowRead(windowRead),
 	sceneRead(sceneRead),
 	projectRead(projectRead),
-	exitWrite(exitWrite)
+	exitWrite(exitWrite),
+	tabRead(tabRead),
+	tabWrite(tabWrite)
 {
 	GLog.add<FD::Log::Type::None>("Construct TitleBarScene.");
 
@@ -32,7 +37,6 @@ FS::TitleBar::TitleBar(
 	style.iconWindowPos = { 0.0f,windowHeight / 10.0f };
 	style.iconWindowSize = { (ImGui::GetStyle().WindowPadding.x * 2.0f + (ImGui::GetStyle().FramePadding.x * 2.0f)) + ImGui::CalcTextSize("   ").x ,windowHeight };
 
-	using namespace FU::ImGui::Operators;
 	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.88f;
 
 	style.buttonSize = { style.windowSize.x / 3.0f, style.windowSize.y };
@@ -136,23 +140,6 @@ void FS::TitleBar::bar() {
 }
 
 void FS::TitleBar::exit() {
-
-	if (projectRead->isDefaultProject()) {
-		auto index = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popupMessage, text.saveAndExit, text.withoutSaving, text.cancel);
-		if (index == 0) {//save
-			GLog.add<FD::Log::Type::None>("Request add Bar::SaveAsScene.");
-			Scene::addScene<Bar::SaveAs>();
-			exitWrite->saveAsAndExit();
-			return;
-		}
-		else if (index == 1) {//without saving
-			;
-		}
-		else {//cancel
-			return;
-		}
-	}
-
-
-	*windowWrite->getCloseFlag() = true;
+	GLog.add<FD::Log::Type::None>("Request Add Bar::ExitScene.");
+	Scene::addScene<Bar::Exit>();
 }

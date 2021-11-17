@@ -35,21 +35,23 @@ FS::Console::~Console() {
 }
 
 void FS::Console::call() {
-	ImGui::Begin("Console");
+	ImGui::Begin("Console", &this->windowFlag);
 
 	this->console();
 	this->input();
 
+
 	this->changeFontSize();
 	ImGui::End();
 
+	this->closeWindow();
 }
 
 void FS::Console::console() {
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, { 0.01f,0.01f,0.01f,1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, { 0.005f,0.005f,0.005f,1.0f });
 
 	const auto size = ImGui::GetWindowSize();
-	ImGui::BeginChild("Console", { size.x * 0.98f,size.y * 0.8f },false,ImGuiWindowFlags_AlwaysVerticalScrollbar);
+	ImGui::BeginChild("ConsoleText", { size.x * 0.98f,size.y * 0.8f }, false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 	ImGui::SetWindowFontScale(style.fontSizeScale);
 
 	ImGuiListClipper clipper;
@@ -59,8 +61,10 @@ void FS::Console::console() {
 		for (int32_t i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
 
 			const auto info = consoleRead->get(i);
-			if(info.first)
+			if (info.first)
 				ImGui::Text(info.second.message.c_str());
+			else
+				ImGui::Spacing();
 		}
 	}
 
@@ -70,8 +74,32 @@ void FS::Console::console() {
 }
 
 void FS::Console::input() {
-	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() - (ImGui::GetStyle().WindowPadding.x * 2.0f));
-	ImGui::InputText("##InputText", inputText.data(), inputText.size());
+	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.8f);
+	ImGui::InputText("##InputText", inputText.data(), inputText.capacity());
+
+	if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && ImGui::IsItemFocused()) {
+		this->push();
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button(ICON_MD_ADD)) {
+		this->push();
+	}
+}
+
+void FS::Console::closeWindow() {
+	if (windowFlag)
+		return;
+
+	//close
+	FluidumScene_Log_RequestDeleteScene("Console");
+	Scene::deleteScene<Console>();
+}
+
+void FS::Console::push() {
+	consoleWrite->add(std::string(inputText.data()));
+	inputText = std::string();
 }
 
 void FS::Console::changeFontSize() {

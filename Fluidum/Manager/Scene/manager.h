@@ -209,6 +209,13 @@ namespace FS::Internal {
 		}
 
 
+		//constructorを呼び出すのみ
+		template<IsSceneAble<Data...> Scene, typename... Arg>
+		void callConstructor(Arg&&... arg) {
+			this->makeScenePtr<Scene>(std::forward<Arg>(arg)...);
+		}
+
+
 		//callbackをセットする
 		void setAddCallback(CallBackType callback) {
 			std::lock_guard<std::mutex> lock(this->mtx);

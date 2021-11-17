@@ -1,13 +1,14 @@
 #pragma once
 
 #include "container.h"
+#include <LuAssist/type.h>
 
 namespace FD::Calc::Lua {
-	using Ret = int;
-	using Num = LUA_NUMBER;//lua number
-	using Val = long long;
-	using String = const char*;//lua string
-	using State = lua_State*;
+	using Ret = LuAssist::Ret;
+	using Num = LuAssist::Num;
+	using Val = LuAssist::Val;
+	using String = LuAssist::String;
+	using State = LuAssist::State;
 
 	template<typename T>
 	concept IsArgType =
@@ -27,7 +28,9 @@ namespace FD::Calc::Lua {
 		Plot_Plot,
 		Plot_SetMarker,
 		Plot_PushBack,
-		Plot_PushFront
+		Plot_PushFront,
+		Plot_Display,
+		Plot_Hide,
 	};
 
 }

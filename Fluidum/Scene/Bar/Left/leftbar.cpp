@@ -117,9 +117,9 @@ namespace FS::Internal {
 		FU::Class::ClassCode::GetClassCode<::FS::TextEditor>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Flu::Node>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Analysis::Overview>(),
-		FU::Class::ClassCode::GetClassCode<::FS::Project>(),
-		FU::Class::ClassCode::GetClassCode<::FS::Animation>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Genome::Overview>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Animation>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Project>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Console>()
 	};
 }

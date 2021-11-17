@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Calc\calc.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\container.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\function.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\lua.h" />
@@ -153,14 +154,14 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\saveas.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Status\statusbar.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Check\check.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Log\log.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\type.h" />
-    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\table.h" />
-    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Run\run.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\new.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\select.h" />
@@ -175,14 +176,18 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Flu\Node\node.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Genome\Overview\overview.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\include.h" />
-    <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Left\layout.h" />
-    <ClInclude Include="..\..\..\Fluidum\Scene\Layout\Right\layout.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Layout\layout.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Project\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Title\title.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Data\reset.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\internal_error.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\message.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\add.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\delete.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\deleteAll.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\include.h" />
     <ClInclude Include="..\..\..\Fluidum\TextEditor\include.h" />
     <ClInclude Include="..\..\..\Fluidum\TextEditor\Source\texteditor.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Class\class.h" />
@@ -202,8 +207,14 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\MessageBox\messagebox.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Text\guitext.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Tuple\tuple.h" />
+    <ClInclude Include="..\..\..\Internal\LuAssist\Common\type.h" />
+    <ClInclude Include="..\..\..\Internal\LuAssist\type.h" />
+    <ClInclude Include="..\..\..\Internal\LuAssist\utils.h" />
+    <ClInclude Include="..\..\..\Internal\LuAssist\Utils\table.h" />
+    <ClInclude Include="..\..\..\Internal\LuAssist\Utils\misc.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Fluidum\Data\Calc\Calc\calc.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Coding\tab.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Console\console.cpp" />
@@ -280,8 +291,11 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\saveas.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Status\statusbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Display.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Hide.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.MakePlot.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Make.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Marker.cpp" />
@@ -291,8 +305,7 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.SleepSeconds.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.Terminate.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\table.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Utils\utils.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Run\run.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\new.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\select.cpp" />
@@ -301,14 +314,16 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Console\Console\console.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Flu\Node\node.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Genome\Overview\overview.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Left\layout.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Layout\Right\layout.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Layout\layout.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\project.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Title\title.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Data\reset.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\internal_error.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\message.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Scene\add.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Scene\deleteAll.cpp" />
     <ClCompile Include="..\..\..\Fluidum\TextEditor\Source\texteditor.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\Cursor\cursor.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\File\path.cpp" />
@@ -317,6 +332,8 @@
     <ClCompile Include="..\..\..\Fluidum\Utils\Log\messenger.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\MessageBox\messagebox.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\Text\guitext.cpp" />
+    <ClCompile Include="..\..\..\Internal\LuAssist\Utils\table.cpp" />
+    <ClCompile Include="..\..\..\Internal\LuAssist\Utils\misc.cpp" />
     <ClCompile Include="..\..\..\Libraries\ImGuiColorTextEdit\TextEditor.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="..\..\..\Libraries\imgui\imgui.cpp" />
@@ -332,9 +349,11 @@
   <ItemGroup>
     <None Include="..\..\..\Fluidum\Language\Lua\FluidumStandardLibrary\plot.lua" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\BarExit" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingSelect" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingTab" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Layout" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\LeftBar" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\MenuBar" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\NewProject" />
@@ -347,7 +366,7 @@
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Title" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\TitleBar" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\TopBar" />
-    <None Include="..\..\..\Resources\Log\Lua\LuaMessage.jpn" />
+    <None Include="..\..\..\Resources\Log\Lua\jpn" />
     <None Include="..\..\..\Test\test.lua" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -421,8 +440,9 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;../../../Libraries/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -441,8 +461,9 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;../../../Libraries/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -461,8 +482,9 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;../../../Libraries/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -480,8 +502,9 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;../../../Libraries/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
