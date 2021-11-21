@@ -17,13 +17,16 @@ FS::Layout::Layout(
 
 	//default project
 	if (layoutRead->empty()) {
-		FD::Layout::DockSpaceWindow window{};
-		window.pos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() - 4.0f };
-		window.size = { guiRead->windowSize().x - guiRead->leftBarWidth(),guiRead->windowSize().y - window.pos.y - guiRead->statusBarHeight() + 4.0f };
-		layoutWrite->push(window);
-		layoutWrite->leftPos(window.pos);
-		layoutWrite->rightPos({ window.pos.x + window.size.x ,window.pos.y });
+		const ImVec2 pos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() - 4.0f };
+		layoutWrite->mainFrameLeft(pos.x);
+		layoutWrite->mainFrameRight(guiRead->windowSize().x);
+		layoutWrite->mainFrameTop(pos.y);
+		layoutWrite->mainFrameBottom(guiRead->windowSize().y - guiRead->statusBarHeight());
+		layoutWrite->reset();
 	}
+
+	layoutWrite->widthLimit(guiRead->windowSize().x * 0.1f);
+	layoutWrite->heightLimit(guiRead->windowSize().y * 0.1f);
 
 }
 
@@ -49,47 +52,15 @@ void FS::Layout::call() {
 }
 
 void FS::Layout::dockGui() {
-
-	for (uint16_t i = 0, size = layoutRead->size(); i < size; i++) {
-		select.current = layoutRead->get(i);
+	this->windows = layoutRead->get();
+	for (uint16_t i = 0, size = static_cast<uint16_t>(windows.size()); i < size; i++) {
+		select.current = windows[i];
 		std::string label = "##Lay" + std::to_string(i);
+
+		ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, { 0.0f,0.0f ,0.007f * i,1.0f });
 		this->dockSpace(label.c_str());
+		ImGui::PopStyleColor();
 	}
-
-
-	//if (!flag.limitLeft)
-	//	ImGui::Begin("LeftLayout", nullptr, windowFlag);
-	//else
-	//	ImGui::Begin("LeftLayout", nullptr, windowFlag | ImGuiWindowFlags_NoResize);
-
-	//id = ImGui::GetID("LeftLayout");
-
-	//ImGui::Dummy({ 0.0f,0.8f });
-	//ImGuiID dockingID = ImGui::DockSpace(id, ImVec2{});
-	//layoutWrite->leftDockSpaceID(dockingID);
-
-	//auto currentSizeX = ImGui::GetWindowSize().x;
-	//if (static_cast<int32_t>(currentSizeX) != static_cast<int32_t>(style.windowSize.x)) {
-	//	style.windowSize.x = currentSizeX;
-	//	flag.isChanged = true;
-	//}
-
-	//if (style.windowSize.x > guiRead->windowSize().x * 0.8f) {
-	//	style.windowSize.x = guiRead->windowSize().x * 0.8f;
-	//	flag.limitLeft = true;
-	//}
-	//else if (style.windowSize.x < guiRead->windowSize().x * 0.15f) {
-	//	style.windowSize.x = guiRead->windowSize().x * 0.15f;
-	//	flag.limitLeft = true;
-	//}
-	//else {
-	//	flag.limitLeft = false;
-	//}
-
-	//layoutWrite->leftLayoutSize(style.windowSize);
-
-
-	//ImGui::End();
 }
 
 void FS::Layout::dockSpace(const char* label) {
@@ -98,12 +69,14 @@ void FS::Layout::dockSpace(const char* label) {
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoScrollbar;
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoSavedSettings;
 
+	ImGui::SetNextWindowSizeConstraints(select.current.minSize, select.current.maxSize);
 	ImGui::SetNextWindowPos(select.current.pos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(select.current.size, ImGuiCond_Always);
 
-	ImGui::Begin(label, nullptr, 0);
+	ImGui::Begin(label, nullptr, ImGuiWindowFlags_NoSavedSettings);
 
 	auto id = ImGui::GetID(label);
 	ImGuiID dockingID = ImGui::DockSpace(id, ImVec2{});
@@ -112,10 +85,11 @@ void FS::Layout::dockSpace(const char* label) {
 	select.current.size = ImGui::GetWindowSize();
 
 	this->ifRightMouseButtonCliked();
-	ImGui::End();
 
-	//pos size
-	layoutWrite->update(select.current);
+	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowFocused())
+		layoutWrite->update(select.current);
+
+	ImGui::End();
 }
 
 void FS::Layout::ifRightMouseButtonCliked() {
@@ -123,9 +97,15 @@ void FS::Layout::ifRightMouseButtonCliked() {
 		return;
 
 	flag.popup = true;
-
 	select.pos = ImGui::GetMousePos();
 	select.right = select.current;
+
+	flag.widthConstraintArea = this->widthConstraintArea(select.pos);
+	flag.heightConstraintArea = this->heightConstraintArea(select.pos);
+
+	flag.centerHorizonalConstraintArea = this->centerHorizonalConstraintArea();
+	flag.centerVerticalConstraintArea = this->centerVerticalConstraintArea();
+
 }
 
 void FS::Layout::popup() {
@@ -140,25 +120,79 @@ void FS::Layout::popup() {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x,ImGui::GetStyle().ItemSpacing.y * 2.2f });
 
-	if (ImGui::Selectable(text.splitVerticalCurrentPos))
+	if (ImGui::MenuItem(text.splitVerticalCurrentPos, 0, false, !flag.widthConstraintArea))
 		this->splitVerticalCurrentPos();
-	if (ImGui::Selectable(text.splitHorizonalCurrentPos))
+	if (ImGui::MenuItem(text.splitHorizonalCurrentPos, 0, false, !flag.heightConstraintArea))
 		this->splitHorizonalCurrentPos();
-	if (ImGui::Selectable(text.splitCrossCurrentPos))
+	if (ImGui::BeginMenu(text.splitCrossCurrentPos, !flag.widthConstraintArea || !flag.heightConstraintArea)) {
 		this->splitCrossCurrentPos();
+		ImGui::EndMenu();
+	}
 
 	ImGui::Separator();
 
-	if (ImGui::Selectable(text.splitVerticalCenterLine))
+	if (ImGui::MenuItem(text.splitVerticalCenterLine, 0, false, !flag.centerVerticalConstraintArea))
 		this->splitVerticalCenterLine();
-	if (ImGui::Selectable(text.splitHorizonalCenterLine))
+	if (ImGui::MenuItem(text.splitHorizonalCenterLine, 0, false, !flag.centerHorizonalConstraintArea))
 		this->splitHorizonalCenterLine();
-	if (ImGui::Selectable(text.splitCrossCenterLine))
+	if (ImGui::BeginMenu(text.splitCrossCenterLine, !flag.widthConstraintArea || !flag.heightConstraintArea)) {
 		this->splitCrossCenterLine();
+		ImGui::EndMenu();
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::Selectable(text.reset))
+		this->reset();
+
+	ImGui::Separator();
+
+	if (ImGui::MenuItem(text.merge, 0, false, flag.widthConstraintArea))
+		this->merge();
 
 	ImGui::PopStyleVar();
 
 	ImGui::EndPopup();
+}
+
+bool FS::Layout::widthConstraintArea(const ImVec2& mousePos) {
+	const float width = layoutRead->widthLimit();
+	for (auto& x : windows) {
+		if (x.pos.x - width < mousePos.x && mousePos.x < x.pos.x + width)
+			return true;
+	}
+
+	return false;
+}
+
+bool FS::Layout::heightConstraintArea(const ImVec2& mousePos) {
+	const float height = layoutRead->heightLimit();
+	for (auto& x : windows) {
+		if (x.pos.y - height < mousePos.x && mousePos.x < x.pos.y + height)
+			return true;
+	}
+
+	return false;
+}
+
+bool FS::Layout::centerHorizonalConstraintArea() {
+	const float height = layoutRead->heightLimit();
+	const float center = select.right.pos.y + (select.right.size.y / 2.0f);
+	for (auto& x : windows) {
+		if (x.pos.y - height < center && center < x.pos.y + height)
+			return true;
+	}
+	return false;
+}
+
+bool FS::Layout::centerVerticalConstraintArea() {
+	const float width = layoutRead->widthLimit();
+	const float center = select.right.pos.x + (select.right.size.x / 2.0f);
+	for (auto& x : windows) {
+		if (x.pos.x - width < center && center < x.pos.x + width)
+			return true;
+	}
+	return false;
 }
 
 void FS::Layout::splitVerticalCurrentPos() {
@@ -170,7 +204,12 @@ void FS::Layout::splitHorizonalCurrentPos() {
 }
 
 void FS::Layout::splitCrossCurrentPos() {
-	layoutWrite->splitCross(select.right, select.pos);
+	if (ImGui::MenuItem(text.horizonal, nullptr, false, !flag.widthConstraintArea))
+		layoutWrite->splitCross(select.right, select.pos);
+
+	if (ImGui::MenuItem(text.vertical, nullptr, false, !flag.heightConstraintArea))
+		layoutWrite->splitCross(select.right, select.pos);
+
 }
 
 void FS::Layout::splitVerticalCenterLine() {
@@ -182,18 +221,40 @@ void FS::Layout::splitHorizonalCenterLine() {
 }
 
 void FS::Layout::splitCrossCenterLine() {
-	layoutWrite->splitCross(select.right,
-		{
-			select.right.pos.x + (select.right.size.x / 2.0f),
-			select.right.pos.y + (select.right.size.y / 2.0f)
-		}
-	);
+	if (ImGui::MenuItem(text.horizonal), 0, false, !flag.widthConstraintArea) {
+		layoutWrite->splitCross(select.right,
+			{
+				select.right.pos.x + (select.right.size.x / 2.0f),
+				select.right.pos.y + (select.right.size.y / 2.0f)
+			}
+		);
+	}
+
+	if (ImGui::MenuItem(text.vertical, 0, false, !flag.heightConstraintArea)) {
+		layoutWrite->splitCross(select.right,
+			{
+				select.right.pos.x + (select.right.size.x / 2.0f),
+				select.right.pos.y + (select.right.size.y / 2.0f)
+			}
+		);
+	}
+}
+
+void FS::Layout::reset() {
+	const auto clicked = FU::MB::ok_cancel("");
+	if (clicked == 0) //ok
+		;
+	else { //cancel
+		assert(clicked == 1);
+		return;
+	}
+	GLog.add<FD::Log::Type::None>("Reset layout.");
+	layoutWrite->reset();
 }
 
 void FS::Layout::merge() {
 
 }
-
 
 
 

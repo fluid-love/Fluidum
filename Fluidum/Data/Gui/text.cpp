@@ -224,6 +224,18 @@ FD::Internal::Text::Layout::Layout() {
 	std::getline(ifs, data);
 	this->merge = ICON_MD_HEALING "  " + data;
 
+	std::getline(ifs, data);
+	this->reset = ICON_MD_CHECK_BOX_OUTLINE_BLANK "  " + data;
+
+	std::getline(ifs, data);
+	this->horizonal = ICON_MD_COMPARE_ARROWS "  " + data;
+
+	std::getline(ifs, data);
+	this->vertical = ICON_MD_IMPORT_EXPORT "  " + data;
+
+	std::getline(ifs, data);
+	this->error_max = data;
+
 }
 
 FD::Internal::Text::BarExit::BarExit() {

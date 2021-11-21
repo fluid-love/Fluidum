@@ -34,19 +34,23 @@ namespace FS {
 
 		const FD::Text::Layout text{};
 	private:
-
+		std::vector<FD::Layout::DockSpaceWindow> windows{};
 
 		struct {
 			FD::Layout::DockSpaceWindow current{};
 			FD::Layout::DockSpaceWindow right{};
+			FD::Layout::DockSpaceWindow resize{};
+
 			ImVec2 pos{};
 		}select;
 
 		struct {
 			bool popup = false;
 
-			bool limitLeft = false;
-			bool isChanged = false;
+			bool widthConstraintArea = false;
+			bool heightConstraintArea = false;
+			bool centerHorizonalConstraintArea = false;
+			bool centerVerticalConstraintArea = false;
 		}flag;
 
 
@@ -57,7 +61,10 @@ namespace FS {
 	private:
 		void ifRightMouseButtonCliked();
 		void popup();
-
+		bool widthConstraintArea(const ImVec2& mousePos);
+		bool heightConstraintArea(const ImVec2& mousePos);
+		bool centerHorizonalConstraintArea();
+		bool centerVerticalConstraintArea();
 	private:
 		void splitVerticalCurrentPos();
 		void splitHorizonalCurrentPos();
@@ -65,8 +72,10 @@ namespace FS {
 		void splitVerticalCenterLine();
 		void splitHorizonalCenterLine();
 		void splitCrossCenterLine();
+		void reset();
 
 	private:
 		void merge();
+
 	};
 }

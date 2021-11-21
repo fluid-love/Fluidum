@@ -50,20 +50,34 @@ namespace FD {
 namespace FD::Layout {
 
 	struct DockSpaceWindow final {
-		ImVec2 pos = ImVec2();
-		ImVec2 size = ImVec2();
+		ImVec2 pos{};
+		ImVec2 size{};
+		ImVec2 minSize{};
+		ImVec2 maxSize{};
 	private:
-		DockSpaceWindow* identifier = nullptr;
+		void* identifier = nullptr; //::FD::Layout::AdjacentInfo
+		DockSpaceWindow* window = nullptr;
+
 	private:
 		friend class LayoutWrite;
 	};
 
 	namespace Internal {
+		enum class ResizedBorder : uint8_t {
+			None,
+			Left,
+			Right,
+			Top,
+			Bottom
+		};
+
 		struct LayoutData final {
 			FluidumUtils_Class_Delete_ConDestructor(LayoutData)
 		private:
-			static inline ImVec2 leftPos{};
-			static inline ImVec2 rightPos{};
+			static inline float mainFrameLeft{};
+			static inline float mainFrameRight{};
+			static inline float mainFrameTop{};
+			static inline float mainFrameBottom{};
 			static inline std::vector<std::shared_ptr<DockSpaceWindow>> windows{};
 
 		private:
@@ -86,32 +100,32 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(LayoutWrite)
 
 	public:
-		void leftPos(const ImVec2& vec2) const;
-		void rightPos(const ImVec2& vec2) const;
+		void mainFrameLeft(const float val) const;
+		void mainFrameRight(const float val) const;
+		void mainFrameTop(const float val) const;
+		void mainFrameBottom(const float val) const;
 
 	public:
-		void push(Layout::DockSpaceWindow& window) const;
+		void widthLimit(const float val) const;
+		void heightLimit(const float val) const;
 
-		void splitVertical(const Layout::DockSpaceWindow& window, const float posX);
-		void splitHorizonal(const Layout::DockSpaceWindow& window, const float posY);
-		void splitCross(const Layout::DockSpaceWindow& window, const ImVec2& pos);
+	public:
+		//construct main layout window from LayoutData
+		void reset() const;
+
+		bool splitVertical(const Layout::DockSpaceWindow& window, const float posX) const;
+		bool splitHorizonal(const Layout::DockSpaceWindow& window, const float posY) const;
+		bool splitCross(const Layout::DockSpaceWindow& window, const ImVec2& pos) const;
 
 
 	public:
-		void update(const Layout::DockSpaceWindow& window);
-
+		void update(const Layout::DockSpaceWindow& window) const;
 
 	public:
 		void save() const noexcept;
 
 	private:
-		std::vector<std::shared_ptr<Layout::DockSpaceWindow>>::iterator find(const Layout::DockSpaceWindow& window) const;
-		void checkItrEnd(const std::vector<std::shared_ptr<Layout::DockSpaceWindow>>::iterator itr) const;
-
-		bool isRightMost(const Layout::DockSpaceWindow& window) const;
-		bool isBottomMost(const Layout::DockSpaceWindow& window) const;
-
-
+		void remakeAllWindows(const Layout::Internal::ResizedBorder border = Layout::Internal::ResizedBorder::None) const;
 	};
 
 	class LayoutRead final {
@@ -121,11 +135,16 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(LayoutRead)
 
 	public:
-		[[nodiscard]] const ImVec2& leftPos() const;
-		[[nodiscard]] const ImVec2& rightPos() const;
+		[[nodiscard]] float mainFrameLeft() const;
+		[[nodiscard]] float mainFrameRight() const;
+		[[nodiscard]] float mainFrameTop() const;
+		[[nodiscard]] float mainFrameBottom() const;
+
+		[[nodiscard]] float widthLimit() const;
+		[[nodiscard]] float heightLimit() const;
 
 	public:
-		[[nodiscard]] Layout::DockSpaceWindow get(const uint16_t index) const;
+		[[nodiscard]] std::vector<Layout::DockSpaceWindow> get() const;
 
 	public:
 		[[nodiscard]] bool empty() const;

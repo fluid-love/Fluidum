@@ -34,3 +34,13 @@ namespace FD::Plot::Limits {
 
 
 }
+
+namespace FD::Layout::Limits {
+	
+	struct Window final {
+		FluidumUtils_Class_Delete_ConDestructor(Window)
+	public:
+		static constexpr uint8_t SeparatorMax = 8;
+	};
+
+}

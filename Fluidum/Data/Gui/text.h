@@ -42,10 +42,13 @@ namespace FD::Internal::Text {
 		GuiText splitHorizonalCenterLine;
 		GuiText splitCrossCenterLine;
 
-
 		GuiText merge;
 
+		GuiText reset;
+		GuiText horizonal;
+		GuiText vertical;
 
+		GuiText error_max;
 	};
 
 	struct TitleBar final {
