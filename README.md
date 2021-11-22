@@ -6,12 +6,7 @@
 <img src="https://github.com/fluid-love/Fluidum/blob/master/Document/Screenshots/logo_white.png" width="240mm">
 <p/>
 
-# Features
-
-- C++20を採用
-- 描写のバックエンドにVulkanを採用
-- Fluidumに最適化されたテキストエディタ
-- 汎用的な目的に使用可能
+遺伝的アルゴリズムのための汎用的な開発環境．
 
 
 # Screenshots
@@ -48,7 +43,7 @@ Libraries Resourcesディレクトリ内はそれぞれのライセンスが適�
 GPLや再配布禁止のライセンスは避けています．  
 ただしFreeTypeなどバイナリ配布時に条件があるライセンスのライブラリがあります.  
 
-## Libraries
+## External
 
 - [imgui](https://github.com/ocornut/imgui)  
 - [glm](https://github.com/g-truc/glm)  
