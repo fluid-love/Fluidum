@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "../../../../Utils/include.h"
-#include "../../../Libraries/magic_enum/include/magic_enum.hpp"
+#include "../../../External/magic_enum/include/magic_enum.hpp"
 
 namespace FKM {
 
@@ -15,13 +15,13 @@ namespace FKM {
 	private:
 		Type index = 0;
 	public:
-		_NODISCARD operator Type()const noexcept;
+		[[nodiscard]] operator Type()const noexcept;
 		void operator=(const Type val)noexcept;
-		_NODISCARD bool operator==(const OrderKey key)const noexcept;
+		[[nodiscard]] bool operator==(const OrderKey key)const noexcept;
 
 		void operator++(int) noexcept;
 
-		_NODISCARD bool operator==(Type val)const noexcept;
+		[[nodiscard]] bool operator==(Type val)const noexcept;
 
 	};
 
@@ -36,11 +36,11 @@ namespace FKM {
 	private:
 		Type order = 0;
 	public:
-		_NODISCARD operator Type()const noexcept;
+		[[nodiscard]] operator Type()const noexcept;
 		void operator=(const Type val)noexcept;
-		_NODISCARD bool operator==(const IndexKey key)const noexcept;
-		_NODISCARD bool operator!=(const IndexKey key)const noexcept;
-		_NODISCARD bool operator==(const Type val)const noexcept;
+		[[nodiscard]] bool operator==(const IndexKey key)const noexcept;
+		[[nodiscard]] bool operator!=(const IndexKey key)const noexcept;
+		[[nodiscard]] bool operator==(const Type val)const noexcept;
 
 	};
 

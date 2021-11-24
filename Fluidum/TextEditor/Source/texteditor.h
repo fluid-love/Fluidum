@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../Libraries/ImGuiColorTextEdit/TextEditor.h"
+#include "../../../External/ImGuiColorTextEdit/TextEditor.h"
 
 namespace FTE {
 

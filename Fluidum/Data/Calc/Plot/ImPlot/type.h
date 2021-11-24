@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../Common/common.h"
-#include "../../../Libraries/implot/implot.h"
+#include "../../../External/implot/implot.h"
 
 namespace FD::Plot {
 

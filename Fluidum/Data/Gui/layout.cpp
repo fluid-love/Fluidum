@@ -1,6 +1,6 @@
 #include "layout.h"
 #include "../Limits/limits.h"
-// number of divisions
+
 namespace FD {
 	struct Gui final {
 		ImVec2 centerPos{};
@@ -11,9 +11,7 @@ namespace FD {
 		float statusBarHeight = 0.0f;
 	};
 	Gui GGui = {};
-
 }
-
 
 void FD::GuiWrite::centerPos(const ImVec2& vec2) const noexcept {
 	GGui.centerPos = vec2;
@@ -73,18 +71,32 @@ namespace FD::Layout {
 		float heightLimit{};
 	}GData;
 
+	using Separator = float;
+
 	struct AdjacentInfo final {
 		bool horizonal{};
-		std::vector<std::shared_ptr<float>> separators{};
+		std::vector<std::shared_ptr<Separator>> separators{};
 
-		float* left = nullptr;
-		float* right = nullptr;
-		float* top = nullptr;
-		float* bottom = nullptr;
+		Separator* left = nullptr;
+		Separator* right = nullptr;
+		Separator* top = nullptr;
+		Separator* bottom = nullptr;
 
-		bool haveChild = false;
+		//top  : 0,1,2,... bottom = nullptr
+		//left : 0,1,2,... right  = nullptr
+		std::vector<std::shared_ptr<Separator>> children{};
+
+		std::shared_ptr<AdjacentInfo> parent = nullptr;
+		std::shared_ptr<Separator> parentSeparator = nullptr;
 	};
 	std::vector<std::shared_ptr<AdjacentInfo>> GAdjacent{};
+
+	std::shared_ptr<AdjacentInfo> find(AdjacentInfo* elm) {
+		auto itr = std::find_if(GAdjacent.begin(), GAdjacent.end(), [=](auto& x) {return x.get() == elm; });
+		if (itr == GAdjacent.end())
+			throw std::runtime_error("Failed to find GAdjacent.");
+		return *itr;
+	}
 
 	uint16_t separatorSize() {
 		uint16_t count = 0;
@@ -94,29 +106,50 @@ namespace FD::Layout {
 		return count;
 	}
 
-	//left right top bottom
-	std::array<float*, 4> getSeparators(AdjacentInfo* info, const float val) {
+	//child : left right top bottom
+	std::pair<std::shared_ptr<float>, std::array<float*, 4>> getSeparators(AdjacentInfo* info, const float val) {
 		if (info->separators.empty()) {
-			return { info->left,info->right,info->top,info->bottom };
+			return { info->separators[0],{ info->left,info->right,info->top,info->bottom } };
 		}
 
 		const uint16_t size = static_cast<uint16_t>(info->separators.size());
 
-		//left
-		if (val < *info->separators[0]) {
-			assert(val > *info->left);
-			return { info->left,info->separators[0].get(),info->top,info->bottom };
-		}
-		//right
-		if (val > *info->separators[size - 1]) {
-			assert(val < *info->right);
-			return { info->separators[size - 1].get(),info->right,info->top,info->bottom };
-		}
+		if (info->horizonal) {
+			//top
+			if (val < *info->separators[0]) {
+				assert(val > *info->top);
+				return { info->separators[0], {info->left, info->right, info->top, info->separators[0].get()} };
+			}
+			//bottom
+			if (val > *info->separators[size - 1]) {
+				assert(val < *info->bottom);
+				return { nullptr,{ info->left, info->right, info->separators[size - 1].get(), info->bottom } };
+			}
 
-		assert(size >= 2);
-		for (uint16_t i = 1; i < size; i++) {
-			if (val < *info->separators[i]) {
-				return { info->separators[i - 1].get(),info->separators[i].get(),info->top,info->bottom };
+			assert(size >= 2);
+			for (uint16_t i = 1; i < size; i++) {
+				if (val < *info->separators[i]) {
+					return { info->separators[i],{info->left,info->right, info->separators[i - 1].get(),info->separators[i].get() } };
+				}
+			}
+		}
+		else {
+			//left
+			if (val < *info->separators[0]) {
+				assert(val > *info->left);
+				return { info->separators[0],{ info->left,info->separators[0].get(),info->top,info->bottom } };
+			}
+			//right
+			if (val > *info->separators[size - 1]) {
+				assert(val < *info->right);
+				return { nullptr,{ info->separators[size - 1].get(),info->right,info->top,info->bottom } };
+			}
+
+			assert(size >= 2);
+			for (uint16_t i = 1; i < size; i++) {
+				if (val < *info->separators[i]) {
+					return { info->separators[i],{ info->separators[i - 1].get(),info->separators[i].get(),info->top,info->bottom } };
+				}
 			}
 		}
 
@@ -136,6 +169,24 @@ namespace FD::Layout {
 			return Bottom;
 		else
 			return None;
+	}
+
+	[[nodiscard]] bool isMainFrameOnly() {
+		return (GAdjacent.size() == 1 && GAdjacent[0]->separators.empty());
+	}
+
+	void round(DockSpaceWindow& window) {
+		window.pos.x = std::roundf(window.pos.x);
+		window.pos.y = std::roundf(window.pos.y);
+		window.size.x = std::roundf(window.size.x);
+		window.size.y = std::roundf(window.size.y);
+	}
+
+	[[nodiscard]] uint16_t findSeparatorIndex(AdjacentInfo* info, std::shared_ptr<Separator>& separator) {
+		auto itr = std::find(info->separators.begin(), info->separators.end(), separator);
+		if (itr == info->separators.end())
+			throw std::runtime_error("Failed to find separator.");
+		return static_cast<uint16_t>(std::distance(info->separators.begin(), itr));
 	}
 }
 
@@ -206,24 +257,30 @@ bool FD::LayoutWrite::splitVertical(const Layout::DockSpaceWindow& window, const
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);
 
 	Layout::AdjacentInfo* layout = static_cast<Layout::AdjacentInfo*>(window.identifier);
-	assert(!layout->haveChild);
 
 	if (Layout::separatorSize() >= Layout::Limits::Window::SeparatorMax)
 		return false;
+
+	if (Layout::isMainFrameOnly())
+		layout->horizonal = false;
 
 	if (!layout->horizonal) {
 		layout->separators.emplace_back(std::make_shared<float>(posX));
 		std::sort(layout->separators.begin(), layout->separators.end(), [](auto& x, auto& y) { return *x.get() < *y.get(); });
 	}
 	else {
-		auto separators = Layout::getSeparators(layout, posX);
+		auto [child, separators] = Layout::getSeparators(layout, window.pos.y + (window.size.y / 2.0f));
 		Layout::AdjacentInfo info{};
 		info.left = separators[0];
 		info.right = separators[1];
 		info.top = separators[2];
 		info.bottom = separators[3];
 		info.horizonal = false;
+		info.parent = Layout::find(layout);
+		info.parentSeparator = child;
 		Layout::GAdjacent.emplace_back(std::make_shared<Layout::AdjacentInfo>(info));
+		Layout::GAdjacent.back()->separators.emplace_back(std::make_shared<float>(posX));
+		layout->children.emplace_back(child);
 	}
 
 	this->remakeAllWindows();
@@ -236,7 +293,9 @@ bool FD::LayoutWrite::splitHorizonal(const Layout::DockSpaceWindow& window, cons
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);
 
 	Layout::AdjacentInfo* layout = static_cast<Layout::AdjacentInfo*>(window.identifier);
-	assert(!layout->haveChild);
+
+	if (Layout::isMainFrameOnly())
+		layout->horizonal = true;
 
 	if (Layout::separatorSize() >= Layout::Limits::Window::SeparatorMax)
 		return false;
@@ -246,14 +305,18 @@ bool FD::LayoutWrite::splitHorizonal(const Layout::DockSpaceWindow& window, cons
 		std::sort(layout->separators.begin(), layout->separators.end(), [](auto& x, auto& y) { return *x.get() < *y.get(); });
 	}
 	else {
-		auto separators = Layout::getSeparators(layout, posY);
+		auto [child, separators] = Layout::getSeparators(layout, window.pos.x + (window.size.x / 2.0f));
 		Layout::AdjacentInfo info{};
 		info.left = separators[0];
 		info.right = separators[1];
 		info.top = separators[2];
 		info.bottom = separators[3];
-		info.horizonal = false;
+		info.horizonal = true;
+		info.parent = Layout::find(layout);
+		info.parentSeparator = child;
 		Layout::GAdjacent.emplace_back(std::make_shared<Layout::AdjacentInfo>(info));
+		Layout::GAdjacent.back()->separators.emplace_back(std::make_shared<float>(posY));
+		layout->children.emplace_back(child);
 	}
 
 	this->remakeAllWindows();
@@ -282,10 +345,8 @@ void FD::LayoutWrite::update(const Layout::DockSpaceWindow& window) const {
 	//left right top bottom
 	std::array<float*, 4> separators{};
 
-	if (info->horizonal)
-		abort();// separators = Layout::getSeparators(info, window.window->pos.y + (window.window->size.y / 2.0f));
-	else
-		separators = Layout::getSeparators(info, window.window->pos.x + (window.window->size.x / 2.0f));
+	const float pos = info->horizonal ? window.window->pos.y + (window.window->size.y / 2.0f) : window.window->pos.x + (window.window->size.x / 2.0f);
+	separators = Layout::getSeparators(info, pos).second;
 
 	if (border == Left) {
 		*separators[0] = window.pos.x;
@@ -310,7 +371,7 @@ void FD::LayoutWrite::save() const noexcept {
 
 void FD::LayoutWrite::remakeAllWindows(const Layout::Internal::ResizedBorder border) const {
 	//main layout window
-	if (Layout::GAdjacent.size() == 1 && Layout::GAdjacent[0]->separators.empty()) {
+	if (Layout::isMainFrameOnly()) {
 		Layout::DockSpaceWindow window{};
 		window.identifier = Layout::GAdjacent[0].get();
 		window.pos = { *Layout::GAdjacent[0]->left,*Layout::GAdjacent[0]->top };
@@ -328,53 +389,195 @@ void FD::LayoutWrite::remakeAllWindows(const Layout::Internal::ResizedBorder bor
 
 
 	for (auto& x : Layout::GAdjacent) {
-
-		if (x.get()->haveChild)
-			continue;
-
-		Layout::DockSpaceWindow window{};
-		window.identifier = x.get();
-		window.minSize = { Layout::GData.widthLimit  ,Layout::GData.heightLimit };
-
-		if (x->separators.empty()) {
-			window.pos = { *x->left,*x->top };
-			window.size = { *x->right - window.pos.x ,*x->bottom - window.pos.y };
-			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
-			result.back().get()->window = result.back().get();
-		}
-		else {
-			//first
-			window.pos = { *x->left,*x->top };
-			window.size = { *x->separators[0] - window.pos.x,*x->bottom - window.pos.y };
-			window.maxSize = { (x->separators.size() == 1 ? *x->right : *x->separators[1]) - window.pos.x - Layout::GData.widthLimit ,10000 };
-			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
-			result.back().get()->window = result.back().get();
-
-			for (uint16_t i = 1, size = static_cast<uint16_t>(x->separators.size()); i < size; i++) {
-				window.pos = { *x->separators[i - 1],*x->top };
-				window.size = { *x->separators[i] - window.pos.x,*x->bottom - window.pos.y };
-
-				if (border == Layout::Internal::ResizedBorder::Left)
-					window.maxSize = { window.pos.x + window.size.x - Layout::GData.widthLimit - (i == 1 ? *x->left : *x->separators[i - 2]),10000 };
-				else if (border == Layout::Internal::ResizedBorder::Right)
-					window.maxSize = { (i == x->separators.size() - 1 ? *x->right : *x->separators[i + 1]) - window.pos.x - Layout::GData.widthLimit,10000 };
-				else
-					window.maxSize = { std::numeric_limits<float>::max(),std::numeric_limits<float>::max() };
-
-				result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
-				result.back().get()->window = result.back().get();
-			}
-
-			//last
-			window.pos = { *x->separators[x->separators.size() - 1],*x->top };
-			window.size = { *x->right - window.pos.x,*x->bottom - window.pos.y };
-			window.maxSize = { window.pos.x + window.size.x - Layout::GData.widthLimit - (x->separators.size() == 1 ? *x->left : *x->separators[x->separators.size() - 2]),10000 };
-			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
-			result.back().get()->window = result.back().get();
-		}
-
+		if (x->horizonal)
+			this->remakeWindow_horizonal(result, x, border);
+		else
+			this->remakeWindow_vertical(result, x, border);
 	}
 	Layout::Internal::LayoutData::windows = std::move(result);
+}
+
+void FD::LayoutWrite::remakeWindow_horizonal(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) const {
+	constexpr float floatMax = std::numeric_limits<float>::max();
+
+	const uint16_t size = static_cast<uint16_t>(x->separators.size());
+
+	Layout::DockSpaceWindow window{};
+	window.identifier = x.get();
+	window.minSize = { Layout::GData.widthLimit  ,Layout::GData.heightLimit };
+
+	//limit size x
+	float maxSizeX = floatMax;
+	if (x->parent) {
+		const uint16_t parentSeparatorsSize = static_cast<uint16_t>(x->parent->separators.size());
+		if (border == Layout::Internal::ResizedBorder::Left) {
+			if (!x->parentSeparator) { //rightmost
+				maxSizeX = *x->parent->right
+					- (parentSeparatorsSize == 1 ? *x->parent->left : *x->parent->separators[parentSeparatorsSize - 2].get())
+					- Layout::GData.widthLimit;
+			}
+			else {
+				const uint16_t index = Layout::findSeparatorIndex(x->parent.get(), x->parentSeparator);
+				if (index == 0) //leftmost
+					;//max
+				else {
+					maxSizeX = -(index == 1 ? *x->parent->left : *x->parent->separators[index - 2].get())
+						+ *x->parent->separators[index].get() - Layout::GData.widthLimit;
+				}
+			}
+		}
+		else if (border == Layout::Internal::ResizedBorder::Right) {
+			if (!x->parentSeparator) //rightmost
+				;//max
+			else {
+				const uint16_t index = Layout::findSeparatorIndex(x->parent.get(), x->parentSeparator);
+				maxSizeX = (parentSeparatorsSize >= index + 1 ? *x->parent->right : *x->parent->separators[index + 1].get())
+					- *x->left - Layout::GData.widthLimit;
+			}
+		}
+	}
+
+	assert(!x->separators.empty());
+
+	//first
+	{
+		auto find = std::find(x->children.begin(), x->children.end(), x->separators[0]);
+		if (find == x->children.end()) {
+			window.pos = { *x->left,*x->top };
+			window.size = { *x->right - window.pos.x, *x->separators[0] - window.pos.y };
+			window.maxSize = { maxSizeX , (x->separators.size() == 1 ? *x->bottom : *x->separators[1]) - window.pos.y - Layout::GData.heightLimit };
+			Layout::round(window);
+			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
+			result.back().get()->window = result.back().get();
+		}
+	}
+
+	for (uint16_t i = 1; i < size; i++) {
+		auto find = std::find(x->children.begin(), x->children.end(), x->separators[i]);
+		if (find == x->children.end()) {
+			window.pos = { *x->left, *x->separators[i - 1] };
+			window.size = { *x->right - window.pos.x, *x->separators[i] - window.pos.y };
+			if (border == Layout::Internal::ResizedBorder::Top)
+				window.maxSize = { floatMax,window.pos.y + window.size.y - Layout::GData.heightLimit - (i == 1 ? *x->top : *x->separators[i - 2]) };
+			else if (border == Layout::Internal::ResizedBorder::Bottom)
+				window.maxSize = { floatMax,(i == x->separators.size() - 1 ? *x->bottom : *x->separators[i + 1]) - window.pos.y - Layout::GData.heightLimit };
+			else if (border == Layout::Internal::ResizedBorder::Left)
+				window.maxSize = { maxSizeX, floatMax };
+			else {
+				assert(border == Layout::Internal::ResizedBorder::Right);
+				window.maxSize = { floatMax, maxSizeX };
+			}
+
+			Layout::round(window);
+			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
+			result.back().get()->window = result.back().get();
+		}
+	}
+
+	//last
+	{
+		auto find = std::find(x->children.begin(), x->children.end(), nullptr);
+		if (find == x->children.end()) {
+			window.pos = { *x->left, *x->separators[size - 1] };
+			window.size = { *x->right - window.pos.x,*x->bottom - window.pos.y };
+			window.maxSize = { maxSizeX,window.pos.y + window.size.y - Layout::GData.heightLimit - (x->separators.size() == 1 ? *x->top : *x->separators[x->separators.size() - 2]) };
+			Layout::round(window);
+			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
+			result.back().get()->window = result.back().get();
+		}
+	}
+
+}
+
+void FD::LayoutWrite::remakeWindow_vertical(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) const {
+	constexpr float floatMax = std::numeric_limits<float>::max();
+
+	const uint16_t size = static_cast<uint16_t>(x->separators.size());
+
+	Layout::DockSpaceWindow window{};
+	window.identifier = x.get();
+	window.minSize = { Layout::GData.widthLimit  ,Layout::GData.heightLimit };
+
+	//limit size y
+	float maxSizeY = floatMax;
+	if (x->parent) {
+		const uint16_t parentSeparatorsSize = static_cast<uint16_t>(x->parent->separators.size());
+		if (border == Layout::Internal::ResizedBorder::Top) {
+			if (!x->parentSeparator) { //bottommost
+				maxSizeY = *x->parent->bottom
+					- (parentSeparatorsSize == 1 ? *x->parent->top : *x->parent->separators[parentSeparatorsSize - 2].get())
+					- Layout::GData.heightLimit;
+			}
+			else {
+				const uint16_t index = Layout::findSeparatorIndex(x->parent.get(), x->parentSeparator);
+				if (index == 0) //topmost
+					;//max
+				else {
+					maxSizeY = -(index == 1 ? *x->parent->top : *x->parent->separators[index - 2].get())
+						+ *x->parent->separators[index].get() - Layout::GData.heightLimit;
+				}
+			}
+		}
+		else if (border == Layout::Internal::ResizedBorder::Bottom) {
+			if (!x->parentSeparator) //bottommost
+				;//max
+			else {
+				const uint16_t index = Layout::findSeparatorIndex(x->parent.get(), x->parentSeparator);
+				maxSizeY = (parentSeparatorsSize >= index + 1 ? *x->parent->bottom : *x->parent->separators[index + 1].get())
+					- *x->top - Layout::GData.heightLimit;
+			}
+
+		}
+	}
+
+	assert(!x->separators.empty());
+
+	//first
+	{
+		auto find = std::find(x->children.begin(), x->children.end(), x->separators[0]);
+		if (find == x->children.end()) {
+			window.pos = { *x->left,*x->top };
+			window.size = { *x->separators[0] - window.pos.x,*x->bottom - window.pos.y };
+			window.maxSize = { (x->separators.size() == 1 ? *x->right : *x->separators[1]) - window.pos.x - Layout::GData.widthLimit ,maxSizeY };
+			Layout::round(window);
+			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
+			result.back().get()->window = result.back().get();
+		}
+	}
+
+	for (uint16_t i = 1, size = static_cast<uint16_t>(x->separators.size()); i < size; i++) {
+		auto find = std::find(x->children.begin(), x->children.end(), x->separators[i]);
+		if (find == x->children.end()) {
+			window.pos = { *x->separators[i - 1],*x->top };
+			window.size = { *x->separators[i] - window.pos.x,*x->bottom - window.pos.y };
+
+			if (border == Layout::Internal::ResizedBorder::Left)
+				window.maxSize = { window.pos.x + window.size.x - Layout::GData.widthLimit - (i == 1 ? *x->left : *x->separators[i - 2]),maxSizeY };
+			else if (border == Layout::Internal::ResizedBorder::Right)
+				window.maxSize = { (i == x->separators.size() - 1 ? *x->right : *x->separators[i + 1]) - window.pos.x - Layout::GData.widthLimit,maxSizeY };
+			else
+				window.maxSize = { std::numeric_limits<float>::max(),std::numeric_limits<float>::max() };
+
+			Layout::round(window);
+			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
+			result.back().get()->window = result.back().get();
+		}
+	}
+
+	//last
+	{
+		auto find = std::find(x->children.begin(), x->children.end(), nullptr);
+		if (find == x->children.end()) {
+			window.pos = { *x->separators[x->separators.size() - 1],*x->top };
+			window.size = { *x->right - window.pos.x,*x->bottom - window.pos.y };
+			window.maxSize = { window.pos.x + window.size.x - Layout::GData.widthLimit - (x->separators.size() == 1 ? *x->left : *x->separators[x->separators.size() - 2]),maxSizeY };
+			Layout::round(window);
+			result.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
+			result.back().get()->window = result.back().get();
+		}
+	}
+
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

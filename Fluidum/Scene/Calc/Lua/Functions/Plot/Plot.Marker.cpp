@@ -54,7 +54,7 @@ namespace FS {
 
 }
 
-FS::Lua::Ret FS::Lua::Calc::plot_setMarker(State L) {
+FS::Lua::Ret FS::Lua::Calc::plot_marker(State L) {
 	//figure index, data index, marker
 	check.argType<Type::Plot_SetMarker>(L, { LuAssist::Type::Integer,LuAssist::Type::Integer,LuAssist::Type::String });
 
