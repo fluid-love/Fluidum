@@ -23,6 +23,8 @@ namespace FD::Calc::Lua {
 		System_SleepSeconds,
 		System_SleepMilliSeconds,
 
+		array_make,
+
 		Plot_Make,
 		Plot_makePlot,
 		Plot_Plot,

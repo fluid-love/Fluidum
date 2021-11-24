@@ -5,13 +5,17 @@ FS::Lua::Calc::Calc(
 	FD::ConsoleWrite* const consoleWrite,
 	FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite,
 	FD::ImPlotWrite* const implotWrite,
-	const FD::ImPlotRead* const implotRead
+	const FD::ImPlotRead* const implotRead,
+	FD::Calc::ArrayWrite* const arrayWrite,
+	const FD::Calc::ArrayRead* const arrayRead
 )
 	: projectread(projectread),
 	consoleWrite(consoleWrite),
 	functionWrite(functionWrite),
 	implotWrite(implotWrite),
 	implotRead(implotRead),
+	arrayWrite(arrayWrite),
+	arrayRead(arrayRead),
 	state(luaL_newstate())
 {
 	assert(this->state);
@@ -26,10 +30,7 @@ void FS::Lua::Calc::call() {
 
 	*static_cast<Calc**>(lua_getextraspace(state)) = this;//memory
 
-	//cpp‚ÌŠÖ”‚ð“o˜^
 	this->registerCppFunctions();
-	//lua•W€ƒ‰ƒCƒuƒ‰ƒŠ‚Ì“o˜^
-	this->registerLuaLibraries();
 
 	//“Ç‚ÝŽæ‚é
 	auto error = luaL_loadfile(state, "C:/Fluidum/Test/test.lua");
@@ -107,55 +108,66 @@ void FS::Lua::Calc::registerCppFunctions() {
 	//
 
 	//FSystem direct
-	{
-		const luaL_Reg regs[] = {
-				{"sleep_seconds"      , &dispatch<&Calc::system_sleep_seconds>      },
-				{"sleep_milliseconds" , &dispatch<&Calc::system_sleep_milliseconds> },
-				{"terminate"          , &dispatch<&Calc::system_terminate>          },
+	//{
+	//	const luaL_Reg regs[] = {
+	//			{"sleep_seconds"      , &dispatch<&Calc::system_sleep_seconds>      },
+	//			{"sleep_milliseconds" , &dispatch<&Calc::system_sleep_milliseconds> },
+	//			{"terminate"          , &dispatch<&Calc::system_terminate>          },
 
-				{nullptr,nullptr}
-		};
-		luaL_newlib(state, regs);
-		lua_setglobal(state, "FSystem");
-	}
+	//			{nullptr,nullptr}
+	//	};
+	//	luaL_newlib(state, regs);
+	//	lua_setglobal(state, "FSystem");
+	//}
 
-	//_Internal_Plot_
-	{
-		const luaL_Reg regs[] = {
-				{"make"       , &dispatch<&Calc::plot_make>      },
-				{"make_plot"  , &dispatch<&Calc::plot_make_plot> },
-				{"plot"       , &dispatch<&Calc::plot_plot>      },
-				{"marker"     , &dispatch<&Calc::plot_marker>    },
-				{"push_back"  , &dispatch<&Calc::plot_push_back> },
+	////_Internal_Plot_
+	//{
+	//	const luaL_Reg regs[] = {
+	//			{"make"       , &dispatch<&Calc::plot_make>      },
+	//			{"make_plot"  , &dispatch<&Calc::plot_make_plot> },
+	//			{"plot"       , &dispatch<&Calc::plot_plot>      },
+	//			{"marker"     , &dispatch<&Calc::plot_marker>    },
+	//			{"push_back"  , &dispatch<&Calc::plot_push_back> },
 
-				{nullptr,nullptr}
-		};
-		luaL_newlib(state, regs);
-		lua_setglobal(state, "_Internal_Plot_");
-	}
+	//			{nullptr,nullptr}
+	//	};
+	//	luaL_newlib(state, regs);
+	//	lua_setglobal(state, "_Internal_Plot_");
+	//}
 
+	//_Fluidum_Register_CppFunctions_
+	const luaL_Reg regs[] = {
+		{"Array" , &dispatch<&Calc::_Fluidum_Register_CppFunctions_Array> },
+		{"Plot"  , &dispatch<&Calc::_Fluidum_Register_CppFunctions_Plot>  },
 
-}
-
-void FS::Lua::Calc::registerLuaLibraries() {
-	luaL_openlibs(state);//standard library
-
-	//Fluidum Standard library
-	std::string folderPath = Resource::LuaFluidumStandardLibraryFolderPath;
-
-	auto result = luaL_dofile(state, (folderPath + "plot.lua").c_str());
-	if (result != LUA_OK) {
-		std::string log = GLog.add<FD::Log::Type::Error>("lual_doFile(plot.lua) return value was not LUA_OK.");
-		throw std::runtime_error(log);
-	}
-
-
+		{nullptr , nullptr}
+	};
+	luaL_newlib(state, regs);
+	lua_setglobal(state, "_Fluidum_Register_CppFunctions_");
 }
 
 void FS::Lua::Calc::terminate() {
-
 	lua_close(state);
-
 	GLog.add<FD::Log::Type::None>("Close Lua.");
-
 }
+
+FS::Lua::Ret FS::Lua::Calc::_Fluidum_Register_CppFunctions_Array(State L) {
+	using namespace Internal;
+
+	assert(LuAssist::Utils::size(L) == 0);
+
+	const luaL_Reg regs[] = {
+		{"make"  , &dispatch<&Calc::plot_make>      },
+		{nullptr ,nullptr}
+	};
+	luaL_newlib(state, regs);
+
+	return 1;
+}
+
+FS::Lua::Ret FS::Lua::Calc::_Fluidum_Register_CppFunctions_Plot(State L) {
+
+
+	return 0;
+}
+

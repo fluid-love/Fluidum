@@ -97,7 +97,7 @@ std::vector<LuAssist::Num> LuAssist::Utils::Table::convertTableToArrayOfNumbers(
 	std::vector<Num> result{};
 	result.reserve(1000);
 
-	std::size_t i = 1;
+	int32_t i = 1;
 	while (!lua_isnone(L, i++)) {
 		//push back
 		lua_rawgeti(L, tableIndex, -1);

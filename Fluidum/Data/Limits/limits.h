@@ -44,3 +44,9 @@ namespace FD::Layout::Limits {
 	};
 
 }
+
+namespace FD::Calc::Array::Limits {
+
+	constexpr inline uint32_t MaxSize = 100000;
+	
+}

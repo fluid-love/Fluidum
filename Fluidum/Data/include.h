@@ -22,5 +22,6 @@
 #include "Calc/Calc/calc.h"
 #include "Calc/Function/function.h"
 #include "Calc/Plot/ImPlot/plot.h"
+#include "Calc/Array/array.h"
 
 #include "Limits/limits.h"

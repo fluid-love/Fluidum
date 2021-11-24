@@ -13,14 +13,18 @@ namespace FS::Lua {
 			FD::ConsoleWrite* const consoleWrite,
 			FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite,
 			FD::ImPlotWrite* const implotWrite,
-			const FD::ImPlotRead* const implotRead
+			const FD::ImPlotRead* const implotRead,
+			FD::Calc::ArrayWrite* const arrayWrite,
+			const FD::Calc::ArrayRead* const arrayRead
 		);
 		void Constructor(
 			FD::ProjectRead,
 			FD::ConsoleWrite,
 			FD::FunctionWrite<FD::Calc::Language::Lua>,
 			FD::ImPlotWrite,
-			FD::ImPlotRead
+			FD::ImPlotRead,
+			FD::Calc::ArrayWrite,
+			FD::Calc::ArrayRead
 		);
 
 		~Calc() noexcept;
@@ -38,6 +42,8 @@ namespace FS::Lua {
 		FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite;
 		FD::ImPlotWrite* const implotWrite;
 		const FD::ImPlotRead* const implotRead;
+		FD::Calc::ArrayWrite* const arrayWrite;
+		const FD::Calc::ArrayRead* const arrayRead;
 
 		Internal::Check check{ consoleWrite };
 
@@ -45,75 +51,80 @@ namespace FS::Lua {
 		lua_State* const state;
 
 	private:
-		void registerCppFunctions();//c++関数の登録
-		void registerLuaLibraries();//luaライブラリの登録
+		void registerCppFunctions();
 		void terminate();
 
 		/* ↓Lua Functions↓ */
-	private://Genome
+	private://register cpp functions
+		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_Array(State L);
+		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_Plot(State L);
 
-	//	//genomeの作成
-	//	/*
-	//	引数：
-	//		個体数
-	//		ゲノムサイズ
-	//		ゲノムタイプ = bin
-	//		初期化方法 = random
-	//	*/
-	//	FLUIDUM_LUA_API Ret create_Genome(State L);
+	private://array
+		Fluidum_Lua_Api Ret array_make(State L);
 
-	//	//一点交叉
-	//	/*
-	//	引数：
-	//		親1の個体番号
-	//		親2の個体番号
-	//		交叉させる位置 1,2,3...
-	//	*/
-	//	FLUIDUM_LUA_API Ret singlePointCrossOver(State L);
 
-	//	//反転
-	//	/*
-	//	引数：
-	//		個体番号
-	//		反転させる位置
-	//	*/
-	//	FLUIDUM_LUA_API Ret flip_Genome(State L);
+		//	//genomeの作成
+		//	/*
+		//	引数：
+		//		個体数
+		//		ゲノムサイズ
+		//		ゲノムタイプ = bin
+		//		初期化方法 = random
+		//	*/
+		//	FLUIDUM_LUA_API Ret create_Genome(State L);
 
-	//	//0 1を入れる
-	//	/*
-	//	引数：
-	//		個体番号
-	//		位置
-	//	*/
-	//	FLUIDUM_LUA_API Ret set_Genome(State L);
-	//	FLUIDUM_LUA_API Ret unset_Genome(State L);
+		//	//一点交叉
+		//	/*
+		//	引数：
+		//		親1の個体番号
+		//		親2の個体番号
+		//		交叉させる位置 1,2,3...
+		//	*/
+		//	FLUIDUM_LUA_API Ret singlePointCrossOver(State L);
 
-	//	//個体を削除
-	//	/*
-	//	引数：
-	//		個体番号
-	//	*/
-	//	FLUIDUM_LUA_API Ret erase_Genome(State L);
+		//	//反転
+		//	/*
+		//	引数：
+		//		個体番号
+		//		反転させる位置
+		//	*/
+		//	FLUIDUM_LUA_API Ret flip_Genome(State L);
 
-	//	//binaryから非負十進数の値に変換
-	//	/*
-	//	引数：
-	//		個体番号
-	//		サイズ
-	//		オフセット
-	//	*/
-	//	FLUIDUM_LUA_API Ret toUInt_Genome(State L);
+		//	//0 1を入れる
+		//	/*
+		//	引数：
+		//		個体番号
+		//		位置
+		//	*/
+		//	FLUIDUM_LUA_API Ret set_Genome(State L);
+		//	FLUIDUM_LUA_API Ret unset_Genome(State L);
 
-	//	//一時的なgenomeをプッシュする
-	//	/*
-	//	引数：
-	//		一時的なgenomeのindex
-	//	*/
-	//	Fluidum_Lua_Api Ret push_Genome(State L);
+		//	//個体を削除
+		//	/*
+		//	引数：
+		//		個体番号
+		//	*/
+		//	FLUIDUM_LUA_API Ret erase_Genome(State L);
 
-	//private://Math
-	//	Fluidum_Lua_Api Ret hypot(State L);//距離を返す
-	//	Fluidum_Lua_Api Ret randomInt(State L);//ランダムな整数値を返す
+		//	//binaryから非負十進数の値に変換
+		//	/*
+		//	引数：
+		//		個体番号
+		//		サイズ
+		//		オフセット
+		//	*/
+		//	FLUIDUM_LUA_API Ret toUInt_Genome(State L);
+
+		//	//一時的なgenomeをプッシュする
+		//	/*
+		//	引数：
+		//		一時的なgenomeのindex
+		//	*/
+		//	Fluidum_Lua_Api Ret push_Genome(State L);
+
+		//private://Math
+		//	Fluidum_Lua_Api Ret hypot(State L);//距離を返す
+		//	Fluidum_Lua_Api Ret randomInt(State L);//ランダムな整数値を返す
 
 	private://FPlot
 
@@ -133,11 +144,11 @@ namespace FS::Lua {
 		//	Fluidum_Lua_Api Ret updateIndex(State L);
 		//	Fluidum_Lua_Api Ret clear_Draw(State L);
 
-	private://FSystem
+	private://system
 
 		Fluidum_Lua_Api Ret system_sleep_seconds(State L);
 		Fluidum_Lua_Api Ret system_sleep_milliseconds(State L);
-		
+
 		//throw Internal::Exception
 		FluidumUtils_Debug_BeginDisableWarning(4646)
 			Fluidum_Lua_Api [[noreturn]] Ret system_terminate(State L);

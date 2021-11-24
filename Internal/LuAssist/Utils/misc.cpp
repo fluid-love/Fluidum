@@ -141,7 +141,7 @@ std::vector<LuAssist::Type> LuAssist::Utils::types(State L) {
 std::size_t LuAssist::Utils::numOfArgs(State L) {
 	std::size_t i = 0;
 	std::size_t count = 0;
-	while (!lua_isnone(L, i)) {
+	while (!lua_isnone(L, static_cast<int>(i))) {
 		i++;
 		count++;
 	}

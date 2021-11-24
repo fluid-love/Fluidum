@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Array\array.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Calc\Array\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Calc\calc.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\container.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Function\function.h" />
@@ -225,6 +227,7 @@
     <ClCompile Include="..\..\..\External\implot\implot.cpp" />
     <ClCompile Include="..\..\..\External\implot\implot_demo.cpp" />
     <ClCompile Include="..\..\..\External\implot\implot_items.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Calc\Array\array.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Calc\calc.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Coding\tab.cpp" />
@@ -305,6 +308,7 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.make.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.display.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.hide.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.make.cpp" />
@@ -347,8 +351,8 @@
     <ClCompile Include="..\..\..\Internal\LuAssist\Utils\misc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Fluidum\Language\Lua\FluidumStandardLibrary\plot.lua" />
-    <None Include="..\..\..\Fluidum\Language\Lua\FluidumStandardLibrary\array.lua" />
+    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum.array.lua" />
+    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum.plot.lua" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\BarExit" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew" />

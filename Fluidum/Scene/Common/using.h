@@ -42,6 +42,8 @@ namespace FS {
 		FD::ImPlotRead_Lock,
 		FD::CalcWrite,
 		FD::CalcRead,
+		FD::Calc::ArrayWrite,
+		FD::Calc::ArrayRead,
 		FD::TopBarWrite,
 		FD::TopBarRead,
 		FD::ImGuiWindowWrite,
