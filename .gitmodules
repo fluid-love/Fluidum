@@ -1,25 +1,25 @@
-[submodule "Libraries/magic_enum"]
-	path = Libraries/magic_enum
+[submodule "External/magic_enum"]
+	path = External/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
-[submodule "Libraries/imgui"]
-	path = Libraries/imgui
+[submodule "External/imgui"]
+	path = External/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
-[submodule "Libraries/glm"]
-	path = Libraries/glm
+[submodule "External/glm"]
+	path = External/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "Libraries/stb"]
-	path = Libraries/stb
+[submodule "External/stb"]
+	path = External/stb
 	url = https://github.com/nothings/stb.git
-[submodule "Libraries/IconFontCppHeaders"]
-	path = Libraries/IconFontCppHeaders
+[submodule "External/IconFontCppHeaders"]
+	path = External/IconFontCppHeaders
 	url = https://github.com/juliettef/IconFontCppHeaders.git
-[submodule "Libraries/ImGuiColorTextEdit"]
-	path = Libraries/ImGuiColorTextEdit
+[submodule "External/ImGuiColorTextEdit"]
+	path = External/ImGuiColorTextEdit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
-[submodule "Libraries/implot"]
-	path = Libraries/implot
+[submodule "External/implot"]
+	path = External/implot
 	url = https://github.com/epezent/implot.git
-[submodule "Libraries/predef"]
-	path = Libraries/predef
+[submodule "External/predef"]
+	path = External/predef
 	url = https://github.com/boostorg/predef.git

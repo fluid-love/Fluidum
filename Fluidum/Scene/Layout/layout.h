@@ -61,8 +61,8 @@ namespace FS {
 	private:
 		void ifRightMouseButtonCliked();
 		void popup();
-		bool widthConstraintArea(const ImVec2& mousePos);
-		bool heightConstraintArea(const ImVec2& mousePos);
+		bool widthConstraintArea();
+		bool heightConstraintArea();
 		bool centerHorizonalConstraintArea();
 		bool centerVerticalConstraintArea();
 	private:

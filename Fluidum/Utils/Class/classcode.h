@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../libraries/lithash/lithash.h"
+#include "../../../External/lithash/lithash.h"
 
 namespace FU::Class {
 
@@ -9,7 +9,7 @@ namespace FU::Class {
 		using CodeType = uint32_t;//hash
 
 		template<typename T>
-		_NODISCARD static consteval CodeType GetClassCode() requires std::is_class_v<T> {
+		[[nodiscard]] static consteval CodeType GetClassCode() requires std::is_class_v<T> {
 			return createHash(__FUNCSIG__);
 		}
 	};

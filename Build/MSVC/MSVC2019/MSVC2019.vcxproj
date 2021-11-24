@@ -214,6 +214,17 @@
     <ClInclude Include="..\..\..\Internal\LuAssist\Utils\misc.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\External\ImGuiColorTextEdit\TextEditor.cpp" />
+    <ClCompile Include="..\..\..\External\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\..\External\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\..\External\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\..\External\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\..\External\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\..\..\External\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\External\imgui\misc\freetype\imgui_freetype.cpp" />
+    <ClCompile Include="..\..\..\External\implot\implot.cpp" />
+    <ClCompile Include="..\..\..\External\implot\implot_demo.cpp" />
+    <ClCompile Include="..\..\..\External\implot\implot_items.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Calc\calc.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Coding\tab.cpp" />
@@ -294,16 +305,16 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Display.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Hide.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.MakePlot.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Make.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Marker.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.Plot.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\Plot.PushBack.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.SleepMilliSeconds.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.SleepSeconds.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\System.Terminate.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.display.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.hide.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.make.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.make_plot.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.marker.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.plot.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.push_back.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.sleep_milliseconds.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.sleep_seconds.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.terminate.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Run\run.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.cpp" />
@@ -334,20 +345,10 @@
     <ClCompile Include="..\..\..\Fluidum\Utils\Text\guitext.cpp" />
     <ClCompile Include="..\..\..\Internal\LuAssist\Utils\table.cpp" />
     <ClCompile Include="..\..\..\Internal\LuAssist\Utils\misc.cpp" />
-    <ClCompile Include="..\..\..\Libraries\ImGuiColorTextEdit\TextEditor.cpp" />
-    <ClCompile Include="..\..\..\Libraries\imgui\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\..\..\Libraries\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\..\Libraries\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\..\Libraries\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\..\Libraries\imgui\imgui_tables.cpp" />
-    <ClCompile Include="..\..\..\Libraries\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="..\..\..\Libraries\imgui\misc\freetype\imgui_freetype.cpp" />
-    <ClCompile Include="..\..\..\Libraries\implot\implot.cpp" />
-    <ClCompile Include="..\..\..\Libraries\implot\implot_demo.cpp" />
-    <ClCompile Include="..\..\..\Libraries\implot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Fluidum\Language\Lua\FluidumStandardLibrary\plot.lua" />
+    <None Include="..\..\..\Fluidum\Language\Lua\FluidumStandardLibrary\array.lua" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\BarExit" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew" />
@@ -440,7 +441,7 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;../../../Libraries/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -448,7 +449,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;../../../Libraries/Vulkan-Headers/lib;../../../Libraries/freetype-2.10.0/objs;../../../Libraries/lua-5.4.3/lib/Release;../../../Libraries/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../External/glfw/lib-vc2019;../../../External/Vulkan-Headers/lib;../../../External/freetype-2.10.0/objs;../../../External/lua-5.4.3/lib/Release;../../../External/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;LuaBuild.lib;nfd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -461,7 +462,7 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;../../../Libraries/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -471,7 +472,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;../../../Libraries/Vulkan-Headers/lib;../../../Libraries/freetype-2.10.0/objs;../../../Libraries/lua-5.4.3/lib/Release;../../../Libraries/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../External/glfw/lib-vc2019;../../../External/Vulkan-Headers/lib;../../../External/freetype-2.10.0/objs;../../../External/lua-5.4.3/lib/Release;../../../External/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;LuaBuild.lib;nfd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -482,14 +483,14 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;../../../Libraries/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;../../../Libraries/Vulkan-Headers/lib;../../../Libraries/freetype-2.10.0/objs;../../../Libraries/lua-5.4.3/lib/Release;../../../Libraries/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../External/glfw/lib-vc2019;../../../External/Vulkan-Headers/lib;../../../External/freetype-2.10.0/objs;../../../External/lua-5.4.3/lib/Release;../../../External/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;LuaBuild.lib;nfd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -502,7 +503,7 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../Libraries/imgui;../../../Libraries/glfw/include;../../../Libraries/Vulkan-Headers/include;../../../Libraries/predef/include;../../../Libraries/freetype-2.10.0/include;../../../Libraries/nativefiledialog/src/include;../../../Libraries/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -512,7 +513,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions> %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>../../../Libraries/glfw/lib-vc2019;../../../Libraries/Vulkan-Headers/lib;../../../Libraries/freetype-2.10.0/objs;../../../Libraries/lua-5.4.3/lib/Release;../../../Libraries/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../External/glfw/lib-vc2019;../../../External/Vulkan-Headers/lib;../../../External/freetype-2.10.0/objs;../../../External/lua-5.4.3/lib/Release;../../../External/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;LuaBuild.lib;nfd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

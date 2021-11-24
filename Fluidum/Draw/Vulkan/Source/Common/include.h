@@ -20,9 +20,9 @@ FluidumUtils_Debug_BeginDisableAllWarning
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_ENABLE_EXPERIMENTAL
-#include "../../../Libraries/glm/glm/glm.hpp"
-#include "../../../Libraries/glm/glm/gtc/matrix_transform.hpp"
-#include "../../../Libraries/glm/glm/gtx/hash.hpp"
+#include "../../../External/glm/glm/glm.hpp"
+#include "../../../External/glm/glm/gtc/matrix_transform.hpp"
+#include "../../../External/glm/glm/gtx/hash.hpp"
 
 //disable warning pop
 FluidumUtils_Debug_EndDisableAllWarning

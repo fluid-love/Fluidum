@@ -8,8 +8,8 @@
 #endif
 
 //ImGui default IconFont
-#include "../../../Libraries/IconFontCppHeaders/IconsMaterialDesign.h"
-#include "../../../Libraries/IconFontCppHeaders/IconsFontAwesome5.h"
+#include "../../../External/IconFontCppHeaders/IconsMaterialDesign.h"
+#include "../../../External/IconFontCppHeaders/IconsFontAwesome5.h"
 
 #include "messenger.h"
 #include "mutex.h"

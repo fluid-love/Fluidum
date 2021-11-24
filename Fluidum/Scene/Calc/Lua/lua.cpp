@@ -15,27 +15,11 @@ FS::Lua::Calc::Calc(
 	state(luaL_newstate())
 {
 	assert(this->state);
-	GLog.add<FD::Log::Type::None>("Construct LuaCalcScene.");
+	FluidumScene_Log_Constructor("Lua::Calc");
 }
 
 FS::Lua::Calc::~Calc() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct LuaCalcScene.");
-
-		this->terminate();
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("Lua::Calc");
 }
 
 void FS::Lua::Calc::call() {
@@ -125,9 +109,9 @@ void FS::Lua::Calc::registerCppFunctions() {
 	//FSystem direct
 	{
 		const luaL_Reg regs[] = {
-				{"SleepSeconds"      , &dispatch<&Calc::sleepSeconds>      },
-				{"SleepMilliSeconds" , &dispatch<&Calc::sleepMilliSeconds> },
-				{"Terminate"         , &dispatch<&Calc::terminate>         },
+				{"sleep_seconds"      , &dispatch<&Calc::system_sleep_seconds>      },
+				{"sleep_milliseconds" , &dispatch<&Calc::system_sleep_milliseconds> },
+				{"terminate"          , &dispatch<&Calc::system_terminate>          },
 
 				{nullptr,nullptr}
 		};
@@ -138,11 +122,11 @@ void FS::Lua::Calc::registerCppFunctions() {
 	//_Internal_Plot_
 	{
 		const luaL_Reg regs[] = {
-				{"Make"      , &dispatch<&Calc::plot_make>      },
-				{"MakePlot"  , &dispatch<&Calc::plot_makePlot>  },
-				{"Plot"      , &dispatch<&Calc::plot_plot>      },
-				{"SetMarker" , &dispatch<&Calc::plot_setMarker> },
-				{"PushBack"  , &dispatch<&Calc::plot_pushBack>  },
+				{"make"       , &dispatch<&Calc::plot_make>      },
+				{"make_plot"  , &dispatch<&Calc::plot_make_plot> },
+				{"plot"       , &dispatch<&Calc::plot_plot>      },
+				{"marker"     , &dispatch<&Calc::plot_marker>    },
+				{"push_back"  , &dispatch<&Calc::plot_push_back> },
 
 				{nullptr,nullptr}
 		};

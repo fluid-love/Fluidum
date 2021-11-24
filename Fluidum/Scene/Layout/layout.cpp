@@ -25,8 +25,8 @@ FS::Layout::Layout(
 		layoutWrite->reset();
 	}
 
-	layoutWrite->widthLimit(guiRead->windowSize().x * 0.1f);
-	layoutWrite->heightLimit(guiRead->windowSize().y * 0.1f);
+	layoutWrite->widthLimit(guiRead->windowSize().x * 0.13f);
+	layoutWrite->heightLimit(guiRead->windowSize().y * 0.13f);
 
 }
 
@@ -57,7 +57,7 @@ void FS::Layout::dockGui() {
 		select.current = windows[i];
 		std::string label = "##Lay" + std::to_string(i);
 
-		ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, { 0.0f,0.0f ,0.007f * i,1.0f });
+		ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, { 0.007f,0.0f ,0.0f ,1.0f });
 		this->dockSpace(label.c_str());
 		ImGui::PopStyleColor();
 	}
@@ -93,15 +93,16 @@ void FS::Layout::dockSpace(const char* label) {
 }
 
 void FS::Layout::ifRightMouseButtonCliked() {
-	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right) || !ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows))
+	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right) || !ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows | ImGuiHoveredFlags_RootAndChildWindows))
 		return;
+
 
 	flag.popup = true;
 	select.pos = ImGui::GetMousePos();
 	select.right = select.current;
 
-	flag.widthConstraintArea = this->widthConstraintArea(select.pos);
-	flag.heightConstraintArea = this->heightConstraintArea(select.pos);
+	flag.widthConstraintArea = this->widthConstraintArea();
+	flag.heightConstraintArea = this->heightConstraintArea();
 
 	flag.centerHorizonalConstraintArea = this->centerHorizonalConstraintArea();
 	flag.centerVerticalConstraintArea = this->centerVerticalConstraintArea();
@@ -155,20 +156,20 @@ void FS::Layout::popup() {
 	ImGui::EndPopup();
 }
 
-bool FS::Layout::widthConstraintArea(const ImVec2& mousePos) {
+bool FS::Layout::widthConstraintArea() {
 	const float width = layoutRead->widthLimit();
 	for (auto& x : windows) {
-		if (x.pos.x - width < mousePos.x && mousePos.x < x.pos.x + width)
+		if (x.pos.x - width < select.pos.x && select.pos.x < x.pos.x + width)
 			return true;
 	}
 
 	return false;
 }
 
-bool FS::Layout::heightConstraintArea(const ImVec2& mousePos) {
+bool FS::Layout::heightConstraintArea() {
 	const float height = layoutRead->heightLimit();
 	for (auto& x : windows) {
-		if (x.pos.y - height < mousePos.x && mousePos.x < x.pos.y + height)
+		if (x.pos.y - height < select.pos.y && select.pos.y < x.pos.y + height)
 			return true;
 	}
 
