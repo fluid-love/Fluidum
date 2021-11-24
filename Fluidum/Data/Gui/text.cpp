@@ -1,7 +1,7 @@
 #include "text.h"
 
-#include "../../../Libraries/IconFontCppHeaders/IconsMaterialDesign.h"
-#include "../../../Libraries/IconFontCppHeaders/IconsFontAwesome5.h"
+#include "../../../External/IconFontCppHeaders/IconsMaterialDesign.h"
+#include "../../../External/IconFontCppHeaders/IconsFontAwesome5.h"
 
 namespace FD::Internal::Text {
 	using Language = ::FD::Text::Language;

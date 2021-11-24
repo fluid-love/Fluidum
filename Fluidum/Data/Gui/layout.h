@@ -126,6 +126,9 @@ namespace FD {
 
 	private:
 		void remakeAllWindows(const Layout::Internal::ResizedBorder border = Layout::Internal::ResizedBorder::None) const;
+		void remakeWindow_horizonal(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) const;
+		void remakeWindow_vertical(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) const;
+
 	};
 
 	class LayoutRead final {

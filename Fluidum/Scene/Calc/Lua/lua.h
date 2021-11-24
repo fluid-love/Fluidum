@@ -118,9 +118,9 @@ namespace FS::Lua {
 	private://FPlot
 
 		Fluidum_Lua_Api Ret plot_make(State L);
-		Fluidum_Lua_Api Ret plot_pushBack(State L);
-		Fluidum_Lua_Api Ret plot_setMarker(State L);
-		Fluidum_Lua_Api Ret plot_makePlot(State L);
+		Fluidum_Lua_Api Ret plot_push_back(State L);
+		Fluidum_Lua_Api Ret plot_marker(State L);
+		Fluidum_Lua_Api Ret plot_make_plot(State L);
 		Fluidum_Lua_Api Ret plot_plot(State L);
 		Fluidum_Lua_Api Ret plot_display(State L);
 		Fluidum_Lua_Api Ret plot_hide(State L);
@@ -135,12 +135,12 @@ namespace FS::Lua {
 
 	private://FSystem
 
-		Fluidum_Lua_Api Ret sleepSeconds(State L);
-		Fluidum_Lua_Api Ret sleepMilliSeconds(State L);
-
-		//終了させる
+		Fluidum_Lua_Api Ret system_sleep_seconds(State L);
+		Fluidum_Lua_Api Ret system_sleep_milliseconds(State L);
+		
+		//throw Internal::Exception
 		FluidumUtils_Debug_BeginDisableWarning(4646)
-			Fluidum_Lua_Api [[noreturn]] Ret terminate(State L);
+			Fluidum_Lua_Api [[noreturn]] Ret system_terminate(State L);
 		FluidumUtils_Debug_EndDisableWarning
 
 			//private:

@@ -4,7 +4,7 @@
 #include "../../Data/include.h"
 #include "../../Draw/include.h"
 
-#include "../../Libraries/ImGuiAnimation/ImGuiAnimation.h"
+#include "../../Internal/ImGuiAnimation/ImGuiAnimation.h"
 
 namespace FS {
 
