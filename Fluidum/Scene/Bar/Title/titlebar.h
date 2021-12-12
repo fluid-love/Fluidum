@@ -58,6 +58,10 @@ namespace FS {
 			ImVec2 windowPos{};
 			ImVec2 windowSize{};
 
+			ImVec2 projectNameWindowPos{};
+			ImVec2 projectNameWindowSize{};
+
+
 			ImVec2 iconSize{};
 
 			ImVec2 buttonSize{};
@@ -66,6 +70,7 @@ namespace FS {
 	private:
 		void icon();
 		void bar();
+		void project();
 
 	private:
 		void exit();

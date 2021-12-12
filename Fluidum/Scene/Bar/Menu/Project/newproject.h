@@ -1,10 +1,6 @@
-/*
-MenuBar->新規作成
-*/
-
 #pragma once
 
-#include <unordered_map>
+#include "projectform.h"
 #include "../../../Common/common.h"
 
 namespace FS::Bar {
@@ -16,24 +12,37 @@ namespace FS::Bar {
 			FD::WindowWrite* const windowWrite,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
-			const FD::Log::ProjectRead* const projectLogRead
+			const FD::Log::ProjectRead* const projectLogRead,
+			FD::Log::ProjectWrite* const projectLogWrite
 		);
-		void Constructor(FD::SceneRead, FD::WindowWrite, FD::GuiRead, FD::GuiWrite,FD::Log::ProjectRead);
+		void Constructor(
+			FD::SceneRead,
+			FD::WindowWrite,
+			FD::GuiRead,
+			FD::GuiWrite,
+			FD::Log::ProjectRead,
+			FD::Log::ProjectWrite
+		);
 
 		~NewProject() noexcept;
 
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
 		const FD::SceneRead* const sceneRead;
 		FD::WindowWrite* const windowWrite;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
+		FD::Log::ProjectWrite* const projectLogWrite;
 
 		FD::Text::NewProject text{};
 
-	private://data
+	private:
+		std::shared_ptr<ProjectForm::Info> formInfo{};
+		void checkForm();
+
+	private:
 		const std::vector<FDR::ImGuiImage> images;
 
 		struct {
@@ -45,6 +54,7 @@ namespace FS::Bar {
 			ImVec2 windowSize{};
 
 			ImVec2 buttonSize{};
+
 		}style;
 
 		enum class Template : uint8_t {
@@ -53,22 +63,33 @@ namespace FS::Bar {
 		};
 
 		struct ButtonInfo final {
+			FD::Log::Project::Type type;
 			FDR::ImGuiImage image;
 			const char* label;
-			const char* title;
+			const std::string& title;
 			const char* description;
+
+			bool hide = false;
 		};
 
-		//雛形　空
-		const std::vector<ButtonInfo> emptyTemplates;
-		//雛形
-		const std::vector<ButtonInfo> algorithmTemplates;
+		//empty
+		std::vector<ButtonInfo> emptyTemplates;
 
-		//filter　すくないのでまだ実装しない
-		const std::unordered_map<Template, const ButtonInfo&> templates;
+		//algorithm
+		std::vector<ButtonInfo> algorithmTemplates;
 
 		//recent
 		const std::vector<ButtonInfo> recentTemplates;
+
+		struct {
+			std::string str{};
+			std::string temp{};
+		}searchStr;
+
+		struct {
+			uint16_t index{};
+			bool flag = false;
+		}recentPopupInfo;
 
 	private:
 		void title();
@@ -79,10 +100,25 @@ namespace FS::Bar {
 
 		void bottom();
 
-		void formScene(const bool isButtonClicked, const char* type);
+		void formScene(const bool isButtonClicked, const ButtonInfo& button);
 
 	private:
-		bool button(const FDR::ImGuiImage& image, const char* label, const char* title, const char* description);
+		//return [left, right]
+		std::pair<bool, bool> button(
+			const FDR::ImGuiImage& image,
+			const char* label,
+			const char* title,
+			const char* description,
+			const std::optional<float> width = std::nullopt
+		);
+
+	private:
+		void search();
+
+	private:
+		void recentPopup();
+		void recent_clear();
+		void recent_erase();
 
 	private:
 		std::vector<ButtonInfo> initRecentTempates(const std::vector<FD::Log::Project::Type>& types);

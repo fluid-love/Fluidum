@@ -77,7 +77,6 @@ namespace FS {
 
 
 	private:
-		void projectNameGui();
 
 		void rightGui();
 

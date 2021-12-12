@@ -250,7 +250,7 @@ void FS::Title::recentProject() {
 }
 
 void FS::Title::newProject() {
-	GLog.add<FD::Log::Type::None>("Request add NewProjectScene.");
+	FluidumScene_Log_RequestAddScene("Bar::NewProject");
 	Scene::addScene<Bar::NewProject>();
 }
 
@@ -318,9 +318,9 @@ void FS::Title::openProject(const char* filePath, const ImVec2& pos) {
 
 void FS::Title::documentLink() {
 #ifdef BOOST_OS_WINDOWS
-	system("start https://github.com/fluid-love/Fluidum");
+	system("start https://fluidum.fluid-love.com/manual_beta/");
 #elif BOOST_OS_MAC
-	system("open https://github.com/fluid-love/Fluidum");
+	system("open https://fluidum.fluid-love.com/manual_beta/");
 #else
 #error Not Supported
 #endif 

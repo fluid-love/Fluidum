@@ -7,7 +7,7 @@ namespace FD::Log::Project {
 		Empty,
 		Empty_Lua,
 		Empty_Python,
-		Empty_AngelScript,
+		Empty_Cpp,
 		Interactive
 	};
 }
@@ -24,6 +24,11 @@ namespace FD::Log {
 	public:
 		void update(const Project::Type type) const;
 
+		//Clear "All"
+		void clear() const;
+
+		//latest 0, 1, 2,...
+		void erase(const std::size_t index) const;
 	};
 
 	//single thread
@@ -34,7 +39,7 @@ namespace FD::Log {
 		FluidumUtils_Class_Delete_CopyMove(ProjectRead)
 
 	public:
-		_NODISCARD std::vector<Project::Type> recent() const;
+		[[nodiscard]] std::vector<Project::Type> recent() const;
 	};
 
 }

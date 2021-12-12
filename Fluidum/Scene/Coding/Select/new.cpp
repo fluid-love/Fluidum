@@ -335,7 +335,7 @@ void FS::Coding::New::create() {
 		ofs << FD::File::Template::EmptyLua << std::endl;
 	else if (select.type == Empty_Python)
 		ofs << FD::File::Template::EmptyPy << std::endl;
-	else if (select.type == Empty_AngelScript)
+	else if (select.type == Empty_Cpp)
 		ofs << FD::File::Template::EmptyAS << std::endl;
 	else {
 		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
@@ -482,7 +482,7 @@ std::vector<FS::Coding::New::ButtonInfo> FS::Coding::New::initRecentFileTypes(co
 			result.emplace_back(ButtonInfo{ images.at(1), "_ELua", text.emptyLua, text.emptyLua_Description });
 		else if (x == Empty_Python)
 			result.emplace_back(ButtonInfo{ images.at(2), "_EPy", text.emptyPython, text.emptyPython_Description });
-		else if (x == Empty_AngelScript)
+		else if (x == Empty_Cpp)
 			result.emplace_back(ButtonInfo{ images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScript_Description });
 
 		else {

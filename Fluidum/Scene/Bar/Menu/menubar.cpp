@@ -134,9 +134,9 @@ void FS::MenuBar::fileGui() {
 
 	this->itemExit();
 
-	ImGui::EndMenu();
-
 	ImGui::PopStyleVar();
+
+	ImGui::EndMenu();
 }
 
 void FS::MenuBar::itemCreateNewProject() {
@@ -244,9 +244,8 @@ void FS::MenuBar::editGui() {
 	this->pushItemSpacing();
 
 
-	ImGui::EndMenu();
-
 	ImGui::PopStyleVar();
+	ImGui::EndMenu();
 }
 
 void FS::MenuBar::calcGui() {
@@ -272,9 +271,8 @@ void FS::MenuBar::calcGui() {
 
 	}
 
-	ImGui::EndMenu();
-
 	ImGui::PopStyleVar();
+	ImGui::EndMenu();
 }
 
 void FS::MenuBar::itemRunDebugMode() {
@@ -593,9 +591,8 @@ void FS::MenuBar::helpGui() {
 	}
 
 
-	ImGui::EndMenu();
-
 	ImGui::PopStyleVar();
+	ImGui::EndMenu();
 }
 
 void FS::MenuBar::pushItemSpacing() {

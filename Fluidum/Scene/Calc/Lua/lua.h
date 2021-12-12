@@ -52,15 +52,72 @@ namespace FS::Lua {
 
 	private:
 		void registerCppFunctions();
+		bool init();
 		void terminate();
 
 		/* ↓Lua Functions↓ */
 	private://register cpp functions
+		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_FSLPath(State L);
+
 		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_Array(State L);
 		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_Plot(State L);
 
 	private://array
 		Fluidum_Lua_Api Ret array_make(State L);
+
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_empty(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_size(State L);
+
+		
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_front(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_back(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array___index(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array___newindex(State L);
+
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_set(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_push_front(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_push_back(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_pop_front(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_pop_back(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_clear(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_erase(State L);
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array_erase_if(State L);
+
+
+		template<FD::Calc::Array::ValueType>
+		Fluidum_Lua_Api Ret array___gc(State L);
+
+
+
+
+
 
 
 		//	//genomeの作成

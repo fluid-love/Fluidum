@@ -22,4 +22,10 @@ namespace FD::Calc::Array {
 		void
 		>>>;
 
+	template<ValueType T>
+	concept IsValueType =
+		(T == ValueType::Number) ||
+		(T == ValueType::String) ||
+		(T == ValueType::Bit);
+
 }

@@ -63,6 +63,13 @@ namespace FD::Layout {
 	};
 
 	namespace Internal {
+		struct History final {
+			float* pos = nullptr;
+			float readPos{};
+			uint32_t parentWindowIndex = 0;
+			bool horizonal = false;
+		};
+
 		enum class ResizedBorder : uint8_t {
 			None,
 			Left,
@@ -80,9 +87,12 @@ namespace FD::Layout {
 			static inline float mainFrameBottom{};
 			static inline std::vector<std::shared_ptr<DockSpaceWindow>> windows{};
 
+			static inline std::vector<History> history{};
 		private:
 			static inline std::mutex mtx{};
 			static inline std::atomic_bool save = false;
+		private:
+			static void remake();
 		private:
 			friend class LayoutWrite;
 			friend class LayoutRead;
@@ -113,10 +123,11 @@ namespace FD {
 		//construct main layout window from LayoutData
 		void reset() const;
 
-		bool splitVertical(const Layout::DockSpaceWindow& window, const float posX) const;
-		bool splitHorizonal(const Layout::DockSpaceWindow& window, const float posY) const;
-		bool splitCross(const Layout::DockSpaceWindow& window, const ImVec2& pos) const;
+		static bool splitVertical(const Layout::DockSpaceWindow& window, const float posX);
+		static bool splitHorizonal(const Layout::DockSpaceWindow& window, const float posY);
 
+	public:
+		void merge() const;
 
 	public:
 		void update(const Layout::DockSpaceWindow& window) const;
@@ -125,10 +136,12 @@ namespace FD {
 		void save() const noexcept;
 
 	private:
-		void remakeAllWindows(const Layout::Internal::ResizedBorder border = Layout::Internal::ResizedBorder::None) const;
-		void remakeWindow_horizonal(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) const;
-		void remakeWindow_vertical(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) const;
+		static void remakeAllWindows(const Layout::Internal::ResizedBorder border = Layout::Internal::ResizedBorder::None);
+		static void remakeWindow_horizonal(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border);
+		static void remakeWindow_vertical(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border);
 
+	private:
+		friend Layout::Internal::LayoutData;
 	};
 
 	class LayoutRead final {

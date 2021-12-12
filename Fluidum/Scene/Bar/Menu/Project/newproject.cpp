@@ -1,18 +1,17 @@
 ﻿#include "newproject.h"
-#include "projectform.h"
 #include "../../../Utils/Popup/backwindow.h"
+#include "../../../Utils/Popup/message.h"
 
 using namespace FU::ImGui::Operators;
 
 namespace FS::Bar::Internal {
 	std::vector<FDR::ImGuiImage> makeImages() {
 		std::vector<FDR::ImGuiImage> result;
-		for (uint16_t i = 0; i < 5; i++) {
+		for (uint16_t i = 0; i < 4; i++) {
 			std::string path = Resource::NewProjectIconsFolderPath;
 			path += std::to_string(i + 1) += ".png";
 			result.emplace_back(FDR::createImGuiImage(path.c_str()));
 		}
-		assert(result.size() == 5);
 		return result;
 	}
 }
@@ -22,43 +21,45 @@ FS::Bar::NewProject::NewProject(
 	FD::WindowWrite* const windowWrite,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
-	const FD::Log::ProjectRead* const projectLogRead
+	const FD::Log::ProjectRead* const projectLogRead,
+	FD::Log::ProjectWrite* const projectLogWrite
 ) :
 	sceneRead(sceneRead),
 	windowWrite(windowWrite),
 	guiRead(guiRead),
 	guiWrite(guiWrite),
+	projectLogWrite(projectLogWrite),
 	images(Internal::makeImages()),
 	emptyTemplates({
-			ButtonInfo{images.at(0), "_Empty", text.empty, text.emptyDescription},
-			ButtonInfo{images.at(1), "_ELua", text.emptyLua, text.emptyLuaDescription},
-			ButtonInfo{images.at(2), "_EPy", text.emptyPython, text.emptyPythonDescription},
-			ButtonInfo{images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScriptDescription}
+			ButtonInfo{FD::Log::Project::Type::Empty, images.at(0), "_Empty", text.empty.operator const std::string & (), text.emptyDescription},
+			ButtonInfo{FD::Log::Project::Type::Empty_Lua, images.at(1), "_ELua", text.emptyLua.operator const std::string & (), text.emptyLuaDescription},
+			ButtonInfo{FD::Log::Project::Type::Empty_Python, images.at(2), "_EPy", text.emptyPython.operator const std::string & (), text.emptyPythonDescription},
+			ButtonInfo{FD::Log::Project::Type::Empty_Cpp, images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCppDescription}
 		}),
 	algorithmTemplates({
-		ButtonInfo{ images.at(4), "_IT", text.interactive, text.interactiveDescription }
 		}),
-	recentTemplates(this->initRecentTempates(projectLogRead->recent()))
+		recentTemplates(this->initRecentTempates(projectLogRead->recent()))
 
 {
-	GLog.add<FD::Log::Type::None>("Construct NewProjectScene.");
-
+	FluidumScene_Log_Constructor("NewProject");
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
 
-	style.buttonSize = ImVec2(style.windowSize.x / 2.2f, style.windowSize.y * 0.09f);
+	style.buttonSize = ImVec2(style.windowSize.x / 2.1f, style.windowSize.y * 0.09f);
 
-	GLog.add<FD::Log::Type::None>("Request add PopupBackWindowScene.");
+	FluidumScene_Log_RequestAddScene("PopupBackWindow");
 	Scene::addScene<PopupBackWindow>();
+
+	this->searchStr.str.reserve(100);
 }
 
 FS::Bar::NewProject::~NewProject() noexcept {
 	try {
-		GLog.add<FD::Log::Type::None>("Request delete PopupBackWindowScene.");
+		FluidumScene_Log_RequestDeleteScene("PopupBackWindow");
 		Scene::deleteScene<PopupBackWindow>();
 
-		GLog.add<FD::Log::Type::None>("Destruct NewProjectScene.");
+		FluidumScene_Log_Destructor("NewProject");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -76,13 +77,13 @@ FS::Bar::NewProject::~NewProject() noexcept {
 
 void FS::Bar::NewProject::call() {
 
-	if (!sceneRead->isExist<ProjectForm>())
+	if (!sceneRead->isExist<ProjectForm>() && !ImGui::IsPopupOpen("RecentPopup"))
 		ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.1f);
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
 
 	constexpr auto flag =
@@ -93,17 +94,23 @@ void FS::Bar::NewProject::call() {
 	ImGui::Begin("NewProject", nullptr, flag);
 
 	//animation
-	ImAnime::PushStyleVar(anime.counter,0.5f,0.0f,1.0f,ImAnimeType::LINEAR,ImGuiStyleVar_Alpha);
+	ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
+
+	ImGui::BeginChild("##NPMain", { 0.0f,style.windowSize.y * 0.92f });
 
 	this->title();
 
 	ImGui::Spacing(); ImGui::Separator();
 
+	ImGui::Spacing(); ImGui::SameLine();
 	this->recent();
-	ImGui::SameLine();
+	ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
+	ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
 	this->select();
 
-	ImGui::Spacing(); ImGui::Spacing();
+	ImGui::EndChild();//NPMain
+
+	ImGui::Spacing(); ImGui::SameLine();
 	this->bottom();
 
 	ImAnime::PopStyleVar();
@@ -111,6 +118,25 @@ void FS::Bar::NewProject::call() {
 	ImGui::End();
 
 	ImGui::PopStyleVar(3);
+
+	this->recentPopup();
+	this->checkForm();
+}
+
+void FS::Bar::NewProject::checkForm() {
+	if (!formInfo)
+		return;
+
+	if (formInfo.use_count() != 1)
+		return;
+
+	if (formInfo->create) {
+		projectLogWrite->update(formInfo->type);
+		FluidumScene_Log_RequestDeleteScene("NewProject");
+		Scene::deleteScene<Bar::NewProject>();
+	}
+
+	formInfo.reset();
 }
 
 void FS::Bar::NewProject::title() {
@@ -123,38 +149,51 @@ void FS::Bar::NewProject::title() {
 	ImGui::BeginChild("Search", ImVec2(style.windowSize.x / 3.0f, style.windowSize.y * 0.07f));
 	ImGui::Spacing();
 
-	//検索
-	std::string data;
-	data.resize(100);
-	ImGui::InputText(text.search, data.data(), 100);
+	//search
+	if (ImGui::InputText(text.search, searchStr.str.data(), searchStr.str.capacity()))
+		this->search();
 
 	ImGui::EndChild();
 }
 
 void FS::Bar::NewProject::recent() {
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
-	ImGui::BeginChild("Recent", ImVec2(style.windowSize.x / 2.5f, style.windowSize.y / 2.0f));
+	ImGui::BeginChild("Recent", ImVec2(style.windowSize.x / 2.35f, style.windowSize.y * 0.8f), false, ImGuiWindowFlags_NoScrollbar);
 
+	ImGui::BeginChild("RecentTitle", ImVec2(0.0f, style.windowSize.y * 0.08f));
+	ImGui::SetWindowFontScale(1.2f);
+	ImGui::Spacing(); ImGui::Spacing();
 	ImGui::Text(text.recent);
-	ImGui::SetWindowFontScale(1.35f);
-	ImGui::Spacing();
 
-	ImGui::BeginChild("RecentInner");
+	ImGui::EndChild();
 
-	ImGui::PushFont(FDR::getDefaultFontMiniSize());
+	ImGui::BeginChild("Recent_", ImVec2(style.windowSize.x / 2.35f, 0.0f), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
 	if (recentTemplates.empty())
 		ImGui::TextDisabled(text.NotApplicable);
 	else {
-		for (auto& x : recentTemplates)
-			bool click = this->button(x.image, x.label, x.title, x.description);
+		const float width = style.windowSize.x / 2.5f;
+		for (auto& x : recentTemplates) {
+			const auto [left, right] = this->button(
+				x.image,
+				x.label,
+				x.title.c_str(),
+				x.description,
+				width
+			);
+			this->formScene(left, x);
+
+			if (right)
+				recentPopupInfo.flag = true;
+		}
 	}
 
-	ImGui::PopFont();
-
+	ImGui::EndChild();
 	ImGui::EndChild();
 
-	ImGui::EndChild();
+	ImGui::PopStyleVar(2);
 }
 
 void FS::Bar::NewProject::select() {
@@ -162,16 +201,16 @@ void FS::Bar::NewProject::select() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
 	//slect空間全体
-	ImGui::BeginChild("Select", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.7f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::BeginChild("Select", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.8f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-	//dummy空間
+	//dummy
 	ImGui::BeginChild("SelectU", ImVec2(0.0f, style.windowSize.y * 0.07f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-	ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+	ImGui::Spacing(); ImGui::Spacing();
 	this->filter();
 
 	ImGui::EndChild();
 
-	ImGui::BeginChild("SelectB", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.7f), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+	ImGui::BeginChild("SelectB", ImVec2(style.windowSize.x / 2.0f, 0.0f), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
 
 	//buttons
@@ -216,55 +255,75 @@ void FS::Bar::NewProject::buttons() {
 
 	ImGui::BulletText(text.empty);
 	for (auto& x : emptyTemplates) {
-		bool click = this->button(x.image, x.label, x.title, x.description);
-		this->formScene(click, x.title);
+		if (x.hide)
+			continue;
+
+		bool click = this->button(x.image, x.label, x.title.c_str(), x.description).first;
+		this->formScene(click, x);
 	}
 
 	ImGui::BulletText(text.algorithm);
 	for (auto& x : algorithmTemplates) {
-		bool click = this->button(x.image, x.label, x.title, x.description);
-		this->formScene(click, x.title);
+		if (x.hide)
+			continue;
+
+		bool click = this->button(x.image, x.label, x.title.c_str(), x.description).first;
+		this->formScene(click, x);
 	}
 
 }
 
-void FS::Bar::NewProject::formScene(const bool isButtonClicked, const char* type) {
+void FS::Bar::NewProject::formScene(const bool isButtonClicked, const ButtonInfo& button) {
 	if (!isButtonClicked)
 		return;
 
-	GLog.add<FD::Log::Type::None>("Request add ProjectFromScene.");
-	Scene::addScene<ProjectForm>(type);
+	ProjectForm::Info info{
+		.type = button.type,
+		.name = button.title
+	};
+
+	this->formInfo = std::make_shared<ProjectForm::Info>(std::move(info));
+
+	FluidumScene_Log_RequestAddScene("ProjectFrom");
+	Scene::addScene<ProjectForm>(formInfo);
 }
 
 void FS::Bar::NewProject::bottom() {
 
 	const ImVec2 buttonSize = ImVec2(ImGui::GetWindowSize().x * 0.2f, 0.0f);
 
-	//キャンセルボタン　赤字
+	//cancel
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::Button(text.cancel, buttonSize)) {
 		ImGui::CloseCurrentPopup();//popupを終了	
 
-		//PopupBackWindowはデストラクタで削除
-		GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
+		//PopupBackWindow -> destructor
+		FluidumScene_Log_RequestDeleteScene("NewProject");
 		Scene::deleteScene<NewProject>();
 
 	}
 	ImGui::PopStyleColor();
 
-
 }
 
 #include <imgui_internal.h>
 
-bool FS::Bar::NewProject::button(const FDR::ImGuiImage& image, const char* label, const char* title, const char* description) {
-	ImGui::BeginChild(label, style.buttonSize, true);
+std::pair<bool, bool> FS::Bar::NewProject::button(
+	const FDR::ImGuiImage& image,
+	const char* label,
+	const char* title,
+	const char* description,
+	const std::optional<float> width
+) {
+	const ImVec2 size = width.has_value() ? ImVec2{ width.value(), style.buttonSize.y } : style.buttonSize;
 
-	const ImVec2 dummy = { 0.0f, style.buttonSize.y * 0.12f };
-	ImGui::BeginChild("Left", { style.buttonSize.x * 0.17f,style.buttonSize.y }, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::BeginChild(label, size, true);
+
+	const ImVec2 dummy = { 0.0f, size.y * 0.12f };
+	ImGui::BeginChild("Left", { size.x * 0.17f,size.y }, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	ImGui::Dummy(dummy); ImGui::Spacing(); ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
-	ImGui::Image(image, ImVec2(style.buttonSize.y * 0.7f, style.buttonSize.y * 0.7f));
+	ImGui::Image(image, ImVec2(size.y * 0.7f, size.y * 0.7f));
 	ImGui::EndChild();
 
 	ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
@@ -276,21 +335,50 @@ bool FS::Bar::NewProject::button(const FDR::ImGuiImage& image, const char* label
 	ImGui::Text(title);
 
 	ImGui::PushFont(FDR::getDefaultFontMiniSize());
+	ImGui::PushStyleColor(ImGuiCol_TextDisabled, { 0.6f,0.6f,0.6f,1.0f });
 	ImGui::TextDisabled(description);
+	ImGui::PopStyleColor();
 	ImGui::PopFont();
 
 	ImGui::EndChild();
 
-	bool click = false;
+	std::pair<bool, bool> click = { false ,false };
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows)) {
 		ImU32 col = ImGui::ColorConvertFloat4ToU32(ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
 		ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetWindowPos(), ImGui::GetWindowPos() + ImGui::GetWindowSize(), col);
-		click = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+		click.first = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+		click.second = ImGui::IsMouseClicked(ImGuiMouseButton_Right);
 	}
 
 	ImGui::EndChild();
 
 	return click;
+}
+
+void FS::Bar::NewProject::search() {
+	const std::string data = searchStr.str.data();
+
+	if (data.size() < searchStr.temp.size()) {
+		std::for_each(emptyTemplates.begin(), emptyTemplates.end(), [&](auto& x) {x.hide = false; });
+		std::for_each(algorithmTemplates.begin(), algorithmTemplates.end(), [&](auto& x) {x.hide = false; });
+
+	}
+
+	searchStr.temp = data;
+
+	auto func = [&](ButtonInfo& x)->void {
+		if (x.hide)
+			return;
+
+		const auto itr = std::search(x.title.begin(), x.title.end(), data.begin(), data.end());
+
+		if (itr == x.title.end()) {
+			x.hide = true;
+		}
+	};
+
+	std::for_each(emptyTemplates.begin(), emptyTemplates.end(), func);
+	std::for_each(algorithmTemplates.begin(), algorithmTemplates.end(), func);
 }
 
 std::vector<FS::Bar::NewProject::ButtonInfo> FS::Bar::NewProject::initRecentTempates(const std::vector<FD::Log::Project::Type>& types) {
@@ -299,22 +387,57 @@ std::vector<FS::Bar::NewProject::ButtonInfo> FS::Bar::NewProject::initRecentTemp
 	std::vector<ButtonInfo> result{};
 	for (const auto x : types) {
 		if (x == Empty)
-			result.emplace_back(ButtonInfo{ images.at(0), "_Empty", text.empty, text.emptyDescription });
+			result.emplace_back(ButtonInfo{ x,images.at(0), "_Empty", text.empty.operator const std::string & (), text.emptyDescription });
 		else if (x == Empty_Lua)
-			result.emplace_back(ButtonInfo{ images.at(1), "_ELua", text.emptyLua, text.emptyLuaDescription });
+			result.emplace_back(ButtonInfo{ x,images.at(1), "_ELua", text.emptyLua.operator const std::string & (), text.emptyLuaDescription });
 		else if (x == Empty_Python)
-			result.emplace_back(ButtonInfo{ images.at(2), "_EPy", text.emptyPython, text.emptyPythonDescription });
-		else if (x == Empty_AngelScript)
-			result.emplace_back(ButtonInfo{ images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScriptDescription });
+			result.emplace_back(ButtonInfo{ x,images.at(2), "_EPy", text.emptyPython.operator const std::string & (), text.emptyPythonDescription });
+		else if (x == Empty_Cpp)
+			result.emplace_back(ButtonInfo{ x,images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCppDescription });
 
-		else if (x == Interactive)
-			result.emplace_back(ButtonInfo{ images.at(4), "_IT", text.interactive, text.interactiveDescription });
 		else {
-			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+			FluidumScene_Log_Abort();
 			abort();
 		}
 	}
 	return result;
+}
+
+void FS::Bar::NewProject::recentPopup() {
+	if (recentPopupInfo.flag) {
+		ImGui::OpenPopup("RecentPopup");
+		recentPopupInfo.flag = false;
+	}
+	if (!ImGui::BeginPopup("RecentPopup"))
+		return;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x,ImGui::GetStyle().ItemSpacing.y * 2.2f });
+
+	if (ImGui::Selectable(text.recent_erase))
+		this->recent_erase();
+
+	if (ImGui::Selectable(text.recent_clear))
+		this->recent_clear();
+
+	ImGui::PopStyleVar();
+
+	ImGui::EndPopup();
+}
+
+void FS::Bar::NewProject::recent_clear() {
+	GLog.add<FD::Log::Type::None>("Clear RecentProject log.");
+	projectLogWrite->clear();
+
+	FluidumScene_Log_RequestAddScene("Utils::Message");
+	Scene::addScene<Utils::Message>(text.recent_message, ImGui::GetItemRectMin());
+}
+
+void FS::Bar::NewProject::recent_erase() {
+	GLog.add<FD::Log::Type::None>("Erase RecentProject log. Log index:{}.", recentPopupInfo.index);
+	projectLogWrite->erase(recentPopupInfo.index);
+
+	FluidumScene_Log_RequestAddScene("Utils::Message");
+	Scene::addScene<Utils::Message>(text.recent_message, ImGui::GetItemRectMin());
 }
 
 

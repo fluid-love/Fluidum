@@ -11,31 +11,34 @@ FS::Bar::ProjectForm::ProjectForm(
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
 	const FD::GuiRead* const guiRead,
-	const std::string& projectType
+	std::shared_ptr<Info>& info
 )
-	: projectWrite(projectWrite), projectRead(projectRead), guiRead(guiRead), projectType(projectType)
+	:
+	projectWrite(projectWrite),
+	projectRead(projectRead),
+	guiRead(guiRead),
+	info(info)
 {
-	GLog.add<FD::Log::Type::None>("Construct ProjectFormScene.");
+	FluidumScene_Log_Constructor("ProjectForm");
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
 
 
-	folderPathStr.reserve(100);
-	projectNameStr.reserve(100);
+	projectNameStr.reserve(200);
 
-	folderPathStr = std::filesystem::current_path().string();
-	folderPathStr += '/';
+	folderPathStr = (std::filesystem::current_path().string() + '/');
+	folderPathStr.reserve(400);
 
 }
 
 FS::Bar::ProjectForm::~ProjectForm() noexcept {
 	try {
-		GLog.add<FD::Log::Type::None>("Destruct ProjectFormScene.");
+		FluidumScene_Log_Destructor("ProjectForm");
 
-		GLog.add<FD::Log::Type::None>("Request trydelete Utils::MessageScene.");
+		FluidumScene_Log_RequestTryDeleteScene("Utils::Message");
 		if (Scene::tryDeleteScene<Utils::Message>())
-			GLog.add<FD::Log::Type::None>("Delete Utils::MessageScene. Scene::tryDelete() == true");
+			GLog.add<FD::Log::Type::None>("Delete Utils::MessageScene.");
 		else
 			GLog.add<FD::Log::Type::None>("Utils::MessageScene does not exist. Scene::tryDelete() == false.");
 	}
@@ -60,7 +63,7 @@ void FS::Bar::ProjectForm::call() {
 	ImGui::SetNextWindowSize(style.windowSize);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.1f);
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
 
 	constexpr auto flag =
@@ -96,7 +99,7 @@ void FS::Bar::ProjectForm::call() {
 void FS::Bar::ProjectForm::title() {
 	ImGui::BeginChild("Title1", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.07f));
 	ImGui::SetWindowFontScale(1.7f);
-	ImGui::Text(projectType.c_str());
+	ImGui::Text(info->name.c_str());
 	ImGui::EndChild();
 
 	ImGui::Separator();
@@ -149,8 +152,8 @@ void FS::Bar::ProjectForm::bottom() {
 
 	//戻る
 	if (ImGui::Button(text.back, buttonSize)) {
-		GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
-		Scene::deleteScene<ProjectForm>();//シーンを消す
+		FluidumScene_Log_RequestDeleteScene("ProjectForm");
+		Scene::deleteScene<ProjectForm>();
 	}
 
 	ImGui::SameLine();
@@ -158,9 +161,9 @@ void FS::Bar::ProjectForm::bottom() {
 	//キャンセルボタン　赤字
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::Button(text.cancel, buttonSize)) {
-		GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
+		FluidumScene_Log_RequestDeleteScene("ProjectForm");
 		Scene::deleteScene<ProjectForm>();
-		GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
+		FluidumScene_Log_RequestDeleteScene("NewProject");
 		Scene::deleteScene<Bar::NewProject>();
 	}
 	ImGui::PopStyleColor();
@@ -168,15 +171,14 @@ void FS::Bar::ProjectForm::bottom() {
 	ImGui::SameLine();
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.35f, 0.02f, 1.0f));
-	if (ImGui::Button(text.create, buttonSize)) {//作成ボタン
+	if (ImGui::Button(text.create, buttonSize)) {//create
 		pos.create = ImGui::GetItemRectMin();
 
 		bool success = this->createProject();
 		if (success) {
-			GLog.add<FD::Log::Type::None>("Request delete ProjectFormScene.");
+			info->create = true;
+			FluidumScene_Log_RequestDeleteScene("ProjectForm");
 			Scene::deleteScene<ProjectForm>();
-			GLog.add<FD::Log::Type::None>("Request delete NewProjectScene.");
-			Scene::deleteScene<Bar::NewProject>();
 		}
 	}
 	ImGui::PopStyleColor();

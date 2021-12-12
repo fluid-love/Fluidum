@@ -160,6 +160,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Check\check.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Commoon\array.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Log\log.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\type.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\Cursor\cursor.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Debug\consolelog.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Debug\warning.h" />
+    <ClInclude Include="..\..\..\Fluidum\Utils\File\file.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\File\path.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\File\text.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\ImGui\imgui.h" />
@@ -308,7 +310,21 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.back.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.clear.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.empty.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.erase.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.front.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.make.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_back.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_front.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_back.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_front.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.set.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.size.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__gc.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__index.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__newindex.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.display.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.hide.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.make.cpp" />
@@ -341,6 +357,7 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Scene\deleteAll.cpp" />
     <ClCompile Include="..\..\..\Fluidum\TextEditor\Source\texteditor.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\Cursor\cursor.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Utils\File\file.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\File\path.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\imgui.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Utils\ImGui\operator.cpp" />
@@ -351,8 +368,9 @@
     <ClCompile Include="..\..\..\Internal\LuAssist\Utils\misc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum.array.lua" />
-    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum.plot.lua" />
+    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\array.lua" />
+    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\plot.lua" />
+    <None Include="..\..\..\Fluidum\Languages\Lua\init.lua" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\BarExit" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew" />

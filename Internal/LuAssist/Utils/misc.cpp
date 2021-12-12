@@ -175,14 +175,14 @@ const char* LuAssist::Utils::typeName(const Type type) noexcept {
 		return "None";
 }
 
-std::string LuAssist::Utils::getSrcCurrentLine(State L,const int32_t depth) {
+std::string LuAssist::Utils::getSrcCurrentLine(State L, const int32_t depth) {
 	lua_Debug info;
 
 	//depth err -> return 0 
 	//else      -> return 1
 	if (lua_getstack(L, depth, &info) == 0)
 		return std::string();
-	
+
 	lua_getinfo(L, "Sl", &info);
 
 	return std::format("[Source\"{}\". Line\"{}\"] ", info.short_src, info.currentline);
@@ -217,6 +217,11 @@ int32_t LuAssist::Utils::currentLine(State L) {
 int32_t LuAssist::Utils::size(State L) {
 	return lua_gettop(L);
 }
+
+bool LuAssist::Utils::empty(State L) {
+	return lua_isnone(L, 1);
+}
+
 //void FS::LuaAssist::setPosColorVerticesAndListIndices(LuaType::State L, FD::Object::Vertices* vertices, FD::Object::Indices* indices) {
 //	assert(getCoreTypes(L).size() == 1);
 //

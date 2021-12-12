@@ -2,6 +2,7 @@
 #include "../../Coding/tab.h"
 #include "../../Scene/scene.h"
 #include "../Files/files.h"
+#include "../../Gui/layout.h"
 #include "name.h"
 
 namespace FD::Project::Internal {
@@ -61,6 +62,11 @@ void FD::ProjectWrite::save_thread() {
 			Project::Internal::UserFilesData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 			this->save_userFiles();
+		}
+		if (Layout::Internal::LayoutData::save) {
+			Layout::Internal::LayoutData::save.store(false);
+			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
+			this->save_layout();
 		}
 	}
 
@@ -208,6 +214,9 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 	//scene
 	std::vector<FU::Class::ClassCode::CodeType> temp_scene_codes{};
 
+	//layout
+	std::vector<Layout::Internal::History> temp_layout_history{};
+
 	try {
 		temp = GCurrentData;
 		temp_files_mainCodeFilePath = Project::Internal::FluidumFilesData::mainCodeFilePath;
@@ -216,6 +225,7 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 		temp_tab_displayFiles = Internal::Coding::TabData::displayFiles;
 		temp_tab_filePathes = Internal::Coding::TabData::filePathes;
 		temp_scene_codes = Internal::Scene::Data::codes;
+		temp_layout_history = Layout::Internal::LayoutData::history;
 	}
 	catch (...) {
 		throw Project::ExceptionType::Unexpected;
@@ -241,6 +251,8 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 		this->read_projectFiles();
 		this->read_userFiles();
 
+		this->read_layout();
+
 		this->read_tab();
 		this->read_scene();
 
@@ -255,7 +267,7 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 		Internal::Coding::TabData::displayFiles = std::move(temp_tab_displayFiles);
 		Internal::Coding::TabData::filePathes = std::move(temp_tab_filePathes);
 		Internal::Scene::Data::codes = std::move(temp_scene_codes);
-
+		Layout::Internal::LayoutData::history = std::move(temp_layout_history);
 		std::rethrow_exception(std::current_exception());
 	}
 	GCurrentData.isTemp = false;
@@ -419,6 +431,37 @@ void FD::ProjectWrite::save_userFiles() const {
 	ofs << Name::Delimiter << std::endl;
 }
 
+void FD::ProjectWrite::save_layout() const {
+	using namespace Layout::Internal;
+
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+
+	std::ofstream ofs(
+		Project::Internal::GCurrentData.projectFolderPath + Project::Internal::Name::Project_Layout,
+		std::ios::trunc
+	);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to open .layout file.");
+
+	ofs << LayoutData::mainFrameLeft << std::endl;
+	ofs << LayoutData::mainFrameRight << std::endl;
+	ofs << LayoutData::mainFrameTop << std::endl;
+	ofs << LayoutData::mainFrameBottom << std::endl;
+
+	for (auto& x : LayoutData::history) {
+		if (x.horizonal)
+			ofs << "true" << std::endl;
+		else
+			ofs << "false" << std::endl;
+
+		ofs << x.parentWindowIndex << std::endl;
+		ofs << *x.pos << std::endl;
+	}
+
+	ofs << Project::Internal::Name::Delimiter << std::endl;
+}
+
 void FD::ProjectWrite::backup() const {
 	using namespace Project::Internal;
 	//assert(GCurrentData.projectFolderPath.back() == '/');
@@ -536,6 +579,7 @@ void FD::ProjectWrite::tryCreateFluidumFiles() const {
 		Name::Project_UserFiles,
 		Name::Project_Tab,
 		Name::Project_Scene,
+		Name::Project_Layout,
 		Name::Genome_Function
 	};
 
@@ -546,7 +590,6 @@ void FD::ProjectWrite::tryCreateFluidumFiles() const {
 			continue;
 
 		std::ofstream ofs(path);
-
 		if (!ofs)
 			throw std::runtime_error("Failed to create file.");
 	}
@@ -730,6 +773,9 @@ void FD::ProjectWrite::read_fluidumFiles() const {
 	if (!ifs)
 		throw Project::ExceptionType::NotFoundProjectFiles;
 
+	if (FU::File::empty(ifs))
+		return;
+
 	std::string buf{};
 
 	//MainCodeFilePath
@@ -746,6 +792,9 @@ void FD::ProjectWrite::read_projectFiles() const {
 	std::ifstream ifs(GCurrentData.projectFolderPath + Name::Project_ProjectFiles);
 	if (!ifs)
 		throw Project::ExceptionType::NotFoundProjectFiles;
+
+	if (FU::File::empty(ifs))
+		return;
 
 	std::string buf{};
 
@@ -775,6 +824,9 @@ void FD::ProjectWrite::read_userFiles() const {
 	if (!ifs)
 		throw Project::ExceptionType::NotFoundProjectFiles;
 
+	if (FU::File::empty(ifs))
+		return;
+
 	std::string buf{};
 
 	std::size_t counter = 0;
@@ -794,6 +846,74 @@ void FD::ProjectWrite::read_userFiles() const {
 	}
 }
 
+void FD::ProjectWrite::read_layout() const {
+	using namespace Project::Internal;
+	using namespace Layout::Internal;
+
+	std::unique_lock<std::mutex> lock(LayoutData::mtx);
+
+	std::ifstream ifs(GCurrentData.projectFolderPath + Name::Project_Layout);
+	if (!ifs)
+		throw Project::ExceptionType::NotFoundProjectFiles;
+
+	if (FU::File::empty(ifs))
+		return;
+
+	std::string buf{};
+
+	//main frame
+	try {
+		std::getline(ifs, buf);
+		LayoutData::mainFrameLeft = std::stof(buf);
+		std::getline(ifs, buf);
+		LayoutData::mainFrameRight = std::stof(buf);
+		std::getline(ifs, buf);
+		LayoutData::mainFrameTop = std::stof(buf);
+		std::getline(ifs, buf);
+		LayoutData::mainFrameBottom = std::stof(buf);
+	}
+	catch (const std::exception&) {
+		throw Project::ExceptionType::BrokenFile;
+	}
+
+	std::size_t counter = 0;
+	while (true) {
+		std::getline(ifs, buf);
+		if (buf == Name::Delimiter)
+			break;
+
+		Layout::Internal::History his{};
+
+		if (buf == "true")
+			his.horizonal = true;
+		else if (buf == "false")
+			his.horizonal = false;
+		else
+			throw Project::ExceptionType::BrokenFile;
+
+		try {
+			std::getline(ifs, buf);
+			his.parentWindowIndex = static_cast<uint32_t>(std::stoul(buf));
+			std::getline(ifs, buf);
+			his.readPos = std::stof(buf);
+		}
+		catch (const std::exception&) {
+			throw Project::ExceptionType::BrokenFile;
+		}
+
+
+		LayoutData::history.emplace_back(his);
+
+
+		counter++;
+		if (counter > 200)
+			throw Project::ExceptionType::BrokenFile;
+	}
+
+	lock.unlock();
+	LayoutData::remake();
+}
+
 void FD::ProjectWrite::read_tab() const {
 	using namespace Project::Internal;
 
@@ -806,6 +926,9 @@ void FD::ProjectWrite::read_tab() const {
 		throw Project::ExceptionType::NotFoundProjectFiles;
 
 	std::string data{};
+
+	if (FU::File::empty(ifs))
+		return;
 
 	//TabDisplayFile
 	{
@@ -845,10 +968,12 @@ void FD::ProjectWrite::read_scene() const {
 
 	std::lock_guard<std::mutex> lock(Internal::Scene::Data::mtx);
 
-	std::ifstream ifs(GCurrentData.projectFolderPath + "ProjectFiles/.scene");
+	std::ifstream ifs(GCurrentData.projectFolderPath + Name::Project_Scene);
 	if (!ifs)
 		throw Project::ExceptionType::NotFoundProjectFiles;
 
+	if (FU::File::empty(ifs))
+		return;
 
 	std::string data{};
 

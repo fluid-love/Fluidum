@@ -103,7 +103,7 @@ std::vector<LuAssist::Num> LuAssist::Utils::Table::convertTableToArrayOfNumbers(
 		lua_rawgeti(L, tableIndex, -1);
 
 		if (!lua_isnumber(L, -1))
-			throw Exception::NotNumber{ i - 1,typeName(type(L,-1)) };
+			throw Exception::NotNumber{ static_cast<std::size_t>(i - 1) ,typeName(type(L,-1)) };
 
 		result.emplace_back(lua_tonumber(L, -1));
 		lua_pop(L, 1);
@@ -111,3 +111,76 @@ std::vector<LuAssist::Num> LuAssist::Utils::Table::convertTableToArrayOfNumbers(
 
 	return result;
 }
+
+std::vector<std::string> LuAssist::Utils::Table::convertTableToArrayOfStrings(State L, const int32_t tableIndex) {
+
+	if (lua_istable(L, tableIndex))
+		throw Exception::NotTable();
+
+	std::vector<std::string> result{};
+	result.reserve(1000);
+
+	int32_t i = 1;
+	while (!lua_isnone(L, i++)) {
+		//push back
+		lua_rawgeti(L, tableIndex, -1);
+
+		if (!lua_isstring(L, -1))
+			throw Exception::NotString{ static_cast<std::size_t>(i - 1) ,typeName(type(L,-1)) };
+
+		result.emplace_back(lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
+
+	return result;
+}
+
+std::vector<bool> LuAssist::Utils::Table::convertTableToArrayOfBooleans(State L, const int32_t tableIndex) {
+
+	if (lua_istable(L, tableIndex))
+		throw Exception::NotTable();
+
+	std::vector<bool> result{};
+	result.reserve(1000);
+
+	int32_t i = 1;
+	while (!lua_isnone(L, i++)) {
+		//push back
+		lua_rawgeti(L, tableIndex, -1);
+
+		if (!lua_isboolean(L, -1))
+			throw Exception::NotBoolean{ static_cast<std::size_t>(i - 1) ,typeName(type(L,-1)) };
+
+		result.emplace_back(lua_toboolean(L, -1));
+		lua_pop(L, 1);
+	}
+
+	return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

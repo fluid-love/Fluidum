@@ -52,10 +52,13 @@ namespace FS::Utils {
 			if constexpr (std::same_as<T, FD::ImPlotWrite>) {
 				std::get<Size - 1>(this->data)->reset();
 			}
+			else if constexpr (std::same_as<T, FD::Calc::ArrayWrite>) {
+				std::get<Size - 1>(this->data)->reset();
+			}
 			else {
 				static_assert(FU::Concept::DelayAssert_T<T>);
 			}
-			
+
 			if constexpr (Size > 1) {
 				this->reset<Size - 1>();
 			}

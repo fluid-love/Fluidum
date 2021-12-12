@@ -8,7 +8,7 @@ namespace FD::Log::File {
 		Empty,
 		Empty_Lua,
 		Empty_Python,
-		Empty_AngelScript
+		Empty_Cpp
 	};
 
 }

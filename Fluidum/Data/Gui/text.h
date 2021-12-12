@@ -36,17 +36,13 @@ namespace FD::Internal::Text {
 
 		GuiText splitVerticalCurrentPos;
 		GuiText splitHorizonalCurrentPos;
-		GuiText splitCrossCurrentPos;
 
 		GuiText splitVerticalCenterLine;
 		GuiText splitHorizonalCenterLine;
-		GuiText splitCrossCenterLine;
 
 		GuiText merge;
 
 		GuiText reset;
-		GuiText horizonal;
-		GuiText vertical;
 
 		GuiText error_max;
 	};
@@ -55,6 +51,7 @@ namespace FD::Internal::Text {
 		TitleBar();
 		~TitleBar() = default;
 
+		GuiText tempProject;
 	};
 
 	struct BarExit final {
@@ -150,7 +147,6 @@ namespace FD::Internal::Text {
 		GuiText package;
 		GuiText layout;
 		GuiText templates;
-		GuiText tempProject;
 
 		GuiText save;
 		GuiText newProject;
@@ -240,13 +236,15 @@ namespace FD::Internal::Text {
 		GuiText emptyLuaDescription;
 		GuiText emptyPython;
 		GuiText emptyPythonDescription;
-		GuiText emptyAngelScript;
-		GuiText emptyAngelScriptDescription;
+		GuiText emptyCpp;
+		GuiText emptyCppDescription;
 		GuiText algorithm;
-		GuiText interactive;
-		GuiText interactiveDescription;
 		GuiText cancel;
 		GuiText select;
+
+		GuiText recent_erase;
+		GuiText recent_clear;
+		GuiText recent_message;
 
 	};
 

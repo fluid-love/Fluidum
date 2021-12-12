@@ -1,7 +1,3 @@
-/*
-MenuBar->êVãKçÏê¨->ïKóvÇ»èÓïÒÇì¸ÇÍÇÈ
-*/
-
 #pragma once
 
 #include "../../../Common/common.h"
@@ -10,11 +6,19 @@ namespace FS::Bar {
 
 	class ProjectForm final : public Scene {
 	public:
+		struct Info final {
+			const FD::Log::Project::Type type;
+			const std::string name;
+
+			bool create = false;
+		};
+
+	public:
 		explicit ProjectForm(
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			const FD::GuiRead* const guiRead,
-			const std::string& projectType
+			std::shared_ptr<Info>& info
 		);
 		void Constructor(FD::ProjectWrite,FD::ProjectRead, FD::GuiRead);
 
@@ -32,7 +36,7 @@ namespace FS::Bar {
 
 	private://data
 
-		const std::string projectType;
+		std::shared_ptr<Info> info;
 
 		std::string folderPathStr{};
 		std::string projectNameStr{};

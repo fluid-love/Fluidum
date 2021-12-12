@@ -1,3 +1,5 @@
-print("HelloWorld")
---FSystem.SleepSeconds(10)
-plot = FPlot.Make()
+array = require"fluidum.array"
+
+numArray = array.make("number")
+
+print(numArray.empty())

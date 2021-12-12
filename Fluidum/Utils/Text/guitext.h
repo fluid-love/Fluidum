@@ -22,6 +22,8 @@ namespace FU::GuiText{
 		void operator=(std::string&& text) noexcept;
 
 		operator const char* () const noexcept;
+
+		explicit operator const std::string&() const noexcept;
 	};
 
 

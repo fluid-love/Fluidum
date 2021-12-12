@@ -4,6 +4,7 @@
 
 namespace FS::Lua {
 	enum class LogType : uint16_t {
+		Initialize,
 		NumOfArgs_Min,
 		NumOfArgs_Max,
 		Type,
@@ -16,6 +17,7 @@ namespace FS::Lua {
 		Plot_MarkerStr,
 		Plot_SameSize,
 
+		OutOfRange
 
 	};
 

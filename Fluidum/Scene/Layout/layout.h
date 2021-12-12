@@ -51,6 +51,8 @@ namespace FS {
 			bool heightConstraintArea = false;
 			bool centerHorizonalConstraintArea = false;
 			bool centerVerticalConstraintArea = false;
+
+			bool noresize = false;
 		}flag;
 
 
@@ -68,14 +70,14 @@ namespace FS {
 	private:
 		void splitVerticalCurrentPos();
 		void splitHorizonalCurrentPos();
-		void splitCrossCurrentPos();
 		void splitVerticalCenterLine();
 		void splitHorizonalCenterLine();
-		void splitCrossCenterLine();
 		void reset();
 
 	private:
 		void merge();
 
+	private:
+		void noresize();
 	};
 }

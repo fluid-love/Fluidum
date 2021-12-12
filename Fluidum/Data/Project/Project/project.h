@@ -64,6 +64,8 @@ namespace FD {
 		void save_fluidumFiles() const;
 		void save_projectFiles() const;
 		void save_userFiles() const;
+		
+		void save_layout() const;
 
 	private:
 		void writeProjectInfo(const char* path) const;
@@ -89,6 +91,8 @@ namespace FD {
 		void read_fluidumFiles() const;
 		void read_projectFiles() const;
 		void read_userFiles() const;
+
+		void read_layout() const;
 
 		void read_tab() const;
 		void read_scene() const;

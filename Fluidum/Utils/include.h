@@ -10,6 +10,7 @@
 #include "Debug/warning.h"
 #include "File/path.h"
 #include "File/text.h"
+#include "File/file.h"
 #include "ImGui/imgui.h"
 #include "ImGui/operator.h"
 #include "Log/messenger.h"

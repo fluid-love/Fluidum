@@ -1,4 +1,4 @@
-#include "titlebar.h"
+ï»¿#include "titlebar.h"
 #include "../Menu/Project/saveas.h"
 #include "Exit/exit.h"
 
@@ -26,44 +26,33 @@ FS::TitleBar::TitleBar(
 	tabRead(tabRead),
 	tabWrite(tabWrite)
 {
-	GLog.add<FD::Log::Type::None>("Construct TitleBarScene.");
-
+	FluidumScene_Log_Constructor("TitleBar");
 
 	style.windowPos = ImVec2(guiRead->windowSize().x * 0.91f, 0.0f);
 	const float windowHeight = guiRead->menuBarHeight();
 	style.windowSize = ImVec2(guiRead->windowSize().x * 0.09f, windowHeight + 1.0f);
 
-	//MenuBar‚ÌƒTƒCƒY‚ÍImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2
+	//MenuBarã®ã‚µã‚¤ã‚ºã¯ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2
 	style.iconWindowPos = { 0.0f,windowHeight / 10.0f };
 	style.iconWindowSize = { (ImGui::GetStyle().WindowPadding.x * 2.0f + (ImGui::GetStyle().FramePadding.x * 2.0f)) + ImGui::CalcTextSize("   ").x ,windowHeight };
 
-	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.88f;
+	style.projectNameWindowPos = { guiRead->windowSize().x * 0.6f, 0.0f };
+	style.projectNameWindowSize = { guiRead->windowSize().x * 0.3f ,windowHeight };
+
+
+	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.86f;
 
 	style.buttonSize = { style.windowSize.x / 3.0f, style.windowSize.y };
 }
 
 FS::TitleBar::~TitleBar() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct TitleBarScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("TitleBar");
 }
 
 void FS::TitleBar::call() {
-
 	this->icon();
 	this->bar();
+	this->project();
 }
 
 void FS::TitleBar::icon() {
@@ -140,6 +129,37 @@ void FS::TitleBar::bar() {
 }
 
 void FS::TitleBar::exit() {
-	GLog.add<FD::Log::Type::None>("Request Add Bar::ExitScene.");
+	FluidumScene_Log_RequestAddScene("Bar::Exit");
 	Scene::addScene<Bar::Exit>();
+}
+
+void FS::TitleBar::project() {
+	ImGui::SetNextWindowPos(style.projectNameWindowPos);
+	ImGui::SetNextWindowSize(style.projectNameWindowSize);
+
+	constexpr ImGuiWindowFlags flag =
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoDocking |
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoBackground;
+
+	ImGui::Begin("##ProjectName", nullptr, flag);
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+
+	if (projectRead->isDefaultProject())
+		ImGui::Button(text.tempProject);
+	else
+		ImGui::Button(projectRead->getProjectName().c_str());
+
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar(2);
+
+	ImGui::End();
 }

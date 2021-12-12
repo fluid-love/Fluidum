@@ -42,7 +42,7 @@ void FS::Calc::Run::call() {
 		abort();
 	}
 
-	Scene::addScene<Utils::ResetData<FD::ImPlotWrite>>();
+	Scene::addScene<Utils::ResetData<FD::ImPlotWrite,FD::Calc::ArrayWrite>>();
 
 	if (type == Lua) {
 		GLog.add<FD::Log::Type::None>("Request add Lua::CalcScene(Async).");

@@ -586,6 +586,12 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Array\type.h">
       <Filter>Fluidum\Data\Calc\Array</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Commoon\array.h">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\File\file.h">
+      <Filter>Fluidum\Utils\File</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fluidum">
@@ -980,6 +986,12 @@
     </Filter>
     <Filter Include="Fluidum\Data\Calc\Array">
       <UniqueIdentifier>{07363c5e-92ff-438c-a82b-a92d4f2974c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Calc\Lua\Functions\Common">
+      <UniqueIdentifier>{0b11b2d4-075c-4618-8c6c-62e0ed6d1361}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Language\Lua\FluidumStandardLibrary\fluidum">
+      <UniqueIdentifier>{ed01a8fe-f4c1-464e-9dec-add6e1a2d6bf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1382,6 +1394,51 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Array\array.cpp">
       <Filter>Fluidum\Data\Calc\Array</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.front.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.back.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_back.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__index.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__newindex.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.clear.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.erase.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_back.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_front.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__gc.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.size.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.empty.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.set.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_front.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Utils\File\file.cpp">
+      <Filter>Fluidum\Utils\File</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Test\test.lua">
@@ -1444,11 +1501,14 @@
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Layout">
       <Filter>Resources\GuiText</Filter>
     </None>
-    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum.array.lua">
-      <Filter>Fluidum\Language\Lua\FluidumStandardLibrary</Filter>
+    <None Include="..\..\..\Fluidum\Languages\Lua\init.lua">
+      <Filter>Fluidum\Language\Lua</Filter>
     </None>
-    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum.plot.lua">
-      <Filter>Fluidum\Language\Lua\FluidumStandardLibrary</Filter>
+    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\plot.lua">
+      <Filter>Fluidum\Language\Lua\FluidumStandardLibrary\fluidum</Filter>
+    </None>
+    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\array.lua">
+      <Filter>Fluidum\Language\Lua\FluidumStandardLibrary\fluidum</Filter>
     </None>
   </ItemGroup>
 </Project>

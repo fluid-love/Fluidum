@@ -192,6 +192,11 @@ FD::Internal::Text::TitleBar::TitleBar() {
 	if (!ifs)
 		throw std::runtime_error("Failed to open TitleBar.");
 
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->tempProject = data;
+
 }
 
 FD::Internal::Text::Layout::Layout() {
@@ -446,13 +451,10 @@ FD::Internal::Text::TopBar::TopBar() {
 	this->templates = data;
 
 	std::getline(ifs, data);
-	this->tempProject = data;
-
-	std::getline(ifs, data);
 	this->save = data;
 
 	std::getline(ifs, data);
-	this->newProject = data;
+	this->newProject =  data;
 
 	std::getline(ifs, data);
 	this->includeFile = data;
@@ -658,25 +660,28 @@ FD::Internal::Text::NewProject::NewProject() {
 	this->emptyPythonDescription = data;
 
 	std::getline(ifs, data);
-	this->emptyAngelScript = data;
+	this->emptyCpp = data;
 
 	std::getline(ifs, data);
-	this->emptyAngelScriptDescription = data;
+	this->emptyCppDescription = data;
 
 	std::getline(ifs, data);
 	this->algorithm = data;
-
-	std::getline(ifs, data);
-	this->interactive = data;
-
-	std::getline(ifs, data);
-	this->interactiveDescription = data;
 
 	std::getline(ifs, data);
 	this->cancel = data;
 
 	std::getline(ifs, data);
 	this->select = data;
+
+	std::getline(ifs, data);
+	this->recent_erase = ICON_MD_DELETE "  " + data;
+
+	std::getline(ifs, data);
+	this->recent_clear = ICON_MD_DELETE_FOREVER "  " + data;
+
+	std::getline(ifs, data);
+	this->recent_message = data;
 
 }
 

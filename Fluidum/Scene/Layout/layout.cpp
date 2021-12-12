@@ -17,7 +17,7 @@ FS::Layout::Layout(
 
 	//default project
 	if (layoutRead->empty()) {
-		const ImVec2 pos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() - 4.0f };
+		const ImVec2 pos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() };
 		layoutWrite->mainFrameLeft(pos.x);
 		layoutWrite->mainFrameRight(guiRead->windowSize().x);
 		layoutWrite->mainFrameTop(pos.y);
@@ -35,6 +35,7 @@ FS::Layout::~Layout() noexcept {
 }
 
 void FS::Layout::call() {
+	this->noresize();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -76,7 +77,7 @@ void FS::Layout::dockSpace(const char* label) {
 	ImGui::SetNextWindowPos(select.current.pos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(select.current.size, ImGuiCond_Always);
 
-	ImGui::Begin(label, nullptr, ImGuiWindowFlags_NoSavedSettings);
+	ImGui::Begin(label, nullptr, windowFlags | (flag.noresize ? ImGuiWindowFlags_NoResize : ImGuiWindowFlags_None));
 
 	auto id = ImGui::GetID(label);
 	ImGuiID dockingID = ImGui::DockSpace(id, ImVec2{});
@@ -95,7 +96,6 @@ void FS::Layout::dockSpace(const char* label) {
 void FS::Layout::ifRightMouseButtonCliked() {
 	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right) || !ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows | ImGuiHoveredFlags_RootAndChildWindows))
 		return;
-
 
 	flag.popup = true;
 	select.pos = ImGui::GetMousePos();
@@ -125,10 +125,6 @@ void FS::Layout::popup() {
 		this->splitVerticalCurrentPos();
 	if (ImGui::MenuItem(text.splitHorizonalCurrentPos, 0, false, !flag.heightConstraintArea))
 		this->splitHorizonalCurrentPos();
-	if (ImGui::BeginMenu(text.splitCrossCurrentPos, !flag.widthConstraintArea || !flag.heightConstraintArea)) {
-		this->splitCrossCurrentPos();
-		ImGui::EndMenu();
-	}
 
 	ImGui::Separator();
 
@@ -136,10 +132,7 @@ void FS::Layout::popup() {
 		this->splitVerticalCenterLine();
 	if (ImGui::MenuItem(text.splitHorizonalCenterLine, 0, false, !flag.centerHorizonalConstraintArea))
 		this->splitHorizonalCenterLine();
-	if (ImGui::BeginMenu(text.splitCrossCenterLine, !flag.widthConstraintArea || !flag.heightConstraintArea)) {
-		this->splitCrossCenterLine();
-		ImGui::EndMenu();
-	}
+
 
 	ImGui::Separator();
 
@@ -198,47 +191,22 @@ bool FS::Layout::centerVerticalConstraintArea() {
 
 void FS::Layout::splitVerticalCurrentPos() {
 	layoutWrite->splitVertical(select.right, select.pos.x);
+	layoutWrite->save();
 }
 
 void FS::Layout::splitHorizonalCurrentPos() {
 	layoutWrite->splitHorizonal(select.right, select.pos.y);
-}
-
-void FS::Layout::splitCrossCurrentPos() {
-	if (ImGui::MenuItem(text.horizonal, nullptr, false, !flag.widthConstraintArea))
-		layoutWrite->splitCross(select.right, select.pos);
-
-	if (ImGui::MenuItem(text.vertical, nullptr, false, !flag.heightConstraintArea))
-		layoutWrite->splitCross(select.right, select.pos);
-
+	layoutWrite->save();
 }
 
 void FS::Layout::splitVerticalCenterLine() {
 	layoutWrite->splitVertical(select.right, select.right.pos.x + (select.right.size.x / 2.0f));
+	layoutWrite->save();
 }
 
 void FS::Layout::splitHorizonalCenterLine() {
 	layoutWrite->splitHorizonal(select.right, select.right.pos.y + (select.right.size.y / 2.0f));
-}
-
-void FS::Layout::splitCrossCenterLine() {
-	if (ImGui::MenuItem(text.horizonal), 0, false, !flag.widthConstraintArea) {
-		layoutWrite->splitCross(select.right,
-			{
-				select.right.pos.x + (select.right.size.x / 2.0f),
-				select.right.pos.y + (select.right.size.y / 2.0f)
-			}
-		);
-	}
-
-	if (ImGui::MenuItem(text.vertical, 0, false, !flag.heightConstraintArea)) {
-		layoutWrite->splitCross(select.right,
-			{
-				select.right.pos.x + (select.right.size.x / 2.0f),
-				select.right.pos.y + (select.right.size.y / 2.0f)
-			}
-		);
-	}
+	layoutWrite->save();
 }
 
 void FS::Layout::reset() {
@@ -251,13 +219,29 @@ void FS::Layout::reset() {
 	}
 	GLog.add<FD::Log::Type::None>("Reset layout.");
 	layoutWrite->reset();
+	layoutWrite->save();
 }
 
 void FS::Layout::merge() {
-
+	layoutWrite->save();
 }
 
+void FS::Layout::noresize() {
+	const ImVec2 mousePos = ImGui::GetMousePos();
+	const float left = layoutRead->mainFrameLeft();
+	const float right = layoutRead->mainFrameRight();
+	const float top = layoutRead->mainFrameTop();
+	const float bottom = layoutRead->mainFrameBottom();
 
-
-
-
+	if (
+		(left - 8.0f < mousePos.x && left + 8.0f > mousePos.x) ||
+		(right - 8.0f < mousePos.x && right + 8.0f > mousePos.x) ||
+		(top - 8.0f < mousePos.y && top + 8.0f > mousePos.y) ||
+		(bottom - 8.0f < mousePos.y && bottom + 8.0f > mousePos.y)
+		)
+	{
+		this->flag.noresize = true;
+	}
+	else
+		this->flag.noresize = false;
+}

@@ -178,10 +178,10 @@ void FS::Project::Project::tab() {
 namespace FS {
 
 	constexpr inline std::pair<const char*, const char*> LuaStandardFluidumLibrary[] = {
-		{ICON_FA_FILE_CODE " plot.lua",Resource::LuaSLLPlotPath},
-		{ICON_FA_FILE_CODE " genome.lua",Resource::LuaSLLGenomePath},
-		{ICON_FA_FILE_CODE " piano.lua",Resource::LuaSLLPianoPath},
-		{ICON_FA_FILE_CODE " math.lua",Resource::LuaSLLMathPath},
+		{ICON_FA_FILE_CODE " fluidum.array.lua",Resource::LuaFluidumStandardLibraryFolderPath},
+		//{ICON_FA_FILE_CODE " genome.lua",Resource::LuaSLLGenomePath},
+		//{ICON_FA_FILE_CODE " piano.lua",Resource::LuaSLLPianoPath},
+		//{ICON_FA_FILE_CODE " math.lua",Resource::LuaSLLMathPath},
 	};
 
 }
@@ -785,26 +785,3 @@ void FS::Project::Project::collapseAll() {
 	else if (select.tab == TabType::User)
 		userFilesWrite->closeAll();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

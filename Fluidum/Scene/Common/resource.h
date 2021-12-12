@@ -76,18 +76,12 @@ namespace FS::Resource {
 #ifdef Fluidum_Path
 	constexpr inline const char* LuaMessagePath = Fluidum_Path "/Resources/Log/Lua/jpn";
 	constexpr inline const char* LuaFluidumStandardLibraryFolderPath = Fluidum_Path "/Fluidum/Language/Lua/FluidumStandardLibrary/";
-	constexpr inline const char* LuaSLLPlotPath = Fluidum_Path  "/Resources/Source/Lua/plot.lua";
-	constexpr inline const char* LuaSLLGenomePath = Fluidum_Path  "/Resources/Source/Lua/genome.lua";
-	constexpr inline const char* LuaSLLPianoPath = Fluidum_Path  "/Resources/Source/Lua/piano.lua";
-	constexpr inline const char* LuaSLLMathPath = Fluidum_Path  "/Resources/Source/Lua/math.lua";
+	constexpr inline const char* LuaInitFilePath = Fluidum_Path "/Fluidum/Language/Lua/init.lua";
 
 #else
 	constexpr inline const char* LuaMessagePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Log/Lua/jpn")>();
-	constexpr inline const char* LuaFluidumStandardLibraryFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Fluidum/Language/Lua/FluidumStandardLibrary/")>();
-	constexpr inline const char* LuaSLLPlotPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/plot.lua")>();
-	constexpr inline const char* LuaSLLGenomePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/genome.lua")>();
-	constexpr inline const char* LuaSLLPianoPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/piano.lua")>();
-	constexpr inline const char* LuaSLLMathPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/math.lua")>();
+	constexpr inline const char* LuaFluidumStandardLibraryFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Fluidum/Languages/Lua/FluidumStandardLibrary/")>();
+	constexpr inline const char* LuaInitFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Fluidum/Languages/Lua/init.lua")>();
 
 #endif	
 

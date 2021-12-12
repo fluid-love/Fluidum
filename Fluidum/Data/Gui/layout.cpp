@@ -190,6 +190,36 @@ namespace FD::Layout {
 	}
 }
 
+void FD::Layout::Internal::LayoutData::remake() {
+	using namespace Layout::Internal;
+	{
+		std::lock_guard<std::mutex> lock(LayoutData::mtx);
+
+		LayoutData::windows.clear();
+		Layout::GAdjacent.clear();
+
+		Layout::AdjacentInfo info{};
+		info.left = &LayoutData::mainFrameLeft;
+		info.right = &LayoutData::mainFrameRight;
+		info.top = &LayoutData::mainFrameTop;
+		info.bottom = &LayoutData::mainFrameBottom;
+		info.horizonal = false;
+		Layout::GAdjacent.emplace_back(std::make_shared<Layout::AdjacentInfo>(info));
+
+		LayoutWrite::remakeAllWindows();
+	}
+
+	for (auto& x : history) {
+		if (x.horizonal)
+			LayoutWrite::splitHorizonal(*windows.at(x.parentWindowIndex).get(), x.readPos);
+		else
+			LayoutWrite::splitVertical(*windows.at(x.parentWindowIndex).get(), x.readPos);
+
+		LayoutWrite::remakeAllWindows();
+	}
+
+}
+
 void FD::LayoutWrite::mainFrameLeft(const float val) const {
 	using namespace Layout::Internal;
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);
@@ -231,6 +261,7 @@ void FD::LayoutWrite::reset() const {
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);
 
 	LayoutData::windows.clear();
+	LayoutData::history.clear();
 	Layout::GAdjacent.clear();
 
 	Layout::AdjacentInfo info{};
@@ -241,18 +272,11 @@ void FD::LayoutWrite::reset() const {
 	info.horizonal = false;
 	Layout::GAdjacent.emplace_back(std::make_shared<Layout::AdjacentInfo>(info));
 
-	Layout::DockSpaceWindow window{};
-	window.identifier = Layout::GAdjacent.back().get();
-	window.pos = { LayoutData::mainFrameLeft,LayoutData::mainFrameTop };
-	window.size = { LayoutData::mainFrameRight - window.pos.x,LayoutData::mainFrameBottom - window.pos.y };
-	window.minSize = { 0.0f,0.0f };
-	window.maxSize = { std::numeric_limits<float>::max(),std::numeric_limits<float>::max() };
 
-	LayoutData::windows.emplace_back(std::make_shared<Layout::DockSpaceWindow>(window));
-	LayoutData::windows.back().get()->window = LayoutData::windows.back().get();
+	this->remakeAllWindows();
 }
 
-bool FD::LayoutWrite::splitVertical(const Layout::DockSpaceWindow& window, const float posX) const {
+bool FD::LayoutWrite::splitVertical(const Layout::DockSpaceWindow& window, const float posX) {
 	using namespace Layout::Internal;
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);
 
@@ -283,12 +307,22 @@ bool FD::LayoutWrite::splitVertical(const Layout::DockSpaceWindow& window, const
 		layout->children.emplace_back(child);
 	}
 
-	this->remakeAllWindows();
+
+	//history
+	History his{};
+	auto itr = std::find_if(LayoutData::windows.begin(), LayoutData::windows.end(), [&](auto& x) {return x.get() == window.window; });
+	assert(itr != LayoutData::windows.end());
+	his.horizonal = false;
+	his.parentWindowIndex = static_cast<uint32_t>(std::distance(LayoutData::windows.begin(), itr));
+	his.pos = layout->separators.back().get();
+	LayoutData::history.emplace_back(his);
+
+	remakeAllWindows();
 
 	return true;
 }
 
-bool FD::LayoutWrite::splitHorizonal(const Layout::DockSpaceWindow& window, const float posY) const {
+bool FD::LayoutWrite::splitHorizonal(const Layout::DockSpaceWindow& window, const float posY) {
 	using namespace Layout::Internal;
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);
 
@@ -319,16 +353,22 @@ bool FD::LayoutWrite::splitHorizonal(const Layout::DockSpaceWindow& window, cons
 		layout->children.emplace_back(child);
 	}
 
-	this->remakeAllWindows();
+
+	//history
+	History his{};
+	his.horizonal = true;
+	auto itr = std::find_if(LayoutData::windows.begin(), LayoutData::windows.end(), [&](auto& x) {return x.get() == window.window; });
+	his.parentWindowIndex = static_cast<uint32_t>(std::distance(LayoutData::windows.begin(), itr));
+	his.pos = layout->separators.back().get();
+	LayoutData::history.emplace_back(his);
+
+	remakeAllWindows();
 
 	return true;
 }
 
-bool FD::LayoutWrite::splitCross(const Layout::DockSpaceWindow& window, const ImVec2& pos) const {
-	using namespace Layout::Internal;
-	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+void FD::LayoutWrite::merge() const {
 
-	return true;
 }
 
 void FD::LayoutWrite::update(const Layout::DockSpaceWindow& window) const {
@@ -369,7 +409,7 @@ void FD::LayoutWrite::save() const noexcept {
 	LayoutData::save.store(true);
 }
 
-void FD::LayoutWrite::remakeAllWindows(const Layout::Internal::ResizedBorder border) const {
+void FD::LayoutWrite::remakeAllWindows(const Layout::Internal::ResizedBorder border) {
 	//main layout window
 	if (Layout::isMainFrameOnly()) {
 		Layout::DockSpaceWindow window{};
@@ -390,14 +430,14 @@ void FD::LayoutWrite::remakeAllWindows(const Layout::Internal::ResizedBorder bor
 
 	for (auto& x : Layout::GAdjacent) {
 		if (x->horizonal)
-			this->remakeWindow_horizonal(result, x, border);
+			remakeWindow_horizonal(result, x, border);
 		else
-			this->remakeWindow_vertical(result, x, border);
+			remakeWindow_vertical(result, x, border);
 	}
 	Layout::Internal::LayoutData::windows = std::move(result);
 }
 
-void FD::LayoutWrite::remakeWindow_horizonal(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) const {
+void FD::LayoutWrite::remakeWindow_horizonal(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) {
 	constexpr float floatMax = std::numeric_limits<float>::max();
 
 	const uint16_t size = static_cast<uint16_t>(x->separators.size());
@@ -489,7 +529,7 @@ void FD::LayoutWrite::remakeWindow_horizonal(std::vector<std::shared_ptr<Layout:
 
 }
 
-void FD::LayoutWrite::remakeWindow_vertical(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) const {
+void FD::LayoutWrite::remakeWindow_vertical(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) {
 	constexpr float floatMax = std::numeric_limits<float>::max();
 
 	const uint16_t size = static_cast<uint16_t>(x->separators.size());

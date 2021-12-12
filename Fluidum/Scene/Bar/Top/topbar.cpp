@@ -34,7 +34,7 @@ FS::TopBar::TopBar(
 	imguiWindowRead(imguiWindowRead),
 	layoutRead(layoutRead)
 {
-	FluidumScene_Log_Constructor("TopBarScene");
+	FluidumScene_Log_Constructor("TopBar");
 
 	style.windowPos = ImVec2(0.0f, guiRead->menuBarHeight());
 	const float windowHeight = guiRead->menuBarHeight();
@@ -48,7 +48,7 @@ FS::TopBar::TopBar(
 }
 
 FS::TopBar::~TopBar() noexcept {
-	FluidumScene_Log_Destructor_("TopBarScene")
+	FluidumScene_Log_Destructor_("TopBar")
 }
 
 namespace FS::Internal::Bar {
@@ -83,38 +83,6 @@ void FS::TopBar::call() {
 
 	ImGui::PopStyleVar(2);
 
-}
-
-
-//		FluidumScene_Log_InternalError();
-//		FluidumScene_Log_CallSceneConstructor("Utils::InternalError");
-//		Scene::callConstructor<Utils::InternalError>();
-//	}
-//
-//}
-//
-//void FS::TopBar::coding() {
-//	FluidumScene_Log_RequestTryAddScene("TextEditor");
-//	Scene::tryAddScene<::FS::TextEditor>();
-//
-//	FluidumScene_Log_RequestTryAddScene("Coding::Tab");
-//	Scene::tryAddScene<Coding::Tab>();
-//}
-
-void FS::TopBar::projectNameGui() {
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-
-	if (projectRead->isDefaultProject())
-		ImGui::Button(text.tempProject);
-	else
-		ImGui::Button(projectRead->getProjectName().c_str());
-
-	ImGui::PopStyleColor(3);
-	ImGui::PopStyleVar(2);
 }
 
 void FS::TopBar::rightGui() {

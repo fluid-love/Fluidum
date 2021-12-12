@@ -10,7 +10,7 @@ namespace FS::Lua {
 	std::string concatArrayValueNames() {
 		std::string ret{};
 		for (auto x : ArrayValueNames) {
-			(ret += x) += ', ';
+			(ret += x) += ',';
 		}
 		return ret;
 	}
@@ -37,7 +37,15 @@ namespace FS::Lua {
 }
 
 FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
-	check.argType<Type::array_make>(L, { LuAssist::Type::String });
+	const bool argTypes = LuAssist::Utils::checkArgTypes<LuAssist::Type::String>(L);
+	if (!argTypes) {
+		//{}関数{}の{}番目の引数の型に誤りがあります．渡された引数の型: {}．正しい引数の型: {}．
+		Message message(LogType::Type);
+		const auto types = LuAssist::Utils::types(L);
+		assert(types.size() == 1);
+		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "make", 1, LuAssist::Utils::typeName(types.at(0)), LuAssist::Utils::typeName(LuAssist::Type::String));
+		consoleWrite->add(std::move(log));
+	}
 
 	const String str = lua_tostring(L, 1);
 	const auto type = stringToArrayValueType(str);
@@ -45,7 +53,7 @@ FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
 	if (!type.has_value()) {//not match
 		//{}関数{}の引数に無効な文字列が渡されました．渡された文字列{}．正しい文字列{}．
 		Message message(LogType::NotMatch);
-		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), str, concatArrayValueNames);
+		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), str, concatArrayValueNames());
 		consoleWrite->add(std::move(log));
 		throw Internal::Exception();
 	}
@@ -60,7 +68,7 @@ FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
 		if (val == MaxSize) {
 			//{}関数{}が呼ばれましたが作成できる{}の最大数を超えています．最大値{}．
 			Message message(LogType::NotMatch);
-			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "array", FD::Calc::Array::Limits::MaxSize);
+			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "make", FD::Calc::Array::Limits::MaxSize);
 			consoleWrite->add(std::move(log));
 			throw Internal::Exception();
 		}
@@ -72,7 +80,6 @@ FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
 		throw Lua::Internal::InternalError(__FILE__);
 	}
 
-	LuAssist::Utils::popAll(L);
 	lua_pushinteger(L, key);
 
 	{

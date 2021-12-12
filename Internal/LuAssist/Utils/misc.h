@@ -15,7 +15,7 @@ namespace LuAssist::Utils {
 	//integer       > number
 	//cfnction      > function
 	//lightuserdata > userdata
-	[[nodiscard]] Type type(State L,const int32_t index);
+	[[nodiscard]] Type type(State L, const int32_t index);
 	[[nodiscard]] std::vector<Type> types(State L);
 
 
@@ -25,12 +25,34 @@ namespace LuAssist::Utils {
 	const char* typeName(const Type type) noexcept;
 
 	//[Source {},Line {}]
-	[[nodiscard]] std::string getSrcCurrentLine(State L,const int32_t depth);
+	[[nodiscard]] std::string getSrcCurrentLine(State L, const int32_t depth);
 
 	[[nodiscard]] int32_t lineDefined(State L);
 	[[nodiscard]] int32_t currentLine(State L);
 
 	[[nodiscard]] int32_t size(State L);
+	[[nodiscard]] bool empty(State L);
+
+	template<Type... Types>
+	[[nodiscard]] bool checkArgTypes(State L) {
+		constexpr uint16_t arraySize = static_cast<uint16_t>(sizeof...(Types));
+		static_assert(arraySize > 0);
+
+		const auto types = ::LuAssist::Utils::types(L);
+
+		if (arraySize != types.size())
+			throw std::out_of_range("arraySize != types.size()");
+
+		for (std::size_t i = 0; auto x: {Types...}) {
+			const bool same = (x == types[i]);
+			if (!same) {
+				return false;
+			}
+			i++;
+		}
+
+		return true;
+	}
 
 	//void setPosColorVerticesAndListIndices(LuaType::State L, FD::Object::Vertices* vertices, FD::Object::Indices* indices);
 	//void setPosColorVertices(LuaType::State L, FD::Object::Vertices* vertices,const std::vector<uint32_t>& changedIndices);

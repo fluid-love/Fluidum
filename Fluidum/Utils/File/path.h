@@ -15,7 +15,7 @@
 namespace FU::File {
 
 	//get length of string(const char*)
-	_NODISCARD consteval std::size_t Strlen(const char* str) noexcept {
+	[[nodiscard]] consteval std::size_t Strlen(const char* str) noexcept {
 		return *str ? 1 + Strlen(str + 1) : 0;
 	}
 
@@ -76,7 +76,7 @@ namespace FU::File {
 	public:
 		//decltype(Path) == std::array
 		//return as const char*
-		_NODISCARD constexpr operator const char* ()const noexcept {
+		[[nodiscard]] constexpr operator const char* ()const noexcept {
 			return Path.data();
 		}
 	};
@@ -88,22 +88,22 @@ namespace FU::File {
 
 	//C:/test/test/ -> test
 	//C:/test/test -> test
-	_NODISCARD std::string directoryName(const std::string& path);
+	[[nodiscard]] std::string directoryName(const std::string& path);
 
 	//C:/test/test/ -> C:/test/test/
 	//C:/test/test -> C:/test/
-	_NODISCARD std::string directory(const std::string& path);
+	[[nodiscard]] std::string directory(const std::string& path);
 
 	//C:/test/test.cpp -> test.cpp
-	_NODISCARD std::string fileName(const std::string& path);
+	[[nodiscard]] std::string fileName(const std::string& path);
 
 	//Windows: '\\' -> '/'
 	//Back '/'
 	//lexically_normal
-	_NODISCARD std::string consistentDirectory(const std::string& dir);
+	[[nodiscard]] std::string consistentDirectory(const std::string& dir);
 
 	void hide(const std::string& path);
 
 	//Windows  \ / : * ? " < > |
-	_NODISCARD bool containForbiddenCharactor(const std::string& name);
+	[[nodiscard]] bool containForbiddenCharactor(const std::string& name);
 }
