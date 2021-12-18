@@ -10,12 +10,12 @@ namespace FS {
 		explicit Project(
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
-			FD::LuaFilesWrite* const luaFilesWrite,
+			FD::LuaFilesWrite_Lock* const luaFilesWrite,
 			FD::FluidumFilesWrite* const fluidumFilesWrite,
 			const FD::FluidumFilesRead* const fluidumFilesRead,
-			FD::ProjectFilesWrite* const projectFilesWrite,
+			FD::ProjectFilesWrite_Lock* const projectFilesWrite,
 			const FD::ProjectFilesRead* const projectFilesRead,
-			FD::UserFilesWrite* const userFilesWrite,
+			FD::UserFilesWrite_Lock* const userFilesWrite,
 			const FD::UserFilesRead* const userFilesRead,
 			const FD::SceneRead* const sceneRead,
 			FD::Coding::TabWrite* const tabWrite
@@ -23,12 +23,12 @@ namespace FS {
 		void Constructor(
 			FD::ProjectWrite,
 			FD::ProjectRead,
-			FD::LuaFilesWrite,
+			FD::LuaFilesWrite_Lock,
 			FD::FluidumFilesWrite,
 			FD::FluidumFilesRead,
-			FD::ProjectFilesWrite,
+			FD::ProjectFilesWrite_Lock,
 			FD::ProjectFilesRead,
-			FD::UserFilesWrite,
+			FD::UserFilesWrite_Lock,
 			FD::UserFilesRead,
 			FD::SceneRead,
 			FD::Coding::TabWrite
@@ -43,13 +43,13 @@ namespace FS {
 
 	private:
 		FD::ProjectWrite* const projectWrite;
-		FD::LuaFilesWrite* const luaFilesWrite;
+		FD::LuaFilesWrite_Lock* const luaFilesWrite;
 		FD::FluidumFilesWrite* const fluidumFilesWrite;
 		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::ProjectRead* const projectRead;
-		FD::ProjectFilesWrite* const projectFilesWrite;
+		FD::ProjectFilesWrite_Lock* const projectFilesWrite;
 		const FD::ProjectFilesRead* const projectFilesRead;
-		FD::UserFilesWrite* const userFilesWrite;
+		FD::UserFilesWrite_Lock* const userFilesWrite;
 		const FD::UserFilesRead* const userFilesRead;
 		const FD::SceneRead* const sceneRead;
 		FD::Coding::TabWrite* const tabWrite;
@@ -116,6 +116,12 @@ namespace FS {
 			bool popup = false;
 			std::shared_ptr<Coding::New::SharedInfo> info{};
 		}newFile;
+
+		struct {
+			ImCounter<ImAnimeTime> sync{};
+			ImCounter<ImAnimeTime> collapseAll{};
+			ImCounter<ImAnimeTime> displayCode{};
+		}anime;
 
 	private:
 		void topBar();

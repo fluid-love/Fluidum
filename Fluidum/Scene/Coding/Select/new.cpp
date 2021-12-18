@@ -12,7 +12,7 @@ namespace FS::Coding::Internal {
 			"empty.png",
 			"lua.png",
 			"python.png",
-			"angelscript.png"
+			"cpp.png"
 		};
 		std::vector<FDR::ImGuiImage> result;
 		for (uint16_t i = 0; i < std::extent_v<decltype(names), 0>; i++) {
@@ -47,20 +47,16 @@ FS::Coding::New::New(
 			ButtonInfo{images.at(0), "_Empty", text.empty, text.empty_Description},
 			ButtonInfo{images.at(1), "_ELua", text.emptyLua, text.emptyLua_Description},
 			ButtonInfo{images.at(2), "_EPy", text.emptyPython, text.emptyPython_Description},
-			ButtonInfo{images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScript_Description}
-
+			ButtonInfo{images.at(3), "_ECpp", text.emptyCpp, text.emptyCpp_Description}
 		})
 {
-	GLog.add<FD::Log::Type::None>("Construct Coding::NewScene.");
+	FluidumScene_Log_Constructor("Coding::New");
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
 
 	style.buttonSize = ImVec2(style.windowSize.x / 2.2f, style.windowSize.y * 0.09f);
 
-	//capacity
-	folderPath.reserve(200);
-	fileName.reserve(200);
 
 	//default
 	if (sharedInfo)
@@ -72,26 +68,15 @@ FS::Coding::New::New(
 			folderPath = sharedInfo->path;
 	}
 
+	//capacity
+	folderPath.reserve(200);
+	fileName.reserve(200);
 
 
 }
 
 FS::Coding::New::~New() {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Coding::NewScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("Coding::New");
 }
 
 void FS::Coding::New::call() {
@@ -113,7 +98,7 @@ void FS::Coding::New::call() {
 	//animation
 	ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
 
-	ImGui::Begin("CodingNew", nullptr, flag);
+	ImGui::Begin("Coding::New", nullptr, flag);
 
 	this->title();
 
@@ -241,18 +226,6 @@ void FS::Coding::New::buttons() {
 
 }
 
-namespace FS {
-	int inputTextCallback(ImGuiInputTextCallbackData* data) {
-		std::string* str = static_cast<std::string*>(data->UserData);
-		if (str->size() == data->BufTextLen)
-			return 0;
-
-		str->resize(data->BufTextLen);
-
-		return 0;
-	}
-}
-
 void FS::Coding::New::form() {
 	if (!select.ptr)
 		return;
@@ -261,14 +234,14 @@ void FS::Coding::New::form() {
 
 	ImGui::BulletText("test"); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.95f);
-	ImGui::InputText("##FolderPath", folderPath.data(), folderPath.capacity(), ImGuiInputTextFlags_CallbackAlways, inputTextCallback, &folderPath);
+	ImGui::InputText("##FolderPath", folderPath.data(), folderPath.capacity());
 	pos.folderPath = ImGui::GetItemRectMin();
 
 	ImGui::Spacing();
 
 	ImGui::BulletText("sile"); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.6f);
-	ImGui::InputText("##FileName", fileName.data(), fileName.capacity(), ImGuiInputTextFlags_CallbackAlways, inputTextCallback, &fileName);
+	ImGui::InputText("##FileName", fileName.data(), fileName.capacity());
 	pos.fileName = ImGui::GetItemRectMin();
 	ImGui::SameLine();
 	ImGui::Text(extension.c_str());
@@ -293,7 +266,7 @@ void FS::Coding::New::bottom() {
 		return;
 
 	//create
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.7f, 0.1f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.35f, 0.02f, 1.0f));
 	if (ImGui::Button(text.create, buttonSize)) {
 		pos.create = ImGui::GetItemRectMin();
 
@@ -329,6 +302,7 @@ void FS::Coding::New::create() {
 	if (!ofs)
 		throw std::runtime_error("Failed to create file.");
 
+	FluidumUtils_Debug_BeginDisableWarning(4390);
 	if (select.type == Empty)
 		;
 	if (select.type == Empty_Lua)
@@ -336,12 +310,12 @@ void FS::Coding::New::create() {
 	else if (select.type == Empty_Python)
 		ofs << FD::File::Template::EmptyPy << std::endl;
 	else if (select.type == Empty_Cpp)
-		ofs << FD::File::Template::EmptyAS << std::endl;
+		ofs << FD::File::Template::EmptyCpp << std::endl;
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		FluidumScene_Log_Abort();
 		abort();
 	}
-
+	FluidumUtils_Debug_EndDisableWarning;
 
 	if (!fluidumFilesRead->isMainCodeFileExist()) {
 		GLog.add<FD::Log::Type::None>("Set MainCodeFile({}).", this->fullPath);
@@ -364,7 +338,7 @@ namespace FS {
 	};
 
 	std::pair<ErrorType, std::string> checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
-		//空かどうか
+
 		if (folderPath.empty()) {
 			return { ErrorType::EmptyFolderPath,{} };
 		}
@@ -372,7 +346,7 @@ namespace FS {
 		if (fileName.empty())
 			return { ErrorType::EmptyFileName,{} };
 
-		//フォルダーが存在するか
+		//folder
 		bool result = !std::filesystem::is_directory(folderPath);
 		if (result)
 			return { ErrorType::NotFound,{} };
@@ -386,23 +360,17 @@ namespace FS {
 		return { ErrorType::None,filePath };
 	}
 
-	//入力された文字列に'/'があればそのまま，なければつける
-	void tryPushSlash_(std::string& path) {
-#ifdef BOOST_OS_WINDOWS
-		if (path.back() != '/' && path.back() != '\\')
-			path.push_back('/');
-#else
-		if (path.back() != '/')
-			path.push_back('/');
-#endif
-	}
 }
 
 bool FS::Coding::New::check() {
 	GLog.add<FD::Log::Type::None>("Check info.");
 
-	tryPushSlash_(this->folderPath);
-	auto [err, path] = checkFile(folderPath, fileName, extension);
+	std::string folderPath_ = this->folderPath.data();
+	std::string fileName_ = this->fileName.data();
+
+
+	FU::File::tryPushSlash(folderPath_);
+	auto [err, path] = checkFile(folderPath_, fileName_, extension);
 
 	//no error -> return true
 	if (err == ErrorType::None) {
@@ -411,24 +379,24 @@ bool FS::Coding::New::check() {
 		return true;
 	}
 
-	//問題があれば問題に応じて警告
+	//error
 	if (err == ErrorType::EmptyFolderPath) {
 		GLog.add<FD::Log::Type::None>("Error EmptyFolderPath.");
-		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		FluidumScene_Log_RequestAddScene("Utils::Message");
 		Scene::addScene<Utils::Message>(text.error_fill, pos.folderPath);
 	}
 	else if (err == ErrorType::EmptyFileName) {
 		GLog.add<FD::Log::Type::None>("Error EmptyFileName.");
-		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		FluidumScene_Log_RequestAddScene("Utils::Message");
 		Scene::addScene<Utils::Message>(text.error_fill, pos.fileName);
 	}
 	else if (err == ErrorType::NotFound) {
-		GLog.add<FD::Log::Type::None>("Error NotFoundDirectory. Typed directory is {}.", folderPath);
+		GLog.add<FD::Log::Type::None>("Error NotFoundDirectory. Typed directory is {}.", folderPath_);
 		Scene::addScene<Utils::Message>(text.error_directoryNotFound, pos.fileName);
 	}
 	else if (err == ErrorType::AlreadyExist) {
-		GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", fileName, path);
-		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", fileName_, path);
+		FluidumScene_Log_RequestAddScene("Utils::Message");
 		Scene::addScene<Utils::Message>(text.error_fileAlreadyExist, pos.create);
 	}
 
@@ -461,7 +429,7 @@ bool FS::Coding::New::button(const FDR::ImGuiImage& image, const char* label, co
 
 	bool click = false;
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows)) {
-		ImU32 col = ImGui::ColorConvertFloat4ToU32(ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
+		constexpr ImU32 col = FU::ImGui::convertImVec4ToImU32(0.950f, 0.950f, 0.950f, 0.156f);
 		ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetWindowPos(), ImGui::GetWindowPos() + ImGui::GetWindowSize(), col);
 		click = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
 	}
@@ -483,10 +451,10 @@ std::vector<FS::Coding::New::ButtonInfo> FS::Coding::New::initRecentFileTypes(co
 		else if (x == Empty_Python)
 			result.emplace_back(ButtonInfo{ images.at(2), "_EPy", text.emptyPython, text.emptyPython_Description });
 		else if (x == Empty_Cpp)
-			result.emplace_back(ButtonInfo{ images.at(3), "_EAS", text.emptyAngelScript, text.emptyAngelScript_Description });
+			result.emplace_back(ButtonInfo{ images.at(3), "_ECpp", text.emptyCpp, text.emptyCpp_Description });
 
 		else {
-			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+			FluidumScene_Log_Abort();
 			abort();
 		}
 	}

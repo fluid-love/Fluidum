@@ -1346,15 +1346,6 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.hide.cpp">
       <Filter>Fluidum\Scene\Calc\Lua\Functions\plot</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.sleep_seconds.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.terminate.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.sleep_milliseconds.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\External\imgui\imgui.cpp">
       <Filter>Libraries\ImGui</Filter>
     </ClCompile>
@@ -1439,6 +1430,18 @@
     <ClCompile Include="..\..\..\Fluidum\Utils\File\file.cpp">
       <Filter>Fluidum\Utils\File</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.sleep_seconds.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.terminate.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.print.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.sleep_milliseconds.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Test\test.lua">
@@ -1508,6 +1511,12 @@
       <Filter>Fluidum\Language\Lua\FluidumStandardLibrary\fluidum</Filter>
     </None>
     <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\array.lua">
+      <Filter>Fluidum\Language\Lua\FluidumStandardLibrary\fluidum</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Console">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\system.lua">
       <Filter>Fluidum\Language\Lua\FluidumStandardLibrary\fluidum</Filter>
     </None>
   </ItemGroup>

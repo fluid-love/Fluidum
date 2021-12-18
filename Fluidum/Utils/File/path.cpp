@@ -103,3 +103,13 @@ bool FU::File::containForbiddenCharactor(const std::string& name) {
 #endif
 	return itr != name.end();
 }
+
+void FU::File::tryPushSlash(std::string& path) {
+#ifdef BOOST_OS_WINDOWS
+	if (path.back() != '/' && path.back() != '\\')
+		path.push_back('/');
+#else
+	if (path.back() != '/')
+		path.push_back('/');
+#endif
+}

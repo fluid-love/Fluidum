@@ -17,7 +17,7 @@
 
 
 #define FluidumScene_Console_InternalError \
-	this->consoleWrite->add(std::string("Internal Error."))
+	this->consoleWrite->push(std::string("Internal Error."))
 
 #define FluidumScene_Log_RequestAddScene(name) \
 	GLog.add<FD::Log::Type::None>("[Request] Add " name " Scene.")

@@ -35,11 +35,17 @@ namespace FS {
 		const FD::Text::Layout text{};
 	private:
 		std::vector<FD::Layout::DockSpaceWindow> windows{};
+		std::vector<FD::Layout::SeparatorPos> separators{};
 
 		struct {
-			FD::Layout::DockSpaceWindow current{};
-			FD::Layout::DockSpaceWindow right{};
-			FD::Layout::DockSpaceWindow resize{};
+			FD::Layout::DockSpaceWindow* current{};
+			FD::Layout::DockSpaceWindow* right{};
+
+			uint16_t resizedWindowIndex = 0;
+
+			FD::Layout::DockSpaceWindow* hovered{};
+
+			FD::Layout::ResizedBorder resizeBorder = FD::Layout::ResizedBorder::None;
 
 			ImVec2 pos{};
 		}select;
@@ -53,6 +59,10 @@ namespace FS {
 			bool centerVerticalConstraintArea = false;
 
 			bool noresize = false;
+
+			bool canMerge = false;
+
+			bool mouseDown = false;
 		}flag;
 
 
@@ -79,5 +89,14 @@ namespace FS {
 
 	private:
 		void noresize();
+		void save_resize();
+
+	private:
+		void updateWindows();
+		void messageLimit();
+
+	private:
+		void drawSeparators();
+
 	};
 }

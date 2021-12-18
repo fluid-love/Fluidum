@@ -37,7 +37,7 @@ FS::TopBar::TopBar(
 	FluidumScene_Log_Constructor("TopBar");
 
 	style.windowPos = ImVec2(0.0f, guiRead->menuBarHeight());
-	const float windowHeight = guiRead->menuBarHeight();
+	const float windowHeight = guiRead->menuBarHeight() + (ImGui::GetFontSize() * 0.35f);
 	style.windowSize = ImVec2(guiRead->windowSize().x, windowHeight);
 
 	if (windowHeight <= ImGui::GetStyle().WindowMinSize.y)
@@ -66,13 +66,11 @@ void FS::TopBar::call() {
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);
 
-	//角をとる
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	//borderを細く
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
 	ImGui::Begin("TopBar", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBringToFrontOnFocus);
-
+	this->windowBorder();
 	ImGui::End();
 
 
@@ -133,10 +131,9 @@ void FS::TopBar::calc() {
 
 	ImGui::SameLine();
 
-	//実行中
 	if (isRunning) {
 
-		//一時停止を要求
+		//request pause
 		bool pause = ImGui::Button(ICON_MD_STOP);
 
 		ImGui::SameLine();
@@ -152,7 +149,7 @@ void FS::TopBar::calc() {
 
 	ImGui::SameLine();
 
-	//次のステップまで進む
+	//next step
 	if (isRunning) {
 		ImGui::Button(ICON_MD_SKIP_NEXT);
 
@@ -160,11 +157,11 @@ void FS::TopBar::calc() {
 	else {
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.1f);
 
-		//停止を要求
+		//request stop
 		bool stop = ImGui::Button(ICON_MD_PAUSE);
 		ImGui::SameLine();
 
-		//次のステップ
+		//next step
 		ImGui::Button(ICON_MD_SKIP_NEXT);
 
 		ImGui::PopStyleVar();
@@ -286,3 +283,13 @@ void FS::TopBar::separator(const float posX, const ImVec4& col4) {
 
 }
 
+#include <imgui_internal.h>
+void FS::TopBar::windowBorder() {
+	constexpr ImU32 col = FU::ImGui::convertImVec4ToImU32(0.4f, 0.4f, 0.4f, 1.0f);
+	ImGui::GetWindowDrawList()->AddLine(
+		{ style.windowPos.x ,style.windowPos.y + style.windowSize.y },
+		{ style.windowPos.x + style.windowSize.x ,style.windowPos.y + style.windowSize.y },
+		col,
+		5.0f
+	);
+}

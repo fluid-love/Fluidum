@@ -8,12 +8,17 @@ FS::TextEditor::TextEditor(
 	const FD::GuiRead* const guiRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
-	FD::ProjectFilesWrite* const projectFilesWrite,
-	const FD::ProjectFilesRead* const projectFilesRead
-)
-	: tabWrite(tabWrite), tabRead(tabRead), guiRead(guiRead), projectWrite(projectWrite), projectRead(projectRead)
+	const FD::ProjectFilesRead* const projectFilesRead,
+	FD::TopBarWrite* const topBarWrite
+) :
+	tabWrite(tabWrite),
+	tabRead(tabRead),
+	guiRead(guiRead),
+	projectWrite(projectWrite),
+	projectRead(projectRead),
+	topBarWrite(topBarWrite)
 {
-	GLog.add<FD::Log::Type::None>("Construct TextEditorScene.");
+	FluidumScene_Log_Constructor("TextEditor");
 
 	auto paths = tabRead->getDisplayFilePaths();
 
@@ -29,15 +34,18 @@ FS::TextEditor::TextEditor(
 
 	this->checkSyntaxTimePoint = std::chrono::system_clock::now() + std::chrono::seconds(3);
 
-	this->luaState = luaL_newstate();
+	topBarWrite->add(&TextEditor::topBar, this, text.editor.operator const std::string &());
 
+	this->luaState = luaL_newstate();
 }
 
 FS::TextEditor::~TextEditor() noexcept {
 	try {
 		lua_close(luaState);
 
-		GLog.add<FD::Log::Type::None>("Destruct TextEditorScene.");
+		topBarWrite->erase<TextEditor>();
+
+		FluidumScene_Log_Destructor("TextEditor");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -257,11 +265,11 @@ void FS::TextEditor::breakPoint() {
 	const ImVec2 size = ImGui::GetWindowSize();
 
 	if (ImGui::IsMouseHoveringRect(pos, { pos.x + size.x,pos.y + size.y })) {
-		
+
 		//FTE::TextEditor::Breakpoints points = {1};
 		//current->editor->SetBreakpoints(points);
 	}
-		
+
 }
 
 void FS::TextEditor::checkSyntaxError() {
@@ -318,4 +326,8 @@ void FS::TextEditor::checkPython() {
 
 void FS::TextEditor::checkAngelScript() {
 
+}
+
+void FS::TextEditor::topBar() {
+	
 }

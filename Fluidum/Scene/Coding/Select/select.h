@@ -3,11 +3,11 @@
 #include "../../Common/common.h"
 #include "../../../TextEditor/include.h"
 
-namespace FS {
+namespace FS::Coding {
 
-	class CodingSelect final : public Scene {
+	class Select final : public Scene {
 	public:
-		explicit CodingSelect(
+		explicit Select(
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::ProjectRead* const projectRead,
 			FD::ProjectWrite* const projectWrite,
@@ -26,9 +26,9 @@ namespace FS {
 			FD::SceneRead
 		);
 
-		~CodingSelect() noexcept;
+		~Select() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(CodingSelect)
+		FluidumUtils_Class_Delete_CopyMove(Select)
 
 	public:
 		virtual void call() override;
@@ -71,7 +71,7 @@ namespace FS {
 			None,
 			Empty_Lua,
 			Empty_Py,
-			Empty_AS
+			Empty_Cpp
 		};
 
 		Template selectType = Template::None;
@@ -89,33 +89,32 @@ namespace FS {
 
 
 	private:
-		//新規作成
+		//make
 		void create();
 
-
-		//最近つかったもの
+	private://recent
 		void quick();
 		void selectTemplate(const ImVec2& size);
 
-		//開く
+	private://open
 		void right();
 		void open(const ImVec2& size);
 		void openDialog();
 		void newFile(const ImVec2& size);
 
-		//右下(クイックにおけるパスとファイル名入力)
+	private://lower right
 		void bottomRight();
 
-		//下
+	private://bottom
 		void bottom();
 
+	private:
 		void setEmptyFile();
 
-		//クイックで作る場合はプロジェクトフォルダのCodeフォルダに入れる
-		void createNewFileQuick();
-		_NODISCARD bool checkQuickInfo();
 
-		//errroのポップアップ
+		void createNewFileQuick();
+		[[nodiscard]] bool checkQuickInfo();
+
 		void errorPopup();
 
 	private:
@@ -131,7 +130,6 @@ namespace FS {
 				NotFound
 			};
 			static std::pair<ErrorType, std::string> checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension);
-			static void tryPushSlash(std::string& path);
 		};
 		static int inputTextCallback(ImGuiInputTextCallbackData* data);
 	};

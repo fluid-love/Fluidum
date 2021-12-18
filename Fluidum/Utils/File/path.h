@@ -106,4 +106,7 @@ namespace FU::File {
 
 	//Windows  \ / : * ? " < > |
 	[[nodiscard]] bool containForbiddenCharactor(const std::string& name);
+
+	//Windows / or \\  
+	void tryPushSlash(std::string& path);
 }

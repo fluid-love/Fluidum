@@ -17,7 +17,7 @@ FS::Lua::Ret FS::Lua::Calc::array_pop_back(State L) {
 		//{}関数{}によって{}番目の要素にアクセスしようとしましたが範囲外でした．要素のサイズ{}．
 		Message message(LogType::OutOfRange);
 		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "pop_back", 1, 0);
-		consoleWrite->add(std::move(log));
+		consoleWrite->push(std::move(log));
 		throw Internal::Exception();
 	}
 

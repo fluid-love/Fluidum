@@ -1,6 +1,7 @@
 #pragma once
 
 #include "resource.h"
+#include "../Limits/limits.h"
 #include <boost/predef.h>
 #include <lua.hpp>
 

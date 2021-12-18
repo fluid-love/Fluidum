@@ -95,5 +95,6 @@ namespace FS {
 
 	private:
 		void separator(const float posX, const ImVec4& col4 = { 0.2f, 0.2f, 0.2f, 1.0f });
+		void windowBorder();
 	};
 }

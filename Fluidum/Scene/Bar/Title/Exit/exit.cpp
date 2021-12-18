@@ -19,25 +19,11 @@ FS::Bar::Exit::Exit(
 	tabRead(tabRead),
 	tabWrite(tabWrite)
 {
-	GLog.add<FD::Log::Type::None>("Construct Bar::ExitScene.");
+	FluidumScene_Log_Constructor("Bar::Exit");
 }
 
 FS::Bar::Exit::~Exit() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Bar::ExitScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor("Bar::Exit");
 }
 
 void FS::Bar::Exit::call() {

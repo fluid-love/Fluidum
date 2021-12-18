@@ -5,16 +5,16 @@
 namespace FD {
 	class ProjectWrite;
 
-	class LuaFilesWrite;
+	class LuaFilesWrite_Lock;
 	class LuaFilesRead;
 
 	class FluidumFilesWrite;
 	class FluidumFilesRead;
 
-	class ProjectFilesWrite;
+	class ProjectFilesWrite_Lock;
 	class ProjectFilesRead;
 
-	class UserFilesWrite;
+	class UserFilesWrite_Lock;
 	class UserFilesRead;
 
 }
@@ -29,7 +29,7 @@ namespace FD::Project::Internal {
 		static inline std::atomic_bool save = false;
 	private:
 		friend class ProjectWrite;
-		friend class LuaFilesWrite;
+		friend class LuaFilesWrite_Lock;
 		friend class LuaFilesRead;
 	};
 
@@ -55,7 +55,7 @@ namespace FD::Project::Internal {
 		static inline std::atomic_bool save = false;
 	private:
 		friend class ProjectWrite;
-		friend class ProjectFilesWrite;
+		friend class ProjectFilesWrite_Lock;
 		friend class ProjectFilesRead;
 	};
 
@@ -67,7 +67,7 @@ namespace FD::Project::Internal {
 		static inline std::atomic_bool save = false;
 	private:
 		friend class ProjectWrite;
-		friend class UserFilesWrite;
+		friend class UserFilesWrite_Lock;
 		friend class UserFilesRead;
 	};
 }
@@ -84,20 +84,20 @@ namespace FD::Project {
 
 namespace FD {
 
-	class LuaFilesWrite final {
+	class LuaFilesWrite_Lock final {
 	public:
-		explicit LuaFilesWrite(Internal::PassKey) {}
-		~LuaFilesWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(LuaFilesWrite)
+		explicit LuaFilesWrite_Lock(Internal::PassKey) {}
+		~LuaFilesWrite_Lock() = default;
+		FluidumUtils_Class_Delete_CopyMove(LuaFilesWrite_Lock)
 
 	public:
 		void closeAll();
 
 	public:
-		_NODISCARD std::vector<Project::List::FileInfo>* fileList();
+		[[nodiscard]] std::vector<Project::List::FileInfo>* fileList();
 
 	public:
-		_NODISCARD std::unique_lock<std::mutex> getLock();
+		[[nodiscard]] std::unique_lock<std::mutex> getLock();
 
 	public:
 		void save() const;
@@ -139,10 +139,10 @@ namespace FD {
 
 	public:
 
-		_NODISCARD std::string mainCodeFilePath() const;
-		_NODISCARD bool isMainCodeFileExist() const;
+		[[nodiscard]] std::string mainCodeFilePath() const;
+		[[nodiscard]] bool isMainCodeFileExist() const;
 
-		_NODISCARD Project::CodeType getCurrentMainCodeType() const;
+		[[nodiscard]] Project::CodeType getCurrentMainCodeType() const;
 
 	};
 
@@ -151,11 +151,11 @@ namespace FD {
 namespace FD {
 
 	//lock
-	class ProjectFilesWrite final {
+	class ProjectFilesWrite_Lock final {
 	public:
-		explicit ProjectFilesWrite(Internal::PassKey) {}
-		~ProjectFilesWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(ProjectFilesWrite)
+		explicit ProjectFilesWrite_Lock(Internal::PassKey) {}
+		~ProjectFilesWrite_Lock() = default;
+		FluidumUtils_Class_Delete_CopyMove(ProjectFilesWrite_Lock)
 
 	public:
 		template<Project::Internal::IsFileInfoElm T>
@@ -174,10 +174,10 @@ namespace FD {
 		void closeAll();
 
 	public:
-		_NODISCARD std::vector<Project::List::FileInfo>* fileList();
+		[[nodiscard]] std::vector<Project::List::FileInfo>* fileList();
 
 	public:
-		_NODISCARD std::unique_lock<std::mutex> getLock();
+		[[nodiscard]] std::unique_lock<std::mutex> getLock();
 
 	public:
 		void save() const;
@@ -202,11 +202,11 @@ namespace FD {
 namespace FD {
 
 	//lock
-	class UserFilesWrite final {
+	class UserFilesWrite_Lock final {
 	public:
-		explicit UserFilesWrite(Internal::PassKey) {}
-		~UserFilesWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(UserFilesWrite)
+		explicit UserFilesWrite_Lock(Internal::PassKey) {}
+		~UserFilesWrite_Lock() = default;
+		FluidumUtils_Class_Delete_CopyMove(UserFilesWrite_Lock)
 
 	public:
 		template<Project::Internal::IsFileInfoElm T>
@@ -221,7 +221,7 @@ namespace FD {
 
 		void eraseFile(const std::string& path);
 
-		_NODISCARD std::string makeTempName();
+		[[nodiscard]] std::string makeTempName();
 
 		void closeAll();
 
@@ -229,10 +229,10 @@ namespace FD {
 		void sync();
 
 	public:
-		_NODISCARD std::vector<Project::List::FileInfo>* fileList();
+		[[nodiscard]] std::vector<Project::List::FileInfo>* fileList();
 
 	public:
-		_NODISCARD std::unique_lock<std::mutex> getLock();
+		[[nodiscard]] std::unique_lock<std::mutex> getLock();
 
 	public:
 		void save() const;

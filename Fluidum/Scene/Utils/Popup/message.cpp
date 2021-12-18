@@ -6,25 +6,11 @@ FS::Utils::Message::Message(
 	const ImVec4& bgColor
 ) : message(message), pos(pos), bgColor(bgColor)
 {
-	GLog.add<FD::Log::Type::None>("Construct Utils::MessageScene.");
+	FluidumScene_Log_Constructor("Utils::Message");
 }
 
 FS::Utils::Message::~Message() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Utils::MessageScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("Utils::Message");
 }
 
 void FS::Utils::Message::call() {

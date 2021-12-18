@@ -31,17 +31,17 @@ namespace FS {
 	private://data
 
 		struct Size final {
-			float taskIcon = 0.0f;
-			float version = 0.0f;
+			float taskIcon{};
+			float version{};
 
-			float barHeight = 30.0f;
-			ImVec2 windowPos = ImVec2();
+			float barHeight{};
+			ImVec2 windowPos{};
 
-			ImVec2 infoWindowPos = ImVec2();
-			ImVec2 infoWindowSize = ImVec2();
+			ImVec2 infoWindowPos{};
+			ImVec2 infoWindowSize{};
 
-			ImVec2 versionWindowPos = ImVec2();
-			ImVec2 versionWindowSize = ImVec2();
+			ImVec2 versionWindowPos{};
+			ImVec2 versionWindowSize{};
 		}style;
 
 

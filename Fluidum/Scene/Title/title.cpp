@@ -22,14 +22,14 @@
 
 namespace FS::Internal {
 	std::vector<FDR::ImGuiImage> createImages() {
-		//画像をセット
+
 		constexpr const char* imageFileNames[] = {
 			"coding.png",
 			"node.png",
 			"analysis.png",
-			"project.png",
-			"animation.png",
 			"genome.png",
+			"animation.png",
+			"project.png",
 			"console.png",
 			"plot.png",
 			"func.png",

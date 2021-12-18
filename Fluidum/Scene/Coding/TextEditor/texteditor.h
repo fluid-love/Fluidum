@@ -12,8 +12,8 @@ namespace FS {
 			const FD::GuiRead* const guiRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
-			FD::ProjectFilesWrite* const projectFilesWrite,
-			const FD::ProjectFilesRead* const projectFilesRead
+			const FD::ProjectFilesRead* const projectFilesRead,
+			FD::TopBarWrite* const topBarWrite
 		);
 		void Constructor(
 			FD::Coding::TabWrite,
@@ -21,8 +21,8 @@ namespace FS {
 			FD::GuiRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
-			FD::ProjectFilesWrite,
-			FD::ProjectFilesRead
+			FD::ProjectFilesRead,
+			FD::TopBarWrite
 		);
 
 		~TextEditor() noexcept;
@@ -38,6 +38,7 @@ namespace FS {
 		const FD::GuiRead* const guiRead;
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
+		FD::TopBarWrite* const topBarWrite;
 
 		FD::Text::TextEditor text{};
 
@@ -84,5 +85,9 @@ namespace FS {
 		void checkPython();
 		void checkAngelScript();
 		lua_State* luaState = nullptr;
+
+	private:
+		void topBar();
+
 	};
 }

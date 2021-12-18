@@ -26,7 +26,7 @@ namespace FS {
 		FD::ConsoleWrite* const consoleWrite;
 		const FD::ConsoleRead* const consoleRead;
 
-		bool windowFlag = true;
+		const FD::Text::Console text{};
 
 	private:
 		std::string inputText{};
@@ -42,6 +42,12 @@ namespace FS {
 			float fontSizeScale = 1.0f;
 		}style;
 
+		struct {
+			bool windowFlag = true;
+			bool popupTitle = false;
+			bool popupRight = false;
+		}flag;
+
 	private:
 		void closeWindow();
 
@@ -51,6 +57,13 @@ namespace FS {
 	private:
 		void input();
 		void push();
+
+	private:
+		void popupTitle();
+		
+		void popupRight();
+		void popup_clear();
+		void popup_backcolor();
 
 	private:
 		void changeFontSize();

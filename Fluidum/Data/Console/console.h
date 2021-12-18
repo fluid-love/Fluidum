@@ -21,8 +21,8 @@ namespace FD::Console::Internal {
 			FluidumUtils_Class_Delete_CopyMove(Data)
 
 	private:
-		static constexpr uint16_t LimitMaxLineSize = 20000;
 		static inline std::vector<::FD::Console::Info> texts{};
+		static inline bool busy = false;
 		static inline std::mutex mtx{};
 	private:
 		friend ::FD::ConsoleWrite;
@@ -44,21 +44,21 @@ namespace FD {
 	public:
 
 		template<typename String>
-		requires(FU::Concept::IsStdString<String>) void add(String&& message) {
+		requires(FU::Concept::IsStdString<String>) void push(String&& message) const{
 			Console::Info info{
 				std::forward<String>(message)
 			};
 			std::lock_guard<std::mutex> lock(Console::Internal::Data::mtx);
 
 			using namespace Console::Internal;
-			if (Data::texts.size() > Data::LimitMaxLineSize)
+			if (Data::texts.size() > Console::Limits::Lines)
 				Data::texts.erase(Data::texts.begin(), Data::texts.begin() + 500);
 			Data::texts.emplace_back(std::move(info));
 		}
 
 		template<typename String, typename... T>
 		requires((sizeof...(T) > 0) && FU::Concept::IsStdString<String>)
-			void add(String&& message, T&&... values) {
+			void push(String&& message, T&&... values) const {
 
 			//formatÇÃà¯êîÇÕ&ÇÃÇ›
 			std::string result = std::format(message, std::forward<T>(values)...);
@@ -67,14 +67,31 @@ namespace FD {
 				std::move(result)
 			};
 			std::lock_guard<std::mutex> lock(Console::Internal::Data::mtx);
-		
+
 			using namespace Console::Internal;
-			if (Data::texts.size() > Data::LimitMaxLineSize)
+			if (Data::texts.size() > Console::Limits::Lines)
 				Data::texts.erase(Data::texts.begin(), Data::texts.begin() + 500);
 			Data::texts.emplace_back(std::move(info));
 		}
 
+		void push_input(const std::string& message) const;
 
+		void push_input(std::string&& message) const;
+
+		template<typename... T>
+		void push_input(const std::string& message, T&&... values) const {
+			std::string msg = ">" + message;
+			this->push(std::move(msg), std::forward<T>(values)...);
+		}
+
+		template<typename... T>
+		void push_input(std::string&& message, T&&... values) const {
+			message.insert(message.begin(), '>');
+			this->push(std::move(message), std::forward<T>(values)...);
+		}
+
+	public:
+		void busy(const bool val) const;
 
 	};
 
@@ -87,6 +104,10 @@ namespace FD {
 	public:
 		//return !out_of_range, text
 		std::pair<bool, Console::Info> get(const std::size_t index) const;
+
+	public:
+		[[nodiscard]] bool busy() const;
+		[[nodiscard]] std::size_t size() const;
 	};
 
 }

@@ -158,7 +158,7 @@ void FS::Bar::ProjectForm::bottom() {
 
 	ImGui::SameLine();
 
-	//キャンセルボタン　赤字
+	//cancel
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::Button(text.cancel, buttonSize)) {
 		FluidumScene_Log_RequestDeleteScene("ProjectForm");
@@ -171,7 +171,7 @@ void FS::Bar::ProjectForm::bottom() {
 	ImGui::SameLine();
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.35f, 0.02f, 1.0f));
-	if (ImGui::Button(text.create, buttonSize)) {//create
+	if (ImGui::Button(text.create, buttonSize)) {//make
 		pos.create = ImGui::GetItemRectMin();
 
 		bool success = this->createProject();

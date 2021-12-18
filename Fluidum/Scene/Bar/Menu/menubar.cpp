@@ -43,7 +43,7 @@ FS::MenuBar::MenuBar(
 	calcWrite(calcWrite),
 	sceneRead(sceneRead)
 {
-	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
+	FluidumScene_Log_Constructor("MenuBar");
 
 	const auto size = ImGui::GetFontSize() * 0.45f;
 	style.offset = { size ,size };
@@ -53,28 +53,14 @@ FS::MenuBar::MenuBar(
 }
 
 FS::MenuBar::~MenuBar() {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct MenuBarScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("MenuBar");
 }
 
 void FS::MenuBar::call() {
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, style.offset);//Œú‚Ý‚ð‚à‚½‚¹‚é
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, style.offset);
 
-	//MenuBar‚ÌƒTƒCƒY‚ÍImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2
+	//MenuBar size == ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2
 
 	ImGui::SetNextWindowPos(ImVec2(), ImGuiCond_Once);
 	ImGui::SetNextWindowSize(ImVec2(guiRead->windowSize().x, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2), ImGuiCond_Once);
@@ -142,8 +128,7 @@ void FS::MenuBar::fileGui() {
 void FS::MenuBar::itemCreateNewProject() {
 	if (!ImGui::MenuItem(text.create))
 		return;
-
-	GLog.add<FD::Log::Type::None>("Request add NewProjectScene.");
+	FluidumScene_Log_RequestAddScene("Bar::NewProject");
 	Scene::addScene<Bar::NewProject>();
 }
 
@@ -173,22 +158,24 @@ void FS::MenuBar::itemOpen() {
 		projectWrite->loadProject(*outPath.get());
 	}
 	catch (const FD::Project::ExceptionType type) {
-		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
 
 		//std::ifstream::operator bool() == false
 		if (type == FD::Project::ExceptionType::FailedToOpenProjectFile) {
+			FluidumScene_Log_RequestAddScene("Utils::Message");
 			Scene::addScene<Utils::Message>(text.error_openProjectFile, pos.open);
 		}
 		//wrong identifier 
 		else if (type == FD::Project::ExceptionType::IllegalFile) {
+			FluidumScene_Log_RequestAddScene("Utils::Message");
 			Scene::addScene<Utils::Message>(text.error_illegalFile, pos.open);
 		}
 		//broken file
 		else if (type == FD::Project::ExceptionType::BrokenFile) {
+			FluidumScene_Log_RequestAddScene("Utils::Message");
 			Scene::addScene<Utils::Message>(text.error_brokenFile, pos.open);
 		}
 		else {
-			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+			FluidumScene_Log_Abort();
 			abort();
 		}
 		GLog.add<FD::Log::Type::None>("Failed to open .fproj file.");
@@ -196,7 +183,7 @@ void FS::MenuBar::itemOpen() {
 	}
 	catch (const std::exception&) {
 		GLog.add<FD::Log::Type::Error>("Failed to open .fproj file.");
-		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		FluidumScene_Log_RequestAddScene("Utils::Message");
 		Scene::addScene<Utils::Message>(text.error_internal, pos.open);
 		return;
 	}
@@ -216,7 +203,7 @@ void FS::MenuBar::itemSaveAs() {
 	if (!ImGui::MenuItem(text.saveFileAs))
 		return;
 
-	GLog.add<FD::Log::Type::None>("Request add Bar::SaveAsScene.");
+	FluidumScene_Log_RequestAddScene("Bar::SaveAs");
 	Scene::addScene<Bar::SaveAs>();
 }
 
@@ -231,7 +218,7 @@ void FS::MenuBar::itemExit() {
 
 	GLog.add<FD::Log::Type::None>("Request Exit.");
 
-	GLog.add<FD::Log::Type::None>("Request Add Bar::ExitScene.");
+	FluidumScene_Log_RequestAddScene("Bar::Exit");
 	Scene::addScene<Bar::Exit>();
 
 	ImGui::PopStyleColor();
@@ -281,7 +268,7 @@ void FS::MenuBar::itemRunDebugMode() {
 		calcWrite->save();
 	}
 
-	GLog.add<FD::Log::Type::None>("Request add Calc::RunScene.");
+	FluidumScene_Log_RequestAddScene("Calc::Run");
 	Scene::addScene<Calc::Run>();
 }
 
@@ -291,7 +278,7 @@ void FS::MenuBar::itemRunNormalMode() {
 		calcWrite->save();
 	}
 
-	GLog.add<FD::Log::Type::None>("Request add Calc::RunScene.");
+	FluidumScene_Log_RequestAddScene("Calc::Run");
 	Scene::addScene<Calc::Run>();
 }
 
@@ -413,7 +400,7 @@ void FS::MenuBar::setLayoutEmpty() {
 }
 
 void FS::MenuBar::setLayoutCoding() {
-	
+
 }
 
 void FS::MenuBar::extensionGui() {
@@ -582,9 +569,9 @@ void FS::MenuBar::helpGui() {
 	}
 	if (ImGui::MenuItem(text.document)) {
 #ifdef BOOST_OS_WINDOWS
-		system("start https://github.com/fluid-love/Fluidum/tree/master/Document");
+		system("start https://fluidum.fluid-love.com/manual_beta/");
 #elif BOOST_OS_MAC
-		system("open https://github.com/fluid-love/Fluidum/tree/master/Document");
+		system("open https://fluidum.fluid-love.com/manual_beta/");
 #else
 #error Not Supported
 #endif 

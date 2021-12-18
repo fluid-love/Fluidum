@@ -208,7 +208,7 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 	Project::Internal::FileList temp_files_userFiles{};
 
 	//tab
-	std::vector<std::string> temp_tab_filePathes{};
+	std::vector<std::string> temp_tab_filePaths{};
 	std::vector<std::string> temp_tab_displayFiles{};
 
 	//scene
@@ -223,7 +223,7 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 		temp_files_projectFiles = Project::Internal::ProjectFilesData::projectFiles;
 		temp_files_userFiles = Project::Internal::UserFilesData::userFiles;
 		temp_tab_displayFiles = Internal::Coding::TabData::displayFiles;
-		temp_tab_filePathes = Internal::Coding::TabData::filePathes;
+		temp_tab_filePaths = Internal::Coding::TabData::filePaths;
 		temp_scene_codes = Internal::Scene::Data::codes;
 		temp_layout_history = Layout::Internal::LayoutData::history;
 	}
@@ -265,9 +265,11 @@ void FD::ProjectWrite::loadProject(const char* path) const {
 		Project::Internal::ProjectFilesData::projectFiles = std::move(temp_files_userFiles);
 		Project::Internal::UserFilesData::userFiles = std::move(temp_files_projectFiles);
 		Internal::Coding::TabData::displayFiles = std::move(temp_tab_displayFiles);
-		Internal::Coding::TabData::filePathes = std::move(temp_tab_filePathes);
+		Internal::Coding::TabData::filePaths = std::move(temp_tab_filePaths);
 		Internal::Scene::Data::codes = std::move(temp_scene_codes);
+
 		Layout::Internal::LayoutData::history = std::move(temp_layout_history);
+
 		std::rethrow_exception(std::current_exception());
 	}
 	GCurrentData.isTemp = false;
@@ -344,7 +346,7 @@ void FD::ProjectWrite::save_tab() const {
 	ofs << Name::Delimiter << std::endl;
 
 	//TabFilePathes
-	for (const auto& x : Internal::Coding::TabData::filePathes) {
+	for (const auto& x : Internal::Coding::TabData::filePaths) {
 		ofs << x << std::endl;
 	}
 	ofs << Name::Delimiter << std::endl;
@@ -444,10 +446,10 @@ void FD::ProjectWrite::save_layout() const {
 	if (!ofs)
 		throw std::runtime_error("Failed to open .layout file.");
 
-	ofs << LayoutData::mainFrameLeft << std::endl;
-	ofs << LayoutData::mainFrameRight << std::endl;
-	ofs << LayoutData::mainFrameTop << std::endl;
-	ofs << LayoutData::mainFrameBottom << std::endl;
+	ofs << *LayoutData::mainFrameLeft << std::endl;
+	ofs << *LayoutData::mainFrameRight << std::endl;
+	ofs << *LayoutData::mainFrameTop << std::endl;
+	ofs << *LayoutData::mainFrameBottom << std::endl;
 
 	for (auto& x : LayoutData::history) {
 		if (x.horizonal)
@@ -455,8 +457,10 @@ void FD::ProjectWrite::save_layout() const {
 		else
 			ofs << "false" << std::endl;
 
-		ofs << x.parentWindowIndex << std::endl;
 		ofs << *x.pos << std::endl;
+
+		//midpoint
+		ofs << (*x.pos_side1 + ((*x.pos_side2 - *x.pos_side1) / 2.0f)) << std::endl;
 	}
 
 	ofs << Project::Internal::Name::Delimiter << std::endl;
@@ -856,6 +860,8 @@ void FD::ProjectWrite::read_layout() const {
 	if (!ifs)
 		throw Project::ExceptionType::NotFoundProjectFiles;
 
+	LayoutData::history.clear();
+
 	if (FU::File::empty(ifs))
 		return;
 
@@ -864,13 +870,13 @@ void FD::ProjectWrite::read_layout() const {
 	//main frame
 	try {
 		std::getline(ifs, buf);
-		LayoutData::mainFrameLeft = std::stof(buf);
+		LayoutData::mainFrameLeft = std::make_shared<float>(std::stof(buf));
 		std::getline(ifs, buf);
-		LayoutData::mainFrameRight = std::stof(buf);
+		LayoutData::mainFrameRight = std::make_shared<float>(std::stof(buf));
 		std::getline(ifs, buf);
-		LayoutData::mainFrameTop = std::stof(buf);
+		LayoutData::mainFrameTop = std::make_shared<float>(std::stof(buf));
 		std::getline(ifs, buf);
-		LayoutData::mainFrameBottom = std::stof(buf);
+		LayoutData::mainFrameBottom = std::make_shared<float>(std::stof(buf));
 	}
 	catch (const std::exception&) {
 		throw Project::ExceptionType::BrokenFile;
@@ -892,10 +898,18 @@ void FD::ProjectWrite::read_layout() const {
 			throw Project::ExceptionType::BrokenFile;
 
 		try {
-			std::getline(ifs, buf);
-			his.parentWindowIndex = static_cast<uint32_t>(std::stoul(buf));
-			std::getline(ifs, buf);
-			his.readPos = std::stof(buf);
+			if (his.horizonal) {
+				std::getline(ifs, buf);
+				his.readPos.y = std::stof(buf);
+				std::getline(ifs, buf);
+				his.readPos.x = std::stof(buf);
+			}
+			else {
+				std::getline(ifs, buf);
+				his.readPos.x = std::stof(buf);
+				std::getline(ifs, buf);
+				his.readPos.y = std::stof(buf);
+			}
 		}
 		catch (const std::exception&) {
 			throw Project::ExceptionType::BrokenFile;
@@ -952,7 +966,7 @@ void FD::ProjectWrite::read_tab() const {
 			std::getline(ifs, data);
 			if (data == Name::Delimiter)
 				break;
-			Internal::Coding::TabData::filePathes.emplace_back(data);
+			Internal::Coding::TabData::filePaths.emplace_back(data);
 
 			counter++;
 			if (counter > 1000)

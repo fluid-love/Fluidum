@@ -7,70 +7,76 @@ FS::Console::Console(
 	consoleWrite(consoleWrite),
 	consoleRead(consoleRead)
 {
-	GLog.add<FD::Log::Type::None>("Construct ConsoleScene.");
+	FluidumScene_Log_Constructor("Console");
 
-	if (inputText.max_size() >= 2000)
-		inputText.reserve(2000);
-	else
+	if (inputText.max_size() <= FD::Console::Limits::Characters)
 		inputText.reserve(inputText.max_size());
+	else
+		inputText.reserve(FD::Console::Limits::Characters);
 
 }
 
 FS::Console::~Console() {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct ConsoleScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("Console");
 }
 
 void FS::Console::call() {
-	ImGui::Begin("Console", &this->windowFlag);
+	ImGui::Begin(text.console, &flag.windowFlag);
 
+	//main
 	this->console();
 	this->input();
 
 
 	this->changeFontSize();
+
 	ImGui::End();
 
+	this->popupTitle();
+	this->popupRight();
 	this->closeWindow();
 }
 
 void FS::Console::console() {
+	using namespace FU::ImGui::Operators;
+
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, { 0.005f,0.005f,0.005f,1.0f });
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.1f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding * 2.0f);
 
 	const auto size = ImGui::GetWindowSize();
-	ImGui::BeginChild("ConsoleText", { size.x * 0.98f,size.y * 0.8f }, false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+	ImGui::BeginChild("ConsoleText", { size.x * 0.98f,size.y * 0.9f }, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 	ImGui::SetWindowFontScale(style.fontSizeScale);
 
-	ImGuiListClipper clipper;
-	clipper.Begin(100);
-	while (clipper.Step()) {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows))
+		flag.popupRight = true;
 
+	ImGuiListClipper clipper;
+	const int32_t clipperSize = static_cast<int32_t>(consoleRead->size() < 100 ? consoleRead->size() : 100);
+	clipper.Begin(clipperSize);
+	while (clipper.Step()) {
 		for (int32_t i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
 
-			const auto info = consoleRead->get(i);
-			if (info.first)
-				ImGui::Text(info.second.message.c_str());
-			else
+			auto [valid, message] = consoleRead->get(i);
+			if (valid)//read_only
+				ImGui::Text(message.message.c_str());
+			else {
 				ImGui::Spacing();
+			}
 		}
+	}
+
+	if (!consoleRead->busy()) {
+		const float alpha = std::fabs(std::sinf(static_cast<float>(2.0 * ImGui::GetTime())));
+		ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,alpha });
+		ImGui::Text(">");
+		ImGui::PopStyleColor();
 	}
 
 	ImGui::EndChild();
 
 	ImGui::PopStyleColor();
+	ImGui::PopStyleVar(2);
 }
 
 void FS::Console::input() {
@@ -89,7 +95,7 @@ void FS::Console::input() {
 }
 
 void FS::Console::closeWindow() {
-	if (windowFlag)
+	if (flag.windowFlag)
 		return;
 
 	//close
@@ -98,8 +104,63 @@ void FS::Console::closeWindow() {
 }
 
 void FS::Console::push() {
-	consoleWrite->add(std::string(inputText.data()));
+	std::string text = ">" + std::string(inputText.data());
+	consoleWrite->push(std::move(text));
 	inputText = std::string();
+
+	if (inputText.max_size() <= FD::Console::Limits::Characters)
+		inputText.reserve(inputText.max_size());
+	else
+		inputText.reserve(FD::Console::Limits::Characters);
+}
+
+void FS::Console::popupTitle() {
+	if (flag.popupTitle) {
+		flag.popupTitle = false;
+		ImGui::OpenPopup("TitlePopup");
+	}
+
+	if (!ImGui::BeginPopup("TitlePopup"))
+		return;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x,ImGui::GetStyle().ItemSpacing.y * 2.2f });
+
+
+	ImGui::PopStyleVar();
+
+	ImGui::EndPopup();
+}
+
+void FS::Console::popupRight() {
+	if (flag.popupRight) {
+		flag.popupRight = false;
+		ImGui::OpenPopup("ConsolePopup");
+	}
+
+	if (!ImGui::BeginPopup("ConsolePopup"))
+		return;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x,ImGui::GetStyle().ItemSpacing.y * 2.2f });
+
+	if (ImGui::Selectable(text.clear))
+		this->popup_clear();
+
+	ImGui::Separator();
+
+	if (ImGui::MenuItem(text.backcolor))
+		this->popup_backcolor();
+
+	ImGui::PopStyleVar();
+
+	ImGui::EndPopup();
+}
+
+void FS::Console::popup_clear() {
+
+}
+
+void FS::Console::popup_backcolor() {
+	//ImGui::ColorPicker4();
 }
 
 void FS::Console::changeFontSize() {
@@ -124,11 +185,4 @@ void FS::Console::changeFontSize() {
 
 	style.fontSizeScale = style.fontSize / ImGui::GetFontSize();
 }
-
-
-
-
-
-
-
 

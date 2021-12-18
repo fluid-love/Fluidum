@@ -8,7 +8,7 @@
 
 using namespace FU::ImGui::Operators;
 
-FS::CodingSelect::CodingSelect(
+FS::Coding::Select::Select(
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::ProjectRead* const projectRead,
 	FD::ProjectWrite* const projectWrite,
@@ -25,19 +25,18 @@ FS::CodingSelect::CodingSelect(
 	sceneRead(sceneRead),
 	newImage(FDR::createImGuiImage(Resource::CodingNewFilePath)), openImage(FDR::createImGuiImage(Resource::CodingOpenFilePath))
 {
-	GLog.add<FD::Log::Type::None>("Construct CodingSelectScene.");
+	FluidumScene_Log_Constructor("Coding::Select");
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
 
-	//templateの表示に使うため書きかえは不可
 	textEditor.SetReadOnly(true);
 
 	//capacity
 	quickInfo.folderPath.reserve(200);
 	quickInfo.fileName.reserve(200);
 
-	//デフォルトでパスはプロジェクトフォルダ/Src
+	//default path -> Project/Src/
 	quickInfo.folderPath = projectRead->getProjectFolderPath() + "Src/";
 	quickInfo.fileName = "main";
 
@@ -45,12 +44,12 @@ FS::CodingSelect::CodingSelect(
 	Scene::addScene<PopupBackWindow>();
 }
 
-FS::CodingSelect::~CodingSelect() {
+FS::Coding::Select::~Select() {
 	try {
-		GLog.add<FD::Log::Type::None>("Request delete PopupBackWindowScene.");
+		FluidumScene_Log_RequestDeleteScene("PopupBackWindow");
 		Scene::deleteScene<PopupBackWindow>();
 
-		GLog.add<FD::Log::Type::None>("Destruct CodingSelectScene.");
+		FluidumScene_Log_Destructor("Coding::Select");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -66,7 +65,7 @@ FS::CodingSelect::~CodingSelect() {
 	}
 }
 
-void FS::CodingSelect::call() {
+void FS::Coding::Select::call() {
 
 	if (!sceneRead->isExist<Coding::New>())
 		ImGui::SetNextWindowFocus();
@@ -105,7 +104,7 @@ void FS::CodingSelect::call() {
 
 }
 
-void FS::CodingSelect::create() {
+void FS::Coding::Select::create() {
 	ImGui::BeginChild("SelectTop", ImVec2(style.windowSize.x, style.windowSize.y * 0.07f));
 
 	ImGui::Text(text.selectPlease);
@@ -114,7 +113,7 @@ void FS::CodingSelect::create() {
 	ImGui::EndChild();
 }
 
-void FS::CodingSelect::quick() {
+void FS::Coding::Select::quick() {
 	const ImVec2 windowSize = ImVec2(style.windowSize.x * 0.7f, style.windowSize.y * 0.8f);
 
 	ImGui::BeginChild("Template", ImVec2(style.windowSize.x * 0.6f, style.windowSize.y * 0.85f));
@@ -142,7 +141,7 @@ void FS::CodingSelect::quick() {
 	ImGui::EndChild();
 }
 
-void FS::CodingSelect::selectTemplate(const ImVec2& size) {
+void FS::Coding::Select::selectTemplate(const ImVec2& size) {
 	bool isColPushed = false;
 	auto pushCol = [&]() {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.6f, 0.6f, 0.5f));
@@ -179,12 +178,12 @@ void FS::CodingSelect::selectTemplate(const ImVec2& size) {
 	}
 	if (isColPushed)	popCol();//color
 
-	//Empty_AS
-	if (selectType == Template::Empty_AS) pushCol(); //color
-	if (ImGui::Button(text.empty_as, size)) {
+	//Empty_Cpp
+	if (selectType == Template::Empty_Cpp) pushCol(); //color
+	if (ImGui::Button(text.empty_cpp, size)) {
 		isFileSelected = true;
-		this->selectType = Template::Empty_AS;
-		quickInfo.extension = ".as";
+		this->selectType = Template::Empty_Cpp;
+		quickInfo.extension = ".cpp";
 		this->setEmptyFile();
 	}
 	if (isColPushed)	popCol();//color
@@ -198,7 +197,7 @@ void FS::CodingSelect::selectTemplate(const ImVec2& size) {
 	ImGui::PopStyleColor();
 }
 
-void FS::CodingSelect::right() {
+void FS::Coding::Select::right() {
 	const ImVec2 windowSize = ImVec2(style.windowSize.x * 0.25f, style.windowSize.y * 0.4f);
 	ImGui::Spacing(); ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::BeginChild("RightU", windowSize);
@@ -215,7 +214,7 @@ void FS::CodingSelect::right() {
 	ImGui::EndChild();
 }
 
-void FS::CodingSelect::open(const ImVec2& size) {
+void FS::Coding::Select::open(const ImVec2& size) {
 	const ImVec2 imageDymmy = { 0.0f, size.y * 0.15f };
 	const ImVec2 textDymmy = { 0.0f, (size.y - ImGui::CalcTextSize(text.openFile).y) / 2.0f };
 
@@ -262,10 +261,10 @@ void FS::CodingSelect::open(const ImVec2& size) {
 		this->openDialog();
 }
 
-void FS::CodingSelect::openDialog() {
+void FS::Coding::Select::openDialog() {
 	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
 	GLog.add<FD::Log::Type::None>("Open file dialog.");
-	const nfdresult_t result = NFD_OpenDialog("lua,py,as", NULL, outPath.get());
+	const nfdresult_t result = NFD_OpenDialog("lua,py,cpp", NULL, outPath.get());
 	if (result == NFD_OKAY) {
 		GLog.add<FD::Log::Type::None>("Open file({}).", *outPath.get());
 	}
@@ -291,7 +290,7 @@ void FS::CodingSelect::openDialog() {
 	this->close();
 }
 
-void FS::CodingSelect::newFile(const ImVec2& size) {
+void FS::Coding::Select::newFile(const ImVec2& size) {
 	const ImVec2 imageDymmy = { 0.0f, size.y * 0.15f };
 	const ImVec2 textDymmy = { 0.0f, (size.y - ImGui::CalcTextSize(text.newFile).y) / 2.0f };
 
@@ -340,8 +339,7 @@ void FS::CodingSelect::newFile(const ImVec2& size) {
 	}
 }
 
-void FS::CodingSelect::bottomRight() {
-	//クイックのときのみ有効
+void FS::Coding::Select::bottomRight() {
 	if (selectType == Template::None)
 		return;
 
@@ -364,16 +362,16 @@ void FS::CodingSelect::bottomRight() {
 	ImGui::EndChild();
 }
 
-void FS::CodingSelect::bottom() {
+void FS::Coding::Select::bottom() {
 
 	const ImVec2 buttonSize = ImVec2(ImGui::GetWindowSize().x * 0.2f, 0.0f);
 
-	//キャンセルボタン　赤字
+	//cancel
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::Button(text.cancel, buttonSize)) {
-		ImGui::CloseCurrentPopup();//popupを終了	
-		GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
-		Scene::deleteScene<CodingSelect>();//シーンを消す
+		ImGui::CloseCurrentPopup();	
+		FluidumScene_Log_RequestDeleteScene("Coding::Select");
+		Scene::deleteScene<Coding::Select>();
 	}
 	ImGui::PopStyleColor();
 
@@ -383,14 +381,15 @@ void FS::CodingSelect::bottom() {
 
 	ImGui::SameLine();
 
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.7f, 0.1f, 1.0f));
-	if (ImGui::Button(text.select, buttonSize)) {//作成ボタン
+	//make file
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.35f, 0.02f, 1.0f));
+	if (ImGui::Button(text.select, buttonSize)) {
 		//cursor wait
 		FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
 		pos.create = ImGui::GetItemRectMin();
-		//作成する前に確認する
-		if (checkQuickInfo()) {//問題なし
+		
+		if (checkQuickInfo()) {
 			this->createNewFileQuick();
 			this->close();
 		}
@@ -398,20 +397,20 @@ void FS::CodingSelect::bottom() {
 	ImGui::PopStyleColor();
 }
 
-void FS::CodingSelect::setEmptyFile() {
+void FS::Coding::Select::setEmptyFile() {
 	using namespace FD::File::Template;
 
 	if (this->selectType == Template::Empty_Lua)
 		textEditor.SetText(EmptyLua);
 	else if (this->selectType == Template::Empty_Py)
 		textEditor.SetText(EmptyPy);
-	else if (this->selectType == Template::Empty_AS)
-		textEditor.SetText(EmptyAS);
+	else if (this->selectType == Template::Empty_Cpp)
+		textEditor.SetText(EmptyCpp);
 	else
 		abort();
 }
 
-void FS::CodingSelect::createNewFileQuick() {
+void FS::Coding::Select::createNewFileQuick() {
 	using namespace FD::File::Template;
 
 	std::ofstream ofs(quickInfo.fullPath, std::ios::out);
@@ -419,13 +418,12 @@ void FS::CodingSelect::createNewFileQuick() {
 	if (!ofs)
 		throw std::runtime_error("Failed to create file.");
 
-	//コードを入れる
 	if (this->selectType == Template::Empty_Lua)
 		ofs << EmptyLua << std::endl;
 	else if (this->selectType == Template::Empty_Py)
 		ofs << EmptyPy << std::endl;
-	else if (this->selectType == Template::Empty_AS)
-		ofs << EmptyAS << std::endl;
+	else if (this->selectType == Template::Empty_Cpp)
+		ofs << EmptyCpp << std::endl;
 	else
 		abort();
 
@@ -438,29 +436,29 @@ void FS::CodingSelect::createNewFileQuick() {
 	tabWrite->save();
 }
 
-bool FS::CodingSelect::checkQuickInfo() {
+bool FS::Coding::Select::checkQuickInfo() {
 
 	GLog.add<FD::Log::Type::None>("Check QuickInfo.");
 
-	Check::tryPushSlash(quickInfo.folderPath);
+	FU::File::tryPushSlash(quickInfo.folderPath);
 	auto [err, path] = Check::checkFile(quickInfo.folderPath, quickInfo.fileName, quickInfo.extension);
 
-	//問題なければtrue
+	//no_error -> return true
 	if (err == Check::ErrorType::None) {
 		GLog.add<FD::Log::Type::None>("QuickInfo NoError.");
 		quickInfo.fullPath = std::move(path);
 		return true;
 	}
 
-	//問題があれば問題に応じて警告
+	//error
 	if (err == Check::ErrorType::EmptyFolderPath) {
 		GLog.add<FD::Log::Type::None>("Error EmptyFolderPath.");
-		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		FluidumScene_Log_RequestAddScene("Utils::Message");
 		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.folderPath);
 	}
 	else if (err == Check::ErrorType::EmptyFileName) {
 		GLog.add<FD::Log::Type::None>("Error EmptyFileName.");
-		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		FluidumScene_Log_RequestAddScene("Utils::Message");
 		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.fileName);
 	}
 	else if (err == Check::ErrorType::NotFound) {
@@ -468,20 +466,20 @@ bool FS::CodingSelect::checkQuickInfo() {
 	}
 	else if (err == Check::ErrorType::AlreadyExist) {
 		GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", quickInfo.fileName, path);
-		GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
+		FluidumScene_Log_RequestAddScene("Utils::Message");
 		Scene::addScene<Utils::Message>(text.error_alreadyExistFile, pos.create);
 	}
 	return false;
 }
 
-void FS::CodingSelect::close() {
-	GLog.add<FD::Log::Type::None>("Request delete CodingSelectScene.");
-	Scene::deleteScene<CodingSelect>();//シーンを消す
-	GLog.add<FD::Log::Type::None>("Request add CodingScene.");
+void FS::Coding::Select::close() {
+	FluidumScene_Log_RequestDeleteScene("Coding::Select");
+	Scene::deleteScene<Coding::Select>();
+	FluidumScene_Log_RequestAddScene("TextEditor");
 	Scene::addScene<TextEditor>();
 }
 
-int FS::CodingSelect::inputTextCallback(ImGuiInputTextCallbackData* data) {
+int FS::Coding::Select::inputTextCallback(ImGuiInputTextCallbackData* data) {
 	std::string* str = static_cast<std::string*>(data->UserData);
 	if (str->size() == data->BufTextLen)
 		return 0;
@@ -491,9 +489,8 @@ int FS::CodingSelect::inputTextCallback(ImGuiInputTextCallbackData* data) {
 	return 0;
 }
 
-std::pair<FS::CodingSelect::Check::ErrorType, std::string> FS::CodingSelect::Check::checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
+std::pair<FS::Coding::Select::Check::ErrorType, std::string> FS::Coding::Select::Check::checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
 
-	//空かどうか
 	if (folderPath.empty()) {
 		return { ErrorType::EmptyFolderPath,{} };
 	}
@@ -501,7 +498,7 @@ std::pair<FS::CodingSelect::Check::ErrorType, std::string> FS::CodingSelect::Che
 	if (fileName.empty())
 		return { ErrorType::EmptyFileName,{} };
 
-	//フォルダーが存在するか
+	//folder
 	bool result = !std::filesystem::is_directory(folderPath);
 	if (result)
 		return { ErrorType::NotFound,{} };
@@ -513,15 +510,4 @@ std::pair<FS::CodingSelect::Check::ErrorType, std::string> FS::CodingSelect::Che
 
 
 	return { ErrorType::None,filePath };
-}
-
-//入力された文字列に'/'があればそのまま，なければつける
-void FS::CodingSelect::Check::tryPushSlash(std::string& path) {
-#ifdef BOOST_OS_WINDOWS
-	if (path.back() != '/' && path.back() != '\\')
-		path.push_back('/');
-#else
-	if (path.back() != '/')
-		path.push_back('/');
-#endif
 }

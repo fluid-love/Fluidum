@@ -6,20 +6,21 @@ FS::StatusBar::StatusBar(
 	const FD::TaskRead* const taskRead
 ) : guiRead(guiRead), taskRead(taskRead)
 {
-	GLog.add<FD::Log::Type::None>("Construct StatusBarScene.");
+	FluidumScene_Log_Constructor("StatusBar");
 
-	//style ‰Šú‰»
+	//style
 	style.taskIcon = ImGui::CalcTextSize(text.task).x;
 	style.version = ImGui::CalcTextSize(text.version).x;
+	style.barHeight = ImGui::GetFontSize() * 1.7f;
 
-	//”wŒi
+	//back
 	style.windowPos = { 0.0f, guiRead->windowSize().y - style.barHeight };
 
-	//’†‰›
+	//center
 	style.infoWindowPos = { guiRead->windowSize().x / 2.0f, style.windowPos.y };
 	style.infoWindowSize = { guiRead->windowSize().x / 3.0f,style.barHeight };
 
-	//‰E‰º
+	//lower right
 	style.versionWindowPos = { guiRead->windowSize().x - (1.5f * style.version), style.windowPos.y };
 	style.versionWindowSize = { 1.5f * style.version,style.barHeight };
 
@@ -27,21 +28,7 @@ FS::StatusBar::StatusBar(
 }
 
 FS::StatusBar::~StatusBar() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct StatusBarScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("StatusBar");
 }
 
 namespace FS::Internal::Bar {
@@ -57,45 +44,35 @@ namespace FS::Internal::Bar {
 }
 
 void FS::StatusBar::call() {
-	//”wŒi‚ÌF‚ðˆÃ‚­‚·‚é
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.01f, 0.01f, 0.01f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.007f, 0.007f, 0.007f, 1.0f));
 
-	//•¶Žš‚Ìã‚Ì—]”’‚ª‘å‚«‚·‚¬‚é‚Ì‚Å¬‚³‚­
-	//auto currentPadding = ImGui::GetStyle().WindowPadding;
-	//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(currentPadding.x, currentPadding.y));
-
-	//Šp‚ðŽæ‚é
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-
-	//ƒ{[ƒ_[‚ðÁ‚·
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { ImGui::GetStyle().WindowPadding.x,ImGui::GetStyle().WindowPadding.y / 2.0f });
 
 	ImGui::SetNextWindowPos(style.windowPos);
-	ImGui::SetNextWindowSize(ImVec2(guiRead->windowSize().x, style.barHeight));
+	ImGui::SetNextWindowSize({ guiRead->windowSize().x, style.barHeight });
 
 
 	ImGui::Begin("StatusBar", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBringToFrontOnFocus);//ƒAƒ“ƒ_[ƒo[‚Ì”wŒi
 
 
-
-	//¶‰º‚É”z’u‚·‚é‚Ì‚Å‚±‚±‚É‘‚­
 	this->taskGui();
 
 	ImGui::End();
 
+	ImGui::PopStyleVar();//padding
 
-	//’†g
 	this->infoGui();
 	this->versionGui();
 
-
 	ImGui::PopStyleColor();
-	ImGui::PopStyleVar(2);//rounding padding
+	ImGui::PopStyleVar(2);//rounding bordersize
 }
 
 void FS::StatusBar::taskGui() {
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+
 	bool clicked = ImGui::Button(text.task); ImGui::SameLine();
 	ImGui::PopStyleVar();
 
@@ -152,4 +129,5 @@ void FS::StatusBar::versionGui() {
 
 	ImGui::End();
 }
+
 

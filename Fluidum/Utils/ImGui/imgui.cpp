@@ -3,43 +3,56 @@
 #include <imgui_internal.h>
 #include <cmath>
 #include <numbers>
+#include <ImGuiAnimation/ImGuiAnimation.h>
 
-void FU::ImGui::helpTooltip(const char* desc) {
-	::ImGui::TextDisabled("(?)");
-	if (::ImGui::IsItemHovered()) {
-		::ImGui::BeginTooltip();
-		::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
-		::ImGui::TextUnformatted(desc);
-		::ImGui::PopTextWrapPos();
-		::ImGui::EndTooltip();
+template<typename T>
+void FU::ImGui::tooltip(T& counter, const char* desc) {
+	static void* address = nullptr;
+	static std::chrono::system_clock::time_point timePoint = {};
+	static ImVec2 pos = {};
+
+	if (!::ImGui::IsItemHovered()) {
+		address = nullptr;
+		return;
 	}
-}
 
-void FU::ImGui::exclamationTooltip(const char* desc) {
-	::ImGui::TextDisabled("(!)");
-	if (::ImGui::IsItemHovered()) {
-		::ImGui::BeginTooltip();
-		::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
-		::ImGui::TextUnformatted(desc);
-		::ImGui::PopTextWrapPos();
-		::ImGui::EndTooltip();
+	if (address != &counter) {
+		counter.reset();
+		timePoint = std::chrono::system_clock::now();
+		address = &counter;
+		pos = { ::ImGui::GetMousePos().x , ::ImGui::GetItemRectMax().y };
 	}
+
+
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timePoint).count() < 800)
+		return;
+
+	ImAnime::PushStyleVar(counter, 0.07f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
+
+	::ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
+	::ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 4.0f);
+	::ImGui::PushStyleColor(ImGuiCol_PopupBg, { 0.016f,0.016f,0.016f,1.0f });
+
+	constexpr ImGuiWindowFlags flag =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_Tooltip;
+
+	::ImGui::SetNextWindowPos(pos);
+
+	::ImGui::Begin("__Tooltip", nullptr, flag);
+	::ImGui::Text(desc);
+	::ImGui::End();
+
+	ImAnime::PopStyleVar();
+	::ImGui::PopStyleColor();
+	::ImGui::PopStyleVar(2);
+
 }
-
-void FU::ImGui::exclamationFadeTooltip(const ImVec2& pos, const char* desc) {
-
-}
-
-void FU::ImGui::hoveredMarker(const char* desc) {
-	if (::ImGui::IsItemHovered()) {
-		::ImGui::BeginTooltip();
-		::ImGui::PushTextWrapPos(::ImGui::GetFontSize() * 35.0f);
-		::ImGui::TextUnformatted(desc);
-		::ImGui::PopTextWrapPos();
-		::ImGui::EndTooltip();
-	}
-}
-
+template void FU::ImGui::tooltip(ImCounter<ImAnimeTime>&, const char*);
 
 
 /***************************************************************************************************************************/

@@ -44,7 +44,7 @@ FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
 		const auto types = LuAssist::Utils::types(L);
 		assert(types.size() == 1);
 		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "make", 1, LuAssist::Utils::typeName(types.at(0)), LuAssist::Utils::typeName(LuAssist::Type::String));
-		consoleWrite->add(std::move(log));
+		consoleWrite->push(std::move(log));
 	}
 
 	const String str = lua_tostring(L, 1);
@@ -54,7 +54,7 @@ FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
 		//{}関数{}の引数に無効な文字列が渡されました．渡された文字列{}．正しい文字列{}．
 		Message message(LogType::NotMatch);
 		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), str, concatArrayValueNames());
-		consoleWrite->add(std::move(log));
+		consoleWrite->push(std::move(log));
 		throw Internal::Exception();
 	}
 
@@ -69,7 +69,7 @@ FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
 			//{}関数{}が呼ばれましたが作成できる{}の最大数を超えています．最大値{}．
 			Message message(LogType::NotMatch);
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "make", FD::Calc::Array::Limits::MaxSize);
-			consoleWrite->add(std::move(log));
+			consoleWrite->push(std::move(log));
 			throw Internal::Exception();
 		}
 		else {

@@ -1,17 +1,16 @@
 #pragma once
 
 #include <imgui.h>
+#include <string>
 
 namespace FU::ImGui {
 
-	void helpTooltip(const char* desc);
+	template<typename ImCounter>//ImGuiAnimation ImCounter<ImAnime>
+	void tooltip(ImCounter& counter, const char* desc);
 
-	void exclamationTooltip(const char* desc);
+}
 
-	void exclamationFadeTooltip(const ImVec2& pos, const char* desc);
-
-	void hoveredMarker(const char* desc);
-
+namespace FU::ImGui {
 	consteval ImU32 convertImVec4ToImU32(const float x, const float y, const float z, const float w) {
 		auto saturate = [](const float f) { return (f < 0.0f) ? 0.0f : (f > 1.0f) ? 1.0f : f; };
 

@@ -20,12 +20,12 @@ namespace FS {
 FS::Project::Project(
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
-	FD::LuaFilesWrite* const luaFilesWrite,
+	FD::LuaFilesWrite_Lock* const luaFilesWrite,
 	FD::FluidumFilesWrite* const fluidumFilesWrite,
 	const FD::FluidumFilesRead* const fluidumFilesRead,
-	FD::ProjectFilesWrite* const projectFilesWrite,
+	FD::ProjectFilesWrite_Lock* const projectFilesWrite,
 	const FD::ProjectFilesRead* const projectFilesRead,
-	FD::UserFilesWrite* const userFilesWrite,
+	FD::UserFilesWrite_Lock* const userFilesWrite,
 	const FD::UserFilesRead* const userFilesRead,
 	const FD::SceneRead* const sceneRead,
 	FD::Coding::TabWrite* const tabWrite
@@ -42,7 +42,7 @@ FS::Project::Project(
 	sceneRead(sceneRead),
 	tabWrite(tabWrite)
 {
-	GLog.add<FD::Log::Type::None>("Construct ProjectScene.");
+	FluidumScene_Log_Constructor("Project");
 
 	style.topBarHeight = ImGui::CalcTextSize(ICON_MD_FOLDER_OPEN).x + 2.0f;
 
@@ -54,31 +54,18 @@ FS::Project::Project(
 }
 
 FS::Project::~Project() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct ProjectScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("Project");
 }
 
 void FS::Project::Project::call() {
+	//lock
 	auto userFilesLock = userFilesWrite->getLock();
 	auto projectFilesLock = projectFilesWrite->getLock();
 	auto luaLock = luaFilesWrite->getLock();
 
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.07f, 0.07f, 0.07f, 0.14f));
 
-	ImGui::Begin("Project");
+	ImGui::Begin(text.project);
 	ImGui::SetWindowFontScale(0.945f);
 
 	this->topBar();
@@ -101,11 +88,12 @@ void FS::Project::Project::topBar() {
 	//sync
 	if (select.tab == TabType::Fluidum) {//dummy
 		//const int32_t count = FU::ImGui::pushStyleColor<ImGuiCol_Button, ImGuiCol_ButtonHovered, ImGuiCol_ButtonActive>({ 0.05f,0.05f,0.05f,1.0f });
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0.05f,0.05f,0.05f,1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.05f,0.05f,0.05f,1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.05f,0.05f,0.05f,1.0f });
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.01f,0.01f,0.01f,0.7f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.01f,0.01f,0.01f,0.7f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.01f,0.01f,0.01f,0.7f });
+		ImGui::PushStyleColor(ImGuiCol_Border, { 0.01f,0.01f,0.01f,0.7f });
 		ImGui::Button(ICON_MD_SYNC);
-		ImGui::PopStyleColor(3);
+		ImGui::PopStyleColor(4);
 	}
 	else {
 		if (ImGui::Button(ICON_MD_SYNC)) {
@@ -113,12 +101,15 @@ void FS::Project::Project::topBar() {
 			this->syncProjectFiles();
 		}
 	}
+	FU::ImGui::tooltip(anime.sync, text.sync);
 
+	ImGui::SameLine();
 
 	//Collapse all folders and files
-	if (ImGui::Button(ICON_FA_FOLDER_MINUS)) {
+	if (ImGui::Button(ICON_MD_FOLDER)) {
 		this->collapseAll();
 	}
+	FU::ImGui::tooltip(anime.collapseAll, text.tooltip_collpsedAll);
 
 	ImGui::SameLine();
 	ImGui::Spacing();
@@ -126,19 +117,22 @@ void FS::Project::Project::topBar() {
 
 	//show
 	this->showCodeButton();
+	FU::ImGui::tooltip(anime.displayCode, text.displayCode);
+
 
 	ImGui::EndChild();
 }
 
 void FS::Project::Project::showCodeButton() {
 	auto* current = select.current();
-
+	
 	if (!current || current->type != FD::Project::List::Type::Code) {
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0.05f,0.05f,0.05f,1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.05f,0.05f,0.05f,1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.05f,0.05f,0.05f,1.0f });
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.01f,0.01f,0.01f,0.7f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.01f,0.01f,0.01f,0.7f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.01f,0.01f,0.01f,0.7f });
+		ImGui::PushStyleColor(ImGuiCol_Border, { 0.01f,0.01f,0.01f,0.7f });
 		ImGui::Button(ICON_MD_CODE);
-		ImGui::PopStyleColor(3);
+		ImGui::PopStyleColor(4);
 		return;
 	}
 
@@ -178,7 +172,8 @@ void FS::Project::Project::tab() {
 namespace FS {
 
 	constexpr inline std::pair<const char*, const char*> LuaStandardFluidumLibrary[] = {
-		{ICON_FA_FILE_CODE " fluidum.array.lua",Resource::LuaFluidumStandardLibraryFolderPath},
+		{ICON_FA_FILE_CODE " fluidum.system",Resource::LuaFluidumStandardLibraryFolderPath},
+		{ICON_FA_FILE_CODE " fluidum.array",Resource::LuaFluidumStandardLibraryFolderPath},
 		//{ICON_FA_FILE_CODE " genome.lua",Resource::LuaSLLGenomePath},
 		//{ICON_FA_FILE_CODE " piano.lua",Resource::LuaSLLPianoPath},
 		//{ICON_FA_FILE_CODE " math.lua",Resource::LuaSLLMathPath},

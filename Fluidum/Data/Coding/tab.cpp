@@ -19,18 +19,18 @@ using namespace ::FD::Internal::Coding;
 void FD::Coding::TabWrite::addFile(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
 
-	if (TabData::filePathes.size() >= LimitMaxFileSize)
+	if (TabData::filePaths.size() >= LimitMaxFileSize)
 		throw Exception::LimitFileSizeMax;
 
-	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
-	if (itr != TabData::filePathes.end())
+	auto itr = std::find(TabData::filePaths.begin(), TabData::filePaths.end(), path);
+	if (itr != TabData::filePaths.end())
 		throw Exception::AlreadyExist;
 
 	std::ifstream ifs(path);
 	if (!ifs)
 		throw Exception::NotFound;
 
-	TabData::filePathes.emplace_back(path);
+	TabData::filePaths.emplace_back(path);
 
 	this->update();
 }
@@ -38,10 +38,10 @@ void FD::Coding::TabWrite::addFile(const std::string& path) const {
 void FD::Coding::TabWrite::eraseFile(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
 	{
-		auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
-		if (itr == TabData::filePathes.end())
+		auto itr = std::find(TabData::filePaths.begin(), TabData::filePaths.end(), path);
+		if (itr == TabData::filePaths.end())
 			throw Exception::NotFound;
-		TabData::filePathes.erase(itr);
+		TabData::filePaths.erase(itr);
 	}
 	{
 		auto itr = GData.find(path);
@@ -56,7 +56,7 @@ void FD::Coding::TabWrite::clear() const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
 
 	TabData::displayFiles.clear();
-	TabData::filePathes.clear();
+	TabData::filePaths.clear();
 	GData.clear();
 
 	this->update();
@@ -64,8 +64,8 @@ void FD::Coding::TabWrite::clear() const {
 
 void FD::Coding::TabWrite::addDisplayFile(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
-	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
-	if (itr == TabData::filePathes.end())
+	auto itr = std::find(TabData::filePaths.begin(), TabData::filePaths.end(), path);
+	if (itr == TabData::filePaths.end())
 		throw Exception::NotFound;
 
 	if (!GData.contains(path)) {
@@ -80,8 +80,8 @@ void FD::Coding::TabWrite::addDisplayFile(const std::string& path) const {
 
 void FD::Coding::TabWrite::eraseDisplayFile(const std::string& path) const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
-	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
-	if (itr == TabData::filePathes.end())
+	auto itr = std::find(TabData::filePaths.begin(), TabData::filePaths.end(), path);
+	if (itr == TabData::filePaths.end())
 		throw Exception::NotFound;
 
 	TabData::displayFiles.erase(itr);
@@ -171,9 +171,9 @@ bool FD::Coding::TabRead::update() const {
 	return result;
 }
 
-std::vector<std::string> FD::Coding::TabRead::getFilePathes() const {
+std::vector<std::string> FD::Coding::TabRead::getFilePaths() const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
-	return TabData::filePathes;
+	return TabData::filePaths;
 }
 
 std::vector<std::string> FD::Coding::TabRead::getDisplayFilePaths() const {
@@ -196,7 +196,7 @@ bool FD::Coding::TabRead::isTextSaved(const std::string& path) const {
 
 bool FD::Coding::TabRead::isAllTextSaved() const {
 	std::lock_guard<std::mutex> lock(TabData::mtx);
-	auto itr = std::find_if(GData.begin(), GData.end(), [](auto& x) { return x.second.get()->isTextSaved; });
+	auto itr = std::find_if(GData.begin(), GData.end(), [](auto& x) { return !x.second.get()->isTextSaved; });
 	return itr == GData.end();
 }
 

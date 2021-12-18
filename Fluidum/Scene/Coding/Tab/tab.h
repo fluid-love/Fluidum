@@ -28,7 +28,7 @@ namespace FS::Coding {
 		FD::Text::CodingTab text{};
 
 	private:
-		bool windowCloseFlag = false;
+		bool windowCloseFlag = true;
 
 		struct {
 			ImVec2 topBarSize{};

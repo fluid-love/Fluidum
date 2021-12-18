@@ -9,7 +9,8 @@ namespace FS::Lua {
 	class Calc final : public Scene {
 	public:
 		explicit Calc(
-			const FD::ProjectRead* const projectread,
+			const FD::ProjectRead* const projectRead,
+			const FD::FluidumFilesRead* const fluidumFilesRead,
 			FD::ConsoleWrite* const consoleWrite,
 			FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite,
 			FD::ImPlotWrite* const implotWrite,
@@ -19,6 +20,7 @@ namespace FS::Lua {
 		);
 		void Constructor(
 			FD::ProjectRead,
+			FD::FluidumFilesRead,
 			FD::ConsoleWrite,
 			FD::FunctionWrite<FD::Calc::Language::Lua>,
 			FD::ImPlotWrite,
@@ -36,8 +38,10 @@ namespace FS::Lua {
 
 	private:
 		using Type = FD::Calc::Lua::FunctionType;
-	private://data
-		const FD::ProjectRead* const projectread;
+
+	private:
+		const FD::ProjectRead* const projectRead;
+		const FD::FluidumFilesRead* const fluidumFilesRead;
 		FD::ConsoleWrite* const consoleWrite;
 		FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite;
 		FD::ImPlotWrite* const implotWrite;
@@ -59,8 +63,12 @@ namespace FS::Lua {
 	private://register cpp functions
 		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_FSLPath(State L);
 
+		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_System(State L);
 		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_Array(State L);
 		Fluidum_Lua_Api Ret _Fluidum_Register_CppFunctions_Plot(State L);
+
+	private://system
+		Fluidum_Lua_Api Ret system_print(State L);
 
 	private://array
 		Fluidum_Lua_Api Ret array_make(State L);

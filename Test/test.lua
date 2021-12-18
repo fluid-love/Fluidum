@@ -1,5 +1,3 @@
-array = require"fluidum.array"
+fsystem = require "fluidum.system"
 
-numArray = array.make("number")
-
-print(numArray.empty())
+fsystem.print(nil,nil)

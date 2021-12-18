@@ -43,10 +43,19 @@ namespace FD::Layout::Limits {
 		static constexpr uint8_t SeparatorMax = 8;
 	};
 
+	constexpr inline uint8_t UnRedo = 100;
+
 }
 
 namespace FD::Calc::Array::Limits {
 
-	constexpr inline uint32_t MaxSize = 100000;
+	constexpr inline uint32_t MaxSize = 100'000;
 	
+}
+
+namespace FD::Console::Limits {
+
+	constexpr inline uint16_t Characters = 10'000;
+	constexpr inline uint16_t Lines = 10'000;
+
 }

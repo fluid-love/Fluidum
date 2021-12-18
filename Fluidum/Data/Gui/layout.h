@@ -60,14 +60,45 @@ namespace FD::Layout {
 
 	private:
 		friend class LayoutWrite;
+		friend class LayoutRead;
+	};
+
+	struct SeparatorPos final {
+		ImVec2 pos1{};
+		ImVec2 pos2{};
+		bool resize = false;
+	};
+
+	struct UnRedoInfo final {
+		enum class Type :uint8_t {
+			Resize,
+			Merge,
+			Split
+		};
+		Type type{};
+
+		//resize
+		float pos1{};
+		float pos2{};
+
+	private:
+		float* separator = nullptr;
+		float calcMidpoint(const float first, const float last) const;
+	private:
+		friend class LayoutWrite;
 	};
 
 	namespace Internal {
+
+
 		struct History final {
 			float* pos = nullptr;
-			float readPos{};
-			uint32_t parentWindowIndex = 0;
+
+			float* pos_side1 = nullptr;
+			float* pos_side2 = nullptr;
+
 			bool horizonal = false;
+			ImVec2 readPos{};
 		};
 
 		enum class ResizedBorder : uint8_t {
@@ -81,11 +112,14 @@ namespace FD::Layout {
 		struct LayoutData final {
 			FluidumUtils_Class_Delete_ConDestructor(LayoutData)
 		private:
-			static inline float mainFrameLeft{};
-			static inline float mainFrameRight{};
-			static inline float mainFrameTop{};
-			static inline float mainFrameBottom{};
+			static inline std::shared_ptr<float> mainFrameLeft{};
+			static inline std::shared_ptr<float> mainFrameRight{};
+			static inline std::shared_ptr<float> mainFrameTop{};
+			static inline std::shared_ptr<float> mainFrameBottom{};
 			static inline std::vector<std::shared_ptr<DockSpaceWindow>> windows{};
+
+			static inline std::vector<UnRedoInfo> unredo{};
+			static inline std::size_t currentUnRedoIndex = 0;
 
 			static inline std::vector<History> history{};
 		private:
@@ -93,12 +127,15 @@ namespace FD::Layout {
 			static inline std::atomic_bool save = false;
 		private:
 			static void remake();
+			static DockSpaceWindow* findWindow(const ImVec2& pos);
 		private:
 			friend class LayoutWrite;
 			friend class LayoutRead;
 			friend class ProjectWrite;
 		};
 	}
+
+	using ResizedBorder = Internal::ResizedBorder;
 }
 
 namespace FD {
@@ -121,16 +158,21 @@ namespace FD {
 
 	public:
 		//construct main layout window from LayoutData
-		void reset() const;
+		static void reset();
 
 		static bool splitVertical(const Layout::DockSpaceWindow& window, const float posX);
 		static bool splitHorizonal(const Layout::DockSpaceWindow& window, const float posY);
 
 	public:
-		void merge() const;
+		bool merge(const Layout::DockSpaceWindow& window, const ImVec2& pos) const;
 
 	public:
-		void update(const Layout::DockSpaceWindow& window) const;
+		Layout::ResizedBorder update(const Layout::DockSpaceWindow& window, const ImVec2& mousePos, Layout::ResizedBorder border) const;
+		void resize(const Layout::DockSpaceWindow& window, const Layout::ResizedBorder border) const;
+
+	public:
+		void undo(const std::size_t count) const;
+		void redo(const std::size_t count) const;
 
 	public:
 		void save() const noexcept;
@@ -162,9 +204,16 @@ namespace FD {
 	public:
 		[[nodiscard]] std::vector<Layout::DockSpaceWindow> get() const;
 
+		[[nodiscard]] std::vector<Layout::SeparatorPos> getSeparators() const;
+
+		[[nodiscard]] std::vector<Layout::UnRedoInfo> getUnRedoInfo() const;
+
 	public:
 		[[nodiscard]] bool empty() const;
 		[[nodiscard]] uint16_t size() const;
+
+	public:
+		[[nodiscard]] bool canMerge(const Layout::DockSpaceWindow& window, const ImVec2& pos) const;
 
 	};
 }
@@ -198,6 +247,7 @@ namespace FD {
 		//return ImGuiWindow*
 		template<typename T>
 		[[nodiscard]] T get(const FU::Class::ClassCode::CodeType classCode) const;
+
 
 	};
 

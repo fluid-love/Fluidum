@@ -77,7 +77,7 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 
 	colors[ImGuiCol_Text] = ImVec4(1.000f, 1.000f, 1.000f, 1.000f);
 	colors[ImGuiCol_TextDisabled] = ImVec4(0.200f, 0.200f, 0.200f, 0.800f);
-	colors[ImGuiCol_WindowBg] = ImVec4(0.016f, 0.016f, 0.016f, 0.99f);
+	colors[ImGuiCol_WindowBg] = ImVec4(0.016f, 0.016f, 0.016f, 1.000f);
 	colors[ImGuiCol_ChildBg] = ImVec4(0.180f, 0.180f, 0.180f, 0.000f);
 	colors[ImGuiCol_PopupBg] = ImVec4(0.02f, 0.02f, 0.02f, 1.000f);
 	colors[ImGuiCol_Border] = ImVec4(0.26f, 0.200f, 0.200f, 1.000f);

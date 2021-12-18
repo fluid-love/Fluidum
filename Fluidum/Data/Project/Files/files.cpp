@@ -2,22 +2,22 @@
 #include "../../Limits/limits.h"
 #include "../Project/name.h"
 
-void FD::LuaFilesWrite::closeAll() {
+void FD::LuaFilesWrite_Lock::closeAll() {
 	using namespace Project::Internal;
 	LibraryFilesData::luaLibraries.forEach([](Project::List::FileInfo& info) {info.open = false; });
 }
 
-void FD::LuaFilesWrite::save() const {
+void FD::LuaFilesWrite_Lock::save() const {
 	using namespace Project::Internal;
 	LibraryFilesData::save.store(true);
 }
 
-std::vector<FD::Project::List::FileInfo>* FD::LuaFilesWrite::fileList() {
+std::vector<FD::Project::List::FileInfo>* FD::LuaFilesWrite_Lock::fileList() {
 	using namespace Project::Internal;
 	return LibraryFilesData::luaLibraries.get();
 }
 
-std::unique_lock<std::mutex> FD::LuaFilesWrite::getLock() {
+std::unique_lock<std::mutex> FD::LuaFilesWrite_Lock::getLock() {
 	using namespace Project::Internal;
 	FluidumUtils_Debug_BeginDisableAllWarning //VS C26115
 		return std::unique_lock<std::mutex>(LibraryFilesData::mtx);
@@ -78,17 +78,17 @@ void FD::FluidumFilesWrite::save() const {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FD::ProjectFilesWrite::eraseFile(const std::string& path) {
+void FD::ProjectFilesWrite_Lock::eraseFile(const std::string& path) {
 	using namespace Project::Internal;
 	ProjectFilesData::projectFiles.erase(path);
 }
 
-void FD::ProjectFilesWrite::changeName(const std::string& path, const std::string& newName) {
+void FD::ProjectFilesWrite_Lock::changeName(const std::string& path, const std::string& newName) {
 	using namespace Project::Internal;
 	ProjectFilesData::projectFiles.changePathAndName(path, newName);
 }
 
-void FD::ProjectFilesWrite::sync(const std::string& top) {
+void FD::ProjectFilesWrite_Lock::sync(const std::string& top) {
 	using namespace Project::Internal;
 
 	ProjectFilesData::projectFiles.sync();
@@ -130,12 +130,12 @@ void FD::ProjectFilesWrite::sync(const std::string& top) {
 	}
 }
 
-void FD::ProjectFilesWrite::save() const {
+void FD::ProjectFilesWrite_Lock::save() const {
 	using namespace Project::Internal;
 	ProjectFilesData::save.store(true);
 }
 
-std::vector<std::string> FD::ProjectFilesWrite::findOpenPaths() const {
+std::vector<std::string> FD::ProjectFilesWrite_Lock::findOpenPaths() const {
 	using namespace Project::Internal;
 	std::vector<Project::List::FileInfo>* data = ProjectFilesData::projectFiles.get();
 
@@ -156,17 +156,17 @@ std::vector<std::string> FD::ProjectFilesWrite::findOpenPaths() const {
 	return openPaths;
 }
 
-void FD::ProjectFilesWrite::closeAll() {
+void FD::ProjectFilesWrite_Lock::closeAll() {
 	using namespace Project::Internal;
 	ProjectFilesData::projectFiles.forEach([](Project::List::FileInfo& info) {info.open = false; });
 }
 
-std::vector<FD::Project::List::FileInfo>* FD::ProjectFilesWrite::fileList() {
+std::vector<FD::Project::List::FileInfo>* FD::ProjectFilesWrite_Lock::fileList() {
 	using namespace Project::Internal;
 	return ProjectFilesData::projectFiles.get();
 }
 
-std::unique_lock<std::mutex> FD::ProjectFilesWrite::getLock() {
+std::unique_lock<std::mutex> FD::ProjectFilesWrite_Lock::getLock() {
 	using namespace Project::Internal;
 	FluidumUtils_Debug_BeginDisableAllWarning //VS C26115
 		return std::unique_lock<std::mutex>(ProjectFilesData::mtx);
@@ -175,12 +175,12 @@ std::unique_lock<std::mutex> FD::ProjectFilesWrite::getLock() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FD::UserFilesWrite::eraseFile(const std::string& path) {
+void FD::UserFilesWrite_Lock::eraseFile(const std::string& path) {
 	using namespace Project::Internal;
 	UserFilesData::userFiles.erase(path);
 }
 
-bool FD::UserFilesWrite::tryChangeName(const std::string& path, const std::string& newName) {
+bool FD::UserFilesWrite_Lock::tryChangeName(const std::string& path, const std::string& newName) {
 	using namespace Project::Internal;
 
 	const bool sameName = UserFilesData::userFiles.sameName(path, newName);
@@ -194,7 +194,7 @@ bool FD::UserFilesWrite::tryChangeName(const std::string& path, const std::strin
 	return true;
 }
 
-std::string FD::UserFilesWrite::makeTempName() {
+std::string FD::UserFilesWrite_Lock::makeTempName() {
 	using namespace Project::Internal;
 
 	for (uint16_t i = 1; i < Project::Limits::UserFiles::DirectorySizeMax; i++) {
@@ -206,29 +206,29 @@ std::string FD::UserFilesWrite::makeTempName() {
 	return {};
 }
 
-std::vector<FD::Project::List::FileInfo>* FD::UserFilesWrite::fileList() {
+std::vector<FD::Project::List::FileInfo>* FD::UserFilesWrite_Lock::fileList() {
 	using namespace Project::Internal;
 	return UserFilesData::userFiles.get();
 }
 
-std::unique_lock<std::mutex> FD::UserFilesWrite::getLock() {
+std::unique_lock<std::mutex> FD::UserFilesWrite_Lock::getLock() {
 	using namespace Project::Internal;
 	FluidumUtils_Debug_BeginDisableAllWarning //VS C26115
 		return std::unique_lock<std::mutex>(UserFilesData::mtx);
 	FluidumUtils_Debug_EndDisableAllWarning
 }
 
-void FD::UserFilesWrite::save() const {
+void FD::UserFilesWrite_Lock::save() const {
 	using namespace Project::Internal;
 	UserFilesData::save.store(true);
 }
 
-void FD::UserFilesWrite::closeAll() {
+void FD::UserFilesWrite_Lock::closeAll() {
 	using namespace Project::Internal;
 	UserFilesData::userFiles.forEach([](Project::List::FileInfo& info) {info.open = false; });
 }
 
-void FD::UserFilesWrite::sync() {
+void FD::UserFilesWrite_Lock::sync() {
 	using namespace Project::Internal;
 	UserFilesData::userFiles.sync();
 }

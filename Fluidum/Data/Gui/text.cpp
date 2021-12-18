@@ -19,6 +19,7 @@ namespace FD::Internal::Text {
 		CodingNew,
 		CodingSelect,
 		CodingTab,
+		Console,
 		Layout,
 		LeftBar,
 		MenuBar,
@@ -62,6 +63,9 @@ namespace FD::Internal::Text {
 		}
 		else if constexpr (T == CodingTab) {
 			path += "CodingTab";
+		}
+		else if constexpr (T == Console) {
+			path += "Console";
 		}
 		else if constexpr (T == Layout) {
 			path += "Layout";
@@ -209,22 +213,16 @@ FD::Internal::Text::Layout::Layout() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->splitVerticalCurrentPos = ICON_MD_BORDER_VERTICAL "  " + data;
+	this->splitVerticalCurrentPos = ICON_MD_IMPORT_EXPORT "  " + data;
 
 	std::getline(ifs, data);
-	this->splitHorizonalCurrentPos = ICON_MD_BORDER_HORIZONTAL "  " + data;
+	this->splitHorizonalCurrentPos = ICON_MD_COMPARE_ARROWS "  " + data;
 
 	std::getline(ifs, data);
-	this->splitCrossCurrentPos = ICON_MD_BORDER_INNER "  " + data;
+	this->splitVerticalCenterLine = ICON_MD_IMPORT_EXPORT "  " + data;
 
 	std::getline(ifs, data);
-	this->splitVerticalCenterLine = ICON_MD_BORDER_VERTICAL "  " + data;
-
-	std::getline(ifs, data);
-	this->splitHorizonalCenterLine = ICON_MD_BORDER_HORIZONTAL "  " + data;
-
-	std::getline(ifs, data);
-	this->splitCrossCenterLine = ICON_MD_BORDER_INNER "  " + data;
+	this->splitHorizonalCenterLine = ICON_MD_COMPARE_ARROWS "  " + data;
 
 	std::getline(ifs, data);
 	this->merge = ICON_MD_HEALING "  " + data;
@@ -233,14 +231,10 @@ FD::Internal::Text::Layout::Layout() {
 	this->reset = ICON_MD_CHECK_BOX_OUTLINE_BLANK "  " + data;
 
 	std::getline(ifs, data);
-	this->horizonal = ICON_MD_COMPARE_ARROWS "  " + data;
-
-	std::getline(ifs, data);
-	this->vertical = ICON_MD_IMPORT_EXPORT "  " + data;
-
-	std::getline(ifs, data);
 	this->error_max = data;
 
+	std::getline(ifs, data);
+	this->confirm_reset = data;
 }
 
 FD::Internal::Text::BarExit::BarExit() {
@@ -511,7 +505,7 @@ FD::Internal::Text::CodingSelect::CodingSelect() {
 	this->empty_py = data;
 
 	std::getline(ifs, data);
-	this->empty_as = data;
+	this->empty_cpp = data;
 
 	std::getline(ifs, data);
 	this->openFile = data;
@@ -597,10 +591,10 @@ FD::Internal::Text::CodingNew::CodingNew() {
 	this->emptyPython_Description = data;
 
 	std::getline(ifs, data);
-	this->emptyAngelScript = data;
+	this->emptyCpp = data;
 
 	std::getline(ifs, data);
-	this->emptyAngelScript_Description = data;
+	this->emptyCpp_Description = data;
 
 	std::getline(ifs, data);
 	this->error_fill = data;
@@ -908,6 +902,9 @@ FD::Internal::Text::CodingTab::CodingTab() {
 	std::string data = "";
 
 	std::getline(ifs, data);
+	this->tab = data;
+
+	std::getline(ifs, data);
 	this->error_limitMaxSize = data;
 
 	std::getline(ifs, data);
@@ -1042,9 +1039,30 @@ FD::Internal::Text::Project::Project() {
 	std::getline(ifs, data);
 	this->error_forbiddenCharactor = data;
 
+	std::getline(ifs, data);
+	this->tooltip_collpsedAll = data;
+
 }
 
+FD::Internal::Text::Console::Console() {
+	std::ifstream ifs{};
 
+	ifs = std::ifstream(makePath<Type::Console>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open Console.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->console = data;
+
+	std::getline(ifs, data);
+	this->clear = data;
+
+	std::getline(ifs, data);
+	this->backcolor = data;
+}
 
 
 

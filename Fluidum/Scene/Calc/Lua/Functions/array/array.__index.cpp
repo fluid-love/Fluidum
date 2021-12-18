@@ -20,7 +20,7 @@ FS::Lua::Ret FS::Lua::Calc::array___index(State L) {
 		//{}ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
 		Message message(LogType::Type);
 		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "__index", 1, LuAssist::Utils::typeName(types.at(1)), LuAssist::Utils::typeName(LuAssist::Type::Number));
-		consoleWrite->add(std::move(log));
+		consoleWrite->push(std::move(log));
 		throw Internal::Exception();
 	}
 
@@ -33,7 +33,7 @@ FS::Lua::Ret FS::Lua::Calc::array___index(State L) {
 		Message message(LogType::OutOfRange);
 		const std::size_t arraySize = arrayRead->size<T>(key);
 		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "__index", index, arraySize);
-		consoleWrite->add(std::move(log));
+		consoleWrite->push(std::move(log));
 		throw Internal::Exception();
 	}
 
@@ -48,7 +48,7 @@ FS::Lua::Ret FS::Lua::Calc::array___index(State L) {
 			Message message(LogType::OutOfRange);
 			const std::size_t arraySize = arrayRead->size<T>(key);
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "__index", index, arraySize);
-			consoleWrite->add(std::move(log));
+			consoleWrite->push(std::move(log));
 			throw Internal::Exception();
 		}
 		else {

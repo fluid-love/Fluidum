@@ -24,7 +24,7 @@ FS::Lua::Ret FS::Lua::Calc::array_front(State L) {
 			//{}関数{}によって{}番目の要素にアクセスしようとしましたが範囲外でした．要素のサイズ{}．
 			Message message(LogType::OutOfRange);
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, 0);
-			consoleWrite->add(std::move(log));
+			consoleWrite->push(std::move(log));
 			throw Internal::Exception();
 		}
 		else {
@@ -43,7 +43,7 @@ FS::Lua::Ret FS::Lua::Calc::array_front(State L) {
 			//{}関数{}の{}番目の引数の型に誤りがあります．渡された引数の型: {}．正しい引数の型: {}．
 			Message message(LogType::Type);
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, LuAssist::Utils::typeName(types.at(1)), LuAssist::Utils::typeName(luaType));
-			consoleWrite->add(std::move(log));
+			consoleWrite->push(std::move(log));
 			throw Internal::Exception();
 		}
 	}
@@ -54,7 +54,7 @@ FS::Lua::Ret FS::Lua::Calc::array_front(State L) {
 		//{}関数{}によって{}番目の要素にアクセスしようとしましたが範囲外でした．要素のサイズ{}．
 		Message message(LogType::OutOfRange);
 		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, 0);
-		consoleWrite->add(std::move(log));
+		consoleWrite->push(std::move(log));
 		throw Internal::Exception();
 	}
 

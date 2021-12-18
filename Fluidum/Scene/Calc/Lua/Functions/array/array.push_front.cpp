@@ -32,7 +32,7 @@ FS::Lua::Ret FS::Lua::Calc::array_push_front(State L) {
 			std::string type = LuAssist::Utils::typeName(LuAssist::Type::Table);
 			(type += ',') += LuAssist::Utils::typeName(Array::ToLuaType<T>());	
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "push_front", 1, LuAssist::Utils::typeName(types.at(1)), type);
-			consoleWrite->add(std::move(log));
+			consoleWrite->push(std::move(log));
 			throw Internal::Exception();
 		}
 	}
@@ -61,7 +61,7 @@ FS::Lua::Ret FS::Lua::Calc::array_push_front(State L) {
 			//{}ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
 			Message message(LogType::Type);
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "push_front", count - 1, LuAssist::Utils::typeName(types[count - 1]), LuAssist::Utils::typeName(Array::ToLuaType<T>()));
-			consoleWrite->add(std::move(log));
+			consoleWrite->push(std::move(log));
 			throw Internal::Exception();
 		}
 

@@ -18,7 +18,7 @@ namespace FD::File::Template {
 	//long  -> Fluidum/Resources/
 	constexpr const char* EmptyLua = "--EmptyFile";
 	constexpr const char* EmptyPy = "#EmptyFile";
-	constexpr const char* EmptyAS = "//EmptyFile";
+	constexpr const char* EmptyCpp = "//EmptyFile";
 }
 
 namespace FD::Log {

@@ -332,9 +332,10 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.marker.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.plot.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.push_back.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.sleep_milliseconds.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.sleep_seconds.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\System\system.terminate.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.print.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.sleep_milliseconds.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.sleep_seconds.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.terminate.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Run\run.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.cpp" />
@@ -370,12 +371,14 @@
   <ItemGroup>
     <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\array.lua" />
     <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\plot.lua" />
+    <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\system.lua" />
     <None Include="..\..\..\Fluidum\Languages\Lua\init.lua" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\BarExit" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingSelect" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingTab" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Console" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Layout" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\LeftBar" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\MenuBar" />

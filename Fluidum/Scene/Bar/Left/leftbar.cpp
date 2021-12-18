@@ -34,14 +34,13 @@ FS::LeftBar::LeftBar(
 	tabRead(tabRead),
 	images(images)
 {
-	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
-
+	FluidumScene_Log_Constructor("LeftBar");
 
 	const auto windowSizeX = guiRead->windowSize().x * 0.03f;
 	style.windowPos = { 0.0f,guiRead->menuBarHeight() + guiRead->topBarHeight() };
 	style.windowSize = { windowSizeX,guiRead->windowSize().y + 1.0f };
 
-	//画像の幅 windowpaddingと内部のスペースを考慮する必要がある
+	//width of image. windowpaddingと内部のスペースを考慮する必要がある
 	//windowpaddingを1/2にして調整する
 	auto imageWidth = windowSizeX - (ImGui::GetStyle().WindowPadding.x) - (ImGui::GetStyle().FramePadding.x * 2.0f);
 
@@ -57,21 +56,7 @@ FS::LeftBar::LeftBar(
 }
 
 FS::LeftBar::~LeftBar() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct MenuBarScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("LeftBar");
 }
 
 void FS::LeftBar::call() {
@@ -87,7 +72,6 @@ void FS::LeftBar::call() {
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar;
 
-	//角とボーダーを消す
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding / 2.0f);
@@ -130,7 +114,7 @@ void FS::LeftBar::imageGui() {
 	for (std::size_t i = 0; i < std::tuple_size_v<decltype(Internal::MainScenes)>; i++) {
 		//シーンが存在するなら降ろす
 		if (sceneRead->isExist(Internal::MainScenes[i])) {
-			//シーンの削除
+
 			ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.main);
 
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
@@ -175,13 +159,13 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 		this->addAnalysisScene();
 	}
 	else if (code == Internal::MainScenes[3]) {
-		this->addProjectScene();
+		this->addGenomeScene();
 	}
 	else if (code == Internal::MainScenes[4]) {
 		this->addAnimationScene();
 	}
 	else if (code == Internal::MainScenes[5]) {
-		this->addGenomeScene();
+		this->addProjectScene();
 	}
 	else if (code == Internal::MainScenes[6]) {
 		this->addConsoleScene();
@@ -200,42 +184,42 @@ void FS::LeftBar::addCodingScene() {
 
 	if (!fluidumFilesRead->isMainCodeFileExist()) {
 		GLog.add<FD::Log::Type::None>("Main file does not exist.");
-		GLog.add<FD::Log::Type::None>("Request add CodingSelectScene.");
-		Scene::addScene<CodingSelect>();
+		FluidumScene_Log_RequestAddScene("Coding::Select");
+		Scene::addScene<Coding::Select>();
 	}
 	else {
-		GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");
+		FluidumScene_Log_RequestAddScene("TextEditor");
 		Scene::addScene<TextEditor>();
 	}
 }
 
 void FS::LeftBar::addFluScene() {
-	GLog.add<FD::Log::Type::None>("Request add Flu::NodeScene.");
+	FluidumScene_Log_RequestAddScene("Flu::Node");
 	Scene::addScene<::FS::Flu::Node>();
 }
 
 void FS::LeftBar::addAnalysisScene() {
-	GLog.add<FD::Log::Type::None>("Request add AnalysisScene.");
+	FluidumScene_Log_RequestAddScene("Analysys::Overview");
 	Scene::addScene<::FS::Analysis::Overview>();
 }
 
 void FS::LeftBar::addProjectScene() {
-	GLog.add<FD::Log::Type::None>("Request add ProjectScene.");
+	FluidumScene_Log_RequestAddScene("Project");
 	Scene::addScene<::FS::Project>();
 }
 
 void FS::LeftBar::addAnimationScene() {
-	GLog.add<FD::Log::Type::None>("Request add AnimationScene.");
+	FluidumScene_Log_RequestAddScene("Animation");
 	Scene::addScene<::FS::Animation>();
 }
 
 void FS::LeftBar::addGenomeScene() {
-	GLog.add<FD::Log::Type::None>("Request add Genome::OverviewScene.");
+	FluidumScene_Log_RequestAddScene("Genome::Overview");
 	Scene::addScene<::FS::Genome::Overview>();
 }
 
 void FS::LeftBar::addConsoleScene() {
-	GLog.add<FD::Log::Type::None>("Request add ConsoleScene.");
+	FluidumScene_Log_RequestAddScene("Console");
 	Scene::addScene<::FS::Console>();
 }
 
@@ -244,31 +228,31 @@ void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 		this->deleteCodingScene();
 	}
 	else if (code == Internal::MainScenes[1]) {
-		GLog.add<FD::Log::Type::None>("Request delete Flu::NodeScene.");
+		FluidumScene_Log_RequestDeleteScene("Flu::Node");
 		Scene::deleteScene<Flu::Node>();
 	}
 	else if (code == Internal::MainScenes[2]) {
-		GLog.add<FD::Log::Type::None>("Request delete AnalysisScene.");
+		FluidumScene_Log_RequestDeleteScene("Analysis::Overview");
 		Scene::deleteScene<Analysis::Overview>();
 	}
 	else if (code == Internal::MainScenes[3]) {
-		GLog.add<FD::Log::Type::None>("Request delete ProjectScene.");
+		FluidumScene_Log_RequestDeleteScene("Project");
 		Scene::deleteScene<Project>();
 	}
 	else if (code == Internal::MainScenes[4]) {
-		GLog.add<FD::Log::Type::None>("Request delete AnimationScene.");
+		FluidumScene_Log_RequestDeleteScene("Animation");
 		Scene::deleteScene<Animation>();
 	}
 	else if (code == Internal::MainScenes[5]) {
-		GLog.add<FD::Log::Type::None>("Request delete Genome::OverviewScene.");
+		FluidumScene_Log_RequestDeleteScene("Genome::Overview");
 		Scene::deleteScene<Genome::Overview>();
 	}
 	else if (code == Internal::MainScenes[6]) {
-		GLog.add<FD::Log::Type::None>("Request delete ConsoleScene.");
+		FluidumScene_Log_RequestDeleteScene("Console");
 		Scene::deleteScene<Console>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		FluidumScene_Log_Abort();
 		abort();
 	}
 	sub.codingImages.clear();
@@ -297,9 +281,9 @@ void FS::LeftBar::deleteCodingScene() {
 		}
 	}
 
-	GLog.add<FD::Log::Type::None>("Request tryDelete Coding::TabScene.");
+	FluidumScene_Log_RequestTryDeleteScene("Coding::Tab");
 	Scene::tryDeleteScene<Coding::Tab>();
-	GLog.add<FD::Log::Type::None>("Request delete TextEditorScene.");
+	FluidumScene_Log_RequestDeleteScene("TextEditor");
 	Scene::deleteScene<TextEditor>();
 }
 
@@ -395,30 +379,30 @@ void FS::LeftBar::subWindowAnalysis() {
 
 void FS::LeftBar::addCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
-		GLog.add<FD::Log::Type::None>("Request add Coding::TabScene.");
+		FluidumScene_Log_RequestAddScene("Coding::Tab");
 		Scene::addScene<Coding::Tab>();
 	}
 	else if (code == ClassCode::GetClassCode<Coding::Debug>()){
-		GLog.add<FD::Log::Type::None>("Request add Coding::DebugScene.");
+		FluidumScene_Log_RequestAddScene("Coding::Debug");
 		Scene::addScene<Coding::Debug>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		FluidumScene_Log_Abort();
 		abort();
 	}
 }
 
 void FS::LeftBar::addAnalysisSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Analysis::Function>()) {
-		GLog.add<FD::Log::Type::None>("Request add Analysis::FunctionScene.");
+		FluidumScene_Log_RequestAddScene("Analysis::Function");
 		Scene::addScene<Analysis::Function>();
 	}
 	else if (code == ClassCode::GetClassCode<Analysis::Plot>()) {
-		GLog.add<FD::Log::Type::None>("Request add Analysis::PlotScene.");
+		FluidumScene_Log_RequestAddScene("Analysis::Plot");
 		Scene::addScene<Analysis::Plot>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		FluidumScene_Log_Abort();
 		abort();
 	}
 
@@ -426,26 +410,26 @@ void FS::LeftBar::addAnalysisSubScene(const ClassCode::CodeType code) {
 
 void FS::LeftBar::deleteCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
-		GLog.add<FD::Log::Type::None>("Request delete Coding::TabScene.");
+		FluidumScene_Log_RequestDeleteScene("Coding::Tab");
 		Scene::deleteScene<Coding::Tab>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		FluidumScene_Log_Abort();
 		abort();
 	}
 }
 
 void FS::LeftBar::deleteAnalysisSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Analysis::Function>()) {
-		GLog.add<FD::Log::Type::None>("Request delete Analysis::FunctionScene.");
+		FluidumScene_Log_RequestDeleteScene("Analysis::Function");
 		Scene::deleteScene<Analysis::Function>();
 	}
 	else if (code == ClassCode::GetClassCode<Analysis::Plot>()) {
-		GLog.add<FD::Log::Type::None>("Request delete Analysis::PlotScene.");
+		FluidumScene_Log_RequestDeleteScene("Analysis::Plot");
 		Scene::deleteScene<Analysis::Plot>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
+		FluidumScene_Log_Abort();
 		abort();
 	}
 }

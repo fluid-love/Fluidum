@@ -45,6 +45,8 @@ namespace FD::Internal::Text {
 		GuiText reset;
 
 		GuiText error_max;
+
+		GuiText confirm_reset;
 	};
 
 	struct TitleBar final {
@@ -175,7 +177,7 @@ namespace FD::Internal::Text {
 		GuiText quick;
 		GuiText empty_lua;
 		GuiText empty_py;
-		GuiText empty_as;
+		GuiText empty_cpp;
 		GuiText openFile;
 		GuiText openFileDescription;
 		GuiText newFile;
@@ -210,8 +212,8 @@ namespace FD::Internal::Text {
 		GuiText emptyLua_Description;
 		GuiText emptyPython;
 		GuiText emptyPython_Description;
-		GuiText emptyAngelScript;
-		GuiText emptyAngelScript_Description;
+		GuiText emptyCpp;
+		GuiText emptyCpp_Description;
 
 		GuiText error_fill;
 		GuiText error_directoryNotFound;
@@ -344,6 +346,8 @@ namespace FD::Internal::Text {
 		CodingTab();
 		~CodingTab() = default;
 
+		GuiText tab;
+
 		GuiText error_limitMaxSize;
 		GuiText error_alreadyExist;
 
@@ -358,6 +362,7 @@ namespace FD::Internal::Text {
 		Project();
 		~Project() = default;
 
+		
 		GuiText sync;
 		GuiText add;
 		GuiText file;
@@ -398,6 +403,8 @@ namespace FD::Internal::Text {
 		GuiText error_sameName;
 		GuiText error_emptyName;
 		GuiText error_forbiddenCharactor;
+
+		GuiText tooltip_collpsedAll;
 	};
 
 	struct AnalysisOverview final {
@@ -411,7 +418,14 @@ namespace FD::Internal::Text {
 
 	};
 
+	struct Console final {
+		Console();
+		~Console() = default;
 
+		GuiText console;
+		GuiText clear;
+		GuiText backcolor;
+	};
 
 
 }
@@ -435,6 +449,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::Project;
 	using ::FD::Internal::Text::AnalysisOverview;
 	using ::FD::Internal::Text::BarExit;
+	using ::FD::Internal::Text::Console;
 
 }
 

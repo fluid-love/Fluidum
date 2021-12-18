@@ -4,18 +4,8 @@
 
 namespace FS::Coding {
 
-	std::vector<std::string> substring(const std::vector<std::string>& pathes) {
-		std::vector<std::string> result(pathes.size());
-		for (std::size_t i = 0, size = result.size(); i < size; i++) {
-			std::filesystem::path path = pathes[i];
-			result[i] = path.filename().string();
-		}
-		return result;
-	}
-
 	constexpr const char* PopupLabel = "CodingTabPopup";
 	constexpr const char* PopupLabel_Window = "CodingTabPopupWindow";
-
 
 }
 
@@ -23,9 +13,12 @@ FS::Coding::Tab::Tab(
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::Coding::TabRead* const tabRead,
 	const FD::ProjectRead* const projectRead
-) : tabWrite(tabWrite), tabRead(tabRead), projectRead(projectRead)
+) :
+	tabWrite(tabWrite),
+	tabRead(tabRead),
+	projectRead(projectRead)
 {
-	GLog.add<FD::Log::Type::None>("Construct Coding::TabScene.");
+	FluidumScene_Log_Constructor("Coding::Tab");
 
 	style.topBarSize = { 0.0f,ImGui::CalcTextSize(ICON_MD_FOLDER_OPEN).y * 1.7f };
 
@@ -33,21 +26,7 @@ FS::Coding::Tab::Tab(
 }
 
 FS::Coding::Tab::~Tab() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Coding::TabScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor_("Coding::Tab");
 }
 
 void FS::Coding::Tab::call() {
@@ -58,7 +37,7 @@ void FS::Coding::Tab::call() {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, 0.0f));
 
-	ImGui::Begin("CodingTab", &windowCloseFlag, ImGuiWindowFlags_NoDocking);
+	ImGui::Begin(text.tab, &windowCloseFlag);
 	pos.center = ImGui::GetWindowPos() / 2.3f;
 
 	this->fileList();
@@ -70,14 +49,14 @@ void FS::Coding::Tab::call() {
 	ImGui::PopStyleVar();
 
 
-	checkWindowShouldClose();
+	this->checkWindowShouldClose();
 }
 
 void FS::Coding::Tab::checkWindowShouldClose() {
-	if (!this->windowCloseFlag)
+	if (this->windowCloseFlag)
 		return;
 
-	GLog.add<FD::Log::Type::None>("Request delete Coding::Tab.");
+	FluidumScene_Log_RequestDeleteScene("Coding::Tab");
 	Scene::deleteScene<Tab>();
 }
 
@@ -124,11 +103,12 @@ void FS::Coding::Tab::update() {
 }
 
 void FS::Coding::Tab::updateInfo() {
-	std::vector<std::string> paths = tabRead->getFilePathes();
-	std::vector<std::string> names = substring(paths);
+	std::vector<std::string> paths = tabRead->getFilePaths();
+
 	info.files.resize(paths.size());
 	for (std::size_t i = 0, size = paths.size(); i < size; i++) {
-		info.files[i] = { std::move(paths[i]),std::move(names[i]) };
+		std::string name = FU::File::fileName(paths[i]);
+		info.files[i] = { std::move(paths[i]),  std::move(name) };
 	}
 }
 
@@ -143,7 +123,7 @@ void FS::Coding::Tab::updateTextSaved() {
 			x.asterisk = false;
 		}
 		else {
-			if (x.asterisk)
+			if (!x.asterisk)
 				x.name += '*';
 			x.asterisk = true;
 		}

@@ -32,7 +32,7 @@ FS::TitleBar::TitleBar(
 	const float windowHeight = guiRead->menuBarHeight();
 	style.windowSize = ImVec2(guiRead->windowSize().x * 0.09f, windowHeight + 1.0f);
 
-	//MenuBarのサイズはImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2
+	//MenuBar size == ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2
 	style.iconWindowPos = { 0.0f,windowHeight / 10.0f };
 	style.iconWindowSize = { (ImGui::GetStyle().WindowPadding.x * 2.0f + (ImGui::GetStyle().FramePadding.x * 2.0f)) + ImGui::CalcTextSize("   ").x ,windowHeight };
 

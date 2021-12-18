@@ -16,7 +16,7 @@ namespace FD::Internal::Coding {
 
 	class TabData final {
 	private:
-		static inline std::vector<std::string> filePathes{};
+		static inline std::vector<std::string> filePaths{};
 		static inline std::vector<std::string> displayFiles{};
 		static inline std::mutex mtx{};
 
@@ -90,7 +90,7 @@ namespace FD::Coding {
 		[[nodiscard]] bool update() const;
 		[[nodiscard]] bool isDisplayFileChanged() const;
 
-		[[nodiscard]] std::vector<std::string> getFilePathes() const;
+		[[nodiscard]] std::vector<std::string> getFilePaths() const;
 		[[nodiscard]] std::vector<std::string> getDisplayFilePaths() const;
 
 		[[nodiscard]] bool update_isTextSaved() const;
