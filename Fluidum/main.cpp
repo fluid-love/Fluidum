@@ -27,7 +27,10 @@ int main() {
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what();
-		abort();
+	}
+	catch (...)
+	{
+		std::cerr << "Error" << std::endl;
 	}
 	GScene.reset();
 }

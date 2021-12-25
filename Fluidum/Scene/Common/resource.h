@@ -42,19 +42,23 @@ namespace FS::Resource {
 
 }
 
-//Coding
+//Project
 namespace FS::Resource {
 
 #ifdef Fluidum_Path
-	constexpr inline const char* CodingNewFilePath = Fluidum_Path "/Resources/Images/Coding/Icon/open.png";
-	constexpr inline const char* CodingOpenFilePath = Fluidum_Path "/Resources/Images/Coding/Icon/new.png";
-	constexpr inline const char* CodingNewIconsFolderPath = Fluidum_Path "/Resources/Images/Coding/Icons/";
+	constexpr inline const char* ProjectNewFilePath = Fluidum_Path "/Resources/Images/Project/Icon/open.png";
+	constexpr inline const char* ProjectOpenFilePath = Fluidum_Path "/Resources/Images/Project/Icon/new.png";
+	constexpr inline const char* ProjectDirectoryPath = Fluidum_Path "/Resources/Images/Project/Icon/dir.png";
+
+	constexpr inline const char* ProjectNewIconsFolderPath = Fluidum_Path "/Resources/Images/Project/Icons/";
 
 #else
-	constexpr inline const char* CodingOpenFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Coding/Icon/open.png")>();
-	constexpr inline const char* CodingNewFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Coding/Icon/new.png")>();
-	constexpr inline const char* CodingNewIconsFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Coding/Icons/")>();
-
+	constexpr inline const char* ProjectOpenFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icon/open.png")>();
+	constexpr inline const char* ProjectNewFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icon/new.png")>();
+	constexpr inline const char* ProjectDirectoryPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icon/dir.png")>();
+								 
+	constexpr inline const char* ProjectNewIconsFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icons/")>();
+								 
 #endif	
 
 }

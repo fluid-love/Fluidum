@@ -116,7 +116,7 @@ void FS::TopBar::calc() {
 	this->mode();
 	ImGui::SameLine();
 
-	bool isRunning = sceneRead->isExist<Lua::Calc>();
+	bool isRunning = sceneRead->exist<Lua::Calc>();
 
 	//前のステップまで戻る
 	//一時停止中以外は選択不可

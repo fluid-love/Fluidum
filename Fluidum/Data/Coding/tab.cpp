@@ -26,8 +26,7 @@ void FD::Coding::TabWrite::addFile(const std::string& path) const {
 	if (itr != TabData::filePaths.end())
 		throw Exception::AlreadyExist;
 
-	std::ifstream ifs(path);
-	if (!ifs)
+	if (!std::filesystem::exists(path))
 		throw Exception::NotFound;
 
 	TabData::filePaths.emplace_back(path);

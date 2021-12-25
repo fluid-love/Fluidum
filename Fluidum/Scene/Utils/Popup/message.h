@@ -24,6 +24,7 @@ namespace FS::Utils {
 		const FU::GuiText::Text message;
 		const ImVec2 pos;
 		const ImVec4 bgColor;
+		const ImVec2 size;
 
 	private:
 		ImCounter<ImAnimeTime> counter{};

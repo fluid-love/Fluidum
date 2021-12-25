@@ -400,9 +400,6 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Tab\tab.h">
       <Filter>Fluidum\Scene\Coding\Tab</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\select.h">
-      <Filter>Fluidum\Scene\Coding\Select</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h">
       <Filter>Fluidum\Scene\Calc\Lua</Filter>
     </ClInclude>
@@ -493,9 +490,6 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\Cursor\cursor.h">
       <Filter>Fluidum\Utils\Cursor</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Select\new.h">
-      <Filter>Fluidum\Scene\Coding\Select</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.h">
       <Filter>Fluidum\Scene\Coding\Debug</Filter>
     </ClInclude>
@@ -516,12 +510,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Console\console.h">
       <Filter>Fluidum\Data\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\container.h">
-      <Filter>Fluidum\Data\Project\Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\files.h">
-      <Filter>Fluidum\Data\Project\Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Task\task.h">
       <Filter>Fluidum\Data\Task</Filter>
@@ -591,6 +579,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Utils\File\file.h">
       <Filter>Fluidum\Utils\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\files.h">
+      <Filter>Fluidum\Data\Project\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\supported.h">
+      <Filter>Fluidum\Data\Project\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\filelist.h">
+      <Filter>Fluidum\Data\Project\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\select.h">
+      <Filter>Fluidum\Scene\Project\Add</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\new.h">
+      <Filter>Fluidum\Scene\Project\Add</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\shared_info.h">
+      <Filter>Fluidum\Scene\Project\Add</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\directory.h">
+      <Filter>Fluidum\Scene\Project\Add</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -792,9 +801,6 @@
     <Filter Include="Fluidum\Scene\Coding\Tab">
       <UniqueIdentifier>{a2fa313b-7a09-4ded-a08d-a5308af474af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\Scene\Coding\Select">
-      <UniqueIdentifier>{4afc80fb-9b22-4085-a6e8-42fefcdef11b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\Scene\Coding\TextEditor">
       <UniqueIdentifier>{38dfaa27-9583-42d8-8735-0a5f81657be7}</UniqueIdentifier>
     </Filter>
@@ -930,9 +936,6 @@
     <Filter Include="Fluidum\Data\Limits">
       <UniqueIdentifier>{0ff6ab60-20b8-45b2-b631-fe54dbfcc498}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\Data\Project\Files">
-      <UniqueIdentifier>{d3e64135-2406-4e12-ac18-34ada87265a0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\Data\Project\Project">
       <UniqueIdentifier>{9da47c23-f848-4b26-adfa-dcbc45200f4b}</UniqueIdentifier>
     </Filter>
@@ -992,6 +995,12 @@
     </Filter>
     <Filter Include="Fluidum\Language\Lua\FluidumStandardLibrary\fluidum">
       <UniqueIdentifier>{ed01a8fe-f4c1-464e-9dec-add6e1a2d6bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Data\Project\Files">
+      <UniqueIdentifier>{7746e604-1d55-489e-925c-4cc2b20e892c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Project\Add">
+      <UniqueIdentifier>{95998d8c-c08e-4b55-9560-0aaac41c705a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1190,9 +1199,6 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Tab\tab.cpp">
       <Filter>Fluidum\Scene\Coding\Tab</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\select.cpp">
-      <Filter>Fluidum\Scene\Coding\Select</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp">
       <Filter>Fluidum\Scene\Calc\Lua</Filter>
     </ClCompile>
@@ -1262,9 +1268,6 @@
     <ClCompile Include="..\..\..\Fluidum\Utils\Cursor\cursor.cpp">
       <Filter>Fluidum\Utils\Cursor</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Select\new.cpp">
-      <Filter>Fluidum\Scene\Coding\Select</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.cpp">
       <Filter>Fluidum\Scene\Coding\Debug</Filter>
     </ClCompile>
@@ -1286,14 +1289,8 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Console\console.cpp">
       <Filter>Fluidum\Data\Console</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\files.cpp">
-      <Filter>Fluidum\Data\Project\Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Task\task.cpp">
       <Filter>Fluidum\Data\Task</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\container.cpp">
-      <Filter>Fluidum\Data\Project\Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Project\project.cpp">
       <Filter>Fluidum\Data\Project\Project</Filter>
@@ -1442,6 +1439,24 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.sleep_milliseconds.cpp">
       <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\files.cpp">
+      <Filter>Fluidum\Data\Project\Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\filelist.cpp">
+      <Filter>Fluidum\Data\Project\Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\supported.cpp">
+      <Filter>Fluidum\Data\Project\Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\select.cpp">
+      <Filter>Fluidum\Scene\Project\Add</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\new.cpp">
+      <Filter>Fluidum\Scene\Project\Add</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\directory.cpp">
+      <Filter>Fluidum\Scene\Project\Add</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Test\test.lua">
@@ -1466,12 +1481,6 @@
       <Filter>Resources\GuiText</Filter>
     </None>
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis">
-      <Filter>Resources\GuiText</Filter>
-    </None>
-    <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingNew">
-      <Filter>Resources\GuiText</Filter>
-    </None>
-    <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingSelect">
       <Filter>Resources\GuiText</Filter>
     </None>
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingTab">
@@ -1518,6 +1527,15 @@
     </None>
     <None Include="..\..\..\Fluidum\Languages\Lua\FluidumStandardLibrary\fluidum\system.lua">
       <Filter>Fluidum\Language\Lua\FluidumStandardLibrary\fluidum</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectSelect">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectNewFile">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectDirectory">
+      <Filter>Resources\GuiText</Filter>
     </None>
   </ItemGroup>
 </Project>

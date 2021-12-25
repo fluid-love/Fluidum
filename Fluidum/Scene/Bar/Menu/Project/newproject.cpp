@@ -77,7 +77,7 @@ FS::Bar::NewProject::~NewProject() noexcept {
 
 void FS::Bar::NewProject::call() {
 
-	if (!sceneRead->isExist<ProjectForm>() && !ImGui::IsPopupOpen("RecentPopup"))
+	if (!sceneRead->exist<ProjectForm>() && !ImGui::IsPopupOpen("RecentPopup"))
 		ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);
@@ -204,7 +204,7 @@ void FS::Bar::NewProject::select() {
 	ImGui::BeginChild("Select", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.8f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	//dummy
-	ImGui::BeginChild("SelectU", ImVec2(0.0f, style.windowSize.y * 0.07f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGui::BeginChild("SelectU", ImVec2(0.0f, style.windowSize.y * 0.08f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	ImGui::Spacing(); ImGui::Spacing();
 	this->filter();
 
@@ -234,6 +234,7 @@ void FS::Bar::NewProject::filter() {
 
 	const char* filter1[3] = { text.all, empty.data() , algo.data() };
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text(ICON_FA_FILTER); ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetWindowSize().x * 0.3f);
 

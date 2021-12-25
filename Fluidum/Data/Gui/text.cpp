@@ -16,8 +16,9 @@ namespace FD::Internal::Text {
 	enum class Type : uint8_t {
 		Analysis,
 		BarExit,
-		CodingNew,
-		CodingSelect,
+		ProjectNewFile,
+		ProjectDirectory,
+		ProjectSelect,
 		CodingTab,
 		Console,
 		Layout,
@@ -55,11 +56,14 @@ namespace FD::Internal::Text {
 		else if constexpr (T == BarExit) {
 			path += "BarExit";
 		}
-		else if constexpr (T == CodingNew) {
-			path += "CodingNew";
+		else if constexpr (T == ProjectNewFile) {
+			path += "ProjectNewFile";
 		}
-		else if constexpr (T == CodingSelect) {
-			path += "CodingSelect";
+		else if constexpr (T == ProjectDirectory) {
+			path += "ProjectDirectory";
+		}
+		else if constexpr (T == ProjectSelect) {
+			path += "ProjectSelect";
 		}
 		else if constexpr (T == CodingTab) {
 			path += "CodingTab";
@@ -111,6 +115,7 @@ namespace FD::Internal::Text {
 		}
 		return path;
 	}
+
 
 
 
@@ -448,7 +453,7 @@ FD::Internal::Text::TopBar::TopBar() {
 	this->save = data;
 
 	std::getline(ifs, data);
-	this->newProject =  data;
+	this->newProject = data;
 
 	std::getline(ifs, data);
 	this->includeFile = data;
@@ -481,14 +486,14 @@ FD::Internal::Text::LeftBar::LeftBar() {
 	this->popup_cancel = data;
 }
 
-FD::Internal::Text::CodingSelect::CodingSelect() {
+FD::Internal::Text::ProjectSelect::ProjectSelect() {
 
 	std::ifstream ifs{};
 
-	ifs = std::ifstream(makePath<Type::CodingSelect>(Getter::get()), std::ios::in);
+	ifs = std::ifstream(makePath<Type::ProjectSelect>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open CodingSelect.");
+		throw std::runtime_error("Failed to open ProjectSelect.");
 
 	std::string data = "";
 
@@ -520,6 +525,12 @@ FD::Internal::Text::CodingSelect::CodingSelect() {
 	this->newFileDescription = data;
 
 	std::getline(ifs, data);
+	this->newDirectory = data;
+
+	std::getline(ifs, data);
+	this->newDirectoryDescription = data;
+
+	std::getline(ifs, data);
 	this->cancel = data;
 
 	std::getline(ifs, data);
@@ -539,15 +550,22 @@ FD::Internal::Text::CodingSelect::CodingSelect() {
 
 	std::getline(ifs, data);
 	this->error_emptyForm = data;
+
+	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
+
 }
 
-FD::Internal::Text::CodingNew::CodingNew() {
+FD::Internal::Text::ProjectNewFile::ProjectNewFile() {
 	std::ifstream ifs{};
 
-	ifs = std::ifstream(makePath<Type::CodingNew>(Getter::get()), std::ios::in);
+	ifs = std::ifstream(makePath<Type::ProjectNewFile>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open CodingNew.");
+		throw std::runtime_error("Failed to open ProjectNewFile.");
 
 	std::string data = "";
 
@@ -555,10 +573,19 @@ FD::Internal::Text::CodingNew::CodingNew() {
 	this->title = data;
 
 	std::getline(ifs, data);
+	this->search = data;
+
+	std::getline(ifs, data);
+	this->all = data;
+
+	std::getline(ifs, data);
 	this->recent = data;
 
 	std::getline(ifs, data);
-	this->recent_empty = data;
+	this->recentEmpty = data;
+
+	std::getline(ifs, data);
+	this->back = data;
 
 	std::getline(ifs, data);
 	this->cancel = data;
@@ -576,25 +603,25 @@ FD::Internal::Text::CodingNew::CodingNew() {
 	this->empty = data;
 
 	std::getline(ifs, data);
-	this->empty_Description = data;
+	this->empty_description = data;
 
 	std::getline(ifs, data);
 	this->emptyLua = data;
 
 	std::getline(ifs, data);
-	this->emptyLua_Description = data;
+	this->emptyLua_description = data;
 
 	std::getline(ifs, data);
 	this->emptyPython = data;
 
 	std::getline(ifs, data);
-	this->emptyPython_Description = data;
+	this->emptyPython_description = data;
 
 	std::getline(ifs, data);
 	this->emptyCpp = data;
 
 	std::getline(ifs, data);
-	this->emptyCpp_Description = data;
+	this->emptyCpp_description = data;
 
 	std::getline(ifs, data);
 	this->error_fill = data;
@@ -604,6 +631,53 @@ FD::Internal::Text::CodingNew::CodingNew() {
 
 	std::getline(ifs, data);
 	this->error_fileAlreadyExist = data;
+
+	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
+}
+
+FD::Internal::Text::ProjectDirectory::ProjectDirectory() {
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::ProjectDirectory>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open ProjectDirectory.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->title = data;
+
+	std::getline(ifs, data);
+	this->parent = data;
+
+	std::getline(ifs, data);
+	this->name = data;
+
+	std::getline(ifs, data);
+	this->back = data;
+
+	std::getline(ifs, data);
+	this->cancel = data;
+
+	std::getline(ifs, data);
+	this->create = data;
+
+	std::getline(ifs, data);
+	this->error_fill = data;
+
+	std::getline(ifs, data);
+	this->error_alreadyExist = data;
+
+	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
 }
 
 FD::Internal::Text::NewProject::NewProject() {
@@ -935,22 +1009,31 @@ FD::Internal::Text::Project::Project() {
 	std::string data = "";
 
 	std::getline(ifs, data);
+	this->explorer = data;
+
+	std::getline(ifs, data);
 	this->sync = data;
 
 	std::getline(ifs, data);
 	this->add = data;
+	this->add_icon = ICON_MD_ADD "  " + data;
+
+	std::getline(ifs, data);
+	this->add_selectNewFile = ICON_MD_SUBDIRECTORY_ARROW_RIGHT ICON_FA_FILE_ALT "  " + data;
+
+	std::getline(ifs, data);
+	this->add_select = ICON_FA_LIST "  " + data;
 
 	std::getline(ifs, data);
 	this->file = data;
+	this->file_icon = ICON_FA_FILE "  " + data;
 
 	std::getline(ifs, data);
-	this->folder = data;
+	this->directory = data;
+	this->directory_icon = ICON_FA_FOLDER "  " + data;
 
 	std::getline(ifs, data);
 	this->rename = data;
-
-	std::getline(ifs, data);
-	this->remove = data;
 
 	std::getline(ifs, data);
 	this->displayCode = data;
@@ -962,7 +1045,7 @@ FD::Internal::Text::Project::Project() {
 	this->notice_removeFile = data;
 
 	std::getline(ifs, data);
-	this->notice_removeFolder = data;
+	this->notice_removeDirectory = data;
 
 	std::getline(ifs, data);
 	{
@@ -972,9 +1055,6 @@ FD::Internal::Text::Project::Project() {
 
 	std::getline(ifs, data);
 	this->mainFile = data;
-
-	std::getline(ifs, data);
-	this->projectFolder = data;
 
 	std::getline(ifs, data);
 	this->project = data;
@@ -992,28 +1072,31 @@ FD::Internal::Text::Project::Project() {
 	this->name = data;
 
 	std::getline(ifs, data);
-	this->createFolder = data;
+	this->virtualFolder = ICON_FA_FOLDER "  " + data;
 
 	std::getline(ifs, data);
-	this->createVirtualFolder = data;
+	this->newFile = ICON_FA_FILE "  " + data;
 
 	std::getline(ifs, data);
-	this->createFile = data;
+	this->collapseAll = ICON_FA_FOLDER_MINUS "  " + data;
 
 	std::getline(ifs, data);
-	this->addExistFolder = data;
+	this->addExistDirectory = data;
 
 	std::getline(ifs, data);
 	this->addExistFile = data;
 
 	std::getline(ifs, data);
-	this->open = data;
+	this->open = ICON_FA_FOLDER_OPEN "  " + data;
 
 	std::getline(ifs, data);
-	this->close = data;
+	this->close = ICON_FA_FOLDER "  " + data;
 
 	std::getline(ifs, data);
-	this->delete_release = data;
+	this->remove = ICON_FA_TRASH_ALT "  " + data;
+
+	std::getline(ifs, data);
+	this->release = ICON_FA_TRASH_ALT "  " + data;
 
 	std::getline(ifs, data);
 	this->error_maxSize = data;
@@ -1025,10 +1108,10 @@ FD::Internal::Text::Project::Project() {
 	this->confirm_releaseFile = Internal::Text::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_deleteFolder = Internal::Text::newLine(ifs, data);
+	this->confirm_removeDirectory = Internal::Text::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_deleteFile = Internal::Text::newLine(ifs, data);
+	this->confirm_removeFile = Internal::Text::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->error_sameName = data;
@@ -1040,7 +1123,37 @@ FD::Internal::Text::Project::Project() {
 	this->error_forbiddenCharactor = data;
 
 	std::getline(ifs, data);
-	this->tooltip_collpsedAll = data;
+	this->error_addDirectory = data;
+
+	std::getline(ifs, data);
+	this->error_addFile = data;
+
+	std::getline(ifs, data);
+	this->error_removeDirectory = data;
+
+	std::getline(ifs, data);
+	this->error_removeFile = data;
+
+	std::getline(ifs, data);
+	this->error_releaseVirtualFolder = data;
+
+	std::getline(ifs, data);
+	this->error_releaseFile = data;
+
+	std::getline(ifs, data);
+	this->error_tabFileSize = data;
+
+	std::getline(ifs, data);
+	this->error_existFile = data;
+
+	std::getline(ifs, data);
+	this->error_hugeFile = data;
+
+	std::getline(ifs, data);
+	this->error_changeName = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
 
 }
 

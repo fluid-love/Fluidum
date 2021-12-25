@@ -113,7 +113,7 @@ void FS::Bar::ProjectForm::title() {
 }
 
 void FS::Bar::ProjectForm::folderPath() {
-	ImGui::Text(text.folderPath);
+	ImGui::BulletText(text.folderPath);
 	ImGui::InputText("##ppath", folderPathStr.data(), folderPathStr.capacity());
 	pos.projectFolder = ImGui::GetItemRectMin();
 
@@ -139,7 +139,7 @@ void FS::Bar::ProjectForm::folderPath() {
 void FS::Bar::ProjectForm::projectName() {
 	ImGui::Spacing(); ImGui::Spacing();
 
-	ImGui::Text(text.projectName);
+	ImGui::BulletText(text.projectName);
 	ImGui::InputText("##pname", projectNameStr.data(), projectNameStr.capacity());
 	pos.projectName = ImGui::GetItemRectMin();
 }

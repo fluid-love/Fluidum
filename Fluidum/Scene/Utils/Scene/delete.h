@@ -83,7 +83,7 @@ namespace FS::Utils {
 				this->genome();
 			else if constexpr (code == ClassCode::GetClassCode<Animation>())
 				this->animation();
-			else if constexpr (code == ClassCode::GetClassCode<Project>())
+			else if constexpr (code == ClassCode::GetClassCode<Project::Explorer>())
 				this->project();
 			else if constexpr (code == ClassCode::GetClassCode<Console>())
 				this->console();
@@ -94,10 +94,10 @@ namespace FS::Utils {
 
 	private:
 		void coding() {
-			if (sceneRead->isExist<Coding::Tab>()) {
+			if (sceneRead->exist<Coding::Tab>()) {
 				this->tab();
 			}
-			if (sceneRead->isExist<Coding::Debug>()) {
+			if (sceneRead->exist<Coding::Debug>()) {
 				this->debug();
 			}
 
@@ -123,10 +123,10 @@ namespace FS::Utils {
 
 	private:
 		void analysis() {
-			if (sceneRead->isExist<Analysis::Plot>()) {
+			if (sceneRead->exist<Analysis::Plot>()) {
 				this->plot();
 			}
-			if (sceneRead->isExist<Analysis::Function>()) {
+			if (sceneRead->exist<Analysis::Function>()) {
 				this->function();
 			}
 
@@ -159,7 +159,7 @@ namespace FS::Utils {
 	private:
 		void project() {
 			FluidumScene_Log_RequestTryDeleteScene("Project");
-			Scene::tryDeleteScene<Project>();
+			Scene::tryDeleteScene<Project::Explorer>();
 		}
 
 	private:

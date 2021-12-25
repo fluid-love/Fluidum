@@ -40,6 +40,9 @@ void FDR::mainLoop(const char* title, void(*function)(), bool* const windowClose
 		Internal::GMessenger.add<FU::Log::Type::Error>(e.what());
 		throw Exception::Error();
 	}
+	catch (...) {
+		std::rethrow_exception(std::current_exception());
+	}
 }
 
 void FDR::setMessengerCallbackFunction(const MessengerCallbackType callback) {

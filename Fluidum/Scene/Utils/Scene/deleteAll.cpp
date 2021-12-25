@@ -21,7 +21,7 @@ void FS::Utils::DeleteAllScenes::deleteAll() {
 		"Analysis::Overview,"\
 		"Genome::Overview,"\
 		"Animation,"\
-		"Project,"\
+		"Project::Explorer,"\
 		"Console>");
 
 	Scene::callConstructor<DeleteScenes<
@@ -30,7 +30,7 @@ void FS::Utils::DeleteAllScenes::deleteAll() {
 		Analysis::Overview,
 		Genome::Overview,
 		Animation,
-		Project,
+		Project::Explorer,
 		Console
 		>>();
 }

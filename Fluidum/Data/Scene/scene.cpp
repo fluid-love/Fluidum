@@ -20,7 +20,7 @@ void FD::Internal::Scene::Data::deleteSceneCallback(bool async, FU::Class::Class
 	save.store(true);
 }
 
-bool FD::SceneRead::isExist(const FU::Class::ClassCode::CodeType code) const noexcept {
+bool FD::SceneRead::exist(const FU::Class::ClassCode::CodeType code) const noexcept {
 	using namespace Internal::Scene;
 	std::lock_guard<std::mutex> lock(Data::mtx);
 	const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), code);

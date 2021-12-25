@@ -40,7 +40,7 @@ std::string FU::File::directory(const std::string& path) {
 	if (itr == result.rend())
 		throw std::runtime_error("Arg \"path\" is not directory.");
 
-	result.erase(std::next(itr).base(), result.end());
+	result.erase(itr.base(), result.end());
 
 	return result;
 }

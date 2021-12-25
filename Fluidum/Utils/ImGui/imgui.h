@@ -8,6 +8,7 @@ namespace FU::ImGui {
 	template<typename ImCounter>//ImGuiAnimation ImCounter<ImAnime>
 	void tooltip(ImCounter& counter, const char* desc);
 
+	ImVec2 messagePos();
 }
 
 namespace FU::ImGui {

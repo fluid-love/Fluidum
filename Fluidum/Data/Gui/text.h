@@ -169,9 +169,9 @@ namespace FD::Internal::Text {
 
 	};
 
-	struct CodingSelect final {
-		CodingSelect();
-		~CodingSelect() = default;
+	struct ProjectSelect final {
+		ProjectSelect();
+		~ProjectSelect() = default;
 
 		GuiText selectPlease;
 		GuiText quick;
@@ -182,6 +182,8 @@ namespace FD::Internal::Text {
 		GuiText openFileDescription;
 		GuiText newFile;
 		GuiText newFileDescription;
+		GuiText newDirectory;
+		GuiText newDirectoryDescription;
 		GuiText cancel;
 		GuiText select;
 
@@ -191,34 +193,65 @@ namespace FD::Internal::Text {
 		GuiText error_notFoundDirectory;
 		GuiText error_alreadyExistFile;
 		GuiText error_emptyForm;
+		GuiText error_forbiddenCharactor;
+		GuiText error_unexpected;
 
 	};
 
-	struct CodingNew final {
-		CodingNew();
-		~CodingNew() = default;
+	struct ProjectNewFile final {
+		ProjectNewFile();
+		~ProjectNewFile() = default;
 
 		GuiText title;
+
+		GuiText search;
+		GuiText all;
+
 		GuiText recent;
-		GuiText recent_empty;
+		GuiText recentEmpty;
+
+		GuiText back;
 		GuiText cancel;
 		GuiText create;
+
 		GuiText folderPath;
 		GuiText fileName;
 
 		GuiText empty;
-		GuiText empty_Description;
+		GuiText empty_description;
 		GuiText emptyLua;
-		GuiText emptyLua_Description;
+		GuiText emptyLua_description;
 		GuiText emptyPython;
-		GuiText emptyPython_Description;
+		GuiText emptyPython_description;
 		GuiText emptyCpp;
-		GuiText emptyCpp_Description;
+		GuiText emptyCpp_description;
 
 		GuiText error_fill;
 		GuiText error_directoryNotFound;
 		GuiText error_fileAlreadyExist;
+		GuiText error_forbiddenCharactor;
+		GuiText error_unexpected;
 
+
+	};
+
+	struct ProjectDirectory final {
+		ProjectDirectory();
+		~ProjectDirectory() = default;
+
+		GuiText title;
+
+		GuiText parent;
+		GuiText name;
+
+		GuiText back;
+		GuiText cancel;
+		GuiText create;
+
+		GuiText error_fill;
+		GuiText error_alreadyExist;
+		GuiText error_forbiddenCharactor;
+		GuiText error_unexpected;
 
 	};
 
@@ -362,21 +395,25 @@ namespace FD::Internal::Text {
 		Project();
 		~Project() = default;
 
-		
+		GuiText explorer;
+
 		GuiText sync;
 		GuiText add;
+		GuiText add_icon;
+		GuiText add_selectNewFile;
+		GuiText add_select;
 		GuiText file;
-		GuiText folder;
+		GuiText file_icon;
+		GuiText directory;
+		GuiText directory_icon;
 		GuiText rename;
-		GuiText remove;
 		GuiText displayCode;
 		GuiText error_openFile;
 		GuiText notice_removeFile;
-		GuiText notice_removeFolder;
+		GuiText notice_removeDirectory;
 
 		GuiText standardFluidumLibrary;
 		GuiText mainFile;
-		GuiText projectFolder;
 
 		GuiText project;
 		GuiText user;
@@ -384,27 +421,38 @@ namespace FD::Internal::Text {
 
 		GuiText path;
 		GuiText name;
-		GuiText createFolder;
-		GuiText createVirtualFolder;
-		GuiText createFile;
-		GuiText addExistFolder;
+		GuiText virtualFolder;
+		GuiText newFile;
+		GuiText collapseAll;
+		GuiText addExistDirectory;
 		GuiText addExistFile;
 		GuiText open;
 		GuiText close;
-		GuiText delete_release;
+		GuiText remove;
+		GuiText release;
 
 		GuiText error_maxSize;
 
 		GuiText confirm_releaseVirtualFolder;
 		GuiText confirm_releaseFile;
-		GuiText confirm_deleteFolder;
-		GuiText confirm_deleteFile;
+		GuiText confirm_removeDirectory;
+		GuiText confirm_removeFile;
 
 		GuiText error_sameName;
 		GuiText error_emptyName;
 		GuiText error_forbiddenCharactor;
+		GuiText error_addDirectory;
+		GuiText error_addFile;
+		GuiText error_removeDirectory;
+		GuiText error_removeFile;
+		GuiText error_releaseVirtualFolder;
+		GuiText error_releaseFile;
+		GuiText error_tabFileSize;
+		GuiText error_existFile;
+		GuiText error_hugeFile;
+		GuiText error_changeName;
+		GuiText error_unexpected;
 
-		GuiText tooltip_collpsedAll;
 	};
 
 	struct AnalysisOverview final {
@@ -438,8 +486,9 @@ namespace FD::Text {
 	using ::FD::Internal::Text::MenuBar;
 	using ::FD::Internal::Text::TopBar;
 	using ::FD::Internal::Text::LeftBar;
-	using ::FD::Internal::Text::CodingSelect;
-	using ::FD::Internal::Text::CodingNew;
+	using ::FD::Internal::Text::ProjectSelect;
+	using ::FD::Internal::Text::ProjectNewFile;
+	using ::FD::Internal::Text::ProjectDirectory;
 	using ::FD::Internal::Text::NewProject;
 	using ::FD::Internal::Text::ProjectForm;
 	using ::FD::Internal::Text::PopupSelect;

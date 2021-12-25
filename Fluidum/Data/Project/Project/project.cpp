@@ -7,7 +7,7 @@
 
 namespace FD::Project::Internal {
 
-	//現在のプロジェクトのデータ
+	//current
 	struct Data final {
 	public:
 		std::string projectName{};
@@ -370,13 +370,22 @@ void FD::ProjectWrite::save_scene() const {
 
 }
 
-void FD::ProjectWrite::save_files_recursive(std::ofstream& ofs, const Project::List::FileInfo* info) const {
+void FD::ProjectWrite::save_files_recursive(std::ofstream& ofs, const Project::FileList::FileInfo* info) const {
 	ofs << info->path << std::endl;
 	ofs << info->name << std::endl;
 	ofs << info->open << std::endl;
-	ofs << static_cast<std::underlying_type_t<decltype(info->type)>>(info->type) << std::endl;
+
+	if (info->type == FD::Project::FileList::Type::Directory)
+		ofs << "D" << std::endl;
+	else if (info->type == FD::Project::FileList::Type::Supported)
+		ofs << "S" << std::endl;
+	else {
+		assert(info->type == FD::Project::FileList::Type::Unsupported);
+		ofs << "U" << std::endl;
+	}
 
 	ofs << info->dir_internal.size() << std::endl;
+
 	for (std::size_t i = 0, size = info->dir_internal.size(); i < size; i++) {
 		save_files_recursive(ofs, &info->dir_internal[i]);
 	}
@@ -724,10 +733,10 @@ void FD::ProjectWrite::readProjectInfo(std::ifstream& ifs) const {
 
 }
 
-FD::Project::List::FileInfo FD::ProjectWrite::readProjectFiles_element(std::ifstream& ifs) const {
+FD::Project::FileList::FileInfo FD::ProjectWrite::readFiles_element(std::ifstream& ifs) const {
 	std::string data{};
 
-	Project::List::FileInfo info;
+	Project::FileList::FileInfo info;
 
 	std::getline(ifs, data);
 	info.path = data;
@@ -742,23 +751,21 @@ FD::Project::List::FileInfo FD::ProjectWrite::readProjectFiles_element(std::ifst
 		info.open = false;
 
 	std::getline(ifs, data);
-	using UT = std::underlying_type_t<decltype(info.type)>;
 	using Type = Project::Internal::FileList::Type;
-	UT type = std::stoi(data);
-	if (type == static_cast<UT>(Type::Directory))
+	if (data == "D")
 		info.type = Type::Directory;
-	else if (type == static_cast<UT>(Type::Code))
-		info.type = Type::Code;
-	else if (type == static_cast<UT>(Type::Unsupported))
+	else if (data == "S")
+		info.type = Type::Supported;
+	else if (data == "U")
 		info.type = Type::Unsupported;
 
 	return info;
 }
 
-void FD::ProjectWrite::read_files_recursive(std::ifstream& ifs, Project::List::FileInfo* parent) const {
+void FD::ProjectWrite::read_files_recursive(std::ifstream& ifs, Project::FileList::FileInfo* parent) const {
 	std::string data{};
 
-	parent->dir_internal.emplace_back(this->readProjectFiles_element(ifs));
+	parent->dir_internal.emplace_back(this->readFiles_element(ifs));
 
 	//size
 	std::getline(ifs, data);
@@ -809,7 +816,7 @@ void FD::ProjectWrite::read_projectFiles() const {
 			break;
 
 		auto data = UserFilesData::userFiles.get();
-		auto info = this->readProjectFiles_element(ifs);
+		auto info = this->readFiles_element(ifs);
 		data->emplace_back(std::move(info));
 		this->read_files_recursive(ifs, &info);
 
@@ -840,12 +847,12 @@ void FD::ProjectWrite::read_userFiles() const {
 			break;
 
 		auto data = UserFilesData::userFiles.get();
-		auto info = this->readProjectFiles_element(ifs);
+		auto info = this->readFiles_element(ifs);
 		data->emplace_back(std::move(info));
 		this->read_files_recursive(ifs, &info);
 
 		counter++;
-		if (counter > 1000)
+		if (counter > 5000)
 			throw Project::ExceptionType::BrokenFile;
 	}
 }

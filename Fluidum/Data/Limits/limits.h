@@ -4,20 +4,23 @@
 
 namespace FD::Project::Limits {
 
-	struct UserFiles final {
-		FluidumUtils_Class_Delete_ConDestructor(UserFiles)
-	public:
+	namespace UserFiles {
 		//num of directories(virtual folder)
-		static constexpr uint16_t DirectorySizeMax = 500;
-	};
+		constexpr inline uint16_t DirectorySizeMax = 500;
+		constexpr inline uint16_t FileSizeMax = 500;
+	}
 
-	struct ProjectFiles final {
-		FluidumUtils_Class_Delete_ConDestructor(ProjectFiles)
-	public:
+	namespace ProjectFiles {
 		//num of directories
-		static constexpr uint16_t DirectorySizeMax = 500;
-	};
+		constexpr inline uint16_t DirectorySizeMax = 500;
+		constexpr inline uint16_t FileSizeMax = 500;
+	}
 
+}
+
+namespace FD::Coding::Limits {
+	//1 charactor 1byte
+	constexpr inline uint32_t FileSizeMax = 500000;
 
 }
 
@@ -36,7 +39,7 @@ namespace FD::Plot::Limits {
 }
 
 namespace FD::Layout::Limits {
-	
+
 	struct Window final {
 		FluidumUtils_Class_Delete_ConDestructor(Window)
 	public:
@@ -50,7 +53,7 @@ namespace FD::Layout::Limits {
 namespace FD::Calc::Array::Limits {
 
 	constexpr inline uint32_t MaxSize = 100'000;
-	
+
 }
 
 namespace FD::Console::Limits {

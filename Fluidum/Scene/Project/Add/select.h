@@ -2,26 +2,21 @@
 
 #include "../../Common/common.h"
 #include "../../../TextEditor/include.h"
+#include "new.h"
+#include "directory.h"
 
-namespace FS::Coding {
+namespace FS::Project::Add {
 
 	class Select final : public Scene {
 	public:
 		explicit Select(
-			FD::Coding::TabWrite* const tabWrite,
 			const FD::ProjectRead* const projectRead,
-			FD::ProjectWrite* const projectWrite,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
-			FD::FluidumFilesWrite* const fluidumFilesWrite,
 			const FD::GuiRead* const guiRead,
-			const FD::SceneRead* const sceneRead
+			const FD::SceneRead* const sceneRead,
+			std::shared_ptr<SharedInfo>& sharedInfo 
 		);
 		void Constructor(
-			FD::Coding::TabWrite,
 			FD::ProjectRead,
-			FD::ProjectWrite,
-			FD::FluidumFilesRead,
-			FD::FluidumFilesWrite,
 			FD::GuiRead,
 			FD::SceneRead
 		);
@@ -34,22 +29,22 @@ namespace FS::Coding {
 		virtual void call() override;
 
 	private://data
-		FD::Coding::TabWrite* const tabWrite;
 		const FD::ProjectRead* const projectRead;
-		FD::ProjectWrite* const projectWrite;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
-		FD::FluidumFilesWrite* const fluidumFilesWrite;
 		const FD::SceneRead* const sceneRead;
+		std::shared_ptr<SharedInfo> sharedInfo;
 
-		FD::Text::CodingSelect text{};
+		FD::Text::ProjectSelect text{};
 
 	private:
 
 		const FDR::ImGuiImage newImage;
 		const FDR::ImGuiImage openImage;
+		const FDR::ImGuiImage dirImage;
+
 
 		struct {
 			ImCounter<ImAnimeTime> counter{};
+			ImCounter<ImAnimeTime> form{};
 		}anime;
 
 		struct {
@@ -58,7 +53,9 @@ namespace FS::Coding {
 
 			bool isOpenWindowHovered = false;
 			bool isNewFileWindowHovered = false;
+			bool isDirWinfowHovered = false;
 
+			bool project{};
 		}style;
 
 		struct {
@@ -89,18 +86,32 @@ namespace FS::Coding {
 
 
 	private:
-		//make
-		void create();
+		void title();
 
 	private://recent
 		void quick();
 		void selectTemplate(const ImVec2& size);
 
-	private://open
+	private://right
 		void right();
+		//return hovered ,left_button_clicked
+		std::pair<bool, bool> button(
+			const char* label,
+			const char* description,
+			const FDR::ImGuiImage& image,
+			const bool hovered,
+			const ImVec2& size
+		);
+
+	private://open
 		void open(const ImVec2& size);
 		void openDialog();
+
+	private://newfile
 		void newFile(const ImVec2& size);
+
+	private://dir
+		void dir(const ImVec2& size);
 
 	private://lower right
 		void bottomRight();
@@ -112,7 +123,7 @@ namespace FS::Coding {
 		void setEmptyFile();
 
 
-		void createNewFileQuick();
+		bool createNewFileQuick();
 		[[nodiscard]] bool checkQuickInfo();
 
 		void errorPopup();
@@ -127,7 +138,8 @@ namespace FS::Coding {
 				EmptyFileName,
 				EmptyFolderPath,
 				AlreadyExist,
-				NotFound
+				NotFound,
+				ForbiddenCharactor
 			};
 			static std::pair<ErrorType, std::string> checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension);
 		};

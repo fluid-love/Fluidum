@@ -18,7 +18,6 @@ namespace FS::Coding {
 
 	private://data
 
-		FD::Text::CodingSelect text{};
 
 	private:
 

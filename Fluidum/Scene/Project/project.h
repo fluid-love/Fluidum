@@ -1,13 +1,13 @@
 #pragma once
 
 #include "../Common/common.h"
-#include "../Coding/Select/new.h"
+#include "Add/new.h"
 
-namespace FS {
+namespace FS::Project {
 
-	class Project final : public Scene {
+	class Explorer final : public Scene {
 	public:
-		explicit Project(
+		explicit Explorer(
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			FD::LuaFilesWrite_Lock* const luaFilesWrite,
@@ -34,9 +34,9 @@ namespace FS {
 			FD::Coding::TabWrite
 		);
 
-		~Project() noexcept;
+		~Explorer() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Project)
+		FluidumUtils_Class_Delete_CopyMove(Explorer)
 
 	public:
 		virtual void call() override;
@@ -75,11 +75,11 @@ namespace FS {
 
 		struct {
 			TabType tab = TabType::Fluidum;
-			FD::Project::List::FileInfo* fluidumFiles = nullptr;
-			FD::Project::List::FileInfo* projectFiles = nullptr;
-			FD::Project::List::FileInfo* userFiles = nullptr;
+			FD::Project::FileList::FileInfo* fluidumFiles = nullptr;
+			FD::Project::FileList::FileInfo* projectFiles = nullptr;
+			FD::Project::FileList::FileInfo* userFiles = nullptr;
 
-			inline FD::Project::List::FileInfo* current() noexcept {
+			inline FD::Project::FileList::FileInfo* current() noexcept {
 				if (tab == TabType::Project)
 					return this->projectFiles;
 				else if (tab == TabType::User)
@@ -89,15 +89,23 @@ namespace FS {
 			}
 		}select;
 
+		enum class PopupType : uint8_t {
+			Top,
+			Dir,
+			Supported
+		};
+
 		struct {
+			PopupType type{};
+
 			bool top = false;
 			static constexpr const char* Top = "TopPopup";
 
 			bool dir = false;
 			static constexpr const char* Dir = "DirPopup";
 
-			bool code = false;
-			static constexpr const char* Code = "CodePopup";
+			bool supported = false;
+			static constexpr const char* Supported = "SupportedPopup";
 
 			static constexpr const char* ChangeName = "ChangeNamePopup";
 
@@ -106,6 +114,7 @@ namespace FS {
 		struct {
 			bool popup = false;
 			bool once = false;
+			std::string tempName{};
 			std::string name{};
 			bool folder = false;
 			ImVec2 pos{};
@@ -114,14 +123,18 @@ namespace FS {
 
 		struct {
 			bool popup = false;
-			std::shared_ptr<Coding::New::SharedInfo> info{};
-		}newFile;
+			std::shared_ptr<Add::SharedInfo> info{};
+		}add;
 
 		struct {
 			ImCounter<ImAnimeTime> sync{};
 			ImCounter<ImAnimeTime> collapseAll{};
 			ImCounter<ImAnimeTime> displayCode{};
 		}anime;
+
+		bool windowFlag = false;
+	private:
+		void closeWindow();
 
 	private:
 		void topBar();
@@ -136,37 +149,41 @@ namespace FS {
 		void standardFluidumLibrary();
 
 	private:
-		std::pair<ImVec2, ImVec2> projectFilesTree(std::vector<FD::Project::List::FileInfo>* node, FD::Project::List::FileInfo* info);
+		std::pair<ImVec2, ImVec2> projectFilesTree(std::vector<FD::Project::FileList::FileInfo>* node, FD::Project::FileList::FileInfo* info);
 		void projectFiles();
-		void createDirectory();
 
 	private:
-		std::pair<ImVec2, ImVec2> userFilesTree(std::vector<FD::Project::List::FileInfo>* node, FD::Project::List::FileInfo* info);
+		std::pair<ImVec2, ImVec2> userFilesTree(std::vector<FD::Project::FileList::FileInfo>* node, FD::Project::FileList::FileInfo* info);
 		void userFiles();
-		void addVirtualFolder();
-		void eraseVirtualFolder();
-		void eraseUserFile();
-		void showCode();
-		void flipOpen();
 
 	private:
+		void addDirectory();
 		void addFile();
-		void catchAddFile();
+		void addSelect();
+		void addFileQuick();
+		void catchAdd();
+		void removeDirectory();
+		void removeFile();
+		void displayCode();
+		void flipOpen();
+		void collapseAll();
 
 	private:
 		void openPopup();
 
 		void topPopup();
 		void directoryPopup();
-		void codePopup();
+		void supportedPopup();
+
+		void popup_add();
 
 		void changeNamePopup();
 		void tryChangeName();
-		_NODISCARD bool checkChangeName();
+		[[nodiscard]] bool checkChangeName();
 
 	private:
 		void syncProjectFiles();
-		void collapseAll();
+		int32_t popupSpacing();
 	};
 
 }

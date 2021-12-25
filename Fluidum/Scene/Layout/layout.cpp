@@ -40,7 +40,7 @@ void FS::Layout::call() {
 	this->noresize();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding / 3.5f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding / 6.5f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
 	ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, ImVec4(0.007f, 0.000f, 0.000f, 1.000f));
@@ -85,14 +85,15 @@ void FS::Layout::dockSpace(const char* label) {
 	ImGui::SetNextWindowSize(select.current->size, ImGuiCond_Always);
 	ImGui::Begin(label, nullptr, windowFlags | (flag.noresize ? ImGuiWindowFlags_NoResize : ImGuiWindowFlags_None));
 
+	select.current->pos = ImGui::GetWindowPos();
+	select.current->size = ImGui::GetWindowSize();
+	this->ifRightMouseButtonCliked();
+
 	auto id = ImGui::GetID(label);
 
 	ImGuiID dockingID = ImGui::DockSpace(id, ImVec2{}, ImGuiDockNodeFlags_PassthruCentralNode);
 
-	select.current->pos = ImGui::GetWindowPos();
-	select.current->size = ImGui::GetWindowSize();
 
-	this->ifRightMouseButtonCliked();
 
 	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowFocused()) {
 		flag.mouseDown = true;
@@ -111,7 +112,10 @@ void FS::Layout::ifRightMouseButtonCliked() {
 
 	select.hovered = select.current;
 
-	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right) || 
+		ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)||
+		ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
+		)
 		return;
 
 	flag.popup = true;
@@ -362,13 +366,13 @@ void FS::Layout::messageLimit() {
 
 void FS::Layout::drawSeparators() {
 	ImDrawList* list = ImGui::GetBackgroundDrawList();
-	constexpr ImU32 col = FU::ImGui::convertImVec4ToImU32(0.266f, 0.200f, 0.200f, 1.000f);
+	constexpr ImU32 col = FU::ImGui::convertImVec4ToImU32(0.366f, 0.366f, 0.366f, 1.000f);
 	constexpr ImU32 colResize = FU::ImGui::convertImVec4ToImU32(1.0f, 0.6f, 0.4f, 1.0f);
 
 	for (auto& x : separators) {
 		if (x.resize)
-			list->AddLine(x.pos1, x.pos2, select.resizeBorder != FD::Layout::ResizedBorder::None ? colResize : col, 2.0f);
+			list->AddLine(x.pos1, x.pos2, select.resizeBorder != FD::Layout::ResizedBorder::None ? colResize : col);
 		else
-			list->AddLine(x.pos1, x.pos2, col, 2.0f);
+			list->AddLine(x.pos1, x.pos2, col);
 	}
 }

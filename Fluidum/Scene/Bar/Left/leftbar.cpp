@@ -1,10 +1,10 @@
 ﻿#include "leftbar.h"
 
-#include "../../Coding/Select/select.h"
 #include "../../Coding/TextEditor/texteditor.h"
 #include "../../Coding/Tab/tab.h"
 #include "../../Coding/Debug/debug.h"
 #include "../../Project/project.h"
+#include "../../Project/Add/select.h"
 #include "../../Analysis/Overview/overview.h"
 #include "../../Analysis/Func/function.h"
 #include "../../Analysis/Plot/plot.h"
@@ -103,7 +103,7 @@ namespace FS::Internal {
 		FU::Class::ClassCode::GetClassCode<::FS::Analysis::Overview>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Genome::Overview>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Animation>(),
-		FU::Class::ClassCode::GetClassCode<::FS::Project>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Project::Explorer>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Console>()
 	};
 }
@@ -113,7 +113,7 @@ void FS::LeftBar::imageGui() {
 
 	for (std::size_t i = 0; i < std::tuple_size_v<decltype(Internal::MainScenes)>; i++) {
 		//シーンが存在するなら降ろす
-		if (sceneRead->isExist(Internal::MainScenes[i])) {
+		if (sceneRead->exist(Internal::MainScenes[i])) {
 
 			ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.main);
 
@@ -179,18 +179,11 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 void FS::LeftBar::addCodingScene() {
 	//set image
 	std::string path = Resource::LeftBarIconsFilePath;
-	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "tab.png").c_str()));	
+	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "tab.png").c_str()));
 	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "debug.png").c_str()));
 
-	if (!fluidumFilesRead->isMainCodeFileExist()) {
-		GLog.add<FD::Log::Type::None>("Main file does not exist.");
-		FluidumScene_Log_RequestAddScene("Coding::Select");
-		Scene::addScene<Coding::Select>();
-	}
-	else {
-		FluidumScene_Log_RequestAddScene("TextEditor");
-		Scene::addScene<TextEditor>();
-	}
+	FluidumScene_Log_RequestAddScene("TextEditor");
+	Scene::addScene<TextEditor>();
 }
 
 void FS::LeftBar::addFluScene() {
@@ -204,8 +197,8 @@ void FS::LeftBar::addAnalysisScene() {
 }
 
 void FS::LeftBar::addProjectScene() {
-	FluidumScene_Log_RequestAddScene("Project");
-	Scene::addScene<::FS::Project>();
+	FluidumScene_Log_RequestAddScene("Project::Explorer");
+	Scene::addScene<::FS::Project::Explorer>();
 }
 
 void FS::LeftBar::addAnimationScene() {
@@ -236,16 +229,16 @@ void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 		Scene::deleteScene<Analysis::Overview>();
 	}
 	else if (code == Internal::MainScenes[3]) {
-		FluidumScene_Log_RequestDeleteScene("Project");
-		Scene::deleteScene<Project>();
+		FluidumScene_Log_RequestDeleteScene("Genome::Overview");
+		Scene::deleteScene<Genome::Overview>();
 	}
 	else if (code == Internal::MainScenes[4]) {
 		FluidumScene_Log_RequestDeleteScene("Animation");
 		Scene::deleteScene<Animation>();
 	}
 	else if (code == Internal::MainScenes[5]) {
-		FluidumScene_Log_RequestDeleteScene("Genome::Overview");
-		Scene::deleteScene<Genome::Overview>();
+		FluidumScene_Log_RequestDeleteScene("Project::Explorer");
+		Scene::deleteScene<Project::Explorer>();
 	}
 	else if (code == Internal::MainScenes[6]) {
 		FluidumScene_Log_RequestDeleteScene("Console");
@@ -322,7 +315,7 @@ void FS::LeftBar::subWindowCoding() {
 	for (std::size_t i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
 
 		//選択されているなら
-		if (sceneRead->isExist(scenes[i])) {
+		if (sceneRead->exist(scenes[i])) {
 			//降ろす　シーンの削除
 			ImGui::ImageButton(sub.codingImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
 
@@ -355,7 +348,7 @@ void FS::LeftBar::subWindowAnalysis() {
 
 	for (std::size_t i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
 
-		if (sceneRead->isExist(scenes[i])) {
+		if (sceneRead->exist(scenes[i])) {
 			ImGui::ImageButton(sub.analysisImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
 
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
@@ -382,7 +375,7 @@ void FS::LeftBar::addCodingSubScene(const ClassCode::CodeType code) {
 		FluidumScene_Log_RequestAddScene("Coding::Tab");
 		Scene::addScene<Coding::Tab>();
 	}
-	else if (code == ClassCode::GetClassCode<Coding::Debug>()){
+	else if (code == ClassCode::GetClassCode<Coding::Debug>()) {
 		FluidumScene_Log_RequestAddScene("Coding::Debug");
 		Scene::addScene<Coding::Debug>();
 	}

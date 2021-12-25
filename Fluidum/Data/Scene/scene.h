@@ -45,9 +45,8 @@ namespace FD {
 
 	public:
 
-		//ÉVÅ[ÉìÇ™ë∂ç›Ç∑ÇÍÇŒtrue
 		template<typename Scene>
-		_NODISCARD bool isExist() const noexcept {
+		[[nodiscard]] bool exist() const noexcept {
 			using namespace Internal::Scene;
 			std::lock_guard<std::mutex> lock(Data::mtx);
 			constexpr CodeType code = FU::Class::ClassCode::GetClassCode<Scene>();
@@ -55,16 +54,50 @@ namespace FD {
 			return itr != Data::codes.cend();
 		}
 
+		//[scene1 exists] [scene2 exists]   -> true
+		//[scene1 exists] [!scene2 exists]  -> true
+		//[!scene1 exists] [!scene2 exists] -> false
+		template<typename... Scene>
+		[[nodiscard]] bool exist_or() const noexcept {
+			using namespace Internal::Scene;
+			std::lock_guard<std::mutex> lock(Data::mtx);
+			constexpr std::array<CodeType, sizeof...(Scene)> codes = { FU::Class::ClassCode::GetClassCode<Scene>()... };
+
+			for (auto x : codes) {
+				const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), x);
+				if (itr != Data::codes.cend())
+					return true;
+			}
+			return false;
+		}
+
+		//[scene1 exists] [scene2 exists]   -> true
+		//[scene1 exists] [!scene2 exists]  -> false
+		//[!scene1 exists] [!scene2 exists] -> false
+		template<typename... Scene>
+		[[nodiscard]] bool exist_and() const noexcept {
+			using namespace Internal::Scene;
+			std::lock_guard<std::mutex> lock(Data::mtx);
+			constexpr std::array<CodeType, sizeof...(Scene)> codes = { FU::Class::ClassCode::GetClassCode<Scene>()... };
+
+			for (auto x : codes) {
+				const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), x);
+				if (itr == Data::codes.cend())
+					return false;
+			}
+			return true;
+		}
+
 		template<FU::Class::ClassCode::CodeType Code>
-		_NODISCARD bool isExist() const noexcept {
+		[[nodiscard]] bool exist() const noexcept {
 			using namespace Internal::Scene;
 			std::lock_guard<std::mutex> lock(Data::mtx);
 			const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), Code);
 			return itr != Data::codes.cend();
 		}
 
-		_NODISCARD bool isExist(const FU::Class::ClassCode::CodeType Code) const noexcept;
-	
+		[[nodiscard]] bool exist(const FU::Class::ClassCode::CodeType Code) const noexcept;
+
 
 	};
 

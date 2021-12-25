@@ -13,7 +13,7 @@ namespace FD::Project::Internal {
 
 		};
 
-		struct Code final {
+		struct Supported final {
 			//element(uint32_t) -> line number
 			std::vector<uint32_t> breakpoints{};
 		};
@@ -24,7 +24,7 @@ namespace FD::Project::Internal {
 
 		enum class Type : uint8_t {
 			Directory,
-			Code,
+			Supported,
 			Unsupported,
 		};
 	public:
@@ -46,12 +46,12 @@ namespace FD::Project::Internal {
 
 	private:
 		std::vector<std::shared_ptr<Directory>> directories{};
-		std::vector<std::shared_ptr<Code>> codes{};
+		std::vector<std::shared_ptr<Supported>> codes{};
 		std::vector<std::shared_ptr<Unsupported>> unsupported{};
 
 	public:
 		Ref* add(const std::string& parent, const std::string& path, const Directory& info);
-		Ref* add(const std::string& parent, const std::string& path, const Code& info);
+		Ref* add(const std::string& parent, const std::string& path, const Supported& info);
 		Ref* add(const std::string& parent, const std::string& path, const Unsupported& info);
 
 		//samePath() && exist -> fail
@@ -59,7 +59,7 @@ namespace FD::Project::Internal {
 		//!samePath() -> add 
 		//fail -> return nullptr
 		Ref* tryAdd(const std::string& parent, const std::string& path, const Directory& info);
-		Ref* tryAdd(const std::string& parent, const std::string& path, const Code& info);
+		Ref* tryAdd(const std::string& parent, const std::string& path, const Supported& info);
 		Ref* tryAdd(const std::string& parent, const std::string& path, const Unsupported& info);
 
 		void erase(const std::string& path);
@@ -78,18 +78,21 @@ namespace FD::Project::Internal {
 		void sync(std::vector<Ref>& info);
 	public:
 		//all
-		_NODISCARD bool samePath(const std::string& path);
+		[[nodiscard]] bool samePath(const std::string& path);
 
 		//same directory
-		_NODISCARD bool sameName(const std::string& path, const std::string& name);
+		[[nodiscard]] bool sameName(const std::string& path, const std::string& name);
 
 	public:
-		_NODISCARD std::vector<Ref>* get() noexcept;
+		[[nodiscard]] std::vector<Ref>* get() noexcept;
 
 	private:
 		void forEach_recursive(void(*function)(Ref&), Ref& ref);
+		void forEach_recursive(void(*function)(Ref&, void*), Ref& ref, void* userData);
+
 	public:
 		void forEach(void(*function)(Ref&));
+		void forEach(void(*function)(Ref&, void*),void* userData);
 
 	private:
 		std::optional<RefIterator> find_recursive(RefIterator rec, const std::string& path);
@@ -106,7 +109,7 @@ namespace FD::Project::Internal {
 
 	private:
 		Ref makeRef(const std::string& path, const Directory& info) const;
-		Ref makeRef(const std::string& path, const Code& info) const;
+		Ref makeRef(const std::string& path, const Supported& info) const;
 		Ref makeRef(const std::string& path, const Unsupported& info) const;
 
 	};
@@ -114,17 +117,20 @@ namespace FD::Project::Internal {
 	template<typename T>
 	concept IsFileInfoElm =
 		std::same_as<T, FileList::Directory> ||
-		std::same_as<T, FileList::Code> ||
+		std::same_as<T, FileList::Supported> ||
 		std::same_as<T, FileList::Unsupported>;
 
 
 }
 
-namespace FD::Project::List {
+namespace FD::Project::FileList {
 	using Type = Internal::FileList::Type;
+	
 	using FileInfo = Internal::FileList::Ref;
+
 	using DirectoryInfo = Internal::FileList::Directory;
-	using CodeInfo = Internal::FileList::Code;
+	using SupportedInfo = Internal::FileList::Supported;
 	using UnsupportedInfo = Internal::FileList::Unsupported;
 
 }
+

@@ -29,29 +29,25 @@ FS::Calc::Run::~Run() noexcept {
 }
 
 void FS::Calc::Run::call() {
-	const FD::Project::CodeType type = fluidumFilesRead->getCurrentMainCodeType();
-	using enum FD::Project::CodeType;
+	const FD::Project::File::SupportedFileType type = fluidumFilesRead->getCurrentMainCodeType();
+	using enum FD::Project::File::SupportedFileType;
 
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
-	if (type == Empty) {
+	if (type == None) {
 		this->deleteThis();
-	}
-	else if (type == Error) {
-		FluidumScene_Log_Abort();
-		abort();
 	}
 
 	Scene::addScene<Utils::ResetData<FD::ImPlotWrite,FD::Calc::ArrayWrite>>();
 
 	if (type == Lua) {
-		GLog.add<FD::Log::Type::None>("Request add Lua::CalcScene(Async).");
+		FluidumScene_Log_RequestAddScene("Lua::Calc");
 		Scene::addAsyncScene<Lua::Calc>();
 	}
 	else if (type == Python) {
 		;
 	}
-	else if (type == AngelScript) {
+	else if (type == Cpp) {
 		;
 	}
 	else {

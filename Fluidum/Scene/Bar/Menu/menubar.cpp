@@ -334,23 +334,23 @@ void FS::MenuBar::viewGui() {
 }
 
 void FS::MenuBar::updateView() {
-	view.coding = sceneRead->isExist<TextEditor>();
-	view.tab = sceneRead->isExist<Coding::Tab>();
-	view.debug = sceneRead->isExist<Coding::Debug>();
+	view.coding = sceneRead->exist<TextEditor>();
+	view.tab = sceneRead->exist<Coding::Tab>();
+	view.debug = sceneRead->exist<Coding::Debug>();
 
-	view.flu = sceneRead->isExist<Flu::Node>();
+	view.flu = sceneRead->exist<Flu::Node>();
 
-	view.analysis = sceneRead->isExist<Analysis::Overview>();
-	view.plot = sceneRead->isExist<Analysis::Plot>();
-	view.function = sceneRead->isExist<Analysis::Function>();
+	view.analysis = sceneRead->exist<Analysis::Overview>();
+	view.plot = sceneRead->exist<Analysis::Plot>();
+	view.function = sceneRead->exist<Analysis::Function>();
 
-	view.genome = sceneRead->isExist<Genome::Overview>();
+	view.genome = sceneRead->exist<Genome::Overview>();
 
-	view.animation = sceneRead->isExist<Animation>();
+	view.animation = sceneRead->exist<Animation>();
 
-	view.project = sceneRead->isExist<Project>();
+	view.project = sceneRead->exist<Project::Explorer>();
 
-	view.console = sceneRead->isExist<Console>();
+	view.console = sceneRead->exist<Console>();
 }
 
 void FS::MenuBar::windowGui() {
@@ -520,12 +520,12 @@ void FS::MenuBar::itemAnimation() {
 void FS::MenuBar::itemProject() {
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
 		if (view.project) {
-			FluidumScene_Log_RequestDeleteScene("Project");
-			Scene::deleteScene<Project>();
+			FluidumScene_Log_RequestDeleteScene("Project::Explorer");
+			Scene::deleteScene<Project::Explorer>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Project");
-			Scene::addScene<Project>();
+			FluidumScene_Log_RequestAddScene("Project::Explorer");
+			Scene::addScene<Project::Explorer>();
 		}
 		ImGui::CloseCurrentPopup();
 	}

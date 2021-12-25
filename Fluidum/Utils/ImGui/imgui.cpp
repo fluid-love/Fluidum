@@ -1,4 +1,5 @@
 #include "imgui.h"
+#include "operator.h"
 
 #include <imgui_internal.h>
 #include <cmath>
@@ -11,8 +12,7 @@ void FU::ImGui::tooltip(T& counter, const char* desc) {
 	static std::chrono::system_clock::time_point timePoint = {};
 	static ImVec2 pos = {};
 
-	if (!::ImGui::IsItemHovered()) {
-		address = nullptr;
+	if (!::ImGui::IsMouseHoveringRect(::ImGui::GetItemRectMin(), ::ImGui::GetItemRectMax())) {
 		return;
 	}
 
@@ -24,7 +24,7 @@ void FU::ImGui::tooltip(T& counter, const char* desc) {
 	}
 
 
-	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timePoint).count() < 800)
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timePoint).count() < 730)
 		return;
 
 	ImAnime::PushStyleVar(counter, 0.07f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
@@ -39,7 +39,8 @@ void FU::ImGui::tooltip(T& counter, const char* desc) {
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoScrollbar |
 		ImGuiWindowFlags_NoSavedSettings |
-		ImGuiWindowFlags_Tooltip;
+		ImGuiWindowFlags_Tooltip |
+		ImGuiWindowFlags_AlwaysAutoResize;
 
 	::ImGui::SetNextWindowPos(pos);
 
@@ -54,6 +55,9 @@ void FU::ImGui::tooltip(T& counter, const char* desc) {
 }
 template void FU::ImGui::tooltip(ImCounter<ImAnimeTime>&, const char*);
 
+ImVec2 FU::ImGui::messagePos() {
+	return { ::ImGui::GetMousePos().x ,::ImGui::GetItemRectMax().y };
+}
 
 /***************************************************************************************************************************/
 /*

@@ -2,66 +2,53 @@
 
 #include "../../Common/common.h"
 #include "../../../TextEditor/include.h"
+#include "shared_info.h"
 
-namespace FS::Coding {
+namespace FS::Project::Add {
 
-	class New final : public Scene {
+	class NewFile final : public Scene {
 	public:
-		struct SharedInfo final {
-			std::string path{};
-
-			bool create = false;
-		};
-
-	public:
-		explicit New(
-			FD::Coding::TabWrite* const tabWrite,
+		explicit NewFile(
 			const FD::ProjectRead* const projectRead,
-			FD::ProjectWrite* const projectWrite,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
-			FD::FluidumFilesWrite* const fluidumFilesWrite,
 			const FD::GuiRead* const guiRead,
 			const FD::Log::FileRead* const fileRead,
-			std::shared_ptr<SharedInfo> sharedInfo = {}
+			std::shared_ptr<SharedInfo>& sharedInfo
 		);
 		void Constructor(
-			FD::Coding::TabWrite,
 			FD::ProjectRead,
-			FD::ProjectWrite,
-			FD::FluidumFilesRead,
-			FD::FluidumFilesWrite,
 			FD::GuiRead,
 			FD::Log::FileRead
 		);
 
-		~New() noexcept;
+		~NewFile() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(New)
+		FluidumUtils_Class_Delete_CopyMove(NewFile)
 
 	public:
 		virtual void call() override;
 
 	private://data
-		FD::Coding::TabWrite* const tabWrite;
 		const FD::ProjectRead* const projectRead;
-		FD::ProjectWrite* const projectWrite;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
-		FD::FluidumFilesWrite* const fluidumFilesWrite;
 
-		FD::Text::CodingNew text{};
+		FD::Text::ProjectNewFile text{};
 
 	private:
 		std::shared_ptr<SharedInfo> sharedInfo;
 
-		const std::string projectType;
+		struct {
+			std::string searchStr{};
 
-		std::string folderPath{};
-		std::string fileName{};
-		std::string extension{};
-		std::string fullPath{};
+			std::string folderPath{};
+			std::string fileName{};
+			std::string extension{};
+			std::string fullPath{};
+		}str;
+
+		bool only = false;
 
 		struct {
 			ImCounter<ImAnimeTime> counter{};
+			ImCounter<ImAnimeTime> form{};
 		}anime;
 
 		struct {
@@ -80,11 +67,16 @@ namespace FS::Coding {
 		}pos;
 
 		struct ButtonInfo final {
-			FDR::ImGuiImage image;
+			const FDR::ImGuiImage& image;
 			const char* label;
-			const char* title;
+			const std::string& title;
 			const char* description;
+			const char* extension;
+			FD::Log::File::Type type{};
+
+			bool hide = false;
 		};
+
 
 		const std::vector<ButtonInfo> recentButtons;
 		const std::vector<FDR::ImGuiImage> images;
@@ -92,12 +84,14 @@ namespace FS::Coding {
 		const std::vector<ButtonInfo> emptyFiles;
 
 		struct {
-			ButtonInfo* ptr = nullptr;
-			FD::Log::File::Type type = FD::Log::File::Type::None;
+			const ButtonInfo* ptr = nullptr;
 		}select;
 
 	private:
 		void title();
+
+	private:
+		void search();
 
 	private:
 		void recent();
@@ -109,16 +103,23 @@ namespace FS::Coding {
 
 	private:
 		void form();
+		void directoryPath();
+		void fileName();
+
+	private:
 		void bottom();
 		bool check();
 		void tryCreate();
-		void create();
+		bool create();
 
 	private:
-		bool button(const FDR::ImGuiImage& image, const char* label, const char* title, const char* description);
-
+		//return [left, right]
+		std::pair<bool, bool> button(
+			const ButtonInfo* const info,
+			const std::optional<float> width = std::nullopt
+		);
 	private:
 		std::vector<ButtonInfo> initRecentFileTypes(const std::vector<FD::Log::File::Type>& types);
-
+		void deleteThisScene();
 	};
 }

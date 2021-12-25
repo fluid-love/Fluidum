@@ -1,6 +1,6 @@
 #pragma once
 
-#include "container.h"
+#include "supported.h"
 
 namespace FD {
 	class ProjectWrite;
@@ -72,16 +72,6 @@ namespace FD::Project::Internal {
 	};
 }
 
-namespace FD::Project {
-	enum class CodeType : uint8_t {
-		Empty,      //mainコードが設定されていない
-		Error,      //error 識別子が下記以外
-		Python,
-		Lua,
-		AngelScript
-	};
-}
-
 namespace FD {
 
 	class LuaFilesWrite_Lock final {
@@ -91,10 +81,10 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(LuaFilesWrite_Lock)
 
 	public:
-		void closeAll();
+		void collapseAll();
 
 	public:
-		[[nodiscard]] std::vector<Project::List::FileInfo>* fileList();
+		[[nodiscard]] std::vector<Project::FileList::FileInfo>* fileList();
 
 	public:
 		[[nodiscard]] std::unique_lock<std::mutex> getLock();
@@ -142,7 +132,7 @@ namespace FD {
 		[[nodiscard]] std::string mainCodeFilePath() const;
 		[[nodiscard]] bool isMainCodeFileExist() const;
 
-		[[nodiscard]] Project::CodeType getCurrentMainCodeType() const;
+		[[nodiscard]] Project::File::SupportedFileType getCurrentMainCodeType() const;
 
 	};
 
@@ -159,22 +149,23 @@ namespace FD {
 
 	public:
 		template<Project::Internal::IsFileInfoElm T>
-		Project::List::FileInfo* addFile(const std::string& parent, const std::string& path, const T& info) {
+		Project::FileList::FileInfo* add(const std::string& parent, const std::string& path, const T& info) {
 			using namespace Project::Internal;
 			return ProjectFilesData::projectFiles.add(parent, path, info);
 		}
 
-		void changeName(const std::string& path, const std::string& newName);
+		//already exists(in the same directory) -> return false
+		bool tryChangeName(const std::string& path, const std::string& newName);
 
-		void eraseFile(const std::string& path);
+		void remove(const std::string& path);
 
 		void sync(const std::string& top);
 
 		//.open = false
-		void closeAll();
+		void collapseAll();
 
 	public:
-		[[nodiscard]] std::vector<Project::List::FileInfo>* fileList();
+		[[nodiscard]] std::vector<Project::FileList::FileInfo>* fileList();
 
 	public:
 		[[nodiscard]] std::unique_lock<std::mutex> getLock();
@@ -194,6 +185,32 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead)
 
 	public:
+		/*
+		return 1
+
+		parent -> child.txt
+			   |
+			   -> child2.txt
+			   |
+			   -> child_dir -> ...
+							|
+							-> ...
+		*/
+		[[nodiscard]] std::size_t numOfDirectories(const std::string& parent) const;
+
+		/*
+		return 2
+
+		parent -> child.txt
+			   |
+			   -> child2.txt
+			   |
+			   -> child_dir -> ...
+							|
+							-> ...
+		*/
+		[[nodiscard]] std::size_t numOfFiles(const std::string& parent) const;
+
 
 	};
 
@@ -210,26 +227,23 @@ namespace FD {
 
 	public:
 		template<Project::Internal::IsFileInfoElm T>
-		Project::List::FileInfo* addFile(const std::string& parent, const std::string& path, const T& info) {
+		Project::FileList::FileInfo* add(const std::string& parent, const std::string& path, const T& info) {
 			using namespace Project::Internal;
 			return UserFilesData::userFiles.add(parent, path, info);
 		}
 
 		//already exists(in the same directory) -> return false
-
 		bool tryChangeName(const std::string& path, const std::string& newName);
 
-		void eraseFile(const std::string& path);
+		void remove(const std::string& path);
 
-		[[nodiscard]] std::string makeTempName();
-
-		void closeAll();
+		void collapseAll();
 
 		//not exist -> .exist = false
 		void sync();
 
 	public:
-		[[nodiscard]] std::vector<Project::List::FileInfo>* fileList();
+		[[nodiscard]] std::vector<Project::FileList::FileInfo>* fileList();
 
 	public:
 		[[nodiscard]] std::unique_lock<std::mutex> getLock();
@@ -246,7 +260,9 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(UserFilesRead)
 
 	public:
-
+		//see ProjectFilesRead::numOfDirectories and ProjectFilesRead::numOfFiles
+		[[nodiscard]] std::size_t numOfVirtualFolder(const std::string& parent) const;
+		[[nodiscard]] std::size_t numOfFiles(const std::string& parent) const;
 
 	};
 

@@ -2,9 +2,11 @@
 #include "../../Limits/limits.h"
 #include "../Project/name.h"
 
-void FD::LuaFilesWrite_Lock::closeAll() {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void FD::LuaFilesWrite_Lock::collapseAll() {
 	using namespace Project::Internal;
-	LibraryFilesData::luaLibraries.forEach([](Project::List::FileInfo& info) {info.open = false; });
+	LibraryFilesData::luaLibraries.forEach([](Project::FileList::FileInfo& info) {info.open = false; });
 }
 
 void FD::LuaFilesWrite_Lock::save() const {
@@ -12,16 +14,14 @@ void FD::LuaFilesWrite_Lock::save() const {
 	LibraryFilesData::save.store(true);
 }
 
-std::vector<FD::Project::List::FileInfo>* FD::LuaFilesWrite_Lock::fileList() {
+std::vector<FD::Project::FileList::FileInfo>* FD::LuaFilesWrite_Lock::fileList() {
 	using namespace Project::Internal;
 	return LibraryFilesData::luaLibraries.get();
 }
 
 std::unique_lock<std::mutex> FD::LuaFilesWrite_Lock::getLock() {
 	using namespace Project::Internal;
-	FluidumUtils_Debug_BeginDisableAllWarning //VS C26115
-		return std::unique_lock<std::mutex>(LibraryFilesData::mtx);
-	FluidumUtils_Debug_EndDisableAllWarning
+	return std::unique_lock<std::mutex>(LibraryFilesData::mtx);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,24 +51,14 @@ bool FD::FluidumFilesRead::isMainCodeFileExist() const {
 	return !FluidumFilesData::mainCodeFilePath.empty();
 }
 
-FD::Project::CodeType FD::FluidumFilesRead::getCurrentMainCodeType() const {
+FD::Project::File::SupportedFileType FD::FluidumFilesRead::getCurrentMainCodeType() const {
 	using namespace Project::Internal;
 	std::lock_guard<std::mutex> lock(FluidumFilesData::mtx);
 
 	if (FluidumFilesData::mainCodeFilePath.empty())
-		return Project::CodeType::Empty;
+		return Project::File::SupportedFileType::None;
 
-	std::filesystem::path path = FluidumFilesData::mainCodeFilePath;
-	std::string extension = path.extension().string();
-
-	if (extension == ".py")
-		return Project::CodeType::Python;
-	else if (extension == ".lua")
-		return Project::CodeType::Lua;
-	else if (extension == ".as")
-		return Project::CodeType::AngelScript;
-
-	return Project::CodeType::Error;
+	return Project::File::getSupportedFileType(FluidumFilesData::mainCodeFilePath);
 }
 
 void FD::FluidumFilesWrite::save() const {
@@ -78,14 +68,22 @@ void FD::FluidumFilesWrite::save() const {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FD::ProjectFilesWrite_Lock::eraseFile(const std::string& path) {
+void FD::ProjectFilesWrite_Lock::remove(const std::string& path) {
 	using namespace Project::Internal;
 	ProjectFilesData::projectFiles.erase(path);
 }
 
-void FD::ProjectFilesWrite_Lock::changeName(const std::string& path, const std::string& newName) {
+bool FD::ProjectFilesWrite_Lock::tryChangeName(const std::string& path, const std::string& newName) {
 	using namespace Project::Internal;
+
+	const bool sameName = ProjectFilesData::projectFiles.sameName(path, newName);
+
+	if (sameName) {
+		return false;
+	}
+
 	ProjectFilesData::projectFiles.changePathAndName(path, newName);
+	return true;
 }
 
 void FD::ProjectFilesWrite_Lock::sync(const std::string& top) {
@@ -95,22 +93,24 @@ void FD::ProjectFilesWrite_Lock::sync(const std::string& top) {
 
 	auto* data = ProjectFilesData::projectFiles.get();
 
-	using Info = Project::List::FileInfo;
+	using Info = Project::FileList::FileInfo;
 
 	std::function<void(const std::string&)> func = [&](const std::string& parent) {
 
 		for (const auto& entry : std::filesystem::directory_iterator(parent)) {
-
+			const std::string name = entry.path().filename().string();
 			if (entry.is_directory()) {
-				if (entry.path().string() == Project::Internal::Name::FluidumHiddenFolder)
-					continue;
-				Project::List::DirectoryInfo dir{};
+				Project::FileList::DirectoryInfo dir{};
 				Info* elm = ProjectFilesData::projectFiles.add(parent, entry.path().string(), dir);
 				func(elm->path);
 			}
+			else if (Project::File::isFileFormatSupported(name)) {
+				Project::FileList::SupportedInfo supported{};
+				Info* elm = ProjectFilesData::projectFiles.add(parent, entry.path().string(), supported);
+			}
 			else {
-				Project::List::CodeInfo code{};
-				Info* elm = ProjectFilesData::projectFiles.add(parent, entry.path().string(), code);
+				Project::FileList::UnsupportedInfo unsupported{};
+				Info* elm = ProjectFilesData::projectFiles.add(parent, entry.path().string(), unsupported);
 			}
 
 		}
@@ -118,14 +118,21 @@ void FD::ProjectFilesWrite_Lock::sync(const std::string& top) {
 	};
 
 	for (const auto& entry : std::filesystem::directory_iterator(top)) {
+		const std::string name = entry.path().filename().string();
 		if (entry.is_directory()) {
-			Project::List::DirectoryInfo dir{};
+			if (name == Project::Internal::Name::FluidumHiddenFolder)
+				continue;
+			Project::FileList::DirectoryInfo dir{};
 			Info* elm = ProjectFilesData::projectFiles.add({}, entry.path().string(), dir);
 			func(elm->path);
 		}
+		else if (Project::File::isFileFormatSupported(name)) {
+			Project::FileList::SupportedInfo supported{};
+			Info* elm = ProjectFilesData::projectFiles.add({}, entry.path().string(), supported);
+		}
 		else {
-			Project::List::CodeInfo code{};
-			Info* elm = ProjectFilesData::projectFiles.add({}, entry.path().string(), code);
+			Project::FileList::UnsupportedInfo unsupported{};
+			Info* elm = ProjectFilesData::projectFiles.add({}, entry.path().string(), unsupported);
 		}
 	}
 }
@@ -137,9 +144,9 @@ void FD::ProjectFilesWrite_Lock::save() const {
 
 std::vector<std::string> FD::ProjectFilesWrite_Lock::findOpenPaths() const {
 	using namespace Project::Internal;
-	std::vector<Project::List::FileInfo>* data = ProjectFilesData::projectFiles.get();
+	std::vector<Project::FileList::FileInfo>* data = ProjectFilesData::projectFiles.get();
 
-	using Info = Project::List::FileInfo;
+	using Info = Project::FileList::FileInfo;
 
 	std::vector<std::string> openPaths{};
 	std::function<void(const Info* parent)> getOpenPaths = [&](const Info* parent) {
@@ -156,26 +163,52 @@ std::vector<std::string> FD::ProjectFilesWrite_Lock::findOpenPaths() const {
 	return openPaths;
 }
 
-void FD::ProjectFilesWrite_Lock::closeAll() {
+void FD::ProjectFilesWrite_Lock::collapseAll() {
 	using namespace Project::Internal;
-	ProjectFilesData::projectFiles.forEach([](Project::List::FileInfo& info) {info.open = false; });
+	ProjectFilesData::projectFiles.forEach([](Project::FileList::FileInfo& info) {info.open = false; });
 }
 
-std::vector<FD::Project::List::FileInfo>* FD::ProjectFilesWrite_Lock::fileList() {
+std::vector<FD::Project::FileList::FileInfo>* FD::ProjectFilesWrite_Lock::fileList() {
 	using namespace Project::Internal;
 	return ProjectFilesData::projectFiles.get();
 }
 
 std::unique_lock<std::mutex> FD::ProjectFilesWrite_Lock::getLock() {
 	using namespace Project::Internal;
-	FluidumUtils_Debug_BeginDisableAllWarning //VS C26115
-		return std::unique_lock<std::mutex>(ProjectFilesData::mtx);
-	FluidumUtils_Debug_EndDisableAllWarning
+	return std::unique_lock<std::mutex>(ProjectFilesData::mtx);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FD::UserFilesWrite_Lock::eraseFile(const std::string& path) {
+std::size_t FD::ProjectFilesRead::numOfDirectories(const std::string& parent) const {
+	using namespace Project::Internal;
+	std::size_t result = 0;
+	ProjectFilesData::projectFiles.forEach([](Project::FileList::FileInfo& info, void* data)
+		{
+			std::size_t* count = static_cast<std::size_t*>(data);
+			if (info.type == Project::FileList::Type::Directory)
+				(*count)++;
+		},
+		&result);
+	return result;
+}
+
+std::size_t FD::ProjectFilesRead::numOfFiles(const std::string& parent) const {
+	using namespace Project::Internal;
+	std::size_t result = 0;
+	ProjectFilesData::projectFiles.forEach([](Project::FileList::FileInfo& info, void* data)
+		{
+			std::size_t* count = static_cast<std::size_t*>(data);
+			if (info.type != Project::FileList::Type::Directory)
+				(*count)++;
+		},
+		&result);
+	return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void FD::UserFilesWrite_Lock::remove(const std::string& path) {
 	using namespace Project::Internal;
 	UserFilesData::userFiles.erase(path);
 }
@@ -194,28 +227,14 @@ bool FD::UserFilesWrite_Lock::tryChangeName(const std::string& path, const std::
 	return true;
 }
 
-std::string FD::UserFilesWrite_Lock::makeTempName() {
-	using namespace Project::Internal;
-
-	for (uint16_t i = 1; i < Project::Limits::UserFiles::DirectorySizeMax; i++) {
-		std::string ret = "NewVirtualFolder" + std::to_string(i);
-		if (!UserFilesData::userFiles.samePath(ret))
-			return ret;
-	}
-
-	return {};
-}
-
-std::vector<FD::Project::List::FileInfo>* FD::UserFilesWrite_Lock::fileList() {
+std::vector<FD::Project::FileList::FileInfo>* FD::UserFilesWrite_Lock::fileList() {
 	using namespace Project::Internal;
 	return UserFilesData::userFiles.get();
 }
 
 std::unique_lock<std::mutex> FD::UserFilesWrite_Lock::getLock() {
 	using namespace Project::Internal;
-	FluidumUtils_Debug_BeginDisableAllWarning //VS C26115
-		return std::unique_lock<std::mutex>(UserFilesData::mtx);
-	FluidumUtils_Debug_EndDisableAllWarning
+	return std::unique_lock<std::mutex>(UserFilesData::mtx);
 }
 
 void FD::UserFilesWrite_Lock::save() const {
@@ -223,9 +242,9 @@ void FD::UserFilesWrite_Lock::save() const {
 	UserFilesData::save.store(true);
 }
 
-void FD::UserFilesWrite_Lock::closeAll() {
+void FD::UserFilesWrite_Lock::collapseAll() {
 	using namespace Project::Internal;
-	UserFilesData::userFiles.forEach([](Project::List::FileInfo& info) {info.open = false; });
+	UserFilesData::userFiles.forEach([](Project::FileList::FileInfo& info) {info.open = false; });
 }
 
 void FD::UserFilesWrite_Lock::sync() {
@@ -233,14 +252,30 @@ void FD::UserFilesWrite_Lock::sync() {
 	UserFilesData::userFiles.sync();
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+std::size_t FD::UserFilesRead::numOfVirtualFolder(const std::string& parent) const {
+	using namespace Project::Internal;
+	std::size_t result = 0;
+	UserFilesData::userFiles.forEach([](Project::FileList::FileInfo& info, void* data)
+		{
+			std::size_t* count = static_cast<std::size_t*>(data);
+			if (info.type == Project::FileList::Type::Directory)
+				(*count)++;
+		},
+		&result);
+	return result;
+}
 
-
-
-
-
-
-
-
-
-
+std::size_t FD::UserFilesRead::numOfFiles(const std::string& parent) const {
+	using namespace Project::Internal;
+	std::size_t result = 0;
+	UserFilesData::userFiles.forEach([](Project::FileList::FileInfo& info, void* data)
+		{
+			std::size_t* count = static_cast<std::size_t*>(data);
+			if (info.type != Project::FileList::Type::Directory)
+				(*count)++;
+		},
+		&result);
+	return result;
+}

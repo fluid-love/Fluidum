@@ -118,7 +118,7 @@ void FS::Title::writeGuiData() {
 }
 
 void FS::Title::changeScene() {
-	if ((!isSelectProjectHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !sceneRead->isExist<Bar::NewProject>()) || !projectRead->isDefaultProject()) {
+	if ((!isSelectProjectHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !sceneRead->exist<Bar::NewProject>()) || !projectRead->isDefaultProject()) {
 		FluidumScene_Log_RequestDeleteScene("Title");
 		Scene::deleteScene<Title>();//delete this
 

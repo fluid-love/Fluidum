@@ -775,7 +775,7 @@ void setupImGui() {
 	ImFontConfig iconConfig2;
 	iconConfig2.MergeMode = true;
 	iconConfig2.PixelSnapH = true;
-	iconConfig2.GlyphOffset = { 6.0f, 1.0f };
+	iconConfig2.GlyphOffset = { 0.0f, 1.0f };
 	//iconConfig2.GlyphExtraSpacing = { 0.60f, -0.60f };
 
 	iconConfig2.OversampleH = 3;//FreeType -> ignore

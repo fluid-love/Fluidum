@@ -37,6 +37,10 @@
 #define FluidumScene_Log_Abort() \
 	GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__)
 
+#define FluidumScene_Log_SeriousError_ThrowException() \
+	std::string FluidumSceneLog_ = GLog.add<FD::Log::Type::Error>("Serious Error.", __FILE__);\
+	throw std::runtime_error(FluidumSceneLog_);
+
 #define FluidumScene_Log_InternalError() \
 	GLog.add<FD::Log::Type::Error>("Internal Error. File {}.", __FILE__)
 
