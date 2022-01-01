@@ -59,7 +59,7 @@ namespace FS::Project::Add {
 		}style;
 
 		struct {
-			ImVec2 folderPath{};
+			ImVec2 directoryPath{};
 			ImVec2 fileName{};
 			ImVec2 create{};
 		}pos;
@@ -78,7 +78,7 @@ namespace FS::Project::Add {
 
 
 		struct {
-			std::string folderPath{};
+			std::string directoryPath{};
 			std::string fileName{};
 			std::string extension{};
 			std::string fullPath{};
@@ -131,18 +131,5 @@ namespace FS::Project::Add {
 	private:
 		void close();
 
-	private:
-		struct Check final {
-			enum class ErrorType : uint8_t {
-				None,
-				EmptyFileName,
-				EmptyFolderPath,
-				AlreadyExist,
-				NotFound,
-				ForbiddenCharactor
-			};
-			static std::pair<ErrorType, std::string> checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension);
-		};
-		static int inputTextCallback(ImGuiInputTextCallbackData* data);
 	};
 }

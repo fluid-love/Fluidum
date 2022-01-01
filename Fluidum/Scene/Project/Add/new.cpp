@@ -1,4 +1,5 @@
 ﻿#include "new.h"
+#include "check_path.h"
 #include <imgui_internal.h>
 #include "../../Coding/TextEditor/texteditor.h"
 #include "select.h"
@@ -51,17 +52,11 @@ FS::Project::Add::NewFile::NewFile(
 
 	style.buttonSize = ImVec2(style.windowSize.x / 2.1f, style.windowSize.y * 0.09f);
 
-	if (!sharedInfo)
-		str.folderPath = projectRead->getProjectFolderPath() + "Src/";
-	else {
-		if (sharedInfo->path.empty())
-			str.folderPath = projectRead->getProjectFolderPath() + "Src/";
-		else
-			str.folderPath = sharedInfo->path;
-	}
+	assert(sharedInfo);
+	str.directoryPath = sharedInfo->path;
 
 	//capacity
-	str.folderPath.reserve(200);
+	str.directoryPath.reserve(200);
 	str.fileName.reserve(200);
 
 
@@ -299,13 +294,13 @@ void FS::Project::Add::NewFile::form() {
 
 void FS::Project::Add::NewFile::directoryPath() {
 	ImGui::BulletText(text.folderPath); ImGui::Spacing(); ImGui::SameLine();
-	
+
 	if (sharedInfo->project)
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
 
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.95f);
-	ImGui::InputText("##FolderPath", str.folderPath.data(), str.folderPath.capacity(), sharedInfo->project ? ImGuiInputTextFlags_ReadOnly : 0);
-	pos.folderPath = ImGui::GetItemRectMin();
+	ImGui::InputText("##FolderPath", str.directoryPath.data(), str.directoryPath.capacity(), sharedInfo->project ? ImGuiInputTextFlags_ReadOnly : 0);
+	pos.directoryPath = ImGui::GetItemRectMin();
 
 	if (sharedInfo->project)
 		ImGui::PopStyleVar();
@@ -379,6 +374,10 @@ void FS::Project::Add::NewFile::tryCreate() {
 	}
 
 	this->deleteThisScene();
+	if (!this->only) {
+		FluidumScene_Log_RequestDeleteScene("Project::Add::Select");
+		Scene::deleteScene<Select>();
+	}
 }
 
 bool FS::Project::Add::NewFile::create() {
@@ -410,83 +409,32 @@ bool FS::Project::Add::NewFile::create() {
 	return true;
 }
 
-namespace FS::Project::Add {
-
-	enum class ErrorType : uint8_t {
-		None,
-		EmptyFileName,
-		EmptyFolderPath,
-		AlreadyExist,
-		NotFound,
-		ForbiddenCharactor
-	};
-
-	std::pair<ErrorType, std::string> checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
-
-		if (folderPath.empty()) {
-			return { ErrorType::EmptyFolderPath,{} };
-		}
-
-		if (fileName.empty())
-			return { ErrorType::EmptyFileName,{} };
-
-		//folder
-		bool result = !std::filesystem::is_directory(folderPath);
-		if (result)
-			return { ErrorType::NotFound,{} };
-
-		std::string filePath = folderPath + fileName + extension;
-		result = std::filesystem::exists(filePath);
-		if (result)
-			return { ErrorType::AlreadyExist,filePath };
-
-		if (FU::File::containForbiddenCharactor(fileName))
-			return { ErrorType::ForbiddenCharactor,{} };
-
-		return { ErrorType::None,filePath };
-	}
-
-}
-
 bool FS::Project::Add::NewFile::check() {
-	std::string folderPath = this->str.folderPath.data();
+	std::string directoryPath = this->str.directoryPath.data();
 	std::string fileName = this->str.fileName.data();
 	std::string extension = this->str.extension.data();
 
+	const std::string name = fileName + extension;
 
-	FU::File::tryPushSlash(folderPath);
-	auto [err, path] = checkFile(folderPath, fileName, extension);
+	CheckPath::Info info{
+		.project = sharedInfo->project,
+		.directory = false,
+		.parent = directoryPath,
+		.name = name,
+		.pos_name = pos.fileName,
+		.pos_path = pos.directoryPath,
+		.pos_create = pos.create,
+	};
 
-	//no error -> return true
-	if (err == ErrorType::None) {
-		this->str.fullPath = std::move(path);
+	FluidumScene_Log_CallSceneConstructor("Project::Add::CheckPath");
+	Scene::callConstructor<CheckPath>(info);
+
+	if (info.noerror) {
+		str.fullPath = std::move(info.fullPath);
 		return true;
 	}
 
 	//error
-	FluidumScene_Log_RequestAddScene("Utils::Message");
-	if (err == ErrorType::EmptyFolderPath) {
-		GLog.add<FD::Log::Type::None>("Error EmptyFolderPath.");
-		Scene::addScene<Utils::Message>(text.error_fill, pos.folderPath);
-	}
-	else if (err == ErrorType::EmptyFileName) {
-		GLog.add<FD::Log::Type::None>("Error EmptyFileName.");
-		Scene::addScene<Utils::Message>(text.error_fill, pos.fileName);
-	}
-	else if (err == ErrorType::NotFound) {
-		GLog.add<FD::Log::Type::None>("Error NotFoundDirectory. Typed directory is {}.", folderPath);
-		Scene::addScene<Utils::Message>(text.error_directoryNotFound, pos.fileName);
-	}
-	else if (err == ErrorType::AlreadyExist) {
-		GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", fileName, path);
-		Scene::addScene<Utils::Message>(text.error_fileAlreadyExist, pos.create);
-	}
-	else if (err == ErrorType::ForbiddenCharactor) {
-		GLog.add<FD::Log::Type::None>("Error ForbiddenCharactor. Typed filename is {}({}).", fileName, path);
-		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, pos.fileName);
-	}
-
-
 	return false;
 }
 

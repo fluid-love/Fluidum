@@ -1,5 +1,9 @@
 #include "descriptorpool.h"
 
+FVK::Internal::DescriptorPool::DescriptorPool(ManagerPassKey, const Data::DescriptorPoolData& data, const Parameter& parameter) {
+	this->create(data, parameter);
+}
+
 void FVK::Internal::DescriptorPool::create(const Data::DescriptorPoolData& data, const Parameter& parameter) {
 
 	auto result = data.get<FvkType::LogicalDevice>().device.createDescriptorPool(*parameter.pInfo);
@@ -12,16 +16,12 @@ void FVK::Internal::DescriptorPool::create(const Data::DescriptorPoolData& data,
 	this->info.device = data.get<FvkType::LogicalDevice>().device;
 }
 
-FVK::Internal::DescriptorPool::DescriptorPool(ManagerPassKey, const Data::DescriptorPoolData& data, const Parameter& parameter) {
-	this->create(data, parameter);
-}
-
 const FVK::Internal::Data::DescriptorPoolInfo& FVK::Internal::DescriptorPool::get() const noexcept {
 	assert(this->info.descriptorPool);
 	return this->info;
 }
 
-void FVK::Internal::DescriptorPool::destroy() {
+void FVK::Internal::DescriptorPool::destroy() noexcept {
 	assert(this->info.descriptorPool);
 	this->info.device.destroyDescriptorPool(this->info.descriptorPool);
 }

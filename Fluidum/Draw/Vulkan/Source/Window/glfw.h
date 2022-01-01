@@ -6,16 +6,28 @@ namespace FVK::Internal {
 
 	class Glfw final {
 	public:
-		Glfw(ManagerPassKey);
+		/*
+		Exception:
+			FailedToCreate
+			NotSupported   -> Vulkan is not supported.
+		*/
+		//strong
+		Glfw(ManagerPassKey);//initialize GLFW
 		~Glfw() = default;
 		FluidumUtils_Class_Default_CopyMove(Glfw)
 
 	public:
-		void destroy();
+		//no-throw
+		void destroy() const noexcept;
 
 	private:
-		void init();
+		/*
+		Exception:
+			FailedToCreate
+			NotSupported   -> Vulkan is not supported.
+		*/
+		//strong
+		void init() const;
 	};
-
 
 }

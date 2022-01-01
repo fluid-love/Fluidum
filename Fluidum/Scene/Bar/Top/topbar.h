@@ -12,8 +12,8 @@ namespace FS {
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
-			const FD::TopBarRead* const topBarRead,
-			FD::TopBarWrite* const topBarWrite,
+			const FD::ToolBarRead* const toolBarRead,
+			FD::ToolBarWrite* const toolBarWrite,
 			const FD::ImGuiWindowRead* const imguiWindowRead,
 			const FD::LayoutRead* const layoutRead
 		);
@@ -23,8 +23,8 @@ namespace FS {
 			FD::GuiRead,
 			FD::GuiWrite,
 			FD::SceneRead,
-			FD::TopBarRead,
-			FD::TopBarWrite,
+			FD::ToolBarRead,
+			FD::ToolBarWrite,
 			FD::ImGuiWindowRead,
 			FD::LayoutRead
 		);
@@ -40,8 +40,8 @@ namespace FS {
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
 		const FD::SceneRead* const sceneRead;
-		const FD::TopBarRead* const topBarRead;
-		FD::TopBarWrite* const topBarWrite;
+		const FD::ToolBarRead* const toolBarRead;
+		FD::ToolBarWrite* const toolBarWrite;
 		const FD::ImGuiWindowRead* const imguiWindowRead;
 		const FD::LayoutRead* const layoutRead;
 

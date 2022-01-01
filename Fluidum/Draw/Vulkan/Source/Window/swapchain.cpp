@@ -10,13 +10,20 @@ void FVK::Internal::Swapchain::create(const Data::SwapchainData& data, Parameter
 
 	auto result = data.get<FvkType::LogicalDevice>().device.createSwapchainKHR(*parameter.pInfo, nullptr);
 
-	if (result.result != vk::Result::eSuccess)
-		Exception::throwFailedToCreate("Failed to create Swapchain");
+	if (result.result != vk::Result::eSuccess) {
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to create Swapchain({}).", vk::to_string(result.result));
+		Exception::throwFailedToCreate();
+	}
+
 	this->info.swapchain = result.value;
 	
+	//no-throw
 	this->setInfo(parameter);
 
+	//no-throw
 	this->info.device = data.get<FvkType::LogicalDevice>().device;
+	static_assert(noexcept(info.device = data.get<FvkType::LogicalDevice>().device));
+
 }
 
 const FVK::Internal::Data::SwapchainInfo& FVK::Internal::Swapchain::get() const noexcept {
@@ -24,15 +31,20 @@ const FVK::Internal::Data::SwapchainInfo& FVK::Internal::Swapchain::get() const 
 	return this->info;
 }
 
-void FVK::Internal::Swapchain::destroy() {
+void FVK::Internal::Swapchain::destroy() noexcept {
 	assert(info.swapchain);
 	this->info.device.destroySwapchainKHR(info.swapchain);
+	static_assert(noexcept(info.device.destroySwapchainKHR(info.swapchain)));
 }
 
 void FVK::Internal::Swapchain::setInfo(const Parameter& parameter) noexcept {
-	info.format = parameter.pInfo->imageFormat;
-	info.extent = parameter.pInfo->imageExtent;
-	info.minImageCount = parameter.pInfo->minImageCount;
+	this->info.format = parameter.pInfo->imageFormat;
+	this->info.extent = parameter.pInfo->imageExtent;
+	this->info.minImageCount = parameter.pInfo->minImageCount;
+
+	static_assert(noexcept(info.format = parameter.pInfo->imageFormat));
+	static_assert(noexcept(info.extent = parameter.pInfo->imageExtent));
+	static_assert(noexcept(info.minImageCount = parameter.pInfo->minImageCount));
 }
 
 bool FVK::Internal::Swapchain::isSurfaceFormatSupport(const vk::Format format, const vk::ColorSpaceKHR colorSpace, const std::vector<vk::SurfaceFormatKHR>& availableFormats) {

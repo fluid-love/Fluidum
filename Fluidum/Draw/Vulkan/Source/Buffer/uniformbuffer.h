@@ -18,20 +18,36 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			NotSupported
+		*/
+		//strong
 		explicit UniformBuffer(ManagerPassKey, const Data::UniformBufferData& data, const Parameter& parameter);
-		~UniformBuffer() = default;
+		
+		~UniformBuffer() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(UniformBuffer)
 
 	private:
+		/*
+		Exception:
+			NotSupported
+		*/
+		//strong
 		void create(const Data::UniformBufferData& data, const Parameter& parameter);
+	
 	public:
-		const Data::UniformBufferInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+	
+	public:
+		//no-throw
+		[[nodiscard]] const Data::UniformBufferInfo& get() const noexcept;
 
 	private:
-		Data::UniformBufferInfo info = {};
-	};
+		Data::UniformBufferInfo info{};
 
+	};
 
 }
 

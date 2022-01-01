@@ -1,6 +1,7 @@
 #pragma once
 
 #include <exception>
+#include <string>
 
 namespace FS::Exception {
 
@@ -21,7 +22,6 @@ namespace FS::Exception {
 	namespace Internal {
 		template<typename Scene>
 		[[noreturn]] void throwAlreadyAdded() {
-			//typeid()::name VisualStudio‚È‚ç‚¿‚á‚ñ‚ÆƒNƒ‰ƒX–¼‚ğ•¶š—ñ‚Æ‚µ‚Äo—Í‚Å‚«‚é.
 			std::string message = typeid(Scene).name();
 			message += " is already added.";
 			throw AlreadyAdded(message);

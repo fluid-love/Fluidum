@@ -19,3 +19,5 @@
 #include "Text/guitext.h"
 #include "Cursor/cursor.h"
 #include "MessageBox/messagebox.h"
+#include "Type/type.h"
+#include "Exception/exception.h"

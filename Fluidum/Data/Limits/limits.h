@@ -10,18 +10,17 @@ namespace FD::Project::Limits {
 		constexpr inline uint16_t FileSizeMax = 500;
 	}
 
-	namespace ProjectFiles {
-		//num of directories
-		constexpr inline uint16_t DirectorySizeMax = 500;
-		constexpr inline uint16_t FileSizeMax = 500;
-	}
-
 }
 
 namespace FD::Coding::Limits {
 	//1 charactor 1byte
 	constexpr inline uint32_t FileSizeMax = 500000;
 
+}
+
+namespace FD::Coding::Tab::Limits {
+	constexpr inline uint8_t FileSizeMax = 100;
+	constexpr inline uint8_t DisplaySizeMax = 10;
 }
 
 namespace FD::Plot::Limits {
@@ -33,8 +32,6 @@ namespace FD::Plot::Limits {
 		static constexpr uint8_t PlotMax = 20;
 		static constexpr uint8_t FigureMax = 20;
 	};
-
-
 
 }
 

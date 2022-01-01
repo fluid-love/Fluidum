@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Gui/text.h"
-#include "Gui/color.h"
+#include "Gui/Style/color.h"
+#include "Gui/Style/var.h"
 #include "Gui/layout.h"
-#include "Gui/topbar.h"
+#include "Gui/tool.h"
 
 #include "Scene/scene.h"
 #include "Scene/window.h"

@@ -8,30 +8,36 @@ namespace FS::Project {
 	class Explorer final : public Scene {
 	public:
 		explicit Explorer(
+			const FD::Style::ColorRead* const colorRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			FD::LuaFilesWrite_Lock* const luaFilesWrite,
 			FD::FluidumFilesWrite* const fluidumFilesWrite,
 			const FD::FluidumFilesRead* const fluidumFilesRead,
 			FD::ProjectFilesWrite_Lock* const projectFilesWrite,
-			const FD::ProjectFilesRead* const projectFilesRead,
+			const FD::ProjectFilesRead_Lock* const projectFilesRead,
 			FD::UserFilesWrite_Lock* const userFilesWrite,
-			const FD::UserFilesRead* const userFilesRead,
+			const FD::UserFilesRead_Lock* const userFilesRead,
 			const FD::SceneRead* const sceneRead,
-			FD::Coding::TabWrite* const tabWrite
+			FD::Coding::TabWrite* const tabWrite,
+			const FD::Coding::TabRead* const tabRead,
+			FD::ToolBarWrite* const toolBarWrite
 		);
 		void Constructor(
+			FD::Style::ColorRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
 			FD::LuaFilesWrite_Lock,
 			FD::FluidumFilesWrite,
 			FD::FluidumFilesRead,
 			FD::ProjectFilesWrite_Lock,
-			FD::ProjectFilesRead,
+			FD::ProjectFilesRead_Lock,
 			FD::UserFilesWrite_Lock,
-			FD::UserFilesRead,
+			FD::UserFilesRead_Lock,
 			FD::SceneRead,
-			FD::Coding::TabWrite
+			FD::Coding::TabWrite,
+			FD::Coding::TabRead,
+			FD::ToolBarWrite
 		);
 
 		~Explorer() noexcept;
@@ -42,17 +48,20 @@ namespace FS::Project {
 		virtual void call() override;
 
 	private:
+		const FD::Style::ColorRead* const colorRead;
 		FD::ProjectWrite* const projectWrite;
 		FD::LuaFilesWrite_Lock* const luaFilesWrite;
 		FD::FluidumFilesWrite* const fluidumFilesWrite;
 		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::ProjectRead* const projectRead;
 		FD::ProjectFilesWrite_Lock* const projectFilesWrite;
-		const FD::ProjectFilesRead* const projectFilesRead;
+		const FD::ProjectFilesRead_Lock* const projectFilesRead;
 		FD::UserFilesWrite_Lock* const userFilesWrite;
-		const FD::UserFilesRead* const userFilesRead;
+		const FD::UserFilesRead_Lock* const userFilesRead;
 		const FD::SceneRead* const sceneRead;
 		FD::Coding::TabWrite* const tabWrite;
+		const FD::Coding::TabRead* const tabRead;
+		FD::ToolBarWrite* const toolBarWrite;
 
 		FD::Text::Project text{};
 
@@ -92,7 +101,8 @@ namespace FS::Project {
 		enum class PopupType : uint8_t {
 			Top,
 			Dir,
-			Supported
+			Supported,
+			Unsupported,
 		};
 
 		struct {
@@ -105,7 +115,10 @@ namespace FS::Project {
 			static constexpr const char* Dir = "DirPopup";
 
 			bool supported = false;
-			static constexpr const char* Supported = "SupportedPopup";
+			static constexpr const char* Supported = "SupPopup";
+
+			bool unsupported = false;
+			static constexpr const char* Unsupported = "UnsupPopup";
 
 			static constexpr const char* ChangeName = "ChangeNamePopup";
 
@@ -132,9 +145,10 @@ namespace FS::Project {
 			ImCounter<ImAnimeTime> displayCode{};
 		}anime;
 
-		bool windowFlag = false;
+		bool windowFlag = true;
 	private:
 		void closeWindow();
+		void toolBar();
 
 	private:
 		void topBar();
@@ -164,9 +178,11 @@ namespace FS::Project {
 		void catchAdd();
 		void removeDirectory();
 		void removeFile();
+		void releaseFile();
 		void displayCode();
 		void flipOpen();
 		void collapseAll();
+		void rename();
 
 	private:
 		void openPopup();
@@ -174,12 +190,13 @@ namespace FS::Project {
 		void topPopup();
 		void directoryPopup();
 		void supportedPopup();
+		void unsupportedPopup();
 
 		void popup_add();
 
 		void changeNamePopup();
 		void tryChangeName();
-		[[nodiscard]] bool checkChangeName();
+		[[nodiscard]] std::pair<bool, std::string> checkChangeName();
 
 	private:
 		void syncProjectFiles();

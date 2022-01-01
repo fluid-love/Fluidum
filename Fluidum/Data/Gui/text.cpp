@@ -18,6 +18,7 @@ namespace FD::Internal::Text {
 		BarExit,
 		ProjectNewFile,
 		ProjectDirectory,
+		ProjectCheckPath,
 		ProjectSelect,
 		CodingTab,
 		Console,
@@ -61,6 +62,9 @@ namespace FD::Internal::Text {
 		}
 		else if constexpr (T == ProjectDirectory) {
 			path += "ProjectDirectory";
+		}
+		else if constexpr (T == ProjectCheckPath) {
+			path += "ProjectCheckPath";
 		}
 		else if constexpr (T == ProjectSelect) {
 			path += "ProjectSelect";
@@ -624,18 +628,6 @@ FD::Internal::Text::ProjectNewFile::ProjectNewFile() {
 	this->emptyCpp_description = data;
 
 	std::getline(ifs, data);
-	this->error_fill = data;
-
-	std::getline(ifs, data);
-	this->error_directoryNotFound = data;
-
-	std::getline(ifs, data);
-	this->error_fileAlreadyExist = data;
-
-	std::getline(ifs, data);
-	this->error_forbiddenCharactor = data;
-
-	std::getline(ifs, data);
 	this->error_unexpected = data;
 }
 
@@ -668,10 +660,31 @@ FD::Internal::Text::ProjectDirectory::ProjectDirectory() {
 	this->create = data;
 
 	std::getline(ifs, data);
+	this->error_unexpected = data;
+}
+
+FD::Internal::Text::ProjectCheckPath::ProjectCheckPath() {
+
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::ProjectCheckPath>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open ProjectCheckPath.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
 	this->error_fill = data;
 
 	std::getline(ifs, data);
-	this->error_alreadyExist = data;
+	this->error_parentDoesNotExist = data;
+
+	std::getline(ifs, data);
+	this->error_directoryAlreadyExist = data;
+
+	std::getline(ifs, data);
+	this->error_fileAlreadyExist = data;
 
 	std::getline(ifs, data);
 	this->error_forbiddenCharactor = data;
@@ -899,7 +912,7 @@ FD::Internal::Text::TextEditor::TextEditor() {
 	this->file = data;
 
 	std::getline(ifs, data);
-	this->save = data;
+	this->save = ICON_FA_SAVE "  " + data;
 
 	std::getline(ifs, data);
 	this->saveAs = data;
@@ -917,28 +930,28 @@ FD::Internal::Text::TextEditor::TextEditor() {
 	this->edit = data;
 
 	std::getline(ifs, data);
-	this->readOnly = data;
+	this->readOnly = ICON_FA_BOOK_OPEN "  " + data;
 
 	std::getline(ifs, data);
-	this->undo = data;
+	this->undo = ICON_FA_UNDO "  " + data;
 
 	std::getline(ifs, data);
-	this->redo = data;
+	this->redo = ICON_FA_REDO "  " + data;
 
 	std::getline(ifs, data);
-	this->copy = data;
+	this->copy = ICON_FA_CLIPBOARD "  " + data;
 
 	std::getline(ifs, data);
-	this->cut = data;
+	this->cut = ICON_FA_CUT "  " + data;
 
 	std::getline(ifs, data);
-	this->del = data;
+	this->del = ICON_FA_ERASER "  " + data;
 
 	std::getline(ifs, data);
-	this->paste = data;
+	this->paste = ICON_FA_CLIPBOARD_LIST "  " + data;
 
 	std::getline(ifs, data);
-	this->selectAll = data;
+	this->selectAll = ICON_FA_GRIP_LINES "  " + data;
 
 	std::getline(ifs, data);
 	this->theme = data;
@@ -1033,10 +1046,10 @@ FD::Internal::Text::Project::Project() {
 	this->directory_icon = ICON_FA_FOLDER "  " + data;
 
 	std::getline(ifs, data);
-	this->rename = data;
+	this->rename = ICON_FA_PEN "  " + data;
 
 	std::getline(ifs, data);
-	this->displayCode = data;
+	this->displayCode = ICON_MD_CODE "  " + data;
 
 	std::getline(ifs, data);
 	this->error_openFile = data;
@@ -1114,6 +1127,9 @@ FD::Internal::Text::Project::Project() {
 	this->confirm_removeFile = Internal::Text::newLine(ifs, data);
 
 	std::getline(ifs, data);
+	this->confirm_releaseFile_notSaved = Internal::Text::newLine(ifs, data);
+
+	std::getline(ifs, data);
 	this->error_sameName = data;
 
 	std::getline(ifs, data);
@@ -1151,6 +1167,12 @@ FD::Internal::Text::Project::Project() {
 
 	std::getline(ifs, data);
 	this->error_changeName = data;
+
+	std::getline(ifs, data);
+	this->error_tab = data;
+
+	std::getline(ifs, data);
+	this->error_fileDoesNotExist = Internal::Text::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->error_unexpected = data;

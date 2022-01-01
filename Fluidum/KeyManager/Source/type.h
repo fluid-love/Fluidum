@@ -1,46 +1,47 @@
 ﻿#pragma once
 
-#include "../../../../Utils/include.h"
+#include "../../Utils/include.h"
 #include "../../../External/magic_enum/include/magic_enum.hpp"
 
 namespace FKM {
 
+	//Assign a serial number to all items.
 	class OrderKey final {
 	public:
-		using Type = uint32_t;
+		using KeyType = UIF32;
 	public:
 		OrderKey() = default;
-		OrderKey(const Type val) noexcept;
+		OrderKey(const KeyType val) noexcept;
 		FluidumUtils_Class_Default_CopyMove(OrderKey)
 	private:
-		Type index = 0;
+		KeyType index = 0;
 	public:
-		[[nodiscard]] operator Type()const noexcept;
-		void operator=(const Type val)noexcept;
+		[[nodiscard]] operator KeyType()const noexcept;
+		void operator=(const KeyType val)noexcept;
 		[[nodiscard]] bool operator==(const OrderKey key)const noexcept;
 
 		void operator++(int) noexcept;
 
-		[[nodiscard]] bool operator==(Type val)const noexcept;
+		[[nodiscard]] bool operator==(KeyType val)const noexcept;
 
 	};
 
-
+	//Each item type is assigned a serial number.
 	class IndexKey final {
 	public:
-		using Type = uint32_t;
+		using KeyType = UIF32;
 	public:
 		IndexKey() = default;
-		IndexKey(const Type val) noexcept;
+		IndexKey(const KeyType val) noexcept;
 		FluidumUtils_Class_Default_CopyMove(IndexKey)
 	private:
-		Type order = 0;
+		KeyType order = 0;
 	public:
-		[[nodiscard]] operator Type()const noexcept;
-		void operator=(const Type val)noexcept;
+		[[nodiscard]] operator KeyType()const noexcept;
+		void operator=(const KeyType val)noexcept;
 		[[nodiscard]] bool operator==(const IndexKey key)const noexcept;
 		[[nodiscard]] bool operator!=(const IndexKey key)const noexcept;
-		[[nodiscard]] bool operator==(const Type val)const noexcept;
+		[[nodiscard]] bool operator==(const KeyType val)const noexcept;
 
 	};
 
@@ -52,7 +53,7 @@ namespace FKM {
 
 	using StrKey = std::string;
 
-	enum class SelectKey : uint16_t {
+	enum class SelectKey : UIF8 {
 		Front,
 		Back
 	};
@@ -61,7 +62,7 @@ namespace FKM {
 
 }
 
-namespace FKM::Internal {
+namespace FKM::Concept {
 
 	template<typename T>
 	concept IsIndexKey = std::same_as<T, IndexKey>;
@@ -79,6 +80,7 @@ namespace FKM::Internal {
 	template<typename T>
 	concept IsSelectKey = std::same_as<T, SelectKey>;
 
+
 	template<typename T>
 	concept IsKeyType = IsIndexKey<T> || IsOrderKey<T> || IsStrKey<T> || IsCharKey<T> || IsSelectKey<T>;
 
@@ -87,8 +89,8 @@ namespace FKM::Internal {
 //callbacks
 namespace FKM {
 
-	using AddCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey::Type, const std::vector<OrderKey>&);
-	using EraseCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey::Type);
+	using AddCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey, const std::vector<OrderKey>&);
+	using EraseCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey);
 
 }
 

@@ -11,7 +11,7 @@
 #include <map>
 #include <functional>
 
-//‘O•ûéŒ¾
+//forward
 namespace FD {
 	template<typename... T>
 	class Manager;
@@ -23,11 +23,7 @@ namespace FD::Internal {
 		template<typename...T>
 		friend class ::FD::Manager;
 
-#ifdef FluidumData_DebugMode
-	public:
-#else
 	private:
-#endif
 		constexpr ManagerPassKey() = default;
 		ManagerPassKey(const ManagerPassKey&) = delete;
 		ManagerPassKey& operator=(const ManagerPassKey&) = delete;

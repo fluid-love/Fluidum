@@ -2,14 +2,6 @@
 
 #include "../Manager/manager.h"
 
-//Key
-namespace FVK {
-	using Internal::Key::StringKeyType;
-	using Internal::Key::CharKeyType;
-	using Internal::Key::IndexKeyType;
-	using Internal::Key::SelectKeyType;
-}
-
 //Window
 namespace FVK {
 	using WindowParameter = Internal::Window::NormalParameter;

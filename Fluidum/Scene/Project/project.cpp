@@ -5,32 +5,23 @@
 #include <imgui_internal.h>
 #include "Add/select.h"
 
-namespace FS {
-	class Index final {
-	public:
-		static std::size_t get() {
-			if (i == std::numeric_limits<std::size_t>::max())
-				throw std::runtime_error("The limit has been exceeded.");
-			return ++i;
-		}
-	private:
-		static inline std::size_t i = 0;
-	};
-}
-
 FS::Project::Explorer::Explorer(
+	const FD::Style::ColorRead* const colorRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
 	FD::LuaFilesWrite_Lock* const luaFilesWrite,
 	FD::FluidumFilesWrite* const fluidumFilesWrite,
 	const FD::FluidumFilesRead* const fluidumFilesRead,
 	FD::ProjectFilesWrite_Lock* const projectFilesWrite,
-	const FD::ProjectFilesRead* const projectFilesRead,
+	const FD::ProjectFilesRead_Lock* const projectFilesRead,
 	FD::UserFilesWrite_Lock* const userFilesWrite,
-	const FD::UserFilesRead* const userFilesRead,
+	const FD::UserFilesRead_Lock* const userFilesRead,
 	const FD::SceneRead* const sceneRead,
-	FD::Coding::TabWrite* const tabWrite
+	FD::Coding::TabWrite* const tabWrite,
+	const FD::Coding::TabRead* const tabRead,
+	FD::ToolBarWrite* const toolBarWrite
 ) :
+	colorRead(colorRead),
 	projectWrite(projectWrite),
 	projectRead(projectRead),
 	luaFilesWrite(luaFilesWrite),
@@ -41,21 +32,42 @@ FS::Project::Explorer::Explorer(
 	userFilesWrite(userFilesWrite),
 	userFilesRead(userFilesRead),
 	sceneRead(sceneRead),
-	tabWrite(tabWrite)
+	tabWrite(tabWrite),
+	tabRead(tabRead),
+	toolBarWrite(toolBarWrite)
 {
-	FluidumScene_Log_Constructor("Project");
+	FluidumScene_Log_Constructor("Project::Explorer");
 
 	style.topBarHeight = ImGui::CalcTextSize(ICON_MD_FOLDER_OPEN).x + 2.0f;
 
-	//sync project files
+	//sync
 	projectFilesWrite->sync(projectRead->getProjectFolderPath());
-	auto d = projectFilesWrite->fileList();
+	userFilesWrite->sync();
 
 	changeName.name.reserve(100);
+
+
+	//toolbar
+	toolBarWrite->add(&Explorer::toolBar, this, text.explorer.operator const char* ());
 }
 
 FS::Project::Explorer::~Explorer() noexcept {
-	FluidumScene_Log_Destructor_("Project");
+	try {
+		toolBarWrite->remove<Explorer>();
+		FluidumScene_Log_Destructor("Project::Explorer");
+	}
+	catch (const std::exception& e) {
+		try {
+			std::cerr << e.what() << std::endl;
+			abort();
+		}
+		catch (...) {
+			abort();
+		}
+	}
+	catch (...) {
+		abort();
+	}
 }
 
 void FS::Project::Explorer::call() {
@@ -81,14 +93,53 @@ void FS::Project::Explorer::call() {
 
 	this->openPopup();
 	this->catchAdd();
+	this->closeWindow();
 }
 
 void FS::Project::Explorer::closeWindow() {
-	if (!this->windowFlag)
+	if (this->windowFlag)
 		return;
 
-	FluidumScene_Log_RequestDeleteScene("Project");
+	FluidumScene_Log_RequestDeleteScene("Project::Explorer");
 	Scene::deleteScene<Explorer>();
+}
+
+void FS::Project::Explorer::toolBar() {
+	//lock
+	auto userFilesLock = userFilesWrite->getLock();
+	auto projectFilesLock = projectFilesWrite->getLock();
+	auto luaLock = luaFilesWrite->getLock();
+
+	//sync
+	if (select.tab == TabType::Fluidum) {//dummy
+		colorRead->pushButtonDisabled();
+		ImGui::Button(ICON_MD_SYNC);
+		colorRead->popButtonDisabled();
+	}
+	else {
+		if (ImGui::Button(ICON_MD_SYNC)) {
+			//pos.sync = ImGui::GetItemRectMin();
+			//this->syncProjectFiles();
+		}
+	}
+	FU::ImGui::tooltip(anime.sync, text.sync);
+
+	ImGui::SameLine();
+
+	//Collapse all directories and files
+	if (ImGui::Button(ICON_FA_FOLDER_MINUS)) {
+		this->collapseAll();
+	}
+	FU::ImGui::tooltip(anime.collapseAll, text.collapseAll);
+
+	ImGui::SameLine();
+	ImGui::Spacing();
+	ImGui::SameLine();
+
+	//show
+	this->showCodeButton();
+	FU::ImGui::tooltip(anime.displayCode, text.displayCode);
+
 }
 
 void FS::Project::Explorer::topBar() {
@@ -97,14 +148,9 @@ void FS::Project::Explorer::topBar() {
 
 	//sync
 	if (select.tab == TabType::Fluidum) {//dummy
-		//const int32_t count = FU::ImGui::pushStyleColor<ImGuiCol_Button, ImGuiCol_ButtonHovered, ImGuiCol_ButtonActive>({ 0.05f,0.05f,0.05f,1.0f });
-		ImVec4 colDisabled = ImGui::GetStyle().Colors[ImGuiCol_Button];
-		ImGui::PushStyleColor(ImGuiCol_Button, colDisabled);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colDisabled);
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, colDisabled);
-		ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,0.3f });
+		colorRead->pushButtonDisabled();
 		ImGui::Button(ICON_MD_SYNC);
-		ImGui::PopStyleColor(4);
+		colorRead->popButtonDisabled();
 	}
 	else {
 		if (ImGui::Button(ICON_MD_SYNC)) {
@@ -117,7 +163,7 @@ void FS::Project::Explorer::topBar() {
 	ImGui::SameLine();
 
 	//Collapse all folders and files
-	if (ImGui::Button(ICON_MD_FOLDER)) {
+	if (ImGui::Button(ICON_FA_FOLDER_MINUS)) {
 		this->collapseAll();
 	}
 	FU::ImGui::tooltip(anime.collapseAll, text.collapseAll);
@@ -138,13 +184,9 @@ void FS::Project::Explorer::showCodeButton() {
 	auto* current = select.current();
 
 	if (!current || current->type != FD::Project::FileList::Type::Supported) {
-		ImVec4 colDisabled = ImGui::GetStyle().Colors[ImGuiCol_Button];
-		ImGui::PushStyleColor(ImGuiCol_Button, colDisabled);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colDisabled);
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, colDisabled);
-		ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,0.3f });
+		colorRead->pushButtonDisabled();
 		ImGui::Button(ICON_MD_CODE);
-		ImGui::PopStyleColor(4);
+		colorRead->popButtonDisabled();
 		return;
 	}
 
@@ -319,6 +361,8 @@ std::pair<ImVec2, ImVec2> FS::Project::Explorer::projectFilesTree(std::vector<FD
 			popup.dir = true;
 		else if (info->type == FD::Project::FileList::Type::Supported)
 			popup.supported = true;
+		else if (info->type == FD::Project::FileList::Type::Unsupported)
+			popup.unsupported = true;
 	}
 
 	//double click
@@ -434,6 +478,8 @@ std::pair<ImVec2, ImVec2> FS::Project::Explorer::userFilesTree(std::vector<FD::P
 			popup.dir = true;
 		else if (info->type == FD::Project::FileList::Type::Supported)
 			popup.supported = true;
+		else if (info->type == FD::Project::FileList::Type::Unsupported)
+			popup.unsupported = true;
 	}
 
 	//double click
@@ -484,7 +530,7 @@ void FS::Project::Explorer::addDirectory() {
 
 	const bool project = (select.tab == TabType::Project);
 	const bool popupTop = (popup.type == PopupType::Top);
-	const std::size_t maxSizeLimit = project ? FD::Project::Limits::ProjectFiles::DirectorySizeMax : FD::Project::Limits::UserFiles::DirectorySizeMax;
+	const std::size_t maxSizeLimit = project ? std::numeric_limits<uint32_t>::max() : FD::Project::Limits::UserFiles::DirectorySizeMax;
 
 	FD::Project::FileList::DirectoryInfo dir{};
 
@@ -497,7 +543,7 @@ void FS::Project::Explorer::addDirectory() {
 		if (project)
 			parent = projectRead->getProjectFolderPath();
 		else
-			parent = "Fluidum:/";
+			parent = userFilesRead->rootDirectory();
 	}
 	else {
 		parent = select.current()->path;
@@ -515,11 +561,19 @@ void FS::Project::Explorer::addDirectory() {
 
 	//make temp name
 	{
-		for (std::size_t i = 1; i <= FD::Project::Limits::ProjectFiles::DirectorySizeMax; i++) {
+		for (std::size_t i = 1; i <= maxSizeLimit; i++) {
 			tempName = "NewFolder" + std::to_string(i);
-			if (!std::filesystem::exists(parent + tempName)) {
-				path = parent + tempName;
-				break;
+			if (project) {
+				if (!std::filesystem::exists(parent + tempName + '/')) {
+					path = parent + tempName;
+					break;
+				}
+			}
+			else {
+				if (!userFilesRead->exist(parent + tempName + '/')) {
+					path = parent + tempName;
+					break;
+				}
 			}
 		}
 	}
@@ -551,7 +605,7 @@ void FS::Project::Explorer::addDirectory() {
 	changeName.popup = true;
 }
 
-void FS::Project::Explorer::addFile() {
+void FS::Project::Explorer::add() {
 	assert(!add.info);
 
 	const bool project = (select.tab == TabType::Project);
@@ -582,6 +636,9 @@ void FS::Project::Explorer::addSelect() {
 	if (project) {
 		info.path = popupTop ? projectRead->getProjectFolderPath() : select.current()->path;
 	}
+	else {
+		info.path = projectRead->getSrcFolderPath();
+	}
 	info.project = project;
 
 	add.info = std::make_shared<Add::SharedInfo>(std::move(info));
@@ -592,9 +649,7 @@ void FS::Project::Explorer::addSelect() {
 }
 
 void FS::Project::Explorer::addFileQuick() {
-	assert(select.tab != TabType::Fluidum);
-
-	const bool project = (select.tab == TabType::Project);
+	assert(select.tab != TabType::User);
 
 	FD::Project::FileList::UnsupportedInfo unsupported{};
 
@@ -612,17 +667,9 @@ void FS::Project::Explorer::addFileQuick() {
 	}
 
 	//limit
-	if (project) {
-		if (projectFilesRead->numOfFiles(parent) >= FD::Project::Limits::ProjectFiles::FileSizeMax) {
-			FU::MB::error(text.error_maxSize);
-			return;
-		}
-	}
-	else {
-		if (userFilesRead->numOfFiles(parent) >= FD::Project::Limits::UserFiles::FileSizeMax) {
-			FU::MB::error(text.error_maxSize);
-			return;
-		}
+	if (userFilesRead->numOfFiles(parent) >= FD::Project::Limits::UserFiles::FileSizeMax) {
+		FU::MB::error(text.error_maxSize);
+		return;
 	}
 
 
@@ -648,10 +695,7 @@ void FS::Project::Explorer::addFileQuick() {
 		select.current()->open = true;
 	changeName.tempName = tempName;
 
-	if (project)
-		select.projectFiles = projectFilesWrite->add(popupTop ? std::string{} : parent, path, unsupported);
-	else
-		select.userFiles = userFilesWrite->add(popupTop ? std::string{} : parent, path, unsupported);
+	select.projectFiles = projectFilesWrite->add(popupTop ? std::string{} : parent, path, unsupported);
 
 	changeName.name = std::move(tempName);
 	changeName.popup = true;
@@ -677,6 +721,9 @@ void FS::Project::Explorer::catchAdd() {
 	const bool popupTop = (popup.type == PopupType::Top);
 
 	const std::string parent = popupTop ? std::string{} : select.current()->path;
+
+	if (!popupTop)
+		select.current()->open = true;
 
 	//add file
 	if (add.info->type == Add::SharedInfo::Type::File) {
@@ -704,6 +751,29 @@ void FS::Project::Explorer::catchAdd() {
 		else
 			select.userFiles = userFilesWrite->add(parent, add.info->path, info);
 	}
+
+	//open file
+	else if (add.info->type == Add::SharedInfo::Type::Open) {
+		assert(!project);
+		if (FD::Project::File::isFileFormatSupported(add.info->path)) {
+			FD::Project::FileList::SupportedInfo info{};
+			select.userFiles = userFilesWrite->add(parent, add.info->path, info);
+		}
+		else {
+			FD::Project::FileList::UnsupportedInfo info{};
+			select.userFiles = userFilesWrite->add(parent, add.info->path, info);
+		}
+	}
+
+	else {
+		FluidumScene_Log_SeriousError_ThrowException();
+	}
+
+	//save
+	if (project)
+		projectFilesWrite->save();
+	else
+		userFilesWrite->save();
 
 	add.info.reset();
 	add.popup = false;
@@ -753,28 +823,54 @@ void FS::Project::Explorer::removeDirectory() {
 void FS::Project::Explorer::removeFile() {
 	assert(select.tab != TabType::Fluidum);
 
-	const bool project = (select.tab != TabType::Project);
+	const bool project = (select.tab == TabType::Project);
+	const std::string& path = select.current()->path;
+
+	const bool tab = tabRead->exist(path);
+	bool exist;
+
+	//file does not exists
+	{
+		try {
+			exist = std::filesystem::exists(path);
+		}
+		catch (const std::filesystem::filesystem_error&) {
+			FU::MB::error(text.error_removeFile);
+			return;
+		}
+	}
+
+	//already removed
+	if (!exist) {
+		FU::MB::information(text.error_fileDoesNotExist);
+		if (project)
+			projectFilesWrite->remove(path);
+		else
+			userFilesWrite->remove(path);
+		return;
+	}
 
 	//confirm
 	{
-		int32_t result;
-		if (project) {
-			result = FU::MB::ok_cancel(text.confirm_removeFile);
-		}
-		else {
-			result = FU::MB::ok_cancel(text.confirm_releaseFile);
-		}
+		const int32_t result = FU::MB::ok_cancel(text.confirm_removeFile);
+
 		assert(result == 0 || result == 1);
 		if (result == 1) {//cancel
 			return;
 		}
 	}
 
-	if (project) {
-		if (!std::filesystem::remove(select.projectFiles->path)) {
+	//remove
+	{
+		std::error_code errorCode{};
+		const bool remove = std::filesystem::remove(select.projectFiles->path, errorCode);
+		if (!remove || errorCode) {
 			FU::MB::error(text.error_removeFile);
 			return;
 		}
+	}
+
+	if (project) {
 		projectFilesWrite->remove(select.projectFiles->path);
 		projectFilesWrite->save();
 		select.projectFiles = nullptr;
@@ -785,16 +881,83 @@ void FS::Project::Explorer::removeFile() {
 		select.userFiles = nullptr;
 	}
 
+	if (tab) {
+		tabWrite->remove(path);
+		tabWrite->save();
+	}
+
+}
+
+void FS::Project::Explorer::releaseFile() {
+	assert(select.tab != TabType::Fluidum);
+
+	const bool project = (select.tab == TabType::Project);
+	const std::string& path = select.current()->path;
+
+	const bool tab = tabRead->exist(path);
+	bool exist;
+
+	//file does not exists
+	{
+		try {
+			exist = std::filesystem::exists(path);
+		}
+		catch (const std::filesystem::filesystem_error&) {
+			FU::MB::error(text.error_releaseFile);
+			return;
+		}
+	}
+
+	if (tab) {
+		if (!tabRead->isTextSaved(path)) {
+			auto clicked = FU::MB::yes_no(text.confirm_releaseFile_notSaved);
+			if (clicked == 0) { //yes -> save
+				//save text
+				tabWrite->saveText(path);
+			}
+			else { //no -> discard
+				;
+			}
+		}
+
+		tabWrite->remove(path);
+		tabWrite->save();
+	}
+
+	if (project) {
+		if (exist) {
+			select.current()->exist = false;
+		}
+		else {
+			projectFilesWrite->remove(path);
+		}
+		projectFilesWrite->save();
+		select.projectFiles = nullptr;
+	}
+	else {
+		userFilesWrite->remove(select.userFiles->path);
+		userFilesWrite->save();
+		select.userFiles = nullptr;
+	}
 }
 
 void FS::Project::Explorer::displayCode() {
 	const std::string& path = select.current()->path;
+	const bool project = (select.tab == TabType::Project);
 
 	uintmax_t fileSize;
 
 	try {
 		if (!std::filesystem::exists(path)) {
 			FU::MB::error(text.error_existFile);
+
+			if (project) {
+				projectFilesWrite->remove(path);
+			}
+			else {
+				select.userFiles->exist = false;
+			}
+
 			return;
 		}
 		fileSize = std::filesystem::file_size(path);
@@ -812,21 +975,22 @@ void FS::Project::Explorer::displayCode() {
 	}
 
 	try {
-		tabWrite->addFile(path);
+		tabWrite->add(path);
 	}
 	catch (const FD::Coding::TabWrite::Exception val) {//exist
 		using enum FD::Coding::TabWrite::Exception;
 		if (val == AlreadyExist)
-			return;
+			;
 		else if (val == NotFound) {
 			FU::MB::error(text.error_existFile);
-			return;
 		}
 		else if (val == LimitFileSizeMax) {
 			FU::MB::error(text.error_tabFileSize);
-			return;
 		}
+		return;
 	}
+
+	tabWrite->save();
 
 	if (!sceneRead->exist<TextEditor>()) {
 		tabWrite->addDisplayFile(path);
@@ -867,6 +1031,16 @@ void FS::Project::Explorer::collapseAll() {
 	}
 }
 
+void FS::Project::Explorer::rename() {
+
+	const bool project = (select.tab == TabType::Project);
+
+	changeName.tempName = select.current()->name;
+
+	changeName.name = changeName.tempName;
+	changeName.popup = true;
+}
+
 void FS::Project::Explorer::openPopup() {
 	//delay(one frame)
 	this->changeNamePopup();
@@ -886,6 +1060,11 @@ void FS::Project::Explorer::openPopup() {
 		popup.type = PopupType::Supported;
 		popup.supported = false;
 	}
+	else if (popup.unsupported) {
+		ImGui::OpenPopup(popup.Unsupported);
+		popup.type = PopupType::Unsupported;
+		popup.unsupported = false;
+	}
 	else if (changeName.popup) {
 		ImGui::OpenPopup(popup.ChangeName);
 		changeName.popup = false;
@@ -895,6 +1074,7 @@ void FS::Project::Explorer::openPopup() {
 	this->topPopup();
 	this->directoryPopup();
 	this->supportedPopup();
+	this->unsupportedPopup();
 
 	//change name
 	this->tryChangeName();
@@ -937,6 +1117,9 @@ void FS::Project::Explorer::directoryPopup() {
 
 	ImGui::Separator();
 
+	if (ImGui::Selectable(text.rename))
+		this->rename();
+
 	if (select.tab == TabType::Project) {
 		if (ImGui::Selectable(text.remove))
 			this->removeDirectory();
@@ -958,6 +1141,29 @@ void FS::Project::Explorer::supportedPopup() {
 
 	ImGui::Separator();
 
+	if (ImGui::Selectable(text.rename))
+		this->rename();
+
+	if (select.tab == TabType::Project) {
+		if (ImGui::Selectable(text.remove))
+			this->removeDirectory();
+	}
+	else if (select.tab == TabType::User) {
+		if (ImGui::Selectable(text.release))
+			this->removeDirectory();
+	}
+
+
+	ImGui::EndPopup();
+}
+
+void FS::Project::Explorer::unsupportedPopup() {
+	if (!ImGui::BeginPopup(popup.Unsupported))
+		return;
+
+	if (ImGui::Selectable(text.rename))
+		this->rename();
+
 	if (select.tab == TabType::Project) {
 		if (ImGui::Selectable(text.remove))
 			this->removeDirectory();
@@ -977,8 +1183,8 @@ void FS::Project::Explorer::popup_add() {
 		this->addSelect();
 
 	if (ImGui::Selectable(text.add_selectNewFile))
-		this->addFile();
-	
+		this->add();
+
 	ImGui::Separator();
 
 	if (select.tab == TabType::User) {
@@ -988,10 +1194,10 @@ void FS::Project::Explorer::popup_add() {
 	else if (select.tab == TabType::Project) {
 		if (ImGui::Selectable(text.directory_icon))
 			this->addDirectory();
-	}
 
-	if (ImGui::Selectable(text.file_icon))
-		this->addFileQuick();
+		if (ImGui::Selectable(text.file_icon))
+			this->addFileQuick();
+	}
 
 
 
@@ -1009,13 +1215,16 @@ void FS::Project::Explorer::changeNamePopup() {
 
 	ImGui::PushStyleColor(ImGuiCol_PopupBg, { 0.02f,0.02f,0.02f,1.0f });
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4());
-	ImGui::PushStyleColor(ImGuiCol_Border, { 0.3f,0.3f,0.3f,1.0f });
 	ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, { 0.1f,0.2f,0.96f,0.7f });
 
 	if (ImGui::BeginPopup(popup.ChangeName)) {
+
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4());
 		ImGui::SetWindowFontScale(1.05f);
 		ImGui::Spacing(); ImGui::SameLine();
+		ImGui::SetNextItemWidth(changeName.size.x);
 		ImGui::InputText("##ChangeName", changeName.name.data(), changeName.name.capacity(), ImGuiInputTextFlags_AutoSelectAll);
+		ImGui::PopStyleColor();
 
 		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
 			ImGui::CloseCurrentPopup();
@@ -1025,7 +1234,7 @@ void FS::Project::Explorer::changeNamePopup() {
 
 
 	ImGui::PopStyleVar(3);
-	ImGui::PopStyleColor(4);
+	ImGui::PopStyleColor(3);
 }
 
 void FS::Project::Explorer::tryChangeName() {
@@ -1034,7 +1243,9 @@ void FS::Project::Explorer::tryChangeName() {
 
 	const bool project = (select.tab == TabType::Project);
 
-	if (!this->checkChangeName()) {
+	const auto [check, name] = this->checkChangeName();
+
+	if (!check) {
 		//save
 		if (project)
 			projectFilesWrite->save();
@@ -1048,8 +1259,6 @@ void FS::Project::Explorer::tryChangeName() {
 		changeName.once = false;
 		return;
 	}
-
-	const std::string name = changeName.name.c_str();
 
 	//reset
 	changeName.name = std::string();
@@ -1084,6 +1293,20 @@ void FS::Project::Explorer::tryChangeName() {
 
 
 	const std::string newPath = FU::File::directory(path_) + name;
+
+	if (project) {
+		if (std::filesystem::exists(newPath)) {
+			FU::MB::error(text.error_sameName);
+			return;
+		}
+	}
+	else {
+		if (userFilesRead->exist(newPath)) {
+			FU::MB::error(text.error_sameName);
+			return;
+		}
+	}
+
 	try {
 		std::filesystem::rename(path, newPath);
 	}
@@ -1112,21 +1335,35 @@ void FS::Project::Explorer::tryChangeName() {
 		userFilesWrite->save();
 }
 
-bool FS::Project::Explorer::checkChangeName() {
-	const std::string name = changeName.name.c_str();
+std::pair<bool, std::string> FS::Project::Explorer::checkChangeName() {
+	const bool project = (select.tab == TabType::Project);
+
+	std::string name = changeName.name.c_str();
 
 	if (name.empty()) {
 		FU::MB::error(text.error_emptyName);
-		return false;
+		return { false , {} };
 	}
 
-	//e.x. Windows / | > < ...
-	if (FU::File::containForbiddenCharactor(name)) {
-		FU::MB::error(text.error_forbiddenCharactor);
-		return false;
+	if (project) {
+		if (FU::File::containForbiddenCharactor(name)) {
+			FU::MB::error(text.error_forbiddenCharactor);
+			return { false , {} };
+		}
+	}
+	else {
+		if (userFilesRead->containForbiddenCharactor(name)) {
+			FU::MB::error(text.error_forbiddenCharactor);
+			return { false , {} };
+		}
 	}
 
-	return true;
+	if (project)
+		name = FU::File::finalName(name);
+	else
+		name = userFilesRead->finalName(name);
+
+	return { true , name };
 }
 
 void FS::Project::Explorer::syncProjectFiles() {

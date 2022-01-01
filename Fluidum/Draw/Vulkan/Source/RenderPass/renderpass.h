@@ -26,17 +26,34 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		explicit RenderPass(ManagerPassKey, const Data::RenderPassData& data, const Parameter& parameter);
-		~RenderPass() = default;
+
+		~RenderPass() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(RenderPass)
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::RenderPassData& data, const Parameter& parameter);
+
 	public:
-		const Data::RenderPassInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		//no-throw
+		[[nodiscard]] const Data::RenderPassInfo& get() const noexcept;
 
 	private:
-		Data::RenderPassInfo info = {};
+		Data::RenderPassInfo info{};
 
 	};
 

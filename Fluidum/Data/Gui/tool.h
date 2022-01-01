@@ -4,8 +4,8 @@
 
 //forward
 namespace FD {
-	class TopBarWrite;
-	class TopBarRead;
+	class ToolBarWrite;
+	class ToolBarRead;
 }
 
 namespace FD {
@@ -20,20 +20,20 @@ namespace FD {
 			static inline std::vector<Info> funcs{};
 			static inline std::vector<uint16_t> indices{};
 		private:
-			friend class ::FD::TopBarWrite;
-			friend class ::FD::TopBarRead;
+			friend class ::FD::ToolBarWrite;
+			friend class ::FD::ToolBarRead;
 		};
 	}
 	namespace TopBar {
 		using Internal::Info;
 	}
 
-	//[[Caution]] single thread
-	class TopBarWrite final {
+	//single thread
+	class ToolBarWrite final {
 	public:
-		TopBarWrite(Internal::PassKey) {}
-		~TopBarWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(TopBarWrite)
+		ToolBarWrite(Internal::PassKey) {}
+		~ToolBarWrite() = default;
+		FluidumUtils_Class_Delete_CopyMove(ToolBarWrite)
 
 	public:
 		template<typename Scene>
@@ -54,7 +54,7 @@ namespace FD {
 		}
 
 		template<typename Scene>
-		void erase() {
+		void remove() {
 			using namespace TopBar::Internal;
 			const auto itr = this->find<Scene>();
 			const auto distance = std::distance(Data::funcs.begin(), itr);
@@ -113,15 +113,15 @@ namespace FD {
 
 	};
 
-	class TopBarRead final {
+	class ToolBarRead final {
 	public:
-		TopBarRead(Internal::PassKey) {}
-		~TopBarRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(TopBarRead)
+		ToolBarRead(Internal::PassKey) {}
+		~ToolBarRead() = default;
+		FluidumUtils_Class_Delete_CopyMove(ToolBarRead)
 
 	public:
-		_NODISCARD const std::vector<TopBar::Info>* getInfo() const noexcept;
-		_NODISCARD const std::vector<uint16_t>* getIndices() const noexcept;
+		[[nodiscard]] const std::vector<TopBar::Info>* getInfo() const noexcept;
+		[[nodiscard]] const std::vector<uint16_t>* getIndices() const noexcept;
 		void call(const uint16_t index) const;
 
 	};

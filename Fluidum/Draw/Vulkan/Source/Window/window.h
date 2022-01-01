@@ -15,8 +15,7 @@ namespace FVK::Internal {
 		template<WindowMode>
 		struct Parameter {
 		private:
-			Parameter() = default;
-			~Parameter() = default;
+			FluidumUtils_Class_Delete_ConDestructor(Parameter)
 		};
 
 		template<>
@@ -43,6 +42,11 @@ namespace FVK::Internal {
 		using MaximizedParameter = Parameter<WindowMode::Maximized>;
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		template<typename T>
 		explicit Window(ManagerPassKey, const Data::WindowData& data, const T& parameter) {
 			this->create(data, parameter);
@@ -52,35 +56,52 @@ namespace FVK::Internal {
 		FluidumUtils_Class_Default_CopyMove(Window)
 
 	public:
-		_NODISCARD const Data::WindowInfo& get() const noexcept;
+		[[nodiscard]] const Data::WindowInfo& get() const noexcept;
 
-		void destroy();
+	public:
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		[[nodiscard]] std::pair<I32, I32> windowSize() const noexcept;
 
 	private:
 
-		//位置・サイズを指定して通常作成
+		//Create window by specifying the position and size.
 		void create(const Data::WindowData& data, const NormalParameter& parameter);
 
-		//フルスクリーン									
+		//Fullscreen									
 		void create(const Data::WindowData& data, const FullScreenParameter& parameter);
 
 		//GLFW_MAXIMIZED									
 		void create(const Data::WindowData& data, const MaximizedParameter& parameter);
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void checkGlfwCreateWindow() const;
-		void setGlfw();
+
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//basic
+		void setResizedCallback();
 
 		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
-	public:
-		_NODISCARD std::pair<int32_t, int32_t> getWindowSize() const;
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
+		GLFWvidmode* getVideoMode() const;
 
 	private:
-		Data::WindowInfo info = {};
-
+		Data::WindowInfo info{};
 	};
-
-
 
 }

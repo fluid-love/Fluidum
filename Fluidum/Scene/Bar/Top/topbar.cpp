@@ -19,8 +19,8 @@ FS::TopBar::TopBar(
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::SceneRead* const sceneRead,
-	const FD::TopBarRead* const topBarRead,
-	FD::TopBarWrite* const topBarWrite,
+	const FD::ToolBarRead* const toolBarRead,
+	FD::ToolBarWrite* const toolBarWrite,
 	const FD::ImGuiWindowRead* const imguiWindowRead,
 	const FD::LayoutRead* const layoutRead
 ) :
@@ -29,8 +29,8 @@ FS::TopBar::TopBar(
 	guiRead(guiRead),
 	guiWrite(guiWrite),
 	sceneRead(sceneRead),
-	topBarRead(topBarRead),
-	topBarWrite(topBarWrite),
+	toolBarRead(toolBarRead),
+	toolBarWrite(toolBarWrite),
 	imguiWindowRead(imguiWindowRead),
 	layoutRead(layoutRead)
 {
@@ -226,7 +226,7 @@ void FS::TopBar::scene() {
 	ImGui::Begin("SceneFunc", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBackground);
 
 	//combo button color
-	if (!topBarRead->getIndices()->empty())
+	if (!toolBarRead->getIndices()->empty())
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.01f, 0.01f, 1.0f));
 	else
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.02f, 0.02f, 1.0f));
@@ -241,7 +241,7 @@ void FS::TopBar::scene() {
 }
 
 void FS::TopBar::combo() {
-	const auto* info = topBarRead->getInfo();
+	const auto* info = toolBarRead->getInfo();
 
 	if (!ImGui::BeginCombo("##SceneFuncCombo", "##None", ImGuiComboFlags_NoPreview))
 		return;
@@ -250,9 +250,9 @@ void FS::TopBar::combo() {
 
 		if (ImGui::Selectable(x.sceneName.c_str(), x.select)) {
 			if (!x.select)
-				topBarWrite->lock(x.code);
+				toolBarWrite->lock(x.code);
 			else
-				topBarWrite->unlock(x.code);
+				toolBarWrite->unlock(x.code);
 		}
 	}
 
@@ -263,11 +263,11 @@ void FS::TopBar::combo() {
 
 void FS::TopBar::func() {
 
-	const auto* indices = topBarRead->getIndices();
+	const auto* indices = toolBarRead->getIndices();
 
 	for (auto x : *indices) {
 		ImGui::Spacing(); ImGui::SameLine();
-		topBarRead->call(x);
+		toolBarRead->call(x);
 		ImGui::SameLine(); ImGui::Spacing();
 		this->separator(ImGui::GetItemRectMax().x + 10.0f);
 		ImGui::SameLine();

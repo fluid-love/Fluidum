@@ -1,11 +1,16 @@
 #include "manager.h"
 
 FVK::Internal::Manager::Manager::Manager() {
-	GMessenger.add<FU::Log::Type::None>("Construct FluidumVK Manager.");
+	GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, "Construct FluidumVK Manager.");
 }
 
 FVK::Internal::Manager::Manager::~Manager() {
-	GMessenger.add<FU::Log::Type::None>("Destruct FluidumVK Manager.");
+	try {
+		GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, "Destruct FluidumVK Manager.");
+	}
+	catch (...) {
+		;
+	}
 }
 
 namespace FVK::Internal {

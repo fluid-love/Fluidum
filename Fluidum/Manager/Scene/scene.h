@@ -4,13 +4,13 @@
 
 namespace FS {
 
-	//同じデータ型で二回作成したらエラー
-	//グローバル変数として使わないことDataの初期化に影響がでる
-	//mainloopを行うスレッドでコンストラクタを呼ぶこと．
+	//Error if the same data type is created twice.
+	//Don't use them as global variables. The initialization may fail.
+	//Calling the constructor in the main thread.
 	template<typename ...Data>
 	class FluidumScene final {
 	public:
-		//GManagerの初期化　DataのコンストラクタのためにGlobal変数の初期化を待つ
+
 		FluidumScene() {
 			if (!Internal::GManager<Data...>)
 				Internal::GManager<Data...> = std::make_unique<Internal::Manager<Data...>>();
@@ -44,12 +44,11 @@ namespace FS {
 			Internal::GManager<Data...>->call();
 		}
 
-		//dataを取得
 		template<typename T>
 		auto getData() {
 			using DataTuple = std::tuple<Data...>;
-			static_assert(FU::Tuple::isSameTypeContain<DataTuple, T>(), "FS::FluidumScene::getData 取得しようとしたデータの型がありません．");
-			constexpr auto index = FU::Tuple::getSameTypeIndex<DataTuple, T>();
+			static_assert(FU::Tuple::IsSameTypeContain<DataTuple, T>());
+			constexpr auto index = FU::Tuple::GetSameTypeIndex<DataTuple, T>();
 			return Internal::GManager<Data...>->data.get<index>();
 		}
 

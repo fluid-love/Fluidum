@@ -6,7 +6,6 @@ namespace FVK::Internal {
 
 	class GraphicsPipeline final {
 	public:
-
 		struct PipelineShaderStageCreateInfo : public vk::PipelineShaderStageCreateInfo {
 		public:
 			using vk::PipelineShaderStageCreateInfo::flags;
@@ -56,25 +55,55 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//basic(see below)
+		/*
+		There is a possibility that the private variable of parameter will be changed.
+		However, these variables are safe 
+		because they cannot be accessed by anyone other than this class.
+		*/
 		explicit GraphicsPipeline(ManagerPassKey, const Data::GraphicsPipelineData& data, Parameter& parameter);
+
 		~GraphicsPipeline() = default;
 		FluidumUtils_Class_Default_CopyMove(GraphicsPipeline)
 
 	private:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//basic
 		void create(const Data::GraphicsPipelineData& data, Parameter& parameter);
+
 	public:
-		const Data::GraphicsPipelineInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		//no-throw
+		[[nodiscard]] const Data::GraphicsPipelineInfo& get() const noexcept;
 
 	private:
+		/*
+		Exception:
+			std::exception
+		*/	
+		//basic
 		void fillParameter(const Data::GraphicsPipelineData& data, Parameter& parameter);
 
 	private:
 		//FVK::PipelineShaderStageCreateInfoÇ∆vk::PipelineShaderStageCreateInfoÇÃÉÅÉÇÉäí≤êÆóp
-		std::vector<vk::PipelineShaderStageCreateInfo> align = {};
-		const vk::PipelineShaderStageCreateInfo* alignPipelineShaderStageCreateInfo(const Parameter& parameter,const std::size_t size);
+		std::vector<vk::PipelineShaderStageCreateInfo> align{};
+		[[nodiscard]] const vk::PipelineShaderStageCreateInfo* alignPipelineShaderStageCreateInfo(const Parameter& parameter, const std::size_t size);
 
 	private:
-		Data::GraphicsPipelineInfo info = {};
+		Data::GraphicsPipelineInfo info{};
+
 	};
+
 }

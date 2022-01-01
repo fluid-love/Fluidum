@@ -1,9 +1,7 @@
 ﻿#pragma once
 
+#include "../Type/type.h"
 #include <type_traits>
-#include <iostream>
-#include <array>
-#include <vector>
 
 namespace FU::Concept {
 
@@ -213,7 +211,7 @@ namespace FU::Concept {
 
 	//&&...
 	template<typename T1, typename ...T2>
-	_NODISCARD constexpr bool isSame() {
+	[[nodiscard]] constexpr bool isSame() {
 		return (std::same_as<T1, T2> && ...);
 	}
 
@@ -226,6 +224,7 @@ namespace FU::Concept {
 
 	template <typename T>
 	constexpr bool DelayAssert_T = false;
-	template <auto T>
+	template <auto N>
 	constexpr bool DelayAssert_N = false;
+
 }

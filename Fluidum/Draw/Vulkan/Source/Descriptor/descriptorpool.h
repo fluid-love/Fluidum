@@ -6,7 +6,6 @@ namespace FVK::Internal {
 
 	class DescriptorPool final {
 	public:
-
 		struct CreateInfo : public vk::DescriptorPoolCreateInfo {
 		public:
 			using vk::DescriptorPoolCreateInfo::flags;
@@ -25,16 +24,22 @@ namespace FVK::Internal {
 
 	public:
 		explicit DescriptorPool(ManagerPassKey, const Data::DescriptorPoolData& data, const Parameter& parameter);
-		~DescriptorPool() = default;
+
+		~DescriptorPool() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(DescriptorPool)
 
 	private:
 		void create(const Data::DescriptorPoolData& data, const Parameter& parameter);
+
 	public:
-		const Data::DescriptorPoolInfo& get() const noexcept;
-		void destroy();
+		void destroy() noexcept;
+
+	public:
+		[[nodiscard]] const Data::DescriptorPoolInfo& get() const noexcept;
 
 	private:
-		Data::DescriptorPoolInfo info = {};
+		Data::DescriptorPoolInfo info{};
+
 	};
+
 }

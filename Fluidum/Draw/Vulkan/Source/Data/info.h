@@ -6,8 +6,7 @@ namespace FVK::Internal::Data {
 
 	template<FvkType Type>
 	struct Info final {
-		Info() = delete;
-		~Info() = delete;
+		FluidumUtils_Class_Delete_ConDestructor(Info)
 	};
 
 	template<>
@@ -72,7 +71,7 @@ namespace FVK::Internal::Data {
 		vk::Format format = {};
 		vk::ColorSpaceKHR colorSpace = {};
 		vk::Extent2D extent = {};
-		uint32_t minImageCount = 0;
+		UI32 minImageCount = 0;
 	};
 
 	template<>
@@ -82,7 +81,7 @@ namespace FVK::Internal::Data {
 	};
 
 	template<>
-	struct Info<FvkType::DescriptorSetLayout> final {	
+	struct Info<FvkType::DescriptorSetLayout> final {
 		vk::Device device = nullptr;
 		vk::DescriptorSetLayout descriptorSetLayout = nullptr;
 	};
@@ -226,8 +225,9 @@ namespace FVK::Internal::Data {
 		vk::Image image = nullptr;
 	};
 
+}
 
-
+namespace FVK::Internal::Data {
 
 	using WindowInfo = Info<FvkType::Window>;
 	using InstanceInfo = Info<FvkType::Instance>;
@@ -260,6 +260,5 @@ namespace FVK::Internal::Data {
 	using DrawInfo = Info<FvkType::Draw>;
 	using ImGuiInfo = Info<FvkType::ImGui>;
 	using ImGuiImageInfo = Info<FvkType::ImGuiImage>;
-
 
 }

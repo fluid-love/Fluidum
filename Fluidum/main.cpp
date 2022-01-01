@@ -1,36 +1,38 @@
 #include "Scene/include.h"
 
-std::unique_ptr<FS::MainFluidumScene> GScene = nullptr;
+//Delay the call to constructor due to the order of "Data" initialization.
+namespace FluidumMain {
+	std::unique_ptr<FS::MainFluidumScene> GScene = nullptr;
 
-void loop() {
-	GScene->call();
-}
+	void loop() {
+		GScene->call();
+	}
 
-void callback(const std::string& m) {
-	std::cout << m << std::endl;
+	void callback(const std::string& m) {
+		std::cout << m << std::endl;
+	}
+
 }
 
 int main() {
-	GScene = std::make_unique<FS::MainFluidumScene>();
-	try
-	{
-		GScene->setAddCallback(FD::Scene::CallBacks::addSceneCallback);
-		GScene->setDeleteCallback(FD::Scene::CallBacks::deleteSceneCallback);
+	FluidumMain::GScene = std::make_unique<FS::MainFluidumScene>();
 
-		GScene->addScene<FS::Title>();
+	try {
+		FluidumMain::GScene->setAddCallback(FD::Scene::CallBacks::addSceneCallback);
+		FluidumMain::GScene->setDeleteCallback(FD::Scene::CallBacks::deleteSceneCallback);
 
-		FD::WindowWrite* window = GScene->getData<FD::WindowWrite>();
+		FluidumMain::GScene->addScene<FS::Title>();
 
-		FDR::setMessengerCallbackFunction(callback);
-		FDR::mainLoop("Fluidum", loop, window->getCloseFlag());
+		FD::WindowWrite* window = FluidumMain::GScene->getData<FD::WindowWrite>();
+
+		FDR::setMessengerCallbackFunction(FluidumMain::callback);
+		FDR::mainLoop("Fluidum", FluidumMain::loop, window->getCloseFlag());
 	}
-	catch (const std::exception& e)
-	{
+	catch (const std::exception& e) {
 		std::cerr << e.what();
 	}
-	catch (...)
-	{
+	catch (...) {
 		std::cerr << "Error" << std::endl;
 	}
-	GScene.reset();
+	FluidumMain::GScene.reset();
 }

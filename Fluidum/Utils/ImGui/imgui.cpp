@@ -13,6 +13,9 @@ void FU::ImGui::tooltip(T& counter, const char* desc) {
 	static ImVec2 pos = {};
 
 	if (!::ImGui::IsMouseHoveringRect(::ImGui::GetItemRectMin(), ::ImGui::GetItemRectMax())) {
+		if (address == &counter) {
+			address = nullptr;
+		}
 		return;
 	}
 

@@ -11,6 +11,6 @@ void FVK::Internal::Exception::glfwErrorCallback(int code, const char* message) 
 	glfwErrorMessage = message;
 }
 
-std::string FVK::Internal::Exception::getGlfwErrorMessage() noexcept {
+std::string FVK::Internal::Exception::getGlfwErrorMessage() {
 	return glfwErrorMessage;
 }

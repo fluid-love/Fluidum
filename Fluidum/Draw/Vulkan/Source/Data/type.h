@@ -14,8 +14,8 @@ namespace FVK::Internal::Data {
 		Type == FvkType::ImageView_Vector ||
 		Type == FvkType::Semaphore_Vector ||
 		Type == FvkType::Fence_Vector,
-		const std::vector<std::reference_wrapper<const Info<ToObjectType<Type>()>>>,
-		const std::reference_wrapper<const Info<ToObjectType<Type>()>>
+		const std::vector<std::reference_wrapper<const Info<ToHandleType<Type>()>>>,
+		const std::reference_wrapper<const Info<ToHandleType<Type>()>>
 		>;
 
 	template<FvkType Type>

@@ -14,20 +14,35 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		DeviceMemory(ManagerPassKey, const Data::DeviceMemoryData& data, const Parameter& parameter);
-		~DeviceMemory() = default;
+
+		~DeviceMemory() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(DeviceMemory)
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::DeviceMemoryData& data, const Parameter& parameter);
-		const Data::DeviceMemoryInfo& get() const noexcept;
-		void destroy();
+
+	public:
+		//no-thrwo
+		void destroy() noexcept;
+
+	public:
+		//no-thrwo
+		[[nodiscard]] const Data::DeviceMemoryInfo& get() const noexcept;
 
 	private:
-		Data::DeviceMemoryInfo info = {};
+		Data::DeviceMemoryInfo info{};
+
 	};
-
-
-
 
 }

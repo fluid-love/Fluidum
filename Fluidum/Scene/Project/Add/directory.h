@@ -10,11 +10,13 @@ namespace FS::Project::Add {
 		explicit Directory(
 			const FD::GuiRead* const guiRead,
 			const FD::SceneRead* const sceneRead,
+			const FD::UserFilesRead* const userFilesRead,
 			std::shared_ptr<SharedInfo>& sharedInfo
 		);
 		void Constructor(
 			FD::GuiRead,
-			FD::SceneRead
+			FD::SceneRead,
+			FD::UserFilesRead
 		);
 
 		~Directory() noexcept;
@@ -26,6 +28,7 @@ namespace FS::Project::Add {
 
 	private://data
 		const FD::SceneRead* const sceneRead;
+		const FD::UserFilesRead* const userFilesRead;
 
 		FD::Text::ProjectDirectory text{};
 
@@ -50,6 +53,7 @@ namespace FS::Project::Add {
 
 		struct {
 			ImVec2 name{};
+			ImVec2 directory{};
 			ImVec2 create{};
 
 		}pos;
@@ -69,6 +73,6 @@ namespace FS::Project::Add {
 
 	private:
 		void create();
-	
+
 	};
 }

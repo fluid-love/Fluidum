@@ -3,7 +3,7 @@
 FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::add(const std::string& parent, const std::string& path_, const Directory& info) {
 	std::string path = path_;
 	FU::File::tryPushSlash(path);
-	
+
 	directories.emplace_back(std::make_shared<Directory>(info));
 	Ref ref = this->makeRef(path, info);
 
@@ -157,6 +157,7 @@ void FD::Project::Internal::FileList::changePathAndName(const std::string& path,
 }
 
 void FD::Project::Internal::FileList::sync() {
+
 	for (auto& x : refs) {
 		if (!std::filesystem::exists(x.path))
 			x.exist = false;

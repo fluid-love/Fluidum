@@ -2,7 +2,7 @@
 
 #include "include.h"
 
-namespace FVK::Internal {
+namespace FVK::Internal::Manager {
 
 	template<typename T>
 	concept IsWindowParameter = FU::Concept::IsInstanceOfNonType<std::remove_const_t<T>, Window::Parameter>;
@@ -43,6 +43,5 @@ namespace FVK::Internal {
 		std::same_as<T, const FvkImGui::Parameter>||
 		std::same_as<T, const ImGuiImage::Parameter>
 		;
-
 
 }

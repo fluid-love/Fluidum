@@ -26,25 +26,34 @@ namespace FKM::Internal {
 		{}
 
 		~Element() = default;
-		FluidumUtils_Class_Default_CopyMove(Element)
+
+		FluidumUtils_Class_Default_Move(Element)
+			FluidumUtils_Class_Delete_Copy(Element)
 
 	public://data
-		Enum type = Enum();
-		OrderKey order = 0;//serial number
-		StrKey key = "";//Duplicate key(StrKey) is not allowed
+		Enum type;
+		OrderKey order; //serial number
+		StrKey key;     //Duplicate key(StrKey) is not allowed.
 
 	public:
-		Connections connections = {};
+		Connections connections{};
 	};
 
 	class OrderCounter final {
 	private:
-		OrderKey counter = 1;
+		OrderKey count = 1;
 	public:
-		//if (counter == std::numeric_limits<OrderKey::Type>::max()) throw exception
+		//if (count == std::numeric_limits<OrderKey::KeyType>::max()) throw exception
+		//strong
 		void operator++(int);
 
+		[[nodiscard]] OrderKey next() const noexcept;
+
+	public:
 		//get
-		operator OrderKey()const noexcept;
+		[[nodiscard]] operator OrderKey() const noexcept;
+		[[nodiscard]] OrderKey current() const noexcept;
+
+
 	};
 }

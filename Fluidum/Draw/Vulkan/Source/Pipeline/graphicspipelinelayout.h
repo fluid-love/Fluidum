@@ -8,8 +8,7 @@ namespace FVK::Internal {
 	public:
 		struct CreateInfo : public vk::PipelineLayoutCreateInfo {
 		public:
-			//pSetLayouts‚Ì‘ã‚í‚è
-			Key::DescriptorSetLayoutVariantVectorKey descriptorSetLayoutKeys = {};
+			Key::DescriptorSetLayoutVariantVectorKey descriptorSetLayoutKeys{};//pSetLayouts
 			using vk::PipelineLayoutCreateInfo::setLayoutCount;
 			using vk::PipelineLayoutCreateInfo::pushConstantRangeCount;
 			using vk::PipelineLayoutCreateInfo::pPushConstantRanges;
@@ -23,21 +22,40 @@ namespace FVK::Internal {
 		};
 
 		struct Parameter {
-			CreateInfo* pInfo;
+			CreateInfo* pInfo = nullptr;
 			std::optional<Key::LogicalDeviceVariantKey> logicalDevice = std::nullopt;
 		};
+
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		explicit GraphicsPipelineLayout(ManagerPassKey, const Data::GraphicsPipelineLayoutData& data, Parameter& parameter);
-		~GraphicsPipelineLayout() = default;
+		
+		~GraphicsPipelineLayout() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(GraphicsPipelineLayout)
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::GraphicsPipelineLayoutData& data, Parameter& parameter);
+	
 	public:
-		const Data::GraphicsPipelineLayoutInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		//no-throw
+		[[nodiscard]] const Data::GraphicsPipelineLayoutInfo& get() const noexcept;
 
 	private:
-		Data::GraphicsPipelineLayoutInfo info = {};
+		Data::GraphicsPipelineLayoutInfo info{};
+
 	};
+
 }

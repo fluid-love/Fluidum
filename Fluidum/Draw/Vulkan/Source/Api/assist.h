@@ -4,8 +4,7 @@
 
 namespace FVK::Internal::API {
 
-	//if (GMnaager.operator bool() == false) throw NotCreated
+	//NotCreated
 	void checkManagerEmpty();
-
 
 }

@@ -1,13 +1,15 @@
 ﻿#include "physicaldevice.h"
 
-bool FVK::Internal::PhysicalDevice::checkDeviceExtensionSupport(const vk::PhysicalDevice device, const std::vector<const char*>& deviceExtensions) {
+bool FVK::Internal::PhysicalDevice::checkDeviceExtensionSupport(const vk::PhysicalDevice device, const std::vector<const char*>& deviceExtensions) const {
 	using namespace FVK::Internal;
 
 	auto result = device.enumerateDeviceExtensionProperties();
-	if (result.result != vk::Result::eSuccess)
-		Exception::throwFailedToCreate("Extension Support");
+	if (result.result != vk::Result::eSuccess) {
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to enumerate DeviceExtensionProperties.", vk::to_string(result.result));
+		Exception::throwFailedToCreate();
+	}
 
-	std::vector<vk::ExtensionProperties> availableExtensions = result.value;
+	const std::vector<vk::ExtensionProperties> availableExtensions = std::move(result.value);
 
 	std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
@@ -18,28 +20,31 @@ bool FVK::Internal::PhysicalDevice::checkDeviceExtensionSupport(const vk::Physic
 	return requiredExtensions.empty();
 }
 
-FVK::Internal::PhysicalDevice::QueueFamilyIndices FVK::Internal::PhysicalDevice::findQueueFamilies(const vk::QueueFlagBits flag, const vk::PhysicalDevice device, const vk::SurfaceKHR surface) {
+FVK::Internal::PhysicalDevice::QueueFamilyIndices FVK::Internal::PhysicalDevice::findQueueFamilies(const vk::QueueFlagBits flag, const vk::PhysicalDevice device, const vk::SurfaceKHR surface) const {
 	using namespace FVK::Internal;
 
-	PhysicalDevice::QueueFamilyIndices indices;
+	PhysicalDevice::QueueFamilyIndices indices{};
 
 	std::vector<vk::QueueFamilyProperties> queueFamilies = device.getQueueFamilyProperties();
 
-	for (int32_t i = 0; const auto & queueFamily : queueFamilies) {
+	for (ISize i = 0; const auto & queueFamily : queueFamilies) {
 		if ((queueFamily.queueFlags & flag) == flag) {
 			indices.graphicsFamily = i;
 		}
 
 		vk::Bool32 presentSupport = false;
 		auto result = device.getSurfaceSupportKHR(i, surface, &presentSupport);
-		if (result != vk::Result::eSuccess)
-			throw std::runtime_error("");
+		if (result != vk::Result::eSuccess) {
+			GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to get SurfaceSupportKHR({}).", vk::to_string(result));
+			Exception::throwFailedToCreate();
+		}
 
 		if (presentSupport) {
 			indices.presentFamily = i;
 		}
 
-		if (indices.isComplete()) {
+		//no-throw
+		if (indices.isComplete()) {//presentFamily and graphicsFamily
 			break;
 		}
 
@@ -49,42 +54,49 @@ FVK::Internal::PhysicalDevice::QueueFamilyIndices FVK::Internal::PhysicalDevice:
 	return indices;
 }
 
-FVK::Internal::PhysicalDevice::SwapChainSupportDetails FVK::Internal::PhysicalDevice::querySwapChainSupport(const vk::PhysicalDevice physicalDevice, const vk::SurfaceKHR surface) {
+FVK::Internal::PhysicalDevice::SwapChainSupportDetails FVK::Internal::PhysicalDevice::querySwapChainSupport(const vk::PhysicalDevice physicalDevice, const vk::SurfaceKHR surface) const {
 	using namespace FVK::Internal;
 
-	SwapChainSupportDetails details;
+	SwapChainSupportDetails details{};
 
 	{
 		auto result = physicalDevice.getSurfaceCapabilitiesKHR(surface);
 
-		if (result.result != vk::Result::eSuccess)
-			Exception::throwFailedToCreate("getSurfaceCapabilitiesKHR");
+		if (result.result != vk::Result::eSuccess) {
+			GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to get SurfaceCapabilities({}).", vk::to_string(result.result));
+			Exception::throwFailedToCreate();
+		}
 
-		details.capabilities = result.value;
+		details.capabilities = std::move(result.value);
 	}
 	{
 		auto result = physicalDevice.getSurfaceFormatsKHR(surface);
 
-		if (result.result != vk::Result::eSuccess)
-			Exception::throwFailedToCreate("getSurfaceFormatsKHR");
+		if (result.result != vk::Result::eSuccess) {
+			GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to get SurfaceFormats({}).", vk::to_string(result.result));
+			Exception::throwFailedToCreate();
+		}
 
-		details.formats = result.value;
+		details.formats = std::move(result.value);
 	}
 	{
 		auto result = physicalDevice.getSurfacePresentModesKHR(surface);
 
-		if (result.result != vk::Result::eSuccess)
-			Exception::throwFailedToCreate("getSurfacePresentModesKHR");
+		if (result.result != vk::Result::eSuccess) {
+			GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to get SurfacePresentModes({}).", vk::to_string(result.result));
+			Exception::throwFailedToCreate();
+		}
 
-		details.presentModes = result.value;
+		details.presentModes = std::move(result.value);
 	}
 
 	return details;
 }
 
-vk::SampleCountFlagBits FVK::Internal::PhysicalDevice::getMaxUsableSampleCount(const vk::PhysicalDevice physicalDevice) {
+vk::SampleCountFlagBits FVK::Internal::PhysicalDevice::getMaxUsableSampleCount(const vk::PhysicalDevice physicalDevice) const {
 
 	vk::PhysicalDeviceProperties physicalDeviceProperties = physicalDevice.getProperties();
+	static_assert(std::is_nothrow_constructible_v<vk::PhysicalDeviceProperties, vk::PhysicalDeviceProperties&&>);
 
 	vk::SampleCountFlags counts = physicalDeviceProperties.limits.framebufferColorSampleCounts & physicalDeviceProperties.limits.framebufferDepthSampleCounts;
 
@@ -98,13 +110,17 @@ vk::SampleCountFlagBits FVK::Internal::PhysicalDevice::getMaxUsableSampleCount(c
 	return vk::SampleCountFlagBits::e1;
 }
 
-void FVK::Internal::PhysicalDevice::fillInfo(const Data::PhysicalDeviceSwapchainData& data) VULKAN_HPP_NOEXCEPT {
+void FVK::Internal::PhysicalDevice::fillInfo(const Data::PhysicalDeviceSwapchainData& data) noexcept {
 	this->info.window = data.get<FvkType::Surface>().window;
 	this->info.instance = data.get<FvkType::Surface>().instance;
 	this->info.surface = data.get<FvkType::Surface>().surface;
+
+	static_assert(noexcept(this->info.window = data.get<FvkType::Surface>().window));
+	static_assert(noexcept(this->info.instance = data.get<FvkType::Surface>().instance));
+	static_assert(noexcept(this->info.surface = data.get<FvkType::Surface>().surface));
 }
 
-bool isFeaturesSupport(const std::vector<FVK::Internal::PhysicalDevice::Feature>& requireFeatures, const vk::PhysicalDeviceFeatures& supportedFeatures) {
+[[nodiscard]] bool isFeaturesSupport(const std::vector<FVK::Internal::PhysicalDevice::Feature>& requireFeatures, const vk::PhysicalDeviceFeatures& supportedFeatures) {
 	using enum FVK::Internal::PhysicalDevice::Feature;
 	vk::Bool32 result = false;
 	for (const auto& x : requireFeatures) {
@@ -128,7 +144,8 @@ FVK::Internal::PhysicalDevice::PhysicalDevice(ManagerPassKey, const Data::Physic
 }
 
 void FVK::Internal::PhysicalDevice::pick(const Data::PhysicalDeviceData& data, const Parameter& parameter) {
-
+	assert(false);
+	//future
 	//auto result = data.get<FvkType::Instance>().enumeratePhysicalDevices();
 
 	//if (result.result != vk::Result::eSuccess)
@@ -156,21 +173,40 @@ void FVK::Internal::PhysicalDevice::pick(const Data::PhysicalDeviceData& data, c
 
 void FVK::Internal::PhysicalDevice::pick(const Data::PhysicalDeviceSwapchainData& data, const SwapchainParameter& parameter) {
 
-	const auto devices = enumeratePhysicalDevices(data.get<FvkType::Surface>().instance);
+	//strong
+	const auto devices = this->enumeratePhysicalDevices(data.get<FvkType::Surface>().instance);
 
-	std::vector<const char*> extensions = convertExtensions(parameter.extensions);
+	//strong
+	std::vector<const char*> extensions = this->convertExtensions(parameter.extensions);
 	this->info.extensionNames = extensions;
 
+	//strong
 	for (const auto& device : devices) {
+		//Select the appropriate physical device found in the first place.
 		if (isDeviceSuitable(parameter, device, data.get<FvkType::Surface>().surface, extensions)) {
+
+			//find
 			this->info.physicalDevice = device;
 			break;
 		}
 	}
 
-	if (!this->info.physicalDevice)
-		Exception::throwFailedToCreate("Failed to pick PhysicalDevice");
+	if (!this->info.physicalDevice) {
+		//not found
+		{
+			auto lock = GMessenger.getLock();
+			GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to pick PhysicalDevice.");
+			GMessenger.add<FU::Log::Type::Info>(__FILE__, __LINE__, "No available physical devices are found. It is not available on this computer.");
+		}
+		Exception::throwNotSupported();
+	}
+	else {
+		//no-throw
+		const auto msaaSamples = this->getMaxUsableSampleCount(this->info.physicalDevice);
+		this->info.usableMaxMsaaSamples = msaaSamples;
+	}
 
+	//no-throw
 	this->fillInfo(data);
 }
 
@@ -180,13 +216,15 @@ const FVK::Internal::Data::PhysicalDeviceInfo& FVK::Internal::PhysicalDevice::ge
 }
 
 void FVK::Internal::PhysicalDevice::destroy() const noexcept {
-
+	//There is nothing to destroy, but the function is there for the sake of consistency.
 }
 
-vk::Format FVK::Internal::PhysicalDevice::findFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling tiling, const vk::FormatFeatureFlags features) const {
+vk::Format FVK::Internal::PhysicalDevice::findFormat(const std::vector<vk::Format>& candidates, const vk::ImageTiling tiling, const vk::FormatFeatureFlags features) const noexcept {
 	for (vk::Format format : candidates) {
 
+		//no-throw
 		vk::FormatProperties props = this->info.physicalDevice.getFormatProperties(format);
+
 
 		if (tiling == vk::ImageTiling::eLinear && (props.linearTilingFeatures & features) == features) {
 			return format;
@@ -194,6 +232,10 @@ vk::Format FVK::Internal::PhysicalDevice::findFormat(const std::vector<vk::Forma
 		else if (tiling == vk::ImageTiling::eOptimal && (props.optimalTilingFeatures & features) == features) {
 			return format;
 		}
+
+		static_assert(noexcept(props.linearTilingFeatures & features));
+		static_assert(noexcept(props.linearTilingFeatures == features));
+
 	}
 
 	return vk::Format::eUndefined;
@@ -237,35 +279,45 @@ bool FVK::Internal::PhysicalDevice::isDeviceSuitable(const Parameter& parameter,
 bool FVK::Internal::PhysicalDevice::isDeviceSuitable(const SwapchainParameter& parameter, vk::PhysicalDevice physicalDevice, const vk::SurfaceKHR surface, const std::vector<const char*>& deviceExtensions) {
 	using namespace FVK::Internal;
 
-	//要求を満たすqueueがあるか
-	bool isQueueComplete = this->isQueueComplete(physicalDevice, surface, parameter.queue);
-	if (!isQueueComplete)
-		return false;
+	//Whether or not there is a queue that satisfies the request.
+	{
+		const bool isQueueComplete = this->isQueueComplete(physicalDevice, surface, parameter.queue);
+		if (!isQueueComplete)
+			return false;
+	}
 
-	//要求を満たす拡張をサポートするか
-	bool isExtensionsSupported = checkDeviceExtensionSupport(physicalDevice, deviceExtensions);
-	if (!isExtensionsSupported)
-		return false;
+	//Whether to support extensions that meet the requirements.
+	{
+		const bool isExtensionsSupported = this->checkDeviceExtensionSupport(physicalDevice, deviceExtensions);
+		if (!isExtensionsSupported)
+			return false;
+	}
+
+	//features{
+	{
+		//no-throw
+		vk::PhysicalDeviceFeatures supportedFeatures = physicalDevice.getFeatures();
+
+		const bool isFeaturesSup = isFeaturesSupport(parameter.features, supportedFeatures);
+		if (!isFeaturesSup)
+			return false;
+	}
 
 	//swapchain
-	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice, surface);
-	bool isSwapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
-	if (!isSwapChainAdequate)
-		return false;
-	this->info.capabilities = swapChainSupport.capabilities;
-	this->info.formats = std::move(swapChainSupport.formats);
-	this->info.presentModes = std::move(swapChainSupport.presentModes);
+	{
+		SwapChainSupportDetails swapChainSupport = this->querySwapChainSupport(physicalDevice, surface);
+		const bool isSwapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+		if (!isSwapChainAdequate)
+			return false;
 
+		//no-throw
+		this->info.capabilities = swapChainSupport.capabilities;
+		static_assert(noexcept(this->info.capabilities = swapChainSupport.capabilities));
 
-	//Features
-	vk::PhysicalDeviceFeatures supportedFeatures = physicalDevice.getFeatures();
-	bool isFeaturesSup = isFeaturesSupport(parameter.features, supportedFeatures);
-	if (!isFeaturesSup)
-		return false;
-
-	//msaasamples
-	auto msaaSamples = getMaxUsableSampleCount(physicalDevice);
-	this->info.usableMaxMsaaSamples = msaaSamples;
+		//no-throw
+		this->info.formats = std::move(swapChainSupport.formats);
+		this->info.presentModes = std::move(swapChainSupport.presentModes);
+	}
 
 	return true;
 }
@@ -273,15 +325,17 @@ bool FVK::Internal::PhysicalDevice::isDeviceSuitable(const SwapchainParameter& p
 std::vector<vk::PhysicalDevice> FVK::Internal::PhysicalDevice::enumeratePhysicalDevices(const vk::Instance instance) const {
 	auto result = instance.enumeratePhysicalDevices();
 
-	if (result.result != vk::Result::eSuccess)
-		Exception::throwFailedToCreate("Find GPUs");
+	if (result.result != vk::Result::eSuccess) {
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to enumerate PhysicalDevices({}).", vk::to_string(result.result));
+		Exception::throwFailedToCreate();
+	}
 
 	return result.value;
 }
 
 std::vector<const char*> FVK::Internal::PhysicalDevice::convertExtensions(const std::vector<Extension>& extensions) const {
 	std::vector<const char*> result(extensions.size());
-	for (std::size_t i = 0, size = extensions.size(); i < size; i++) {
+	for (Size i = 0, size = extensions.size(); i < size; i++) {
 		result[i] = ExtensionNames[static_cast<UT>(extensions[i])];
 		assert(static_cast<UT>(extensions[i]) < std::extent_v<decltype(ExtensionNames)>);
 	}
@@ -289,27 +343,41 @@ std::vector<const char*> FVK::Internal::PhysicalDevice::convertExtensions(const 
 }
 
 bool FVK::Internal::PhysicalDevice::isQueueComplete(const vk::PhysicalDevice device, const vk::SurfaceKHR surface, const std::optional<vk::QueueFlagBits> flag) {
-	QueueFamilyIndices indices;
-	//queueの要求がなければtrue
+
 	if (!flag.has_value()) {
 		return true;
 	}
-	//条件に合致するdeviceを探す
-	indices = findQueueFamilies(flag.value(), device, surface);
-	if (indices.isComplete()) {
+
+	//Find devices that match the criteria.
+	QueueFamilyIndices indices = findQueueFamilies(flag.value(), device, surface);
+
+	//no-throw
+	const bool complete = indices.isComplete();
+
+	if (complete) { //good
+
+		//no-throw 
+		/*
+		There is no possibility that the exception bad_optional_access will be thrown,
+		as confirmed by the isComplete function.
+		*/
 		this->info.graphicsFamily = indices.graphicsFamily.value();
 		this->info.presentFamily = indices.presentFamily.value();
 		return true;
 	}
+
 	return false;
 }
 
 vk::Format FVK::Internal::PhysicalDevice::findSupportedFormat(const vk::PhysicalDevice physicalDevice, const std::vector<vk::Format>& candidates, vk::ImageTiling tiling, vk::FormatFeatureFlags features) {
 	for (vk::Format format : candidates) {
-		vk::FormatProperties props;
+		vk::FormatProperties props{};
+		static_assert(std::is_nothrow_constructible_v<vk::FormatProperties>);
 
+		//no-throw
 		physicalDevice.getFormatProperties(format, &props);
 
+		//no-throw
 		if (tiling == vk::ImageTiling::eLinear && (props.linearTilingFeatures & features) == features) {
 			return format;
 		}
@@ -318,18 +386,21 @@ vk::Format FVK::Internal::PhysicalDevice::findSupportedFormat(const vk::Physical
 		}
 	}
 
-	Exception::throwNotSupported("Failed to find supported format");
+	Exception::throwNotSupported();
 }
 
-uint32_t FVK::Internal::PhysicalDevice::findMemoryType(const vk::PhysicalDevice physicalDevice, const uint32_t typeFilter, const vk::MemoryPropertyFlags properties) {
+FVK::UI32 FVK::Internal::PhysicalDevice::findMemoryType(const vk::PhysicalDevice physicalDevice, const uint32_t typeFilter, const vk::MemoryPropertyFlags properties) {
 
+	//no-throw
 	vk::PhysicalDeviceMemoryProperties memProperties = physicalDevice.getMemoryProperties();
+	static_assert(std::is_nothrow_constructible_v<vk::PhysicalDeviceMemoryProperties, vk::PhysicalDeviceMemoryProperties&&>);
 
-	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+	//no-throw
+	for (UI32 i = 0; i < memProperties.memoryTypeCount; i++) {
 		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
 			return i;
 		}
 	}
 
-	Exception::throwNotSupported("failed to find memory type");
+	Exception::throwNotSupported();
 }

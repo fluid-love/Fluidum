@@ -7,22 +7,28 @@ namespace FS {
 	class TextEditor final : public Scene {
 	public:
 		explicit TextEditor(
+			const FD::Style::VarRead* const varRead,
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
+			FD::Coding::DisplayWrite* const displayWrite,
+			const FD::Coding::DisplayRead* const displayRead,
 			const FD::GuiRead* const guiRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			const FD::ProjectFilesRead* const projectFilesRead,
-			FD::TopBarWrite* const topBarWrite
+			FD::ToolBarWrite* const toolBarWrite
 		);
 		void Constructor(
+			FD::Style::VarRead,
 			FD::Coding::TabWrite,
 			FD::Coding::TabRead,
+			FD::Coding::DisplayWrite,
+			FD::Coding::DisplayRead,
 			FD::GuiRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
 			FD::ProjectFilesRead,
-			FD::TopBarWrite
+			FD::ToolBarWrite
 		);
 
 		~TextEditor() noexcept;
@@ -33,12 +39,15 @@ namespace FS {
 		virtual void call() override;
 
 	private://data
+		const FD::Style::VarRead* const varRead;
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
+		FD::Coding::DisplayWrite* const displayWrite;
+		const FD::Coding::DisplayRead* const displayRead;
 		const FD::GuiRead* const guiRead;
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
-		FD::TopBarWrite* const topBarWrite;
+		FD::ToolBarWrite* const toolBarWrite;
 
 		FD::Text::TextEditor text{};
 
@@ -53,12 +62,18 @@ namespace FS {
 		struct Info final {
 			FTE::TextEditor* editor = nullptr;
 			std::string path{};
-			FD::Calc::Language language{};
+			FD::Project::File::SupportedFileType language{};
 		};
 		std::vector<Info> info{};
 
 		Info* current = nullptr;
 
+	private:
+		void toolBar();
+
+	private:
+		void windowEmpty();
+		void setInfo();
 
 	private:
 		void textEditorMenu();
@@ -85,9 +100,6 @@ namespace FS {
 		void checkPython();
 		void checkAngelScript();
 		lua_State* luaState = nullptr;
-
-	private:
-		void topBar();
 
 	};
 }

@@ -8,7 +8,7 @@ namespace FVK::Internal {
 	public:
 		enum class ValidationLayer : UT {
 			None,
-			VK_LAYER_KHRONOS_validation //Ç±ÇÍà»äOÇÕîÒêÑèß https://vulkan.lunarg.com/doc/view/1.1.114.0/windows/validation_layers.html
+			VK_LAYER_KHRONOS_validation //Anything else is deprecated. https://vulkan.lunarg.com/doc/view/1.1.114.0/windows/validation_layers.html
 		};
 
 		struct Message {
@@ -19,7 +19,7 @@ namespace FVK::Internal {
 		struct Parameter {
 			ValidationLayer validationLayer = ValidationLayer::VK_LAYER_KHRONOS_validation;
 			PFN_vkDebugUtilsMessengerCallbackEXT callback = messengerCallback;
-			Message message = {};
+			Message message{};
 		};
 
 		static inline VKAPI_ATTR VkBool32 VKAPI_CALL messengerCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
@@ -28,26 +28,56 @@ namespace FVK::Internal {
 		}
 
 	public:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//strong
 		explicit Messenger(ManagerPassKey, const Data::MessengerData& data, const Parameter& parameter);
+		
 		~Messenger() = default;
 		FluidumUtils_Class_Default_CopyMove(Messenger)
 
 	private:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::MessengerData& data, const Parameter& parameter);
+
 	public:
-		_NODISCARD const Data::MessengerInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		[[nodiscard]] const Data::MessengerInfo& get() const noexcept;
+
+	public:
+		//no-throw
+		void destroy() noexcept;
 
 	private:
-		_NODISCARD bool checkValidationLayerSupport(const Parameter& parameter) const;
-		_NODISCARD VkResult createDebugUtilsMessengerEXT(const Data::MessengerData& data, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
-		_NODISCARD std::vector<const char*> makeValidationLayerNames(const Parameter& parameter)const noexcept;
-
-		void fillInfo(const Data::MessengerData& data) VULKAN_HPP_NOEXCEPT;
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//strong
+		[[nodiscard]] bool checkValidationLayerSupport(const Parameter& parameter) const;
+		
+		[[nodiscard]] VkResult createDebugUtilsMessengerEXT(const Data::MessengerData& data, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+		
+		/*
+		Exception:
+			std::exception
+		*/
+		//strong
+		[[nodiscard]] std::vector<const char*> makeValidationLayerNames(const Parameter& parameter)const noexcept;
+				
+		//no-throw
+		void fillInfo(const Data::MessengerData& data) noexcept;
 	private://data
 		Data::MessengerInfo info = {};
 	};
-
-
 
 }

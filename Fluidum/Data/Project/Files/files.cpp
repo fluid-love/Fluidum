@@ -99,18 +99,20 @@ void FD::ProjectFilesWrite_Lock::sync(const std::string& top) {
 
 		for (const auto& entry : std::filesystem::directory_iterator(parent)) {
 			const std::string name = entry.path().filename().string();
+			const std::string path = entry.path().string();
+
 			if (entry.is_directory()) {
 				Project::FileList::DirectoryInfo dir{};
-				Info* elm = ProjectFilesData::projectFiles.add(parent, entry.path().string(), dir);
+				Info* elm = ProjectFilesData::projectFiles.add(parent, path, dir);
 				func(elm->path);
 			}
 			else if (Project::File::isFileFormatSupported(name)) {
 				Project::FileList::SupportedInfo supported{};
-				Info* elm = ProjectFilesData::projectFiles.add(parent, entry.path().string(), supported);
+				Info* elm = ProjectFilesData::projectFiles.add(parent, path, supported);
 			}
 			else {
 				Project::FileList::UnsupportedInfo unsupported{};
-				Info* elm = ProjectFilesData::projectFiles.add(parent, entry.path().string(), unsupported);
+				Info* elm = ProjectFilesData::projectFiles.add(parent, path, unsupported);
 			}
 
 		}
@@ -119,20 +121,22 @@ void FD::ProjectFilesWrite_Lock::sync(const std::string& top) {
 
 	for (const auto& entry : std::filesystem::directory_iterator(top)) {
 		const std::string name = entry.path().filename().string();
+		const std::string path = entry.path().string();
+
 		if (entry.is_directory()) {
 			if (name == Project::Internal::Name::FluidumHiddenFolder)
 				continue;
 			Project::FileList::DirectoryInfo dir{};
-			Info* elm = ProjectFilesData::projectFiles.add({}, entry.path().string(), dir);
+			Info* elm = ProjectFilesData::projectFiles.add({}, path, dir);
 			func(elm->path);
 		}
 		else if (Project::File::isFileFormatSupported(name)) {
 			Project::FileList::SupportedInfo supported{};
-			Info* elm = ProjectFilesData::projectFiles.add({}, entry.path().string(), supported);
+			Info* elm = ProjectFilesData::projectFiles.add({}, path, supported);
 		}
 		else {
 			Project::FileList::UnsupportedInfo unsupported{};
-			Info* elm = ProjectFilesData::projectFiles.add({}, entry.path().string(), unsupported);
+			Info* elm = ProjectFilesData::projectFiles.add({}, path, unsupported);
 		}
 	}
 }
@@ -180,27 +184,29 @@ std::unique_lock<std::mutex> FD::ProjectFilesWrite_Lock::getLock() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::size_t FD::ProjectFilesRead::numOfDirectories(const std::string& parent) const {
+std::size_t FD::ProjectFilesRead_Lock::numOfDirectories(const std::string& parent) const {
 	using namespace Project::Internal;
 	std::size_t result = 0;
 	ProjectFilesData::projectFiles.forEach([](Project::FileList::FileInfo& info, void* data)
 		{
-			std::size_t* count = static_cast<std::size_t*>(data);
-			if (info.type == Project::FileList::Type::Directory)
+			if (info.type == Project::FileList::Type::Directory) {
+				std::size_t* count = static_cast<std::size_t*>(data);
 				(*count)++;
+			}
 		},
 		&result);
 	return result;
 }
 
-std::size_t FD::ProjectFilesRead::numOfFiles(const std::string& parent) const {
+std::size_t FD::ProjectFilesRead_Lock::numOfFiles(const std::string& parent) const {
 	using namespace Project::Internal;
 	std::size_t result = 0;
 	ProjectFilesData::projectFiles.forEach([](Project::FileList::FileInfo& info, void* data)
 		{
-			std::size_t* count = static_cast<std::size_t*>(data);
-			if (info.type != Project::FileList::Type::Directory)
+			if (info.type != Project::FileList::Type::Directory) {
+				std::size_t* count = static_cast<std::size_t*>(data);
 				(*count)++;
+			}
 		},
 		&result);
 	return result;
@@ -254,28 +260,137 @@ void FD::UserFilesWrite_Lock::sync() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::size_t FD::UserFilesRead::numOfVirtualFolder(const std::string& parent) const {
+std::size_t FD::UserFilesRead_Lock::numOfVirtualFolder(const std::string& parent) const {
 	using namespace Project::Internal;
 	std::size_t result = 0;
 	UserFilesData::userFiles.forEach([](Project::FileList::FileInfo& info, void* data)
 		{
-			std::size_t* count = static_cast<std::size_t*>(data);
-			if (info.type == Project::FileList::Type::Directory)
+			if (info.type == Project::FileList::Type::Directory) {
+				std::size_t* count = static_cast<std::size_t*>(data);
 				(*count)++;
+			}
 		},
 		&result);
 	return result;
 }
 
-std::size_t FD::UserFilesRead::numOfFiles(const std::string& parent) const {
+std::size_t FD::UserFilesRead_Lock::numOfFiles(const std::string& parent) const {
 	using namespace Project::Internal;
 	std::size_t result = 0;
 	UserFilesData::userFiles.forEach([](Project::FileList::FileInfo& info, void* data)
 		{
-			std::size_t* count = static_cast<std::size_t*>(data);
-			if (info.type != Project::FileList::Type::Directory)
+			if (info.type != Project::FileList::Type::Directory) {
+				std::size_t* count = static_cast<std::size_t*>(data);
 				(*count)++;
+			}
 		},
 		&result);
 	return result;
+}
+
+bool FD::UserFilesRead_Lock::exist(const std::string& path) const {
+	using namespace Project::Internal;
+
+	std::pair<bool, const std::string* const> result = std::make_pair(false, &path);
+
+	UserFilesData::userFiles.forEach([](Project::FileList::FileInfo& info, void* data)
+		{
+			std::pair<bool, const std::string* const>* res = static_cast<std::pair<bool, const std::string* const>*>(data);
+			if (res->first)
+				return;
+
+			if (info.path == (*res->second))
+				res->first = true;
+		},
+		&result);
+
+	return result.first;
+}
+
+bool FD::UserFilesRead_Lock::containForbiddenCharactor(const std::string& name) const {
+	const bool result =
+		(name.find('/') != std::string::npos) ||
+		(name == "..") ||
+		(name == ".");
+
+	return result;
+}
+
+std::string FD::UserFilesRead_Lock::finalName(const std::string& name) const {
+	assert(!containForbiddenCharactor(name) && !name.empty());
+	//future
+	return name;
+}
+
+std::string FD::UserFilesRead_Lock::rootDirectory() const {
+	return "Fluidum:/";
+}
+
+std::string FD::UserFilesRead::rootDirectory() const {
+	return "Fluidum:/";
+}
+
+bool FD::UserFilesRead::containForbiddenCharactor(const std::string& name) const {
+	const bool result =
+		(name.find('/') != std::string::npos) ||
+		(name == "..") ||
+		(name == ".");
+
+	return result;
+}
+
+std::string FD::UserFilesRead::finalName(const std::string& name) const {
+	assert(!containForbiddenCharactor(name) && !name.empty());
+	//future
+	return name;
+}
+
+std::string FD::UserFilesRead::canonical(const std::string& current, const std::string& path) const {
+	assert(false);
+	return{};
+}
+
+std::string FD::UserFilesRead::canonical(const std::string& path) const {
+	assert(false);
+	assert(path.find("Fluidum:/") == 0);
+
+	std::string result = path;
+
+	while (true) {
+		{
+			const auto pos = result.find("/./");
+			if (pos != std::string::npos)
+				result.replace(pos, pos + 3, "/");
+		}
+
+		//{
+		//	const auto pos = result.find("/../");
+		//	if (pos != std::string::npos) {
+		//		const auto itr = std::find(result.begin() + pos, resu);
+		//
+		//	}
+		//}
+	}
+
+	return{};
+}
+
+bool FD::UserFilesRead::exist(const std::string& path) const {
+	using namespace Project::Internal;
+	std::lock_guard<std::mutex> lock(UserFilesData::mtx);
+
+	std::pair<bool, const std::string* const> result = std::make_pair(false, &path);
+
+	UserFilesData::userFiles.forEach([](Project::FileList::FileInfo& info, void* data)
+		{
+			std::pair<bool, const std::string* const>* res = static_cast<std::pair<bool, const std::string* const>*>(data);
+			if (res->first)
+				return;
+
+			if (info.path == (*res->second))
+				res->first = true;
+		},
+		&result);
+
+	return result.first;
 }

@@ -1,13 +1,14 @@
 #include "path.h"
+#include "../Text/guitext.h"
+#include "../Type/type.h"
 
 #ifdef BOOST_OS_WINDOWS
 #include <Windows.h>
-#include "../Text/guitext.h"
 #endif
 
 std::string FU::File::directoryName(const std::string& path) {
 	std::string result = path;
-
+	
 #ifdef BOOST_OS_WINDOWS
 	if (result.back() == '/' || result.back() == '\\')
 		result.pop_back();
@@ -63,8 +64,6 @@ std::string FU::File::consistentDirectory(const std::string& dir) {
 			break;
 	}
 #endif
-	if (result.back() != '/')
-		result.push_back('/');
 	return result;
 }
 
@@ -98,13 +97,40 @@ bool FU::File::containForbiddenCharactor(const std::string& name) {
 				(x == '|');
 		}
 	);
+
+	const auto dotCount = std::count(name.begin(), name.end(), '.');
+	const auto spaceCount = std::count(name.begin(), name.end(), ' ');
+
 #else
 #error NotSupported
 #endif
-	return itr != name.end();
+	return (itr != name.end()) || (dotCount == name.size()) || (spaceCount == name.size());
+}
+
+std::string FU::File::finalName(const std::string& name) {
+	assert(!containForbiddenCharactor(name) && !name.empty());
+
+	std::string result = name;
+	 
+	Size count = 0;
+
+	for (auto itr = result.rbegin(), end = result.rend(); itr != end; itr++) {
+		if (*itr == '.' || *itr == ' ')
+			count++;
+		else
+			break;
+	}
+
+	if (count == 0)
+		return name;
+
+	result.erase(result.end() - count, result.end());
+	return result;
 }
 
 void FU::File::tryPushSlash(std::string& path) {
+	if (path.empty())
+		return;
 #ifdef BOOST_OS_WINDOWS
 	if (path.back() != '/' && path.back() != '\\')
 		path.push_back('/');

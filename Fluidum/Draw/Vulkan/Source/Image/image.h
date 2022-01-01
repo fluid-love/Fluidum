@@ -14,18 +14,35 @@ namespace FVK::Internal {
 		};
 
 	public:
-		explicit Image(ManagerPassKey,const Data::ImageData& data, const Parameter& parameter);
-		~Image() = default;
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
+		explicit Image(ManagerPassKey, const Data::ImageData& data, const Parameter& parameter);
+
+		~Image() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(Image)
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::ImageData& data, const Parameter& parameter);
+
 	public:
-		const Data::ImageInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		//no-throw
+		[[nodiscard]] const Data::ImageInfo& get() const noexcept;
 
 	private:
-		Data::ImageInfo info = {};
+		Data::ImageInfo info{};
 
 	};
+
 }

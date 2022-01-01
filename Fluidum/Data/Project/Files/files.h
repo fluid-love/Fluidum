@@ -12,9 +12,10 @@ namespace FD {
 	class FluidumFilesRead;
 
 	class ProjectFilesWrite_Lock;
-	class ProjectFilesRead;
+	class ProjectFilesRead_Lock;
 
 	class UserFilesWrite_Lock;
+	class UserFilesRead_Lock;
 	class UserFilesRead;
 
 }
@@ -56,7 +57,7 @@ namespace FD::Project::Internal {
 	private:
 		friend class ProjectWrite;
 		friend class ProjectFilesWrite_Lock;
-		friend class ProjectFilesRead;
+		friend class ProjectFilesRead_Lock;
 	};
 
 	struct UserFilesData final {
@@ -68,6 +69,7 @@ namespace FD::Project::Internal {
 	private:
 		friend class ProjectWrite;
 		friend class UserFilesWrite_Lock;
+		friend class UserFilesRead_Lock;
 		friend class UserFilesRead;
 	};
 }
@@ -178,11 +180,11 @@ namespace FD {
 
 	};
 
-	class ProjectFilesRead final {
+	class ProjectFilesRead_Lock final {
 	public:
-		explicit ProjectFilesRead(Internal::PassKey) noexcept {}
-		~ProjectFilesRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead)
+		explicit ProjectFilesRead_Lock(Internal::PassKey) noexcept {}
+		~ProjectFilesRead_Lock() = default;
+		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead_Lock)
 
 	public:
 		/*
@@ -211,9 +213,17 @@ namespace FD {
 		*/
 		[[nodiscard]] std::size_t numOfFiles(const std::string& parent) const;
 
-
 	};
 
+	class ProjectFilesRead final {
+	public:
+		explicit ProjectFilesRead(Internal::PassKey) noexcept {}
+		~ProjectFilesRead() = default;
+		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead)
+
+	public:
+
+	};
 }
 
 namespace FD {
@@ -253,6 +263,30 @@ namespace FD {
 
 	};
 
+	class UserFilesRead_Lock final {
+	public:
+		explicit UserFilesRead_Lock(Internal::PassKey) noexcept {}
+		~UserFilesRead_Lock() = default;
+		FluidumUtils_Class_Delete_CopyMove(UserFilesRead_Lock)
+
+	public:
+		//see ProjectFilesRead_Lock::numOfDirectories and ProjectFilesRead_Lock::numOfFiles
+		[[nodiscard]] std::size_t numOfVirtualFolder(const std::string& parent) const;
+		[[nodiscard]] std::size_t numOfFiles(const std::string& parent) const;
+
+	public:
+		//return "Fluidum:/"
+		[[nodiscard]] std::string rootDirectory() const;
+
+	public:
+		[[nodiscard]] bool containForbiddenCharactor(const std::string& name) const;
+		
+		[[nodiscard]] std::string finalName(const std::string& name) const;
+
+	public:
+		[[nodiscard]] bool exist(const std::string& path) const;
+	};
+
 	class UserFilesRead final {
 	public:
 		explicit UserFilesRead(Internal::PassKey) noexcept {}
@@ -260,9 +294,34 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(UserFilesRead)
 
 	public:
-		//see ProjectFilesRead::numOfDirectories and ProjectFilesRead::numOfFiles
-		[[nodiscard]] std::size_t numOfVirtualFolder(const std::string& parent) const;
-		[[nodiscard]] std::size_t numOfFiles(const std::string& parent) const;
+		//return "Fluidum:/"
+		[[nodiscard]] std::string rootDirectory() const;
+
+		[[nodiscard]] bool exist(const std::string& path) const;
+
+	public:
+		//ng "." ".." "/" "a/a"
+		//ok ".a" "..a" 
+		[[nodiscard]] bool containForbiddenCharactor(const std::string& name) const;
+
+		[[nodiscard]] std::string finalName(const std::string& name) const;
+
+	public:
+		/*
+		*
+		/./a  -> /a
+		/a/b/../ -> /a
+
+		relative -> absolute
+
+		e.g.
+			Fluidum:/a/./b  -> Fluidum:/a/b
+			Fluidum:/a/../b -> Fluidum:/b
+		*/
+		//relative
+		[[nodiscard]] std::string canonical(const std::string& current, const std::string& path) const;
+		//absolute
+		[[nodiscard]] std::string canonical(const std::string& path) const;
 
 	};
 

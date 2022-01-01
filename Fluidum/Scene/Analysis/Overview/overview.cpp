@@ -3,8 +3,8 @@
 
 FS::Analysis::Overview::~Overview() noexcept {
 	try {
-		topBarWrite->erase<Overview>();
-		GLog.add<FD::Log::Type::None>("Destruct AnalysisScene.");
+		toolBarWrite->remove<Overview>();
+		FluidumScene_Log_Destructor("Analysis::Overview");
 	}
 	catch (const std::exception& e) {
 		try {
@@ -35,7 +35,7 @@ void FS::Analysis::Overview::closeWindow() {
 	if (windowShouldClose)
 		return;
 
-	GLog.add<FD::Log::Type::None>("Request delete AnalysisOverviewScene.");
+	FluidumScene_Log_RequestDeleteScene("Analysis::Overview");
 	Scene::deleteScene<Overview>();
 }
 

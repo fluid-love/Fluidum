@@ -16,7 +16,7 @@ namespace FS::Internal {
 	template<typename... Data>
 	class SceneBase {
 	public:
-		SceneBase() = default;//抽象クラスなので継承せずには作成不可
+		SceneBase() = default;//As an abstract class, it cannot be created without inheritance.
 		virtual ~SceneBase() = default;
 		FluidumUtils_Class_Delete_CopyMove(SceneBase)
 
@@ -25,15 +25,13 @@ namespace FS::Internal {
 
 	public:
 
-		//シーンの追加
-		//同期シーンが一周したら追加される．つまり次のループから呼ばれることになる．
+		//Added scene is called from the next loop.
 		template<IsSceneAble<Data...> Scene, typename... Args>
 		void addScene(Args&&... args) {
 			GManager<Data...>->addScene<Scene>(std::forward<Args>(args)...);
 		}
 
-		//シーンの追加を試みる
-		//既に作成されていれば，作成しない->return false
+		//If it has already been created, do not create it -> return false
 		template<IsSceneAble<Data...> Scene, typename... Args>
 		bool tryAddScene(Args&&... args) {
 			try {
@@ -45,23 +43,18 @@ namespace FS::Internal {
 			return true;
 		}
 
-		//非同期シーンの追加
-		//すぐに非同期として関数が呼ばれる
+		//Function is called immediately
 		template<IsSceneAble<Data...> Scene, typename... Args>
 		void addAsyncScene(Args&&... args) {
 			GManager<Data...>->addAsyncScene<Scene>(std::forward<Args>(args)...);
 		}
 
-		//シーンの削除
-		//同期シーンの一周が終わったあとに消される
-		//すぐに次の処理へと移る
+		//Scene is deleted after one round.
 		template<IsSceneAble<Data...> Scene>
 		void deleteScene() {
 			GManager<Data...>->addDeleteCode<Scene>();
 		}
 
-		//シーンの削除を試みる
-		//すでに削除（削除されていない）場合は，削除しない->return false
 		template<IsSceneAble<Data...> Scene>
 		bool tryDeleteScene() {
 			try {
@@ -73,7 +66,6 @@ namespace FS::Internal {
 			return true;
 		}
 
-		//非同期シーンの削除
 		template<IsSceneAble<Data...> Scene>
 		void deleteAsyncScene() {
 			GManager<Data...>->deleteAsyncScene<Scene>();
@@ -93,21 +85,10 @@ namespace FS::Internal {
 			GManager<Data...>->data.deleteData<T>();
 		}
 
-		//constなデータポインタを返す
-		//変更したい場合はコンストラクタでデータを取得すること
-		template<FD::IsDataAble T>
-		[[nodiscard]] const auto* getData() {
-			static_assert(std::is_pointer_v<T>);
-			//pointerにしてunique_ptrを確認．違うのであれば戻す
-			constexpr auto index = FU::Tuple::getSameTypeIndex<std::tuple<Data...>, T>();
-			return GManager<Data...>->data.get<index>();
-		}
-
-		//dataが作成されているか
 		template<FD::IsDataAble T>
 		[[nodiscard]] bool isDataCreated() const {
 			static_assert(std::is_pointer_v<T>);
-			constexpr auto index = FU::Tuple::getSameTypeIndex<std::tuple<Data...>, T>();
+			constexpr auto index = FU::Tuple::GetSameTypeIndex<std::tuple<Data...>, T>();
 			return GManager<Data...>->data.isDataCreated<index>();
 		}
 

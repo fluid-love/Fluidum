@@ -2,36 +2,39 @@
 
 #include "include.h"
 
-namespace FVK::Internal {
+namespace FVK::Internal::Manager {
 
-	using Windows = std::vector<Window>;
-	using Instances = std::vector<Instance>;
-	using Messengers = std::vector<Messenger>;
-	using Surfaces = std::vector<Surface>;
-	using PhysicalDevices = std::vector<PhysicalDevice>;
-	using LogicalDevices = std::vector<LogicalDevice>;
-	using Queues = std::vector<Queue>;
-	using Swapchains = std::vector<Swapchain>;
-	using RenderPasses = std::vector<RenderPass>;
-	using DescriptorSetLayouts = std::vector<DescriptorSetLayout>;
-	using ShaderModules = std::vector<ShaderModule>;
-	using GraphicsPipelineLayouts = std::vector<GraphicsPipelineLayout>;
-	using GraphicsPipelines = std::vector<GraphicsPipeline>;
-	using Images = std::vector<Image>;
-	using ImageViews = std::vector<ImageView>;
-	using DeviceMemories = std::vector<DeviceMemory>;
-	using CommandPools = std::vector<CommandPool>;
-	using VertexBuffers = std::vector<VertexBuffer>;
-	using IndexBuffers = std::vector<IndexBuffer>;
-	using UniformBuffers = std::vector<UniformBuffer>;
-	using DescriptorPools = std::vector<DescriptorPool>;
-	using DescriptorSets = std::vector<DescriptorSet>;
-	using CommandBuffers = std::vector<CommandBuffer>;
-	using FrameBuffers = std::vector<FrameBuffer>;
-	using Semaphores = std::vector<Semaphore>;
-	using Fences = std::vector<Fence>;
-	using Samplers = std::vector<Sampler>;
-	using Textures = std::vector<Texture>;
+	using Windows = std::vector<std::unique_ptr<Window>>;//resized callback
+	using Instances = std::vector<std::unique_ptr<Instance>>;
+	using Messengers = std::vector<std::unique_ptr<Messenger>>;
+	using Surfaces = std::vector<std::unique_ptr<Surface>>;
+	using PhysicalDevices = std::vector<std::unique_ptr<PhysicalDevice>>;
+	using LogicalDevices = std::vector<std::unique_ptr<LogicalDevice>>;
+	using Queues = std::vector<std::unique_ptr<Queue>>;
+	using Swapchains = std::vector<std::unique_ptr<Swapchain>>;
+	using RenderPasses = std::vector<std::unique_ptr<RenderPass>>;
+	using DescriptorSetLayouts = std::vector<std::unique_ptr<DescriptorSetLayout>>;
+	using ShaderModules = std::vector<std::unique_ptr<ShaderModule>>;
+	using GraphicsPipelineLayouts = std::vector<std::unique_ptr<GraphicsPipelineLayout>>;
+	using GraphicsPipelines = std::vector<std::unique_ptr<GraphicsPipeline>>;
+	using Images = std::vector<std::unique_ptr<Image>>;
+	using ImageViews = std::vector<std::unique_ptr<ImageView>>;
+	using DeviceMemories = std::vector<std::unique_ptr<DeviceMemory>>;
+	using CommandPools = std::vector<std::unique_ptr<CommandPool>>;
+	using VertexBuffers = std::vector<std::unique_ptr<VertexBuffer>>;
+	using IndexBuffers = std::vector<std::unique_ptr<IndexBuffer>>;
+
+	using UniformBuffers = std::vector<std::unique_ptr<UniformBuffer>>;
+	using DescriptorPools = std::vector<std::unique_ptr<DescriptorPool>>;
+
+	using DescriptorSets = std::vector<std::unique_ptr<DescriptorSet>>;
+	using CommandBuffers = std::vector<std::unique_ptr<CommandBuffer>>;
+	using FrameBuffers = std::vector<std::unique_ptr<FrameBuffer>>;
+	using Semaphores = std::vector<std::unique_ptr<Semaphore>>;
+	using Fences = std::vector<std::unique_ptr<Fence>>;
+	using Samplers = std::vector<std::unique_ptr<Sampler>>;
+	using Textures = std::vector<std::unique_ptr<Texture>>;
+
 	using Draws = std::vector<Draw>;
 	using ImGuis = std::vector<FvkImGui>;
 	using ImGuiImages = std::vector<ImGuiImage>;
@@ -40,7 +43,7 @@ namespace FVK::Internal {
 
 namespace FVK::Internal::Manager {
 
-	//class Manager‚Ådata‚ðˆµ‚¤
+	//used in class Manager.
 	using DataTuple = std::tuple <
 		Glfw,
 		Windows,
@@ -79,8 +82,8 @@ namespace FVK::Internal::Manager {
 		ImGuiImages
 	> ;
 
-	//DataTuple‚Æ‘Î‰ž‚³‚¹‚é
-	//pair::first->FvkType‚É‘Î‰ž‚·‚épair::second->index
+	//Correspondence to DataTuple.
+	//pair::first->FvkType | pair::second->index
 	using CorrespondenceType = std::array<std::pair<FvkType, uint16_t>, 40>;
 	constexpr inline CorrespondenceType Correspondence = {
 		std::make_pair(FvkType::Glfw, 0),
@@ -127,10 +130,9 @@ namespace FVK::Internal::Manager {
 		std::make_pair(FvkType::ImGui, 30),
 		std::make_pair(FvkType::ImGuiImage, 31)
 
-
 	};
 
-	//Type‚©‚çIndex‚ðŽæ“¾
+	//Get Index from Type.
 	template<FvkType Type>
 	consteval CorrespondenceType::value_type::second_type CorrespondenceAt() {
 		auto func = [&](auto& x) {return x.first == Type; };
@@ -205,14 +207,15 @@ namespace FVK::Internal::Manager {
 			return FvkType::ImGui;
 		else if constexpr (std::same_as<T, ImGuiImage>)
 			return FvkType::ImGuiImage;
-
+		else
+			FU::Concept::DelayAssert_T<T>;
 	}
 
 }
 
 namespace FVK::Internal {
 
-	//device waitIdle‚Ì•K—v‚ª‚ ‚é‚©
+	//Whether we need to waitidle or not.
 	template<typename Info>
 	concept IsRequireWaitIdle = requires(Info info) {
 		info.device;

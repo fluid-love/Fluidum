@@ -1,4 +1,5 @@
 ﻿#include "select.h"
+#include "check_path.h"
 #include "directory.h"
 #include <imgui_internal.h>
 #include "../../Coding/TextEditor/texteditor.h"
@@ -33,14 +34,11 @@ FS::Project::Add::Select::Select(
 	style.project = sharedInfo->project;
 
 	//capacity
-	quickInfo.folderPath.reserve(200);
+	quickInfo.directoryPath.reserve(200);
 	quickInfo.fileName.reserve(200);
 
 	//default path -> Project/Src/
-	if (sharedInfo)
-		quickInfo.folderPath = sharedInfo->path;
-	else
-		quickInfo.folderPath = projectRead->getProjectFolderPath() + "Src/";
+	quickInfo.directoryPath = sharedInfo->path;
 
 	quickInfo.fileName = "main";
 
@@ -371,15 +369,15 @@ void FS::Project::Add::Select::bottomRight() {
 	//directory path
 	ImGui::BulletText(text.folderPath); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.95f);
-	ImGui::InputText("##FolderPath", quickInfo.folderPath.data(), quickInfo.folderPath.capacity(), ImGuiInputTextFlags_CallbackAlways, inputTextCallback, &quickInfo.folderPath);
-	pos.folderPath = ImGui::GetItemRectMin();
+	ImGui::InputText("##FolderPath", quickInfo.directoryPath.data(), quickInfo.directoryPath.capacity());
+	pos.directoryPath = ImGui::GetItemRectMin();
 
 	ImGui::Spacing();
 
 	//file path
 	ImGui::BulletText(text.fileName); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.6f);
-	ImGui::InputText("##FileName", quickInfo.fileName.data(), quickInfo.fileName.capacity(), ImGuiInputTextFlags_CallbackAlways, inputTextCallback, &quickInfo.fileName);
+	ImGui::InputText("##FileName", quickInfo.fileName.data(), quickInfo.fileName.capacity());
 	pos.fileName = ImGui::GetItemRectMin();
 	ImGui::SameLine();
 	ImGui::Text(quickInfo.extension.c_str());
@@ -472,43 +470,29 @@ bool FS::Project::Add::Select::createNewFileQuick() {
 
 bool FS::Project::Add::Select::checkQuickInfo() {
 
-	GLog.add<FD::Log::Type::None>("[Project::Add::Select] Check QuickInfo.");
+	std::string directoryPath = this->quickInfo.directoryPath.data();
+	std::string fileName = this->quickInfo.fileName.data();
+	std::string extension = this->quickInfo.extension.data();
 
-	FU::File::tryPushSlash(quickInfo.folderPath);
-	auto [err, path] = Check::checkFile(quickInfo.folderPath, quickInfo.fileName, quickInfo.extension);
+	CheckPath::Info info{
+		.project = sharedInfo->project,
+		.directory = false,
+		.parent = directoryPath,
+		.name = fileName + extension,
+		.pos_name = pos.fileName,
+		.pos_path = pos.directoryPath,
+		.pos_create = pos.create,
+	};
 
-	//no_error -> return true
-	if (err == Check::ErrorType::None) {
-		quickInfo.fullPath = std::move(path);
+	FluidumScene_Log_CallSceneConstructor("Project::Add::CheckPath");
+	Scene::callConstructor<CheckPath>(info);
+
+	if (!info.noerror) {
+		quickInfo.fullPath = std::move(info.fullPath);
 		return true;
 	}
 
 	//error
-	FluidumScene_Log_RequestAddScene("Utils::Message");
-	if (err == Check::ErrorType::EmptyFolderPath) {
-		GLog.add<FD::Log::Type::None>("Error EmptyFolderPath.");
-		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.folderPath);
-	}
-	else if (err == Check::ErrorType::EmptyFileName) {
-		GLog.add<FD::Log::Type::None>("Error EmptyFileName.");
-		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.fileName);
-	}
-	else if (err == Check::ErrorType::NotFound) {
-		GLog.add<FD::Log::Type::None>("Error NotFoundDirectory. Typed directory is {}.", quickInfo.folderPath);
-		Scene::addScene<Utils::Message>(text.error_notFoundDirectory, pos.create);
-	}
-	else if (err == Check::ErrorType::AlreadyExist) {
-		GLog.add<FD::Log::Type::None>("Error AlreadyExist. Typed filename is {}({}).", quickInfo.fileName, path);
-		Scene::addScene<Utils::Message>(text.error_alreadyExistFile, pos.create);
-	}
-	else if (err == Check::ErrorType::ForbiddenCharactor) {
-		GLog.add<FD::Log::Type::None>("Error ForbiddenCharactor. Typed filename is {}({}).", quickInfo.fileName, path);
-		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, pos.fileName);
-	}
-	else {
-		FluidumScene_Log_SeriousError_ThrowException();
-	}
-
 	return false;
 }
 
@@ -517,39 +501,4 @@ void FS::Project::Add::Select::close() {
 	Scene::deleteScene<Select>();
 	FluidumScene_Log_RequestAddScene("TextEditor");
 	Scene::addScene<TextEditor>();
-}
-
-int FS::Project::Add::Select::inputTextCallback(ImGuiInputTextCallbackData* data) {
-	std::string* str = static_cast<std::string*>(data->UserData);
-	if (str->size() == data->BufTextLen)
-		return 0;
-
-	str->resize(data->BufTextLen);
-
-	return 0;
-}
-
-std::pair<FS::Project::Add::Select::Check::ErrorType, std::string> FS::Project::Add::Select::Check::checkFile(const std::string& folderPath, const std::string& fileName, const std::string& extension) {
-
-	if (folderPath.empty()) {
-		return { ErrorType::EmptyFolderPath,{} };
-	}
-
-	if (fileName.empty())
-		return { ErrorType::EmptyFileName,{} };
-
-	//folder
-	bool result = !std::filesystem::is_directory(folderPath);
-	if (result)
-		return { ErrorType::NotFound,{} };
-
-	std::string filePath = folderPath + fileName + extension;
-	result = std::filesystem::exists(filePath);
-	if (result)
-		return { ErrorType::AlreadyExist,filePath };
-
-	if (FU::File::containForbiddenCharactor(fileName + extension))
-		return { ErrorType::ForbiddenCharactor,filePath };
-
-	return { ErrorType::None,filePath };
 }

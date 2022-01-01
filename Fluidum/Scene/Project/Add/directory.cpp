@@ -1,14 +1,17 @@
 ﻿#include "directory.h"
 #include "../../Utils/Popup/message.h"
 #include "select.h"
+#include "check_path.h"
 
 FS::Project::Add::Directory::Directory(
 	const FD::GuiRead* const guiRead,
 	const FD::SceneRead* const sceneRead,
+	const FD::UserFilesRead* const userFilesRead,
 	std::shared_ptr<SharedInfo>& sharedInfo
 ) :
 	sceneRead(sceneRead),
-	sharedInfo(sharedInfo)
+	sharedInfo(sharedInfo),
+	userFilesRead(userFilesRead)
 {
 	FluidumScene_Log_Constructor("Project::Add::Directory");
 
@@ -144,41 +147,38 @@ void FS::Project::Add::Directory::create() {
 	GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Create directory.");
 
 	const std::string typedName = str.name.c_str();
-	std::string path = str.parent + typedName;
+	std::string parent = sharedInfo->path;
+	FU::File::tryPushSlash(parent);
 
-	if (typedName.empty()) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Directory name id empty.");
-		FluidumScene_Log_RequestAddScene("Utils::Message");
-		Scene::addScene<Utils::Message>(text.error_fill, pos.name);
+	CheckPath::Info info{
+		.project = sharedInfo->project,
+		.directory = true,
+		.parent = parent,
+		.name = typedName,
+		.pos_name = pos.name,
+		.pos_path = pos.directory,
+		.pos_create = pos.create,
+	};
+
+	FluidumScene_Log_CallSceneConstructor("Project::Add::CheckPath");
+	Scene::callConstructor<CheckPath>(info);
+
+	if (!info.noerror)
 		return;
-	}
 
-	if (std::filesystem::exists(path)) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Directory path({}) already exists.", path);
-		FluidumScene_Log_RequestAddScene("Utils::Message");
-		Scene::addScene<Utils::Message>(text.error_alreadyExist, pos.create);
-		return;
+	if (sharedInfo->project) {
+		if (!std::filesystem::create_directory(info.fullPath)) {
+			GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Failed to create directory.");
+			FluidumScene_Log_RequestAddScene("Utils::Message");
+			Scene::addScene<Utils::Message>(text.error_unexpected, pos.create);
+			return;
+		}
 	}
-
-	if (FU::File::containForbiddenCharactor(typedName)) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Directoryname({}) contains forbidden character.", typedName);
-		FluidumScene_Log_RequestAddScene("Utils::Message");
-		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, pos.name);
-		return;
-	}
-
-	if (!std::filesystem::create_directory(path)) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Failed to create directory.");
-		FluidumScene_Log_RequestAddScene("Utils::Message");
-		Scene::addScene<Utils::Message>(text.error_unexpected, pos.create);
-		return;
-	}
-
 
 	//info
 	{
 		sharedInfo->type = SharedInfo::Type::Directory;
-		sharedInfo->path = std::move(path);
+		sharedInfo->path = std::move(info.fullPath);
 		sharedInfo->create = true;
 	}
 

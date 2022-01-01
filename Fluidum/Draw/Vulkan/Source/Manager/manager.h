@@ -13,26 +13,48 @@ namespace FVK::Internal::Manager {
 		FluidumUtils_Class_Delete_CopyMove(Manager)
 
 	public:
-
-		//追加する
-		//Windowなど他のアイテムの情報が必要ない場合
+		/*
+		Exception:
+			std::exception
+			CollisionOfKeys
+			FailedToCreate
+		*/
+		//strong
+		//if item don't need any other data.
 		template<FvkType Type, IsParameter Parameter>
 		void add(const char* key, Parameter& parameter) {
 			static_assert(GetRequiredDataSize<Type>() == 0);
 
-			//keyの被り
-			if (Internal::GKeyManager.isKeyCollision(key))
+			//Same name is not allowed.
+			if (GKeyManager.isKeyCollided(key))
 				Exception::throwCollisionOfKeys(key);
 
-			auto ptr = getPtr<Type>();
+			//No duplicate names guaranteed.
+			try {
+				//strong
+				GKeyManager.add<ToHandleType<Type>()>(key);
+			}
+			catch (const FKM::Exception::Error& e) {
+				if (e.code() == FKM::Exception::ErrorType::ReachIndexLimit) {
+					GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "The maximum number of items that can be added has been exceeded.");
+					Exception::throwFailedToCreate();
+				}
+				else {
+					GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "");
+					Exception::throwUnexpected();
+				}
+			}
+
+			auto ptr = this->getItemVectorPtr<Type>();
 			Data::Data<Type> requiredData({});
 
-			//std::vector::value_type 各アイテムのクラス
+			//std::vector::value_type(Class of each item).
 			using ValueType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type;
-			ptr->emplace_back(ValueType(ManagerPassKey{}, requiredData, parameter));
 
-			//keyを登録
-			GKeyManager.add<ToObjectType<Type>()>(key);
+			//https://eel.is/c++draft/vector.modifiers
+			//strong
+			static_assert(std::is_nothrow_move_constructible_v<ValueType>);
+			ptr->emplace_back(ValueType(ManagerPassKey{}, requiredData, parameter));
 		}
 
 		//追加する
@@ -66,12 +88,25 @@ namespace FVK::Internal::Manager {
 			GKeyManager.add_recursive<ToObjectType<Type>()>(key, toKeyAddType<dataTypes>(connections));
 		}
 
-
-		//削除する
-		template<FvkType Type,/*Key::IsKeyバグ*/typename T>
+	public:
+		/*
+		Exception:
+			std::exception
+			CollisionOfKeys
+			FailedToCreate
+		*/
+		//strong
+		//if item don't need any other data.		
+		template<FvkType Type, Key::IsKey T>
 		void erase(const T& key) {
 			//throw NotFound
-			const IndexKey index = Key::Converter::toIndexKey(key);
+			IndexKey index{};
+			try {
+				index = Key::Converter::toIndexKey(key);
+			}
+			catch () {
+
+			}
 
 			auto ptr = getPtr<Type>();
 
@@ -158,77 +193,100 @@ namespace FVK::Internal::Manager {
 
 	private:
 
-		//constなし
+		//no-throw
+		//not const
 		template<FvkType Type>
-		_NODISCARD auto getPtr() {
-			return &std::get<CorrespondenceAt<Type>()>(data);
-		}
-		//constあり
-		template<FvkType Type>
-		_NODISCARD auto getPtr() const {
+		[[nodiscard]] auto getItemVectorPtr() noexcept {
 			return &std::get<CorrespondenceAt<Type>()>(data);
 		}
 
+		//no-throw
+		//const
 		template<FvkType Type>
-		_NODISCARD auto get(const FKM::IndexKey key) {
-			auto data = getPtr<Type>();
-			return data->at(key).get();
+		[[nodiscard]] auto getItemVectorPtr() const noexcept {
+			return &std::get<CorrespondenceAt<Type>()>(data);
 		}
 
+		/*
+		Exception:
+			std::exception
+		*/
+		//strong
 		template<FvkType Type>
-		_NODISCARD Data::CorrespondenceType<Type> getRef(const std::vector<FKM::IndexKey>& keys) const {
+		[[nodiscard]] auto getItem(const FKM::IndexKey key) const {
+			auto data = getItemVectorPtr<Type>();
+			auto& at = data->at(key);
+			static_assert(noexcept(at.get()));
+			return at.get();
+		}
+
+		/*
+		Exception:
+			std::exception
+		*/
+		//strong
+		template<FvkType Type>
+		[[nodiscard]] Data::CorrespondenceType<Type> getRef(const std::vector<FKM::IndexKey>& keys) const {
 			using T = Data::CorrespondenceType<Type>;
 
-			auto data = getPtr<Type>();
-			if constexpr (FU::Concept::IsStdVector<T>) {
-				std::remove_const_t<T> result;
+			//no-throw
+			auto data = getItemVectorPtr<Type>();
 
-				for (std::size_t i = 0, size = keys.size(); i < size; i++) {
-					result.emplace_back(data->at(keys[i]).get());
+			if constexpr (FU::Concept::IsStdVector<T>) {
+				std::remove_const_t<T> result{};
+
+				for (Size i = 0, size = keys.size(); i < size; i++) {
+					result.emplace_back(this->getItem(keys[i]));
 				}
 				return result;
 			}
-			else {
-				return data->at(keys.at(0)).get();
+			else {//not vector
+				assert(keys.size() == 1);
+				//strong
+				return this->getItem(keys.at(0));
 			}
 		}
 
 		template<auto DataTypes, FU::Concept::IsStdArray Array, std::size_t... Index>
-		_NODISCARD auto fillData(std::index_sequence<Index...>, const Array& connections) {
+		[[nodiscard]] auto fillData(std::index_sequence<Index...>, const Array& connections) {
 			return std::make_tuple(this->getRef<DataTypes.at(Index)>(connections.at(Index))...);
 		}
 
 		template<auto DataTypeArray>
 		static consteval auto DataTypeArrayToAddKeyDataTypeArray() {
 			using Array = decltype(DataTypeArray);
-			Array result;
-			for (std::size_t i = 0; const auto & x : DataTypeArray) {
-				result.at(i) = ToObjectType(x);
+			Array result{};
+			for (Size i = 0; const auto & x : DataTypeArray) {
+				result.at(i) = ToHandleType(x);
 				i++;
 			}
 			return result;
 		}
 
-		//KeyManager
-		template<auto DataTypeArray, std::size_t Size>
-		std::vector<std::pair<FvkType, IndexKey>> toKeyAddType(const std::array<std::vector<IndexKey>, Size>& indices) const {
-			assert(DataTypeArray.size() == Size);
+		/*
+		Exception:
+			std::exception
+		*/
+		//strong
+		template<auto DataTypeArray, Size N>
+		std::vector<std::pair<FvkType, IndexKey>> toKeyAddType(const std::array<std::vector<IndexKey>, N>& indices) const {
+			assert(DataTypeArray.size() == N);
 			constexpr auto currectDataTypeArray = DataTypeArrayToAddKeyDataTypeArray<DataTypeArray>();
-			std::vector<std::pair<FvkType, IndexKey>> result;
-			for (std::size_t i = 0; i < Size; i++) {
-				for (std::size_t j = 0, size = indices[i].size(); j < size; j++) {
+			std::vector<std::pair<FvkType, IndexKey>> result{};
+			static_assert(std::is_nothrow_move_constructible_v<decltype(result)::value_type>);
+			for (Size i = 0; i < N; i++) {
+				for (Size j = 0, size = indices[i].size(); j < size; j++) {
 					result.emplace_back(std::make_pair(currectDataTypeArray[i], indices[i][j]));
 				}
 			}
 			return result;
 		}
 
-
-
 	public://terminate
-		//全ての所有するアイテムを破壊・解放する
+		//must be terminated explicitly.
 		void terminate();
 
+	private:
 		template<std::size_t Index = std::tuple_size_v<DataTuple>>
 		void terminate_recursive() {
 			if constexpr (Index == 0)
@@ -253,15 +311,15 @@ namespace FVK::Internal::Manager {
 
 	private://data
 		DataTuple data = [&]() -> DataTuple {
-			auto element = []<uint16_t Index, bool IsVector>() ->auto {
+			auto element = []<Size Index, bool IsVector>() ->auto {
 				if constexpr (IsVector)
 					return std::tuple_element_t<Index, DataTuple>();
 				else
 					return ManagerPassKey();
 			};
-			return[&]<uint16_t...Index>(std::integer_sequence<uint16_t, Index...>)->DataTuple {
+			return[&]<Size...Index>(std::integer_sequence<Size, Index...>)->DataTuple {
 				return DataTuple(element.operator() < Index, FU::Concept::IsStdVector<std::tuple_element_t<Index, DataTuple>> > ()...);
-			}(std::make_integer_sequence<uint16_t, std::tuple_size_v<DataTuple>>());
+			}(std::make_integer_sequence<Size, std::tuple_size_v<DataTuple>>());
 		}();
 
 
@@ -269,7 +327,7 @@ namespace FVK::Internal::Manager {
 }
 
 
-//Manager本体  Global
+//Manager
 namespace FVK::Internal {
 	inline std::unique_ptr<Manager::Manager> GManager = nullptr;
 }

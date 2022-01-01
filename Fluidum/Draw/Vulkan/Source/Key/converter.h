@@ -6,9 +6,9 @@ namespace FVK::Internal::Key {
 
 	class Converter final {
 	public:
-		//VariantKey‚©variant<vector>
+		//VariantKey or variant<vector>
 		template<FvkType Type, typename... T>
-		_NODISCARD static auto variantKeysToConnectionKeysBase(const T&... vars) {
+		[[nodiscard]] static auto variantKeysToConnectionKeysBase(const T&... vars) {
 
 			auto func = []<typename U>(const U & var)->std::vector<OrderKey> {
 				if (var.index() == 0)

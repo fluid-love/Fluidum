@@ -31,10 +31,11 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Common\common.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Common\resource.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Console\console.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Gui\color.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\layout.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\Style\color.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\Style\var.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\text.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Gui\topbar.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\tool.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Limits\limits.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\console.h" />
@@ -65,10 +66,6 @@
     <ClInclude Include="..\..\..\Fluidum\Draw\Source\Vulkan\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Source\Vulkan\Initialization\initialize.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\include.h" />
-    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\exception.h" />
-    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\info.h" />
-    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\manager.h" />
-    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\api.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\assist.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\using.h" />
@@ -137,6 +134,11 @@
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\surface.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\swapchain.h" />
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\window.h" />
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\include.h" />
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\exception.h" />
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\info.h" />
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\manager.h" />
+    <ClInclude Include="..\..\..\Fluidum\KeyManager\Source\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Manager\Data\manager.h" />
     <ClInclude Include="..\..\..\Fluidum\Manager\Data\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Manager\include.h" />
@@ -179,6 +181,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Genome\Overview\overview.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Layout\layout.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\check_path.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\directory.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\new.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\select.h" />
@@ -203,6 +206,7 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\Cursor\cursor.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Debug\consolelog.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Debug\warning.h" />
+    <ClInclude Include="..\..\..\Fluidum\Utils\Exception\exception.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\File\file.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\File\path.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\File\text.h" />
@@ -214,6 +218,7 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\MessageBox\messagebox.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Text\guitext.h" />
     <ClInclude Include="..\..\..\Fluidum\Utils\Tuple\tuple.h" />
+    <ClInclude Include="..\..\..\Fluidum\Utils\Type\type.h" />
     <ClInclude Include="..\..\..\Internal\LuAssist\Common\type.h" />
     <ClInclude Include="..\..\..\Internal\LuAssist\type.h" />
     <ClInclude Include="..\..\..\Internal\LuAssist\utils.h" />
@@ -237,10 +242,11 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Coding\tab.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Console\console.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Data\Gui\color.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\layout.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\Style\color.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\Style\var.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\text.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Data\Gui\topbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\tool.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Log\log.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\file.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\project.cpp" />
@@ -255,9 +261,6 @@
     <ClCompile Include="..\..\..\Fluidum\Draw\Source\Vulkan\Base\mainloop.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Source\Vulkan\Image\imgui_image.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Source\Vulkan\Initialization\initialize.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\exception.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\info.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\KeyManager\Source\type.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\api.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Api\assist.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Buffer\buffer.cpp" />
@@ -299,6 +302,9 @@
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\surface.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\swapchain.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Window\window.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\exception.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\info.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\type.cpp" />
     <ClCompile Include="..\..\..\Fluidum\main.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Analysis\Func\function.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Analysis\Overview\overview.cpp" />
@@ -349,6 +355,7 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Flu\Node\node.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Genome\Overview\overview.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Layout\layout.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\check_path.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\directory.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\new.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\select.cpp" />
@@ -388,6 +395,7 @@
     <None Include="..\..\..\Resources\Gui\Text\Japanese\NewProject" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\PopupSelect" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Project" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectCheckPath" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectDirectory" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectForm" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectNewFile" />

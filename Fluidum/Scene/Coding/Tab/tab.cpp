@@ -78,7 +78,7 @@ void FS::Coding::Tab::checkWindowShouldClose() {
 //
 //	using enum FD::Coding::TabWrite::Exception;
 //	try {
-//		tabWrite->addFile(*outPath.get());
+//		tabWrite->add(*outPath.get());
 //	}
 //	catch (const FD::Coding::TabWrite::Exception type) {
 //		if (type == AlreadyExist) {
@@ -220,7 +220,7 @@ void FS::Coding::Tab::closeButton() {
 void FS::Coding::Tab::close() {
 	auto& current = info.files.at(select.index);
 	if (tabRead->isTextSaved(current.path)) {
-		tabWrite->eraseFile(current.path);
+		tabWrite->remove(current.path);
 		tabWrite->save();
 		return;
 	}
@@ -229,10 +229,10 @@ void FS::Coding::Tab::close() {
 	int32_t button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
 	if (button == 0) {//save close
 		tabWrite->saveText(current.path);
-		tabWrite->eraseFile(current.path);
+		tabWrite->remove(current.path);
 	}
 	else if (button == 1) {//without saving
-		tabWrite->eraseFile(current.path);
+		tabWrite->remove(current.path);
 	}
 	else if (button == 2)//cancel
 		return;

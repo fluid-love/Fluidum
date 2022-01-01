@@ -23,8 +23,7 @@ namespace FDR {
 	そして，引数のfunctionを毎フレーム適切な場所で呼び出す
 
 	フォントはfreetypeを利用して3つロードされる.
-		fa_
-
+		
 	注意：setMessengerCallbackFunctionを除き，全ての関数はmainLoopないで呼ばなければならない
 
 	引数:
@@ -67,14 +66,14 @@ namespace FDR {
 	/*
 	戻り値: {width, height}
 	*/
-	FluidumDrawAPI _NODISCARD std::pair<int32_t, int32_t> getWindowSize();
+	FluidumDrawAPI [[nodiscard]] std::pair<int32_t, int32_t> getWindowSize();
 
 
 	//Windowの位置を取得
 	/*
 	戻り値: {x, y}
 	*/
-	FluidumDrawAPI _NODISCARD std::pair<int32_t, int32_t> getWindowPos();
+	FluidumDrawAPI [[nodiscard]] std::pair<int32_t, int32_t> getWindowPos();
 
 
 	//Windowのサイズを変更
@@ -152,7 +151,7 @@ namespace FDR {
 namespace FDR {
 
 	//デフォルトで用意したフォントの小さいサイズを取得 ImGui::PushFont用
-	FluidumDrawAPI _NODISCARD ImFont* getDefaultFontMiniSize();
+	FluidumDrawAPI [[nodiscard]] ImFont* getDefaultFontMiniSize();
 
 
 }

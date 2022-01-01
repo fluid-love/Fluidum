@@ -9,131 +9,147 @@
 
 namespace FU::Tuple {
 
-
 	template<typename... T>
 	concept IsTuple = ::FU::Concept::IsTuple<T...>;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace FU::Tuple {
 
-
-	template <std::size_t N, typename Class, typename Return, typename ... Args>
-	_NODISCARD constexpr auto getFunctionArgType(Return(Class::*)(Args...)) {
-		return std::tuple_element_t<N, std::tuple<Args...>>();
-	};
-
-	template <std::size_t N, typename Return, typename ... Args>
-	_NODISCARD constexpr auto getFunctionArgType(Return(*)(Args...)) {
-		return std::tuple_element_t<N, std::tuple<Args...>>();
-	};
-
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	template<auto Function>
-	struct ClassFunctionArgsToTuple final {
-	private:
-		template<typename... Args>
-		struct Tuple final {
-			using Type = std::tuple<Args...>;
+	namespace Internal {
+		template <Size N, typename Class, typename Return, typename ... Args>
+		consteval auto GetFunctionArgType(Return(Class::*)(Args...)) {
+			static_assert(N < sizeof...(Args));
+			return std::tuple_element_t<N, std::tuple<Args...>>();
 		};
-		template <typename Class, typename Return, typename... Args>
-		static constexpr auto arg(Return(Class::*)(Args...)) {
-			return Tuple<Args...>();
-		}
-	public:
-		using Type = typename decltype(arg(Function))::Type;
-	};
 
-	template<auto Function>
-	struct NonClassFunctionArgsToTuple final {
-	private:
-		template<typename... Args>
-		struct Tuple final {
-			using Type = std::tuple<Args...>;
+		template <Size N, typename Return, typename ... Args>
+		consteval auto GetFunctionArgType(Return(*)(Args...)) {
+			static_assert(N < sizeof...(Args));
+			return std::tuple_element_t<N, std::tuple<Args...>>();
 		};
-		template <typename Return, typename... Args>
-		static constexpr auto arg(Return(*)(Args...)) {
-			return Tuple<Args...>();
-		}
-	public:
-		using Type = typename decltype(arg(Function))::Type;
-	};
+
+		template<Size N, auto Function>
+		requires(::FU::Concept::IsFunction<Function>)
+			struct FunctionArgType final {
+			using Type = decltype(GetFunctionArgType<N>(Function));
+		};
+	}
+
+	//void hoge(int) -> FunctionArgType<0, hoge> == int
+	//struct A{void hoge(int){} }; -> FunctionArgType<0, &A::hoge> == int
+	template<Size N, auto Function>
+	using FunctionArgType = Internal::FunctionArgType<N, Function>::Type;
+
+}
+
+namespace FU::Tuple {
+
+	namespace Internal {
+		template<auto Function>
+		struct ClassFunctionArgsToTuple final {
+		private:
+			template<typename... Args>
+			struct Tuple final {
+				using Type = std::tuple<Args...>;
+			};
+			template <typename Class, typename Return, typename... Args>
+			static constexpr auto arg(Return(Class::*)(Args...)) {
+				return Tuple<Args...>();
+			}
+		public:
+			using Type = typename decltype(arg(Function))::Type;
+		};
+
+		template<auto Function>
+		struct NonClassFunctionArgsToTuple final {
+		private:
+			template<typename... Args>
+			struct Tuple final {
+				using Type = std::tuple<Args...>;
+			};
+			template <typename Return, typename... Args>
+			static constexpr auto arg(Return(*)(Args...)) {
+				return Tuple<Args...>();
+			}
+		public:
+			using Type = typename decltype(arg(Function))::Type;
+		};
+
+		template<auto Function>
+		requires Concept::IsFunction<Function>
+			struct FunctionArgsToTuple final {
+			using Type = std::conditional_t<Concept::IsMemberFunctionPointer<Function>, ClassFunctionArgsToTuple<Function>, NonClassFunctionArgsToTuple<Function>>::Type;
+		};
+	}
 
 	template<auto Function>
-	requires Concept::IsFunction<Function>
-		struct FunctionArgsToTuple final {
-		using Type = std::conditional_t<Concept::IsMemberFunctionPointer<Function>, ClassFunctionArgsToTuple<Function>, NonClassFunctionArgsToTuple<Function>>::Type;
-	};
+	using FunctionArgsToTupleType = Internal::FunctionArgsToTuple<Function>::Type;
 
-	template<auto Function>
-	using FunctionArgsToTupleType = FunctionArgsToTuple<Function>::Type;
+}
 
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	template <typename Class, typename Return, typename ... Args>
-	_NODISCARD constexpr auto getFunctionArgsSize(Return(Class::*)(Args...)) {
+	[[nodiscard]] constexpr Size getFunctionArgsSize(Return(Class::*)(Args...)) {
 		auto size = std::tuple_size_v<std::tuple<Args...>>;
 		return size;
 	};
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	//count same type(Type) in tuple.
 	namespace Internal {
 
-		template<std::size_t Size, IsTuple Tuple, typename Type>
-		_NODISCARD consteval std::size_t getSameTypeSize() {
-			if constexpr (Size == 0)
+		template<Size N, IsTuple Tuple, typename Type>
+		consteval Size GetSameTypeSize() {
+			if constexpr (N == 0)
 				return 0;
 			else {
-				using T = std::tuple_element_t<Size - 1, Tuple>;
+				using T = std::tuple_element_t<N - 1, Tuple>;
 
 				if (std::is_same_v<T, Type>)
-					return  getSameTypeSize<Size - 1, Tuple, Type>() + 1;
+					return  GetSameTypeSize<N - 1, Tuple, Type>() + 1;
 				else
-					return  getSameTypeSize<Size - 1, Tuple, Type>();
+					return  GetSameTypeSize<N - 1, Tuple, Type>();
 			}
 		}
 	}
 
 	template<IsTuple Tuple, typename Type>
-	_NODISCARD consteval std::size_t getSameTypeSize() {
+	[[nodiscard]] consteval Size GetSameTypeSize() {
 		constexpr auto tupleSize = std::tuple_size_v<Tuple>;
-		return Internal::getSameTypeSize<tupleSize, Tuple, Type>();
+		return Internal::GetSameTypeSize<tupleSize, Tuple, Type>();
 	}
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	//exist same type in tuple -> true
 	template <IsTuple Tuple, typename Type>
-	_NODISCARD consteval bool isSameTypeContain() {
-		if (getSameTypeSize<Tuple, Type>() > 0)
+	[[nodiscard]] consteval bool IsSameTypeContain() {
+		if (GetSameTypeSize<Tuple, Type>() > 0)
 			return true;
 		else
 			return false;
 	}
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	namespace Internal {
 
-		template <std::size_t Size, IsTuple Tuple>
-		_NODISCARD consteval bool isSameTypeInTuple() {
-			if constexpr (Size == 0)
+		template <Size N, IsTuple Tuple>
+		consteval bool IsSameTypeInTuple() {
+			if constexpr (N == 0)
 				return false;
 			else {
-				using T = std::tuple_element_t<Size - 1, Tuple>;
-				if constexpr (FU::Tuple::getSameTypeSize<Tuple, T>() > 1)
+				using T = std::tuple_element_t<N - 1, Tuple>;
+				if constexpr (FU::Tuple::GetSameTypeSize<Tuple, T>() > 1)
 					return true;
 				else
 					return false;
@@ -143,26 +159,26 @@ namespace FU::Tuple {
 	}
 
 	template <IsTuple Tuple>
-	_NODISCARD consteval bool isSameTypeInTuple() {
+	[[nodiscard]] consteval bool IsSameTypeInTuple() {
 		constexpr auto tupleSize = std::tuple_size_v<Tuple>;
-		return Internal::isSameTypeInTuple<tupleSize, Tuple>();
+		return Internal::IsSameTypeInTuple<tupleSize, Tuple>();
 	}
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	namespace Internal {
-		template <std::size_t Size, IsTuple Tuple, typename Type>
-		consteval std::size_t getSameTypeIndex() {
-			if constexpr (Size == 0)
-				return std::numeric_limits<std::size_t>::max();
+		template <Size N, IsTuple Tuple, typename Type>
+		consteval Size GetSameTypeIndex() {
+			if constexpr (N == 0)
+				return std::numeric_limits<Size>::max();
 			else {
-				using T = std::tuple_element_t<Size - 1, Tuple>;
+				using T = std::tuple_element_t<N - 1, Tuple>;
 				if (std::is_same_v<T, Type>)
-					return  Size - 1;
+					return  N - 1;
 				else
-					return getSameTypeIndex<Size - 1, Tuple, Type>();
+					return GetSameTypeIndex<N - 1, Tuple, Type>();
 			}
 		}
 	}
@@ -172,93 +188,98 @@ namespace FU::Tuple {
 	//getSameTypeIndex<std::tuple<int,float>>() == 1
 	//static_assert: getSameTypeIndex<std::tuple<int,int>>() same type in tuple
 	template <IsTuple Tuple, typename Type>
-	consteval std::size_t getSameTypeIndex() {
-		static_assert(getSameTypeSize<Tuple, Type>() == 1);
+	[[nodiscard]] consteval Size GetSameTypeIndex() {
+		static_assert(GetSameTypeSize<Tuple, Type>() == 1);
 		constexpr auto tupleSize = std::tuple_size_v<Tuple>;
-		return Internal::getSameTypeIndex<tupleSize, Tuple, Type>();
+		return Internal::GetSameTypeIndex<tupleSize, Tuple, Type>();
 	}
 
 	//Under
-	template <std::size_t Under, IsTuple Tuple, typename Type>
-	consteval std::size_t getSameTypeIndexUnder() {
-		return Internal::getSameTypeIndex<Under, Tuple, Type>();
+	template <Size Under, IsTuple Tuple, typename Type>
+	[[nodiscard]] consteval Size GetSameTypeIndexUnder() {
+		return Internal::GetSameTypeIndex<Under, Tuple, Type>();
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
 
-	template<std::size_t ...T>
+namespace FU::Tuple {
+
+	template<Size ...T>
 	struct Indices final {
 		using Value = std::index_sequence<T...>;
 
-		template<std::size_t index>
-		constexpr auto push() const ->Indices<T..., index> {
-			return Indices<T..., index>();
+		template<Size Index>
+		constexpr auto push() const ->Indices<T..., Index> {
+			return Indices<T..., Index>();
 		}
 
-		template<std::size_t index>
-		constexpr auto pushFront() const ->Indices<index, T...> {
-			return Indices<index, T...>();
+		template<Size Index>
+		constexpr auto pushFront() const ->Indices<Index, T...> {
+			return Indices<Index, T...>();
 		}
 	};
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
 
+namespace FU::Tuple {
 
 	namespace Internal {
 
-		template <std::size_t Size, IsTuple BaseTuple, IsTuple Tuple>
-		consteval auto getSameTupleTypeIndices() {
-			if constexpr (Size == 0)
+		template <Size N, IsTuple BaseTuple, IsTuple Tuple>
+		consteval auto GetSameTupleTypeIndices() {
+			if constexpr (N == 0)
 				return Indices<>();
 			else {
-				using T = std::tuple_element_t<Size - 1, Tuple>;
-				constexpr auto index = FU::Tuple::getSameTypeIndex<BaseTuple, T>();
-				auto result = getSameTupleTypeIndices<Size - 1, BaseTuple, Tuple>();
+				using T = std::tuple_element_t<N - 1, Tuple>;
+				constexpr auto index = FU::Tuple::GetSameTypeIndex<BaseTuple, T>();
+				auto result = GetSameTupleTypeIndices<N - 1, BaseTuple, Tuple>();
 				return result.push<index>();
 			}
 		}
 
-	}
+		template <IsTuple BaseTuple, IsTuple Tuple>
+		[[nodiscard]] consteval auto GetSameTupleTypeIndices_() {
+			constexpr auto tupleSize = std::tuple_size_v<Tuple>;
+			return GetSameTupleTypeIndices<tupleSize, BaseTuple, Tuple>();
+		}
 
-	template <IsTuple BaseTuple, IsTuple Tuple>
-	consteval auto getSameTupleTypeIndices() {
-		constexpr auto tupleSize = std::tuple_size_v<Tuple>;
-		return Internal::getSameTupleTypeIndices<tupleSize, BaseTuple, Tuple>();
 	}
 
 	template <IsTuple BaseTuple, IsTuple Tuple>
 	struct SameTupleTypeIndices final {
-		using Sequence = decltype(getSameTupleTypeIndices<BaseTuple, Tuple>())::template Value;
+		using Sequence = decltype(Internal::GetSameTupleTypeIndices_<BaseTuple, Tuple>())::template Value;
 	};
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+namespace FU::Tuple {
 
 	namespace Internal {
 
-		template<std::size_t Size, IsTuple Tuple>
-		_NODISCARD consteval bool isConstElementContain() {
-			if constexpr (Size == 0)
+		template<Size N, IsTuple Tuple>
+		consteval bool IsConstElementContain() {
+			if constexpr (N == 0)
 				return false;
 			else {
-				using T = std::tuple_element_t<Size - 1, Tuple>;
+				using T = std::tuple_element_t<N - 1, Tuple>;
 				if (std::is_const_v<T>)
 					return false;
 				else
-					return isConstElementContain<Size - 1, Tuple>();
+					return IsConstElementContain<N - 1, Tuple>();
 			}
 		}
 
 	}
 
 	template<IsTuple Tuple>
-	_NODISCARD consteval bool isConstElementContain() {
+	[[nodiscard]] consteval bool IsConstElementContain() {
 		constexpr auto tupleSize = std::tuple_size_v<Tuple>;
-		return Internal::isConstElementContain<tupleSize, Tuple>();
+		return Internal::IsConstElementContain<tupleSize, Tuple>();
 	}
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	namespace Internal {
 
@@ -277,39 +298,40 @@ namespace FU::Tuple {
 			}
 		};
 
-		template<std::size_t N, std::size_t Size, IsTuple Tuple, typename Type>
-		_NODISCARD consteval auto changeElementType() {
-			if constexpr (Size == 0) {
+		template<Size I, Size N, IsTuple Tuple, typename Type>
+		consteval auto ChangeElementType_() {
+			if constexpr (N == 0) {
 				return TempTuple<>();
 			}
-			else if constexpr (N == (Size - 1)) {
-				auto result = changeElementType<N, Size - 1, Tuple, Type>();
+			else if constexpr (I == (N - 1)) {
+				auto result = ChangeElementType_<N, N - 1, Tuple, Type>();
 				auto next = result.pushBack<Type>();
 				return next;
 			}
 			else {
-				using T = std::tuple_element_t<Size - 1, Tuple>;
-				auto result = changeElementType<N, Size - 1, Tuple, Type>();
+				using T = std::tuple_element_t<N - 1, Tuple>;
+				auto result = ChangeElementType_<I, N - 1, Tuple, Type>();
 				auto next = result.pushBack<T>();
 				return next;
 			}
 		}
 
+		template<Size N, IsTuple Tuple, typename Type>
+		[[nodiscard]] consteval auto ChangeElementType() {
+			constexpr auto tupleSize = std::tuple_size_v<Tuple>;
+			return ChangeElementType_<N, tupleSize, Tuple, Type>();
+		}
+
 	}
 
-	template<std::size_t N, IsTuple Tuple, typename Type>
-	_NODISCARD consteval auto changeElementType() {
-		constexpr auto tupleSize = std::tuple_size_v<Tuple>;
-		return Internal::changeElementType<N, tupleSize, Tuple, Type>();
-	}
-
-	template<std::size_t N, IsTuple Tuple, typename Type>
+	template<Size N, IsTuple Tuple, typename Type>
 	struct ChangeElementType final {
-		using ChangedTuple = decltype(changeElementType<N, Tuple, Type>())::template Tuple;
+		using ChangedTuple = decltype(Internal::ChangeElementType<N, Tuple, Type>())::template Tuple;
 	};
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace FU::Tuple {
 
 	namespace Internal {
 
@@ -319,8 +341,8 @@ namespace FU::Tuple {
 			using Ty = U;
 		};
 
-		template<std::size_t Size1, std::size_t Size2, IsTuple Tuple1, IsTuple Tuple2>
-		_NODISCARD consteval auto getValue() {
+		template<Size Size1, Size Size2, IsTuple Tuple1, IsTuple Tuple2>
+		consteval auto GetValue() {
 			if constexpr (Size1 > 0) {
 				using V = std::tuple_element_t<Size1 - 1, Tuple1>;
 				return ReturnType<V>();
@@ -331,10 +353,10 @@ namespace FU::Tuple {
 			}
 		}
 
-		template<std::size_t Size1, std::size_t Size2, bool Next, IsTuple Tuple1, IsTuple Tuple2, typename... T>
+		template<Size Size1, Size Size2, bool Next, IsTuple Tuple1, IsTuple Tuple2, typename... T>
 		struct TupleCat final {
 
-			using ValueType = decltype(getValue<Size1, Size2, Tuple1, Tuple2>())::template Ty;
+			using ValueType = decltype(GetValue<Size1, Size2, Tuple1, Tuple2>())::template Ty;
 			using Result = TupleCat<!Next ? Size1 - 1 : 0, Next ? Size2 - 1 : Size2, (Size1 <= 1), Tuple1, Tuple2, ValueType, T...>;
 			using Type = Result::Type;
 		};
@@ -344,44 +366,58 @@ namespace FU::Tuple {
 			using Type = std::tuple<T...>;
 		};
 
+		template<IsTuple Tuple1, IsTuple Tuple2>
+		struct Cat final {
+			using Type = Internal::TupleCat<std::tuple_size_v<Tuple2>, std::tuple_size_v<Tuple1>, false, Tuple2, Tuple1>::Type;
+		};
+
+		template<Size N, IsTuple Tuple1, IsTuple Tuple2, IsTuple...Tuple>
+		struct Cat_ final {
+			using Cat12 = Cat<Tuple1, Tuple2>::Type;
+			using Type = Cat_<N - 1, Cat12, Tuple...>::Type;
+		};
+
+		template<IsTuple Tuple1, IsTuple Tuple2, IsTuple...Tuple>
+		struct Cat_<2, Tuple1, Tuple2, Tuple...> final {
+			static_assert(sizeof...(Tuple) == 0);
+			using Type = Cat<Tuple1, Tuple2>::Type;
+		};
+
 	}
 
-	//TupleÇåãçá
-	template<IsTuple Tuple1, IsTuple Tuple2>
-	struct Cat final {
-		using Type = Internal::TupleCat<std::tuple_size_v<Tuple2>, std::tuple_size_v<Tuple1>, false, Tuple2, Tuple1>::Type;
-	};
+	template<IsTuple...Tuple>
+	using Cat = Internal::Cat_<sizeof...(Tuple), Tuple...>::Type;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	//std::tuple<int*> -> std::tuple<std::unique_ptr<int>>
 	namespace Internal {
 
-		template<std::size_t Size, IsTuple Tuple>
-		_NODISCARD consteval auto changeRawPtrToUniquePtr() {
-			if constexpr (Size == 0)
+		template<Size N, IsTuple Tuple>
+		consteval auto ChangeRawPtrToUniquePtr() {
+			if constexpr (N == 0)
 				return Tuple();
 			else {
-				using T = std::tuple_element_t<Size - 1, Tuple>;
+				using T = std::tuple_element_t<N - 1, Tuple>;
 				if constexpr (std::is_pointer_v<T>) {
 					using UPtr = std::unique_ptr<std::remove_pointer_t<T>>;
-					using ChangedTuple = ChangeElementType<Size - 1, Tuple, UPtr>::ChangedTuple;
-					return changeRawPtrToUniquePtr<Size - 1, ChangedTuple>();
+					using ChangedTuple = ::FU::Tuple::ChangeElementType<N - 1, Tuple, UPtr>::ChangedTuple;
+					return ChangeRawPtrToUniquePtr<N - 1, ChangedTuple>();
 				}
 				else {
-					return changeRawPtrToUniquePtr<Size - 1, Tuple>();
+					return ChangeRawPtrToUniquePtr<N - 1, Tuple>();
 				}
 			}
 		}
 
-		template<std::size_t Size, IsTuple Tuple>
+		template<Size N, IsTuple Tuple>
 		struct RawPtrToUniquePtr final {
-			using T = std::tuple_element_t<Size - 1, Tuple>;
+			using T = std::tuple_element_t<N - 1, Tuple>;
 			using ValueType = std::conditional_t<std::is_pointer_v<T>, std::unique_ptr<std::remove_pointer_t<T>>, T>;
-			using Temp = ChangeElementType<Size - 1, Tuple, ValueType>::ChangedTuple;
-			using Type = RawPtrToUniquePtr<Size - 1, Temp>::Type;
+			using Temp = ::FU::Tuple::ChangeElementType<N - 1, Tuple, ValueType>::template ChangedTuple;
+			using Type = RawPtrToUniquePtr<N - 1, Temp>::Type;
 		};
 
 		template<IsTuple Tuple>
@@ -392,118 +428,111 @@ namespace FU::Tuple {
 	}
 
 	template<IsTuple Tuple>
-	_NODISCARD consteval auto rawPtrToUniquePtr() {
-		constexpr auto tupleSize = std::tuple_size_v<Tuple>;
-		return Internal::changeRawPtrToUniquePtr<tupleSize, Tuple>();
-	}
-
-	template<IsTuple Tuple>
 	struct RawPtrToUniquePtr final {
 		using Type = Internal::RawPtrToUniquePtr<std::tuple_size_v<Tuple>, Tuple>::Type;
 	};
 
+}
 
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	//runtime 
 	namespace Internal {
-		template <std::size_t Size>
+		template <Size N>
 		struct Visit final {
 			template <typename T, typename Function>
-			static void call(const T& tuple, const std::size_t index, Function func) {
-				if (index == Size - 1)
-					func(std::get<Size - 1>(tuple));
+			static void call(const T& tuple, const Size index, Function func) {
+				if (index == N - 1)
+					func(std::get<N - 1>(tuple));
 				else
-					Visit<Size - 1>::call(tuple, index, func);
+					Visit<N - 1>::call(tuple, index, func);
 			}
 		};
 
 		template <>
 		struct Visit<0> final {
 			template <typename T, typename Function>
-			static void call(const T& tuple, const std::size_t index, Function func) {
+			static void call(const T& tuple, const Size index, Function func) {
 				assert(false);
 			}
 		};
 	}
 
 	template <typename Function, IsTuple Tuple>
-	void visit(const Tuple& tuple, const std::size_t index, Function func) {
+	void visit(const Tuple& tuple, const Size index, Function func) {
 		Internal::Visit<std::tuple_size_v<Tuple>>::call(tuple, index, func);
 	}
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace FU::Tuple {
 
-	
 	//runtime
 	namespace Internal {
-		template <std::size_t Size>
+		template <Size N>
 		struct Set final {
 			template <typename T, typename SetType>
-			static void call(T& tuple, const std::size_t index, const SetType& val) {
-				if (index == Size - 1) {
-					if constexpr (std::same_as<SetType, std::tuple_element_t<Size - 1, T>>)
-						std::get<Size - 1>(tuple) = val;
+			static void call(T& tuple, const Size index, const SetType& val) {
+				if (index == N - 1) {
+					if constexpr (std::same_as<SetType, std::tuple_element_t<N - 1, T>>)
+						std::get<N - 1>(tuple) = val;
 					else
 						assert(false);
 				}
 				else
-					Set<Size - 1>::call(tuple, index, val);
+					Set<N - 1>::call(tuple, index, val);
 			}
 		};
 
 		template <>
 		struct Set<0> final {
 			template <typename T, typename SetType>
-			static void call(T& tuple, const std::size_t index, const SetType& val) {
+			static void call(T& tuple, const Size index, const SetType& val) {
 				assert(false);
 			}
 		};
 	}
 
 	template <typename SetType, IsTuple Tuple>
-	void set(Tuple& tuple, const std::size_t index, const SetType& val) {
+	void set(Tuple& tuple, const Size index, const SetType& val) {
 		Internal::Set<std::tuple_size_v<Tuple>>::call(tuple, index, val);
 	}
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	namespace Internal {
-		template<std::size_t Size, Tuple::IsTuple Tuple>
+		template<Size N, Tuple::IsTuple Tuple>
 		constexpr void isDefaultConstrictible(std::array<bool, std::tuple_size_v<Tuple>>& result) {
-			if constexpr (Size == 0)
+			if constexpr (N == 0)
 				return;
 			else {
-				if constexpr (std::is_default_constructible_v<std::tuple_element_t<Size - 1, Tuple>>) {
-					result.at(Size - 1) = true;
+				if constexpr (std::is_default_constructible_v<std::tuple_element_t<N - 1, Tuple>>) {
+					result.at(N - 1) = true;
 				}
-				isDefaultConstrictible<Size - 1, Tuple>(result);
+				isDefaultConstrictible<N - 1, Tuple>(result);
 			}
 		}
 	}
 
 	template<Tuple::IsTuple Tuple>
-	_NODISCARD constexpr std::array<bool, std::tuple_size_v<Tuple>> isDefaultConstrictible() {
+	[[nodiscard]] constexpr std::array<bool, std::tuple_size_v<Tuple>> isDefaultConstrictible() {
 		std::array<bool, std::tuple_size_v<Tuple>> result;
 		std::fill(result.begin(), result.end(), false);
 		Internal::isDefaultConstrictible<std::tuple_size_v<Tuple>, Tuple>(result);
 		return result;
 	}
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	//Array<int,3>::Type == std::tuple<int,int,int>
 	namespace Internal {
-		template<typename T, std::size_t Size, typename... U>
+		template<typename T, Size N, typename... U>
 		struct Array final {
-			using Type = Array<T, Size - 1, U..., T>::Type;
+			using Type = Array<T, N - 1, U..., T>::Type;
 		};
 
 		template<typename T, typename... U>
@@ -513,21 +542,19 @@ namespace FU::Tuple {
 
 	}
 
-	template<typename T, std::size_t Size>
-	struct Array final {
-		using Type = Internal::Array<T, Size>::Type;
-	};
+	template<typename T, Size N>
+	using Array = Internal::Array<T, N>::Type;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	namespace Internal {
-		template<IsTuple Tuple, typename T, std::size_t Size, template<typename...>typename Bool, typename... U>
+		template<IsTuple Tuple, typename T, Size N, template<typename...>typename Bool, typename... U>
 		struct ChangeIf final {
-			using CurrentType = std::tuple_element_t<Size - 1, Tuple>;
+			using CurrentType = std::tuple_element_t<N - 1, Tuple>;
 			using PushType = std::conditional_t<std::derived_from<Bool<CurrentType>, std::true_type>, T, CurrentType>;
-			using Type = ChangeIf<Tuple, T, Size - 1, Bool, PushType, U...>::Type;
+			using Type = ChangeIf<Tuple, T, N - 1, Bool, PushType, U...>::Type;
 		};
 
 		template<IsTuple Tuple, typename T, template<typename...>typename Bool, typename ...U>
@@ -541,16 +568,16 @@ namespace FU::Tuple {
 		using Type = Internal::ChangeIf<Tuple, T, std::tuple_size_v<Tuple>, Bool>::Type;
 	};
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	namespace Internal {
-		template<IsTuple Tuple, typename T, std::size_t Size, template<typename...>typename Bool, typename... U>
+		template<IsTuple Tuple, typename T, Size N, template<typename...>typename Bool, typename... U>
 		struct ChangeIfNot final {
-			using CurrentType = std::tuple_element_t<Size - 1, Tuple>;
+			using CurrentType = std::tuple_element_t<N - 1, Tuple>;
 			using PushType = std::conditional_t<std::derived_from<Bool<CurrentType>, std::false_type>, T, CurrentType>;
-			using Type = ChangeIfNot<Tuple, T, Size - 1, Bool, PushType, U...>::Type;
+			using Type = ChangeIfNot<Tuple, T, N - 1, Bool, PushType, U...>::Type;
 		};
 
 		template<IsTuple Tuple, typename T, template<typename...>typename Bool, typename ...U>
@@ -564,17 +591,17 @@ namespace FU::Tuple {
 		using Type = Internal::ChangeIfNot<Tuple, T, std::tuple_size_v<Tuple>, Bool>::Type;
 	};
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	namespace Internal {
-		template<typename T, std::size_t Size, T Under, T Push, T... Index>
+		template<typename T, Size N, T Under, T Push, T... Index>
 		struct SequenceHelper final {
 			using Type = std::conditional_t<
 				(Push < Under),
 				SequenceHelper<T, 0, Under, 0, Index...>,
-				SequenceHelper<T, Size - 1, Under, Size - 1, Push, Index...>
+				SequenceHelper<T, N - 1, Under, N - 1, Push, Index...>
 				>::Type;
 		};
 		template<typename T, T Under, T Push, T... Index>
@@ -582,12 +609,12 @@ namespace FU::Tuple {
 			using Type = std::integer_sequence<T, Index...>;
 		};
 
-		template<typename T, std::size_t Size, T Under, T Push, T... Index>
+		template<typename T, Size N, T Under, T Push, T... Index>
 		struct ReverseSequenceHelper final {
 			using Type = std::conditional_t<
 				(Push < Under),
 				ReverseSequenceHelper<T, 0, Under, 0, Index...>,
-				ReverseSequenceHelper<T, Size - 1, Under, Size - 1, Index..., Push>
+				ReverseSequenceHelper<T, N - 1, Under, N - 1, Index..., Push>
 				>::Type;
 		};
 		template<typename T, T Under, T Push, T... Index>
@@ -600,7 +627,7 @@ namespace FU::Tuple {
 
 	//makeIntegerSequence<int,2,5> -> return std::integer_sequence<int,2,3,4,5>
 	template<std::integral T, T Index1, T Index2>
-	constexpr auto makeIntegerSequence() {
+	[[nodiscard]] constexpr auto makeIntegerSequence() {
 		if constexpr (Index1 < Index2)
 			return Internal::SequenceHelper<T, Index2, Index1, Index2>::Type();
 		else if constexpr (Index1 == Index2)
@@ -609,9 +636,9 @@ namespace FU::Tuple {
 			return Internal::ReverseSequenceHelper<T, Index1, Index2, Index1>::Type();
 	}
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Tuple {
 
 	//std::array to std::tuple
 	template<auto Array, template<auto>typename Correspondence>
@@ -623,7 +650,7 @@ namespace FU::Tuple {
 		struct Ty {
 			using T = Type;
 		};
-		template<std::size_t...Index>
+		template<Size...Index>
 		static auto helper(std::index_sequence<Index...>) {
 			return Ty<std::tuple<Correspondence<Array.at(Index)>...>>();
 		}
@@ -633,7 +660,5 @@ namespace FU::Tuple {
 
 	template<auto Array, template<auto>typename Correspondence>
 	using ArrayToTupleType = ArrayToTuple<Array, Correspondence>::Type;
-
-
 
 }

@@ -226,10 +226,6 @@ namespace FD::Internal::Text {
 		GuiText emptyCpp;
 		GuiText emptyCpp_description;
 
-		GuiText error_fill;
-		GuiText error_directoryNotFound;
-		GuiText error_fileAlreadyExist;
-		GuiText error_forbiddenCharactor;
 		GuiText error_unexpected;
 
 
@@ -248,8 +244,18 @@ namespace FD::Internal::Text {
 		GuiText cancel;
 		GuiText create;
 
+		GuiText error_unexpected;
+
+	};
+
+	struct ProjectCheckPath final {
+		ProjectCheckPath();
+		~ProjectCheckPath() = default;
+
 		GuiText error_fill;
-		GuiText error_alreadyExist;
+		GuiText error_parentDoesNotExist;
+		GuiText error_directoryAlreadyExist;
+		GuiText error_fileAlreadyExist;
 		GuiText error_forbiddenCharactor;
 		GuiText error_unexpected;
 
@@ -437,6 +443,8 @@ namespace FD::Internal::Text {
 		GuiText confirm_releaseFile;
 		GuiText confirm_removeDirectory;
 		GuiText confirm_removeFile;
+		GuiText confirm_releaseFile_notSaved;
+
 
 		GuiText error_sameName;
 		GuiText error_emptyName;
@@ -451,6 +459,8 @@ namespace FD::Internal::Text {
 		GuiText error_existFile;
 		GuiText error_hugeFile;
 		GuiText error_changeName;
+		GuiText error_tab;
+		GuiText error_fileDoesNotExist;
 		GuiText error_unexpected;
 
 	};
@@ -489,6 +499,7 @@ namespace FD::Text {
 	using ::FD::Internal::Text::ProjectSelect;
 	using ::FD::Internal::Text::ProjectNewFile;
 	using ::FD::Internal::Text::ProjectDirectory;
+	using ::FD::Internal::Text::ProjectCheckPath;
 	using ::FD::Internal::Text::NewProject;
 	using ::FD::Internal::Text::ProjectForm;
 	using ::FD::Internal::Text::PopupSelect;

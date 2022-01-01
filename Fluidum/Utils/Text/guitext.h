@@ -4,7 +4,7 @@
 #include "../Class/class.h"
 #include <boost/predef.h>
 
-namespace FU::GuiText{
+namespace FU::GuiText {
 
 	class Text final {
 	public:
@@ -13,7 +13,7 @@ namespace FU::GuiText{
 		explicit Text(const char* text);
 
 		FluidumUtils_Class_Default_ConDestructor(Text)
-			FluidumUtils_Class_Default_CopyMove(Text)
+		FluidumUtils_Class_Default_CopyMove(Text)
 
 	private:
 		std::string text{};
@@ -23,7 +23,7 @@ namespace FU::GuiText{
 
 		operator const char* () const noexcept;
 
-		explicit operator const std::string&() const noexcept;
+		explicit operator const std::string& () const noexcept;
 	};
 
 

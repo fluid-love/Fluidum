@@ -20,13 +20,13 @@ namespace FVK::Internal::Data {
 
 	public:
 		template<FvkType T> requires(!FU::Concept::IsStdVector<CorrespondenceType<T>>)
-			_NODISCARD CorrespondenceType<T>::type& get() const noexcept {
+			[[nodiscard]] CorrespondenceType<T>::type& get() const noexcept {
 			return std::get<CorrespondenceType<T>>(data).get();
 		}
 
 		//vector<reference_wapper<ref>>
 		template<FvkType T> requires(FU::Concept::IsStdVector<CorrespondenceType<T>>)
-			_NODISCARD auto& get() const noexcept {
+			[[nodiscard]] auto& get() const noexcept {
 			return std::get<CorrespondenceType<T>>(data);
 		}
 	private:
