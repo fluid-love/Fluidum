@@ -3,30 +3,34 @@
 #include "../Common/common.h"
 
 namespace FD::Text {
-	enum class Language : uint8_t {
+
+	enum class Language : UT {
 		Japanese,
 		English,
 		Chinese
 	};
+
 }
 
-namespace FD::Internal::Text {
+namespace FD::Text::Internal {
 
 	using GuiText = ::FU::GuiText::Text;
 
 	struct Title final {
 		Title();
-		~Title() = default;
+		~Title() noexcept = default;
 
 		GuiText recentProject;
 		GuiText newProject;
 		GuiText openProject;
 		GuiText document;
 
+		GuiText error_notSupported;
+		GuiText error_loadProjectHistory;
 		GuiText error_openProjectFile;
 		GuiText error_illegalFile;
 		GuiText error_brokenFile;
-		GuiText error_internal;
+		GuiText error_noexpected;
 
 	};
 
@@ -307,6 +311,7 @@ namespace FD::Internal::Text {
 		GuiText createWithoutSaving;
 
 		GuiText error_emptyForm;
+		GuiText error_maxSize;
 		GuiText error_notFoundDirectory;
 		GuiText error_alreadyExist;
 		GuiText error_failedToCreate;
@@ -321,20 +326,20 @@ namespace FD::Internal::Text {
 
 		GuiText title;
 
-		GuiText folderPath;
+		GuiText directoryPath;
 		GuiText projectName;
 
 		GuiText cancel;
 		GuiText save;
 
-		GuiText checkCurrentProject;
-		GuiText saveAndWrite;
-		GuiText ignore;
+		GuiText confirm_notSaved;
+		GuiText confirm_save;
+		GuiText confirm_ignore;
 
 		GuiText error_empty;
 		GuiText error_alreadyExist;
 		GuiText error_notFound;
-		GuiText error_failed;
+		GuiText error_unexpected;
 	};
 
 	struct PopupSelect final {
@@ -485,31 +490,31 @@ namespace FD::Internal::Text {
 		GuiText backcolor;
 	};
 
-
 }
 
 namespace FD::Text {
-	using ::FD::Internal::Text::Title;
-	using ::FD::Internal::Text::Layout;
-	using ::FD::Internal::Text::TitleBar;
-	using ::FD::Internal::Text::StatusBar;
-	using ::FD::Internal::Text::MenuBar;
-	using ::FD::Internal::Text::TopBar;
-	using ::FD::Internal::Text::LeftBar;
-	using ::FD::Internal::Text::ProjectSelect;
-	using ::FD::Internal::Text::ProjectNewFile;
-	using ::FD::Internal::Text::ProjectDirectory;
-	using ::FD::Internal::Text::ProjectCheckPath;
-	using ::FD::Internal::Text::NewProject;
-	using ::FD::Internal::Text::ProjectForm;
-	using ::FD::Internal::Text::PopupSelect;
-	using ::FD::Internal::Text::TextEditor;
-	using ::FD::Internal::Text::CodingTab;
-	using ::FD::Internal::Text::ProjectSaveAs;
-	using ::FD::Internal::Text::Project;
-	using ::FD::Internal::Text::AnalysisOverview;
-	using ::FD::Internal::Text::BarExit;
-	using ::FD::Internal::Text::Console;
+
+	using ::FD::Text::Internal::Title;
+	using ::FD::Text::Internal::Layout;
+	using ::FD::Text::Internal::TitleBar;
+	using ::FD::Text::Internal::StatusBar;
+	using ::FD::Text::Internal::MenuBar;
+	using ::FD::Text::Internal::TopBar;
+	using ::FD::Text::Internal::LeftBar;
+	using ::FD::Text::Internal::ProjectSelect;
+	using ::FD::Text::Internal::ProjectNewFile;
+	using ::FD::Text::Internal::ProjectDirectory;
+	using ::FD::Text::Internal::ProjectCheckPath;
+	using ::FD::Text::Internal::NewProject;
+	using ::FD::Text::Internal::ProjectForm;
+	using ::FD::Text::Internal::PopupSelect;
+	using ::FD::Text::Internal::TextEditor;
+	using ::FD::Text::Internal::CodingTab;
+	using ::FD::Text::Internal::ProjectSaveAs;
+	using ::FD::Text::Internal::Project;
+	using ::FD::Text::Internal::AnalysisOverview;
+	using ::FD::Text::Internal::BarExit;
+	using ::FD::Text::Internal::Console;
 
 }
 

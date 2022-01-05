@@ -23,12 +23,22 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		explicit DescriptorPool(ManagerPassKey, const Data::DescriptorPoolData& data, const Parameter& parameter);
 
 		~DescriptorPool() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(DescriptorPool)
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::DescriptorPoolData& data, const Parameter& parameter);
 
 	public:

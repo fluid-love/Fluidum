@@ -1,13 +1,12 @@
 #include "menubar.h"
 #include <nfd.h>
 
-#include "../Title/Exit/exit.h"
+#include "../Exit/exit.h"
 
-#include "Project/newproject.h"
-#include "Project/saveas.h"
+#include "../../Project/File/new.h"
+#include "../../Project/File/saveas.h"
 
 #include "../../Utils/Popup/backwindow.h"
-#include "../../Utils/Popup/popupselect.h"
 #include "../../Utils/Popup/message.h"
 #include "../../Utils/Popup/internal_error.h"
 #include "../../Utils/Scene/deleteAll.h"
@@ -43,7 +42,7 @@ FS::MenuBar::MenuBar(
 	calcWrite(calcWrite),
 	sceneRead(sceneRead)
 {
-	FluidumScene_Log_Constructor("MenuBar");
+	FluidumScene_Log_Constructor(::FS::MenuBar);
 
 	const auto size = ImGui::GetFontSize() * 0.45f;
 	style.offset = { size ,size };
@@ -53,7 +52,7 @@ FS::MenuBar::MenuBar(
 }
 
 FS::MenuBar::~MenuBar() {
-	FluidumScene_Log_Destructor_("MenuBar");
+	FluidumScene_Log_Destructor(::FS::MenuBar);
 }
 
 void FS::MenuBar::call() {
@@ -128,7 +127,8 @@ void FS::MenuBar::fileGui() {
 void FS::MenuBar::itemCreateNewProject() {
 	if (!ImGui::MenuItem(text.create))
 		return;
-	FluidumScene_Log_RequestAddScene("Bar::NewProject");
+
+	FluidumScene_Log_RequestAddScene(::FS::Project::File::New);
 	Scene::addScene<Bar::NewProject>();
 }
 

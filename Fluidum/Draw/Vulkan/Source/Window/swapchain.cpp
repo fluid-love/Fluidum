@@ -34,7 +34,6 @@ const FVK::Internal::Data::SwapchainInfo& FVK::Internal::Swapchain::get() const 
 void FVK::Internal::Swapchain::destroy() noexcept {
 	assert(info.swapchain);
 	this->info.device.destroySwapchainKHR(info.swapchain);
-	static_assert(noexcept(info.device.destroySwapchainKHR(info.swapchain)));
 }
 
 void FVK::Internal::Swapchain::setInfo(const Parameter& parameter) noexcept {

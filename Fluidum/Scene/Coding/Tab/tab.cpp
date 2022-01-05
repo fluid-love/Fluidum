@@ -12,10 +12,14 @@ namespace FS::Coding {
 FS::Coding::Tab::Tab(
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::Coding::TabRead* const tabRead,
+	FD::Coding::DisplayWrite* const displayWrite,
+	const FD::Coding::DisplayRead* const displayRead,
 	const FD::ProjectRead* const projectRead
 ) :
 	tabWrite(tabWrite),
 	tabRead(tabRead),
+	displayWrite(displayWrite),
+	displayRead(displayRead),
 	projectRead(projectRead)
 {
 	FluidumScene_Log_Constructor("Coding::Tab");
@@ -103,7 +107,7 @@ void FS::Coding::Tab::update() {
 }
 
 void FS::Coding::Tab::updateInfo() {
-	std::vector<std::string> paths = tabRead->getFilePaths();
+	std::vector<std::string> paths = tabRead->paths();
 
 	info.files.resize(paths.size());
 	for (std::size_t i = 0, size = paths.size(); i < size; i++) {
@@ -181,15 +185,15 @@ void FS::Coding::Tab::fileList() {
 
 void FS::Coding::Tab::display() {
 	const std::string path = info.files.at(select.index).path;
-
-	if (tabRead->getDisplayFilePaths().at(0) == path)
+	const auto frontFisplayPath = displayRead->paths().at(0);
+	if (frontFisplayPath == path)
 		return;
 
 	GLog.add<FD::Log::Type::None>("Erase display file {}.", path);
-	tabWrite->eraseDisplayFile(tabRead->getDisplayFilePaths().at(0));
+	displayWrite->remove(frontFisplayPath);
 
-	GLog.add<FD::Log::Type::None>("Add display file {}.", tabRead->getDisplayFilePaths().at(0));
-	tabWrite->addDisplayFile(path);
+	GLog.add<FD::Log::Type::None>("Add display file {}.", frontFisplayPath);
+	displayWrite->add(path);
 }
 
 void FS::Coding::Tab::closeButton() {

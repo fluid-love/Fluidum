@@ -35,6 +35,8 @@ namespace FS {
 
 		~MenuBar() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(MenuBar)
+
 	public:
 		virtual void call() override;
 
@@ -53,8 +55,7 @@ namespace FS {
 
 		FD::Text::MenuBar text{};
 
-	private://data
-
+	private:
 		struct {
 			ImVec2 offset{};
 			ImVec2 itemSpacing{};
@@ -86,7 +87,6 @@ namespace FS {
 		}view;
 
 	private:
-
 		//file
 		void fileGui();
 		void itemCreateNewProject();
@@ -132,5 +132,7 @@ namespace FS {
 
 	private:
 		void pushItemSpacing();
+
 	};
+
 }

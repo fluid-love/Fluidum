@@ -14,23 +14,24 @@ namespace FVK::Internal::Command {
 		SharedPtr ptr;
 
 	private:
-		explicit Command(SharedPtr&& ptr) :ptr(std::move(ptr)) {}//Manager‚Ì‚Ý
+		explicit Command(SharedPtr&& ptr) noexcept : ptr(std::move(ptr)) {}//Manager
 	public:
-		~Command() = default;
+		~Command() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(Command)
 
 	public:
-		_NODISCARD Element* operator->() const noexcept {
+		[[nodiscard]] Element* operator->() const noexcept {
 			return this->ptr.get();
 		}
 
-		_NODISCARD std::size_t count() const noexcept {
-			return this->ptr.use_count();
+		[[nodiscard]] Size count() const noexcept {
+			return static_cast<Size>(this->ptr.use_count());
 		}
 
 	private:
 		friend ::FVK::Internal::Manager::Manager;
 		friend Commands;
+
 	};
 
 	template<FvkType ...T>
@@ -43,23 +44,24 @@ namespace FVK::Internal::Command {
 		SharedPtr ptr = nullptr;
 
 	private:
-		explicit AnyCommand(SharedPtr&& ptr) :ptr(std::move(ptr)) {}//Manager‚Ì‚Ý
+		explicit AnyCommand(SharedPtr&& ptr) noexcept : ptr(std::move(ptr)) {}//Manager
 	public:
 		~AnyCommand() = default;
 		FluidumUtils_Class_Default_CopyMove(AnyCommand)
 
 	public:
-		_NODISCARD Element* operator->() const noexcept {
+		[[nodiscard]] Element* operator->() const noexcept {
 			return this->ptr.get();
 		}
 
-		_NODISCARD std::size_t count() const noexcept {
-			return this->ptr.use_count();
+		[[nodiscard]] Size count() const noexcept {
+			return static_cast<Size>(this->ptr.use_count());
 		}
 
 	private:
 		friend ::FVK::Internal::Manager::Manager;
 		friend Commands;
+
 	};
 
 }

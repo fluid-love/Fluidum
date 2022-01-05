@@ -30,11 +30,11 @@ FDR::Internal::ImGuiImageData::~ImGuiImageData() noexcept {
 		FVK::destroyImGuiImage(keys.second);
 	}
 	//初期化->ImGuiImageを作成->ImGuiImageをcopy->終了(リソースが解放される)->もう一回初期化->解放されているが上の条件式に引っかからずabortになってしまう．
-	catch (const FVK::Exception::NotFound&) {
-		return;
-	}
+	//catch (const FVK::Exception::NotFound&) {
+	//	return;
+	//}
 	catch (const std::exception& e) {
-		GMessenger.add<FU::Log::Type::Error>(e.what());
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, e.what());
 		abort();
 	}
 	catch (...) {

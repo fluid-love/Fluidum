@@ -4,9 +4,11 @@ FS::StatusBar::StatusBar(
 	FD::GuiWrite* const guiWrite,
 	const FD::GuiRead* const guiRead,
 	const FD::TaskRead* const taskRead
-) : guiRead(guiRead), taskRead(taskRead)
+) :
+	guiRead(guiRead), 
+	taskRead(taskRead)
 {
-	FluidumScene_Log_Constructor("StatusBar");
+	FluidumScene_Log_Constructor(::FS::StatusBar);
 
 	//style
 	style.taskIcon = ImGui::CalcTextSize(text.task).x;
@@ -28,7 +30,7 @@ FS::StatusBar::StatusBar(
 }
 
 FS::StatusBar::~StatusBar() noexcept {
-	FluidumScene_Log_Destructor_("StatusBar");
+	FluidumScene_Log_Destructor(::FS::StatusBar);
 }
 
 namespace FS::Internal::Bar {
@@ -55,7 +57,6 @@ void FS::StatusBar::call() {
 
 
 	ImGui::Begin("StatusBar", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBringToFrontOnFocus);//ƒAƒ“ƒ_[ƒo[‚Ì”wŒi
-
 
 	this->taskGui();
 

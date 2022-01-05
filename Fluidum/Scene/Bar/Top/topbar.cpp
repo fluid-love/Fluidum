@@ -34,7 +34,7 @@ FS::TopBar::TopBar(
 	imguiWindowRead(imguiWindowRead),
 	layoutRead(layoutRead)
 {
-	FluidumScene_Log_Constructor("TopBar");
+	FluidumScene_Log_Constructor(::FS::TopBar);
 
 	style.windowPos = ImVec2(0.0f, guiRead->menuBarHeight());
 	const float windowHeight = guiRead->menuBarHeight() + (ImGui::GetFontSize() * 0.35f);
@@ -48,7 +48,7 @@ FS::TopBar::TopBar(
 }
 
 FS::TopBar::~TopBar() noexcept {
-	FluidumScene_Log_Destructor_("TopBar")
+	FluidumScene_Log_Destructor(::FS::TopBar);
 }
 
 namespace FS::Internal::Bar {
@@ -191,11 +191,11 @@ void FS::TopBar::run() {
 
 	return;
 	if (!fluidumFilesRead->isMainCodeFileExist()) {
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_mainfile, pos.run);
 	}
 
-	FluidumScene_Log_RequestAddScene("Calc::RunScene");
+	FluidumScene_Log_RequestAddScene(::FS::Calc::Run);
 	Scene::addScene<Calc::Run>();
 }
 

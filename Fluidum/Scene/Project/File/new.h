@@ -1,13 +1,13 @@
 #pragma once
 
-#include "projectform.h"
-#include "../../../Common/common.h"
+#include "form.h"
+#include "../../Common/common.h"
 
-namespace FS::Bar {
+namespace FS::Project::File {
 
-	class NewProject final : public Scene {
+	class New final : public Scene {
 	public:
-		explicit NewProject(
+		explicit New(
 			const FD::SceneRead* const sceneRead,
 			FD::WindowWrite* const windowWrite,
 			const FD::GuiRead* const guiRead,
@@ -24,7 +24,9 @@ namespace FS::Bar {
 			FD::Log::ProjectWrite
 		);
 
-		~NewProject() noexcept;
+		~New() noexcept;
+
+		FluidumUtils_Class_Delete_CopyMove(New)
 
 	public:
 		virtual void call() override;

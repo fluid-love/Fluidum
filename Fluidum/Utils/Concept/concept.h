@@ -5,7 +5,6 @@
 
 namespace FU::Concept {
 
-
 	//remove all const
 	template<typename T>
 	struct remove_all_const : std::remove_const<T> {};
@@ -21,9 +20,9 @@ namespace FU::Concept {
 	template<typename T>
 	using remove_all_const_t = remove_all_const<T>::type;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	template<typename T>
 	struct remove_all_pointer : std::remove_pointer<T> {};
@@ -39,9 +38,9 @@ namespace FU::Concept {
 	template<typename T>
 	using remove_all_pointer_t = remove_all_pointer<T>::type;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	//remove all const && v && ref && p
 	template<typename T>
@@ -52,9 +51,9 @@ namespace FU::Concept {
 	template<typename T>
 	using remove_all_t = remove_all<T>::type;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	template<typename T>
 	concept IsEnum = std::is_enum_v<T>;
@@ -62,9 +61,9 @@ namespace FU::Concept {
 	template<typename T>
 	concept IsClass = std::is_class_v<T>;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	namespace Internal {
 		template<typename T>
@@ -79,9 +78,9 @@ namespace FU::Concept {
 	template<typename T, typename U>
 	concept IsStdArrayParticularType = IsStdArray<T> && std::same_as<U, typename remove_all_t<T>::value_type>;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	namespace Internal {
 		template<typename T>
@@ -96,9 +95,9 @@ namespace FU::Concept {
 	template<typename T, typename U>
 	concept IsStdVectorParticularType = IsStdVector<T> && std::same_as<U, typename remove_all_t<T>::value_type>;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	namespace Internal {
 		template<typename T>
@@ -110,16 +109,16 @@ namespace FU::Concept {
 	template<typename T>
 	concept IsUniquePtr = Internal::is_unique_ptr<remove_all_t<T>>::value;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	template<typename T>
 	concept IsStdString = std::same_as<remove_all_t<T>, std::string>;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	namespace Internal {
 		template<typename T>
@@ -131,16 +130,16 @@ namespace FU::Concept {
 	template<typename... T>
 	concept IsTuple = Internal::is_std_tuple<remove_all_t<T...>>::value;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	template<typename T>
 	concept IsScopedEnum = std::is_enum_v<T> && !std::is_convertible_v<T, std::underlying_type_t<T>>;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	//https://teratail.com/questions/334431#reply-461376
 	template<typename T, template <typename ...> typename U>
@@ -189,9 +188,9 @@ namespace FU::Concept {
 	template<typename T, template <auto, typename> typename U>
 	concept IsInstanceOfNonTypeType = is_instance_of_nontype_type<T, U>::value;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	//class member function -> true
 	template<auto Func>
@@ -205,9 +204,9 @@ namespace FU::Concept {
 	template<auto Func>
 	concept IsFunction = IsMemberFunctionPointer<Func> || IsNonMenberFunctionPointer<Func>;
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+namespace FU::Concept {
 
 	//&&...
 	template<typename T1, typename ...T2>
@@ -218,9 +217,28 @@ namespace FU::Concept {
 	template<typename T1, typename ...T2>
 	concept IsSame = isSame<T1, T2...>();
 
+}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace FU::Concept {
 
+	template<typename T>
+	concept IsNothrowMoveConstructibleAssignable =
+		std::is_nothrow_move_constructible_v<T> &&
+		std::is_nothrow_move_assignable_v<T>;
+
+	template<typename T>
+	concept IsNothrowCopyConstructibleAssignable =
+		std::is_nothrow_copy_constructible_v<T> &&
+		std::is_nothrow_copy_assignable_v<T>;
+
+	template<typename T>
+	concept IsNothrowCopyMoveConstructibleAssignable =
+		IsNothrowMoveConstructibleAssignable<T> &&
+		IsNothrowCopyConstructibleAssignable<T>;
+
+}
+
+namespace FU::Concept {
 
 	template <typename T>
 	constexpr bool DelayAssert_T = false;
@@ -228,3 +246,4 @@ namespace FU::Concept {
 	constexpr bool DelayAssert_N = false;
 
 }
+

@@ -19,6 +19,8 @@ FS::Project::Explorer::Explorer(
 	const FD::SceneRead* const sceneRead,
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::Coding::TabRead* const tabRead,
+	FD::Coding::DisplayWrite* const displayWrite,
+	const FD::Coding::DisplayRead* const displayRead,
 	FD::ToolBarWrite* const toolBarWrite
 ) :
 	colorRead(colorRead),
@@ -34,6 +36,8 @@ FS::Project::Explorer::Explorer(
 	sceneRead(sceneRead),
 	tabWrite(tabWrite),
 	tabRead(tabRead),
+	displayWrite(displayWrite),
+	displayRead(displayRead),
 	toolBarWrite(toolBarWrite)
 {
 	FluidumScene_Log_Constructor("Project::Explorer");
@@ -605,7 +609,7 @@ void FS::Project::Explorer::addDirectory() {
 	changeName.popup = true;
 }
 
-void FS::Project::Explorer::add() {
+void FS::Project::Explorer::addFile() {
 	assert(!add.info);
 
 	const bool project = (select.tab == TabType::Project);
@@ -993,7 +997,7 @@ void FS::Project::Explorer::displayCode() {
 	tabWrite->save();
 
 	if (!sceneRead->exist<TextEditor>()) {
-		tabWrite->addDisplayFile(path);
+		displayWrite->add(path);
 		FluidumScene_Log_RequestAddScene("TextEditor");
 		Scene::addScene<TextEditor>();
 	}
@@ -1183,7 +1187,7 @@ void FS::Project::Explorer::popup_add() {
 		this->addSelect();
 
 	if (ImGui::Selectable(text.add_selectNewFile))
-		this->add();
+		this->addFile();
 
 	ImGui::Separator();
 

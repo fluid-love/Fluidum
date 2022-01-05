@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../Common/common.h"
+#include "../../Common/common.h"
 
 namespace FS::Bar {
 
@@ -27,6 +27,8 @@ namespace FS::Bar {
 
 		~Exit() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(Exit)
+
 	public:
 		virtual void call() override;
 
@@ -39,8 +41,7 @@ namespace FS::Bar {
 		const FD::Coding::TabRead* const tabRead;
 		FD::Coding::TabWrite* const tabWrite;
 
-	private://data
-
+	private:
 		const FD::Text::BarExit text{};
 
 	private:
@@ -50,5 +51,7 @@ namespace FS::Bar {
 
 	private:
 		void deleteThis();
+
 	};
+
 }

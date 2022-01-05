@@ -9,8 +9,8 @@ namespace FD {
 	class ProjectRead;
 }
 
-namespace FD {
-	namespace Internal::Scene {
+namespace FD::Scene {
+	namespace Internal {
 		class Data final {
 		public://callback
 			static void addSceneCallback(bool async, FU::Class::ClassCode::CodeType code);
@@ -26,9 +26,8 @@ namespace FD {
 			friend class ProjectRead;
 		};
 	}
-	namespace Scene {
-		using CallBacks = ::FD::Internal::Scene::Data;
-	}
+
+	using CallBacks = ::FD::Scene::Internal::Data;
 
 }
 

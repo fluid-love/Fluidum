@@ -1,6 +1,6 @@
 ﻿#include "titlebar.h"
-#include "../Menu/Project/saveas.h"
-#include "Exit/exit.h"
+#include "../../Project/File/saveas.h"
+#include "../Exit/exit.h"
 
 using namespace FU::ImGui::Operators;
 
@@ -14,8 +14,7 @@ FS::TitleBar::TitleBar(
 	FD::ExitWrite* const exitWrite,
 	const FD::Coding::TabRead* const tabRead,
 	FD::Coding::TabWrite* const tabWrite
-)
-	:
+) :
 	guiRead(guiRead),
 	guiWrite(guiWrite),
 	windowWrite(windowWrite),
@@ -26,7 +25,7 @@ FS::TitleBar::TitleBar(
 	tabRead(tabRead),
 	tabWrite(tabWrite)
 {
-	FluidumScene_Log_Constructor("TitleBar");
+	FluidumScene_Log_Constructor(::FS::TitleBar);
 
 	style.windowPos = ImVec2(guiRead->windowSize().x * 0.91f, 0.0f);
 	const float windowHeight = guiRead->menuBarHeight();
@@ -39,14 +38,13 @@ FS::TitleBar::TitleBar(
 	style.projectNameWindowPos = { guiRead->windowSize().x * 0.6f, 0.0f };
 	style.projectNameWindowSize = { guiRead->windowSize().x * 0.3f ,windowHeight };
 
-
 	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.86f;
 
 	style.buttonSize = { style.windowSize.x / 3.0f, style.windowSize.y };
 }
 
 FS::TitleBar::~TitleBar() noexcept {
-	FluidumScene_Log_Destructor_("TitleBar");
+	FluidumScene_Log_Destructor(::FS::TitleBar);
 }
 
 void FS::TitleBar::call() {
@@ -62,8 +60,7 @@ void FS::TitleBar::icon() {
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoBackground
-		;
+		ImGuiWindowFlags_NoBackground;
 
 	ImGui::SetNextWindowPos(style.iconWindowPos);
 	ImGui::SetNextWindowSize(style.iconWindowSize);
@@ -113,11 +110,11 @@ void FS::TitleBar::bar() {
 	bool close = ImGui::Button(ICON_MD_CLOSE, style.buttonSize);
 
 	if (minimize) {
-		GLog.add<FD::Log::Type::None>("Request MinimizeWindow.");
+		GLog.add_str<FU::Log::Type::None>("[Request] MinimizeWindow.");
 		FDR::minimizeWindow();
 	}
 	else if (close) {
-		GLog.add<FD::Log::Type::None>("Request Terminate.");
+		GLog.add_str<FU::Log::Type::None>("[Request] Terminate.");
 		this->exit();
 	}
 
@@ -129,7 +126,7 @@ void FS::TitleBar::bar() {
 }
 
 void FS::TitleBar::exit() {
-	FluidumScene_Log_RequestAddScene("Bar::Exit");
+	FluidumScene_Log_RequestAddScene(::FS::Bar::Exit);
 	Scene::addScene<Bar::Exit>();
 }
 
@@ -156,7 +153,7 @@ void FS::TitleBar::project() {
 	if (projectRead->isDefaultProject())
 		ImGui::Button(text.tempProject);
 	else
-		ImGui::Button(projectRead->getProjectName().c_str());
+		ImGui::Button(projectRead->projectName().c_str());
 
 	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar(2);

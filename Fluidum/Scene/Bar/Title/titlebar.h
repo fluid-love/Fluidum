@@ -31,6 +31,8 @@ namespace FS {
 
 		~TitleBar() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(TitleBar)
+
 	public:
 		virtual void call() override;
 
@@ -45,8 +47,7 @@ namespace FS {
 		const FD::Coding::TabRead* const tabRead;
 		FD::Coding::TabWrite* const tabWrite;
 
-	private://data
-
+	private:
 		const FD::Text::TitleBar text{};
 
 		const FDR::ImGuiImage iconImage = FDR::createImGuiImage(Resource::TitleBarIconFilePath);
@@ -76,4 +77,5 @@ namespace FS {
 		void exit();
 
 	};
+
 }

@@ -7,17 +7,17 @@ namespace FVK::Internal::Key {
 	template<CommandType Type>
 	class ConnectionCommandKeysBase {
 	private:
-		static constexpr inline auto Size = GetCommandDataTypesSize<Type>();
-		const std::array<std::vector<OrderKey>, Size> order;
+		static constexpr inline auto N = GetCommandDataSize<Type>();
+		const std::array<std::vector<OrderKey>, N> order;
 
 	protected:
-		template</*IsKeyコンパイラバグ*/typename... T> requires(Size == sizeof...(T) && !FU::Concept::IsSame<std::vector<OrderKey>, T...>)
+		template</*MSVC bug IsKey*/typename... T> requires(N == sizeof...(T) && !FU::Concept::IsSame<std::vector<OrderKey>, T...>)
 			ConnectionCommandKeysBase(const T&... arg)
 			: order{ this->toOrderKey<T>(arg)... }
 		{}
 
 		//OrderKey...
-		template<typename... T> requires(Size == sizeof...(T) && FU::Concept::IsSame<std::vector<OrderKey>, T...>)
+		template<typename... T> requires(N == sizeof...(T) && FU::Concept::IsSame<std::vector<OrderKey>, T...>)
 			explicit ConnectionCommandKeysBase(const T&... arg)
 			: order{ arg... }
 		{}
@@ -25,10 +25,10 @@ namespace FVK::Internal::Key {
 		ConnectionCommandKeysBase()
 			: order({})
 		{
-			assert(Size == 0);
+			assert(N == 0);
 		}
-	private:
 
+	private:
 		template<typename T>
 		static OrderKey toOrderKeyHelper(const T& key) {
 			if constexpr (std::same_as<typename T::KeyType, IndexKey>)
@@ -43,35 +43,34 @@ namespace FVK::Internal::Key {
 				return OrderKey(std::numeric_limits<OrderKey::Type>::max());//未実装 GKeyManager.toOrderKey(key);
 		}
 
-		//一度通し番号に変換しておいて使う時に戻す
-		//Tはvector<Key>かKey
+		//Convert the number to a serial number once, and put it back when you use it.
+		//T is vector<Key> or Key
 		template<typename T>
-		static std::vector<OrderKey> toOrderKey(const T& key) {
+		[[nodiscard]] static std::vector<OrderKey> toOrderKey(const T& key) {
 
-			//keyがvectorできた場合
+			//key is vector
 			if constexpr (FU::Concept::IsStdVector<T>) {
 				std::vector<OrderKey> result(key.size());
-				for (std::size_t i = 0, size = key.size(); i < size; i++) {
+				for (Size i = 0, size = key.size(); i < size; i++) {
 					result[i] = toOrderKeyHelper<T::value_type>(key[i]);
 				}
 				return result;
 			}
-			else {//単発
+			else {
 				return { toOrderKeyHelper<T>(key) };
 			}
 		}
 
 	protected:
-
-		_NODISCARD std::array<std::vector<IndexKey>, Size> convert() const {
-			if constexpr (Size == 0) {
+		[[nodiscard]] std::array<std::vector<IndexKey>, N> convert() const {
+			if constexpr (N == 0) {
 				return {};
 			}
 			else {
-				std::array<std::vector<IndexKey>, Size> result = {};
-				for (std::size_t i = 0; i < Size; i++) {
+				std::array<std::vector<IndexKey>, N> result = {};
+				for (Size i = 0; i < N; i++) {
 					std::vector<IndexKey> temp(order[i].size());
-					for (std::size_t j = 0, size = order[i].size(); j < size; j++) {
+					for (Size j = 0, size = order[i].size(); j < size; j++) {
 						temp[j] = GKeyManager.toIndexKey(order[i][j]);
 					}
 					result[i] = std::move(temp);
@@ -80,7 +79,6 @@ namespace FVK::Internal::Key {
 				return result;
 			}
 		}
-
 
 	private:
 		friend class ::FVK::Internal::Key::Converter;

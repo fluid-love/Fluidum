@@ -2,7 +2,7 @@
 
 #include "../../Common/common.h"
 
-namespace FS {
+namespace FS::Utils {
 
 	class PopupBackWindow final : public Scene {
 	public:
@@ -16,19 +16,16 @@ namespace FS {
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
 		const FD::GuiRead* const guiRead;
 
-
+	private:
 		struct {
 			ImVec2 windowPos{};
 			ImVec2 windowSize{};
 
 		}style;
-
-	private:
-
-
-
+	
 	};
+
 }

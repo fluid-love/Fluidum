@@ -33,7 +33,6 @@
 #include "../Sync/fence.h"
 #include "../Image/sampler.h"
 #include "../Image/texture.h"
-#include "../Draw/draw.h"
 #include "../ImGui/fluidum_imgui.h"
 #include "../ImGui/image.h"
 

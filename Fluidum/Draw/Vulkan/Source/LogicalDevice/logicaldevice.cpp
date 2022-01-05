@@ -53,7 +53,6 @@ const FVK::Internal::Data::LogicalDeviceInfo& FVK::Internal::LogicalDevice::get(
 
 void FVK::Internal::LogicalDevice::destroy() noexcept {
 	assert(this->info.device);
-	static_assert(noexcept(info.device.destroy()));
 	this->info.device.destroy();
 }
 

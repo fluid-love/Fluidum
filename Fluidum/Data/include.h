@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Gui/text.h"
+#include "Gui/gui.h"
 #include "Gui/Style/color.h"
 #include "Gui/Style/var.h"
 #include "Gui/layout.h"

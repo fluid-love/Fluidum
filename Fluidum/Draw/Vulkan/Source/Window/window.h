@@ -52,7 +52,7 @@ namespace FVK::Internal {
 			this->create(data, parameter);
 		}
 
-		~Window() = default;
+		~Window() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(Window)
 
 	public:
@@ -98,7 +98,7 @@ namespace FVK::Internal {
 			FailedToCreate
 		*/
 		//strong
-		GLFWvidmode* getVideoMode() const;
+		const GLFWvidmode* getVideoMode() const;
 
 	private:
 		Data::WindowInfo info{};

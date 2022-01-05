@@ -7,5 +7,5 @@ namespace FVK::Internal {
 }
 
 namespace FVK {
-	using MessengerCallbackType = void(*)(const std::string&);
+	using FU::Log::MessengerCallbackType;
 }

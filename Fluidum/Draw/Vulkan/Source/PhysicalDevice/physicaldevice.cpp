@@ -27,20 +27,20 @@ FVK::Internal::PhysicalDevice::QueueFamilyIndices FVK::Internal::PhysicalDevice:
 
 	std::vector<vk::QueueFamilyProperties> queueFamilies = device.getQueueFamilyProperties();
 
-	for (ISize i = 0; const auto & queueFamily : queueFamilies) {
+	for (Size i = 0; const auto & queueFamily : queueFamilies) {
 		if ((queueFamily.queueFlags & flag) == flag) {
-			indices.graphicsFamily = i;
+			indices.graphicsFamily = static_cast<UI32>(i);
 		}
 
 		vk::Bool32 presentSupport = false;
-		auto result = device.getSurfaceSupportKHR(i, surface, &presentSupport);
+		auto result = device.getSurfaceSupportKHR(static_cast<UI32>(i), surface, &presentSupport);
 		if (result != vk::Result::eSuccess) {
 			GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to get SurfaceSupportKHR({}).", vk::to_string(result));
 			Exception::throwFailedToCreate();
 		}
 
 		if (presentSupport) {
-			indices.presentFamily = i;
+			indices.presentFamily = static_cast<UI32>(i);
 		}
 
 		//no-throw
@@ -93,7 +93,7 @@ FVK::Internal::PhysicalDevice::SwapChainSupportDetails FVK::Internal::PhysicalDe
 	return details;
 }
 
-vk::SampleCountFlagBits FVK::Internal::PhysicalDevice::getMaxUsableSampleCount(const vk::PhysicalDevice physicalDevice) const {
+vk::SampleCountFlagBits FVK::Internal::PhysicalDevice::getMaxUsableSampleCount(const vk::PhysicalDevice physicalDevice) const noexcept {
 
 	vk::PhysicalDeviceProperties physicalDeviceProperties = physicalDevice.getProperties();
 	static_assert(std::is_nothrow_constructible_v<vk::PhysicalDeviceProperties, vk::PhysicalDeviceProperties&&>);
@@ -389,7 +389,7 @@ vk::Format FVK::Internal::PhysicalDevice::findSupportedFormat(const vk::Physical
 	Exception::throwNotSupported();
 }
 
-FVK::UI32 FVK::Internal::PhysicalDevice::findMemoryType(const vk::PhysicalDevice physicalDevice, const uint32_t typeFilter, const vk::MemoryPropertyFlags properties) {
+FVK::UI32 FVK::Internal::PhysicalDevice::findMemoryType(const vk::PhysicalDevice physicalDevice, const UI32 typeFilter, const vk::MemoryPropertyFlags properties) {
 
 	//no-throw
 	vk::PhysicalDeviceMemoryProperties memProperties = physicalDevice.getMemoryProperties();

@@ -47,7 +47,7 @@ namespace FVK::Internal {
 		explicit Instance(ManagerPassKey, const Data::InstanceData& data, const Parameter& parameter);
 		explicit Instance(ManagerPassKey, const Data::InstanceData& data, const MessengerParameter& parameter);
 
-		~Instance() = default;
+		~Instance() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(Instance)
 
 	private:
@@ -71,7 +71,7 @@ namespace FVK::Internal {
 			std::exception
 		*/
 		//strong
-		[[nodiscard]] std::vector<const char*> makeValidationLayerNames(const Messenger::ValidationLayer type) const noexcept;
+		[[nodiscard]] std::vector<const char*> makeValidationLayerNames(const Messenger::ValidationLayer type) const;
 		[[nodiscard]] std::vector<const char*> getRequiredExtensions() const;
 		
 		/*

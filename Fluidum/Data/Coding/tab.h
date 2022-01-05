@@ -3,15 +3,18 @@
 #include "../Common/common.h"
 #include "../../TextEditor/include.h"
 
-//forward
+//forward declaration
 namespace FD {
+
 	namespace Coding {
 		class TabWrite;
 		class TabRead;
 		class DisplayWrite;
 		class DisplayRead;
 	}
+
 	class ProjectWrite;
+
 }
 
 namespace FD::Coding::Internal {
@@ -32,17 +35,14 @@ namespace FD::Coding::Internal {
 		friend ::FD::ProjectWrite;
 	};
 
-
 }
-
 
 namespace FD::Coding {
 
-	//tab
 	class TabWrite final {
 	public:
-		explicit TabWrite(::FD::Internal::PassKey) {}
-		~TabWrite() = default;
+		explicit TabWrite(::FD::Internal::PassKey) noexcept {}
+		~TabWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(TabWrite)
 
 	public:
@@ -60,7 +60,7 @@ namespace FD::Coding {
 
 		//NotFound
 		void remove(const std::string& path) const;
-	
+
 		void clear() const;
 
 	public:
@@ -85,28 +85,31 @@ namespace FD::Coding {
 
 	};
 
-	//current project
+}
+
+namespace FD::Coding {
+
 	class TabRead final {
 	public:
 		explicit TabRead(::FD::Internal::PassKey) noexcept {};
-		~TabRead() = default;
+		~TabRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(TabRead)
 
 	public:
-
 		[[nodiscard]] bool update() const;
 		[[nodiscard]] std::vector<std::string> paths() const;
 
 	public:
 		[[nodiscard]] bool update_isTextSaved() const;
 		[[nodiscard]] bool isTextSaved(const std::string& path) const;
-		[[nodiscard]] bool isAllTextSaved() const;
+
+		//no-throw
+		[[nodiscard]] bool isAllTextSaved() const noexcept;
 
 		[[nodiscard]] std::vector<std::string> notSavedTexts() const;
 
 	public:
 		[[nodiscard]] bool exist(const std::string& path) const;
-
 
 	};
 
@@ -117,7 +120,7 @@ namespace FD::Coding {
 	class DisplayWrite final {
 	public:
 		explicit DisplayWrite(::FD::Internal::PassKey) noexcept {};
-		~DisplayWrite() = default;
+		~DisplayWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(DisplayWrite)
 
 	public:
@@ -135,10 +138,14 @@ namespace FD::Coding {
 		bool tryRemove(const std::string& path) const;
 	};
 
+}
+
+namespace FD::Coding {
+
 	class DisplayRead final {
 	public:
 		explicit DisplayRead(::FD::Internal::PassKey) noexcept {};
-		~DisplayRead() = default;
+		~DisplayRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(DisplayRead)
 
 	public:
@@ -148,6 +155,6 @@ namespace FD::Coding {
 		[[nodiscard]] std::vector<std::string> paths() const;
 		[[nodiscard]] bool empty() const;
 
-
 	};
+
 }

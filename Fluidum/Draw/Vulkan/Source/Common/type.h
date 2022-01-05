@@ -78,7 +78,6 @@ namespace FVK::Internal {
 		Fence_Vector,
 		Sampler,
 		Texture,
-		Draw,
 		ImGui,
 		ImGuiImage,
 

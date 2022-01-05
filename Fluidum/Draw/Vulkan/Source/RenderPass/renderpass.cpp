@@ -30,5 +30,4 @@ const FVK::Internal::Data::RenderPassInfo& FVK::Internal::RenderPass::get() cons
 void FVK::Internal::RenderPass::destroy() noexcept {
 	assert(this->info.renderPass);
 	this->info.device.destroyRenderPass(this->info.renderPass);
-	static_assert(noexcept(info.device.destroyRenderPass(info.renderPass)));
 }

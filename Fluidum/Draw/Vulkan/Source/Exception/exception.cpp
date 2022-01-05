@@ -27,3 +27,7 @@ void FVK::Internal::Exception::throwCollisionOfKeys() {
 void FVK::Internal::Exception::throwUnexpected() {
 	throw ::FVK::Exception::Error(::FVK::Exception::ErrorType::Unexpected);
 }
+
+void FVK::Internal::Exception::throwUnknown() {
+	throw ::FVK::Exception::Error(::FVK::Exception::ErrorType::Unknown);
+}

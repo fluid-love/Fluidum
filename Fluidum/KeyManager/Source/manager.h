@@ -29,15 +29,15 @@ namespace FKM {
 	private:
 		Internal::OrderCounter counter{};
 
-		AddCallbackType addCallback = [](const magic_enum::string_view&, const char*, OrderKey, const std::vector<OrderKey>&) {};
-		EraseCallbackType eraseCallback = [](const magic_enum::string_view&, const char*, OrderKey) {};
+		AddCallbackType addCallback = nullptr;
+		RemoveCallbackType removeCallback = nullptr;
 
 	public:
-		void setAddCallback(AddCallbackType callback) {
+		void setAddCallback(AddCallbackType callback) noexcept {
 			this->addCallback = callback;
 		}
-		void setEraseCallback(EraseCallbackType callback) {
-			this->eraseCallback = callback;
+		void setRemoveCallback(RemoveCallbackType callback) noexcept {
+			this->removeCallback = callback;
 		}
 
 	public://add
@@ -46,8 +46,6 @@ namespace FKM {
 			std::exception
 			CollisionOfKeys
 			ReachIndexLimit
-
-			callback
 		*/
 		//strong
 		template<Enum Type>
@@ -72,8 +70,6 @@ namespace FKM {
 			CollisionOfKeys
 			ReachIndexLimit
 			NotFound
-
-			callback
 		*/
 		//strong
 		template<Enum Type>
@@ -112,8 +108,6 @@ namespace FKM {
 			CollisionOfKeys
 			ReachIndexLimit
 			NotFound (size > 0)
-
-			callback
 		*/
 		//strong
 		template<Enum Type, auto TypeArray, FU::Concept::IsStdArrayParticularType<IndexKey> IndexArray>
@@ -186,9 +180,6 @@ namespace FKM {
 		Exception:
 			std::exception
 			NotFound
-			FailedToRemove
-
-			callback
 		*/
 		//strong
 		void remove(const char* key) {
@@ -198,16 +189,13 @@ namespace FKM {
 			const auto order = this->toOrderKey(key);
 
 			const auto itr = this->find(key);
-			assert(itr != Elements.cend());
-
-			if (this->isKeyConnected(key))
-				Exception::Internal::throwFailedToRemove();//FailedToRemove
+			assert(itr != Elements::cend());
 
 			//This function(erase) does not throw an exception
 			//because Element satisfies is_nothrow_move_constructible_v and is_move_constructible.
 			Elements::erase(itr);
 
-			this->eraseCallback(magic_enum::enum_name(type), key, order);
+			this->removeCallback(magic_enum::enum_name(type), key, order);
 		}
 		void remove(const StrKey& key) {
 			//c_str() no-throw
@@ -216,6 +204,26 @@ namespace FKM {
 		void remove(const Enum type, const IndexKey key) {
 			const StrKey strKey = this->toStrKey(type, key);
 			this->remove(strKey);
+		}
+
+	public:
+		void clear() noexcept {
+			Elements::clear();
+			try {
+				Elements::shrink_to_fit();
+			}
+			catch (...) {
+				;
+			}
+		}
+
+	public:
+		[[nodiscard]] bool empty() const noexcept {
+			return Elements::empty();
+		}
+
+		[[nodiscard]] Size size() const noexcept {
+			return static_cast<Size>(Elements::size());
 		}
 
 	public:
@@ -373,6 +381,12 @@ namespace FKM {
 		}
 
 	public:
+		/*
+		Exception:
+			std::exception
+			NotFound
+		*/
+		//strong
 		[[nodiscard]] bool isKeyConnected(CharKey key, CharKey find) const {
 			const OrderKey order = toOrderKey(find);
 			const Connections& connections = connectionsRef(key);
@@ -381,7 +395,6 @@ namespace FKM {
 				return true;
 			return false;
 		}
-
 		[[nodiscard]] bool isKeyConnected(CharKey key) const {
 			const OrderKey order = toOrderKey(key);
 			for (Size i = 0, size = Elements::size(); i < size; i++) {
@@ -393,6 +406,9 @@ namespace FKM {
 			}
 
 			return false;
+		}
+		[[nodiscard]] bool isKeyConnected(const Enum type, const IndexKey key) const {
+			return this->isKeyCollided(this->toStrKey(type,key));
 		}
 
 	public:

@@ -34,7 +34,7 @@ namespace FVK::Internal::Key {
 
 	private:
 		template<FvkType>
-		friend class RequiredDataKeysBase;
+		friend class RequiredDataKeys;
 		friend class Converter;
 		friend class ::FVK::Internal::Manager::Manager;
 	};
@@ -63,10 +63,12 @@ namespace FVK::Internal::Key {
 			this->key = key;
 		}
 
-		//no-throw
-		[[nodiscard]] std::string get()const noexcept {
+		//strong
+		[[nodiscard]] std::string get() const {
 			return this->key;
 		}
+
+		//no-throw
 		void operator=(std::string&& key) noexcept {
 			this->key = std::move(key);
 		}
@@ -76,7 +78,7 @@ namespace FVK::Internal::Key {
 
 	private:
 		template<FvkType>
-		friend class RequiredDataKeysBase;
+		friend class RequiredDataKeys;
 		friend class Converter;
 		friend class ::FVK::Internal::Manager::Manager;
 	};

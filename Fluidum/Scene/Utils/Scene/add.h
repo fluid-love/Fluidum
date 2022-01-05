@@ -15,7 +15,6 @@ namespace FS::Utils {
 
 		FluidumUtils_Class_Delete_CopyMove(AddScenes)
 
-
 	public:
 		virtual void call() override;
 

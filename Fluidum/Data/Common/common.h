@@ -1,6 +1,7 @@
 #pragma once
 
 #include "resource.h"
+#include "log.h"
 #include "../Limits/limits.h"
 #include <boost/predef.h>
 #include <lua.hpp>
@@ -34,5 +35,11 @@ namespace FD::Internal {
 	};
 
 	using PassKey = const ManagerPassKey&;
+
+}
+
+namespace FD {
+	
+	using UT = UIF16;
 
 }

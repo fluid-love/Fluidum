@@ -1,28 +1,35 @@
 #pragma once
 
-#include "../../../Common/common.h"
+#include "../../Common/common.h"
 
-namespace FS::Bar {
+namespace FS::Project::File {
 
-	class ProjectForm final : public Scene {
+	class Form final : public Scene {
 	public:
-		struct Info final {
+		struct SharedInfo final {
+		public://arg
 			const FD::Log::Project::Type type;
 			const std::string name;
-
+		public://return
 			bool create = false;
 		};
 
 	public:
-		explicit ProjectForm(
+		explicit Form(
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			const FD::GuiRead* const guiRead,
-			std::shared_ptr<Info>& info
+			std::shared_ptr<SharedInfo>& info
 		);
-		void Constructor(FD::ProjectWrite,FD::ProjectRead, FD::GuiRead);
+		void Constructor(
+			FD::ProjectWrite,
+			FD::ProjectRead,
+			FD::GuiRead
+		);
 
-		~ProjectForm() noexcept;
+		~Form() noexcept;
+
+		FluidumUtils_Class_Delete_CopyMove(Form)
 
 	public:
 		virtual void call() override;
@@ -34,12 +41,13 @@ namespace FS::Bar {
 
 		FD::Text::ProjectForm text{};
 
-	private://data
+	private:
+		std::shared_ptr<SharedInfo> info;
 
-		std::shared_ptr<Info> info;
-
-		std::string folderPathStr{};
-		std::string projectNameStr{};
+		struct {
+			std::string directoryPath{};
+			std::string name{};
+		}str;
 
 		struct {
 			ImCounter<ImAnimeTime> counter{};
@@ -67,8 +75,8 @@ namespace FS::Bar {
 
 	private:
 		void createDirectory();
-		_NODISCARD bool createProject();
-
+		[[nodiscrad]] bool createProject();
 
 	};
+
 }

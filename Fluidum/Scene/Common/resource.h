@@ -2,8 +2,6 @@
 
 #include "using.h"
 
-//相対パスにする時はResources/までの相対パスを指定する
-
 namespace FS::Resource {
 
 #ifdef Fluidum_Path
@@ -59,17 +57,6 @@ namespace FS::Resource {
 								 
 	constexpr inline const char* ProjectNewIconsFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icons/")>();
 								 
-#endif	
-
-}
-
-//Utils
-namespace FS::Resource {
-
-#ifdef Fluidum_Path
-	constexpr inline const char* UtilsIconFolderPath = Fluidum_Path "/Resources/Utils/icon/";
-#else
-	constexpr inline const char* UtilsIconFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/FluidumSceneUtils/icon/")>();
 #endif	
 
 }

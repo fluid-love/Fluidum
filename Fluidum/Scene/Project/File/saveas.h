@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../../Common/common.h"
+#include "../../Common/common.h"
 
-namespace FS::Bar {
+namespace FS::Project::File {
 
 	class SaveAs final : public Scene {
 	public:
@@ -14,8 +14,8 @@ namespace FS::Bar {
 			FD::WindowWrite* const windowWrite
 		);
 		void Constructor(
-			FD::ProjectWrite, 
-			FD::ProjectRead, 
+			FD::ProjectWrite,
+			FD::ProjectRead,
 			FD::GuiRead,
 			FD::ExitRead,
 			FD::WindowWrite
@@ -23,10 +23,12 @@ namespace FS::Bar {
 
 		~SaveAs() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(SaveAs)
+
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
 		const FD::GuiRead* const guiRead;
@@ -34,8 +36,7 @@ namespace FS::Bar {
 
 		FD::Text::ProjectSaveAs text{};
 
-	private://data
-
+	private:
 		struct {
 			ImVec2 windowPos{};
 			ImVec2 windowSize{};
@@ -43,8 +44,10 @@ namespace FS::Bar {
 			float innerPosHeight = 0.0f;
 		}style;
 
-		std::string folderPathStr;
-		std::string projectNameStr;
+		struct {
+			std::string directoryPath{};
+			std::string projectName{};
+		}str;
 
 		struct {
 			ImVec2 projectFolder{};
@@ -65,5 +68,7 @@ namespace FS::Bar {
 		bool save();
 
 		void checkExit();
+
 	};
+
 }

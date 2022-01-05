@@ -13,6 +13,7 @@ namespace FVK::Internal::Exception {
 	[[noreturn]] void throwNotSupported();
 	[[noreturn]] void throwCollisionOfKeys();
 	[[noreturn]] void throwUnexpected();
+	[[noreturn]] void throwUnknown();
 
 }
 
@@ -25,18 +26,10 @@ namespace FVK::Exception {
 		NotFound,
 		NotSupported,
 		CollisionOfKeys,
-		Unexpected
+		Unexpected,
+		Unknown
 	};
 
-	class Error final {
-	public:
-		explicit Error(const ErrorType val) noexcept : val(val) {}
-
-	public:
-		[[nodiscard]] inline ErrorType code() const noexcept;
-
-	private:
-		const ErrorType val;
-	};
+	using Error = FU::Exception::Base<ErrorType>;
 
 }

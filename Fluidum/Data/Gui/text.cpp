@@ -3,17 +3,18 @@
 #include "../../../External/IconFontCppHeaders/IconsMaterialDesign.h"
 #include "../../../External/IconFontCppHeaders/IconsFontAwesome5.h"
 
-namespace FD::Internal::Text {
+namespace FD::Text::Internal {
+
 	using Language = ::FD::Text::Language;
 
-	std::string newLine(std::ifstream& ifs, const std::string& src) {
+	[[nodiscard]] std::string newLine(std::ifstream& ifs, const std::string& src) {
 		std::string temp{};
 		temp.push_back('\n');
 		std::getline(ifs, temp);
 		return src + '\n' + temp;
 	}
 
-	enum class Type : uint8_t {
+	enum class Type : UT {
 		Analysis,
 		BarExit,
 		ProjectNewFile,
@@ -37,17 +38,18 @@ namespace FD::Internal::Text {
 		TopBar
 	};
 
-
 	template<Type T>
 	std::string makePath(const Language lang) {
+		using namespace ::FD::Internal::Resource;
 		using enum Type;
+
 		std::string path{};
 		if (lang == Language::Japanese)
-			path += Resource::JapaneseGuiTextFolderPath;
+			path += JapaneseGuiTextFolderPath;
 		else if (lang == Language::English)
-			path += Resource::EnglishGuiTextFolderPath;
+			path += EnglishGuiTextFolderPath;
 		else if (lang == Language::Chinese)
-			path += Resource::ChineseGuiTextFolderPath;
+			path += ChineseGuiTextFolderPath;
 		else
 			abort();
 
@@ -120,14 +122,11 @@ namespace FD::Internal::Text {
 		return path;
 	}
 
-
-
-
 }
 
-namespace FD::Internal::Text {
+namespace FD::Text::Internal {
 
-	//ëOï˚êÈåæ
+	//forward declaration
 	class Getter;
 
 	class LangType final {
@@ -155,15 +154,15 @@ FD::GuiTextRead::GuiTextRead(Internal::PassKey) {
 	std::getline(ifs, data);
 
 	if (data == "Japanese")
-		Internal::Text::LangType::type = Text::Language::Japanese;
+		Text::Internal::LangType::type = Text::Language::Japanese;
 	else if (data == "English")
-		Internal::Text::LangType::type = Text::Language::English;
+		Text::Internal::LangType::type = Text::Language::English;
 	else
 		throw std::runtime_error("Failed to read GuiTextType.");
 
 }
 
-FD::Internal::Text::Title::Title() {
+FD::Text::Internal::Title::Title() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::Title>(Getter::get()), std::ios::in);
@@ -186,7 +185,13 @@ FD::Internal::Text::Title::Title() {
 	this->document = data;
 
 	std::getline(ifs, data);
-	this->error_openProjectFile = Internal::Text::newLine(ifs, data);
+	this->error_notSupported = data;
+
+	std::getline(ifs, data);
+	this->error_loadProjectHistory = data;
+
+	std::getline(ifs, data);
+	this->error_openProjectFile = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->error_illegalFile = data;
@@ -195,10 +200,10 @@ FD::Internal::Text::Title::Title() {
 	this->error_brokenFile = data;
 
 	std::getline(ifs, data);
-	this->error_internal = data;
+	this->error_noexpected = data;
 }
 
-FD::Internal::Text::TitleBar::TitleBar() {
+FD::Text::Internal::TitleBar::TitleBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::TitleBar>(Getter::get()), std::ios::in);
@@ -212,7 +217,7 @@ FD::Internal::Text::TitleBar::TitleBar() {
 
 }
 
-FD::Internal::Text::Layout::Layout() {
+FD::Text::Internal::Layout::Layout() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::Layout>(Getter::get()), std::ios::in);
@@ -246,7 +251,7 @@ FD::Internal::Text::Layout::Layout() {
 	this->confirm_reset = data;
 }
 
-FD::Internal::Text::BarExit::BarExit() {
+FD::Text::Internal::BarExit::BarExit() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::BarExit>(Getter::get()), std::ios::in);
@@ -256,10 +261,10 @@ FD::Internal::Text::BarExit::BarExit() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->popup_projectMessage = Internal::Text::newLine(ifs, data);
+	this->popup_projectMessage = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->popup_codingTabMessage = Internal::Text::newLine(ifs, data);
+	this->popup_codingTabMessage = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->popup_saveAndExit = data;
@@ -271,7 +276,7 @@ FD::Internal::Text::BarExit::BarExit() {
 	this->popup_cancel = data;
 }
 
-FD::Internal::Text::StatusBar::StatusBar() {
+FD::Text::Internal::StatusBar::StatusBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::StatusBar>(Getter::get()), std::ios::in);
@@ -292,7 +297,7 @@ FD::Internal::Text::StatusBar::StatusBar() {
 	this->taskInfo = data;
 }
 
-FD::Internal::Text::MenuBar::MenuBar() {
+FD::Text::Internal::MenuBar::MenuBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::MenuBar>(Getter::get()), std::ios::in);
@@ -430,11 +435,11 @@ FD::Internal::Text::MenuBar::MenuBar() {
 	this->error_internal = data;
 
 	std::getline(ifs, data);
-	this->confirm_changeLayout = Internal::Text::newLine(ifs, data);
+	this->confirm_changeLayout = Internal::newLine(ifs, data);
 
 }
 
-FD::Internal::Text::TopBar::TopBar() {
+FD::Text::Internal::TopBar::TopBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::TopBar>(Getter::get()), std::ios::in);
@@ -467,7 +472,7 @@ FD::Internal::Text::TopBar::TopBar() {
 
 }
 
-FD::Internal::Text::LeftBar::LeftBar() {
+FD::Text::Internal::LeftBar::LeftBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::LeftBar>(Getter::get()), std::ios::in);
@@ -478,7 +483,7 @@ FD::Internal::Text::LeftBar::LeftBar() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->popup_save = Internal::Text::newLine(ifs, data);;
+	this->popup_save = Internal::newLine(ifs, data);;
 
 	std::getline(ifs, data);
 	this->popup_saveAndClose = data;
@@ -490,7 +495,7 @@ FD::Internal::Text::LeftBar::LeftBar() {
 	this->popup_cancel = data;
 }
 
-FD::Internal::Text::ProjectSelect::ProjectSelect() {
+FD::Text::Internal::ProjectSelect::ProjectSelect() {
 
 	std::ifstream ifs{};
 
@@ -563,7 +568,7 @@ FD::Internal::Text::ProjectSelect::ProjectSelect() {
 
 }
 
-FD::Internal::Text::ProjectNewFile::ProjectNewFile() {
+FD::Text::Internal::ProjectNewFile::ProjectNewFile() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::ProjectNewFile>(Getter::get()), std::ios::in);
@@ -631,7 +636,7 @@ FD::Internal::Text::ProjectNewFile::ProjectNewFile() {
 	this->error_unexpected = data;
 }
 
-FD::Internal::Text::ProjectDirectory::ProjectDirectory() {
+FD::Text::Internal::ProjectDirectory::ProjectDirectory() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::ProjectDirectory>(Getter::get()), std::ios::in);
@@ -663,7 +668,7 @@ FD::Internal::Text::ProjectDirectory::ProjectDirectory() {
 	this->error_unexpected = data;
 }
 
-FD::Internal::Text::ProjectCheckPath::ProjectCheckPath() {
+FD::Text::Internal::ProjectCheckPath::ProjectCheckPath() {
 
 	std::ifstream ifs{};
 
@@ -693,7 +698,7 @@ FD::Internal::Text::ProjectCheckPath::ProjectCheckPath() {
 	this->error_unexpected = data;
 }
 
-FD::Internal::Text::NewProject::NewProject() {
+FD::Text::Internal::NewProject::NewProject() {
 
 	std::ifstream ifs{};
 
@@ -766,7 +771,7 @@ FD::Internal::Text::NewProject::NewProject() {
 
 }
 
-FD::Internal::Text::ProjectForm::ProjectForm() {
+FD::Text::Internal::ProjectForm::ProjectForm() {
 
 	std::ifstream ifs{};
 
@@ -814,6 +819,9 @@ FD::Internal::Text::ProjectForm::ProjectForm() {
 	this->error_emptyForm = data;
 
 	std::getline(ifs, data);
+	this->error_maxSize = data;
+
+	std::getline(ifs, data);
 	this->error_notFoundDirectory = data;
 
 	std::getline(ifs, data);
@@ -823,7 +831,7 @@ FD::Internal::Text::ProjectForm::ProjectForm() {
 	this->error_failedToCreate = data;
 }
 
-FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
+FD::Text::Internal::ProjectSaveAs::ProjectSaveAs() {
 
 	std::ifstream ifs{};
 
@@ -838,7 +846,7 @@ FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
 	this->title = data;
 
 	std::getline(ifs, data);
-	this->folderPath = data;
+	this->directoryPath = data;
 
 	std::getline(ifs, data);
 	this->projectName = data;
@@ -850,13 +858,13 @@ FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
 	this->save = data;
 
 	std::getline(ifs, data);
-	this->checkCurrentProject = data;
+	this->confirm_notSaved = data;
 
 	std::getline(ifs, data);
-	this->saveAndWrite = data;
+	this->confirm_save = data;
 
 	std::getline(ifs, data);
-	this->ignore = data;
+	this->confirm_ignore = data;
 
 	std::getline(ifs, data);
 	this->error_empty = data;
@@ -868,10 +876,10 @@ FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
 	this->error_notFound = data;
 
 	std::getline(ifs, data);
-	this->error_failed = data;
+	this->error_unexpected = data;
 }
 
-FD::Internal::Text::PopupSelect::PopupSelect() {
+FD::Text::Internal::PopupSelect::PopupSelect() {
 
 	std::ifstream ifs{};
 
@@ -894,7 +902,7 @@ FD::Internal::Text::PopupSelect::PopupSelect() {
 
 }
 
-FD::Internal::Text::TextEditor::TextEditor() {
+FD::Text::Internal::TextEditor::TextEditor() {
 
 	std::ifstream ifs{};
 
@@ -977,7 +985,7 @@ FD::Internal::Text::TextEditor::TextEditor() {
 }
 
 
-FD::Internal::Text::CodingTab::CodingTab() {
+FD::Text::Internal::CodingTab::CodingTab() {
 
 	std::ifstream ifs{};
 
@@ -1011,7 +1019,7 @@ FD::Internal::Text::CodingTab::CodingTab() {
 
 }
 
-FD::Internal::Text::Project::Project() {
+FD::Text::Internal::Project::Project() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::Project>(Getter::get()), std::ios::in);
@@ -1115,19 +1123,19 @@ FD::Internal::Text::Project::Project() {
 	this->error_maxSize = data;
 
 	std::getline(ifs, data);
-	this->confirm_releaseVirtualFolder = Internal::Text::newLine(ifs, data);
+	this->confirm_releaseVirtualFolder = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_releaseFile = Internal::Text::newLine(ifs, data);
+	this->confirm_releaseFile = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_removeDirectory = Internal::Text::newLine(ifs, data);
+	this->confirm_removeDirectory = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_removeFile = Internal::Text::newLine(ifs, data);
+	this->confirm_removeFile = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_releaseFile_notSaved = Internal::Text::newLine(ifs, data);
+	this->confirm_releaseFile_notSaved = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->error_sameName = data;
@@ -1172,14 +1180,14 @@ FD::Internal::Text::Project::Project() {
 	this->error_tab = data;
 
 	std::getline(ifs, data);
-	this->error_fileDoesNotExist = Internal::Text::newLine(ifs, data);
+	this->error_fileDoesNotExist = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->error_unexpected = data;
 
 }
 
-FD::Internal::Text::Console::Console() {
+FD::Text::Internal::Console::Console() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::Console>(Getter::get()), std::ios::in);

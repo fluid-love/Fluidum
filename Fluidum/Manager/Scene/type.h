@@ -27,9 +27,11 @@ namespace FS::Internal {
 }
 
 namespace FS {
+
 	//add and delete
 	namespace Internal {
 		using CallBackType = void(*)(bool, FU::Class::ClassCode::CodeType);
 	}
 	using Internal::CallBackType;
+
 }

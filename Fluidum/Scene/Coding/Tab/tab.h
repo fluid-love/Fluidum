@@ -9,9 +9,17 @@ namespace FS::Coding {
 		explicit Tab(
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
+			FD::Coding::DisplayWrite* const displayWrite,
+			const FD::Coding::DisplayRead* const displayRead,
 			const FD::ProjectRead* const projectRead
 		);
-		void Constructor(FD::Coding::TabWrite, FD::Coding::TabRead, FD::ProjectRead);
+		void Constructor(
+			FD::Coding::TabWrite,
+			FD::Coding::TabRead,
+			FD::Coding::DisplayWrite,
+			FD::Coding::DisplayRead,
+			FD::ProjectRead
+		);
 
 		~Tab() noexcept;
 
@@ -24,6 +32,8 @@ namespace FS::Coding {
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
 		const FD::ProjectRead* const projectRead;
+		FD::Coding::DisplayWrite* const displayWrite;
+		const FD::Coding::DisplayRead* const displayRead;
 
 		FD::Text::CodingTab text{};
 

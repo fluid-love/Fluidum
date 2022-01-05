@@ -68,8 +68,6 @@ namespace FVK::Internal {
 			return DataTypeArray<1>({ LogicalDevice });
 		else if constexpr (Type == Texture)
 			return DataTypeArray<4>({ PhysicalDevice, LogicalDevice, Queue, CommandPool });
-		else if constexpr (Type == Draw)
-			return DataTypeArray<1>({ LogicalDevice });
 		else if constexpr (Type == ImGui)
 			return DataTypeArray<8>({ Window,Instance,PhysicalDevice,LogicalDevice,Queue_Vector,RenderPass,CommandPool,DescriptorPool });
 		else if constexpr (Type == ImGuiImage)

@@ -8,69 +8,67 @@ namespace FD {
 	class LogRead;
 }
 
-namespace FD::Internal::Log {
+namespace FD::Log::Internal {
 
-	//Logの中身を保存しておく
 	class Data final {
 	private:
-		static inline std::array<std::string, LogArraySize> data{};
-		static inline std::uint16_t currentIndex = 0;
+		static inline std::array<std::string, Limits::LogArraySize> data{};
+		static inline UIF16 currentIndex = 0;
 
 		static void insert(std::string&& message);
 		static void insert(const std::string& message);
 
 		static inline std::atomic_bool writeFlag = false;
 		static inline std::mutex mtx{};
+
 	private:
 		friend ::FD::LogWrite;
 		friend ::FD::LogRead;
+
 	};
 
 }
 
 namespace FD {
 
-	//Globalで1つもっておく
 	class LogWrite final {
 	public:
-		LogWrite();
-		~LogWrite() = default;
+		LogWrite() noexcept;
+		~LogWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(LogWrite)
 
 	public:
-		template<Log::Type Ty, typename... U>
-		std::string add(const std::string& message, U&&... values) {
+		enum class Exception : UT {
+			FailedToAdd
+		};
 
-			std::string type = FU::Log::getTypeText<Ty>();
+	public:
+		/*
+		Exception:
+			FailedToAdd
+		*/
+		//strong
+		void add(const std::string& message);
 
-			//現在の時間
-			std::string result = FU::Log::getCurrentTimeString();
+	public:
+		//no-throw
+		void requestStop() noexcept;
 
-			//メッセージ本体
-			std::string msg = std::format(message, std::forward<U>(values)...);
-
-			result += type += msg;
-
-#ifndef NDEBUG
-			std::cout << result << std::endl;
-#endif
-
-			Internal::Log::Data::insert(result);
-			return result;
-		}
+		[[nodiscrad]] bool threadJoinable() const noexcept;
 
 	private:
-		//ファイル名 jthreadより先に破棄してはいけない
-		//"FluidumLog/現在の時刻.log"
+		//filepath
+		//Don't destroy it before jthread.
+		//"FluidumLog/current_time.log"
 		const std::string filePath;
 
-		void file(const bool all = true);
-		void write();
+		void file(const bool all = true) noexcept;
+		void write() noexcept;
 
+	private:
 		std::jthread writeLogThread{};
 
 	};
-
 
 	class LogRead final {
 	public:
@@ -79,8 +77,9 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(LogRead)
 
 	public:
-		//最後に追加されたメッセージを取得する
-		_NODISCARD std::string getLatestMessage() const;
+		//Get the last message added.
+		[[nodiscard]] std::string getLatestMessage() const;
+
 	};
 
 }

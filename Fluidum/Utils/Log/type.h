@@ -18,6 +18,6 @@ namespace FU::Log {
 		Error
 	};
 
-	using MessengerCallbackType = void(*)(const std::string& message);
+	using MessengerCallbackType = void(*)(const std::string& message) noexcept;
 
 }

@@ -205,11 +205,6 @@ namespace FVK::Internal::Data {
 	};
 
 	template<>
-	struct Info<FvkType::Draw> final {
-
-	};
-
-	template<>
 	struct Info<FvkType::ImGui> final {
 		vk::Device device = nullptr;
 		vk::DescriptorPool descriptorPool = nullptr;
@@ -257,7 +252,6 @@ namespace FVK::Internal::Data {
 	using FenceInfo = Info<FvkType::Fence>;
 	using SamplerInfo = Info<FvkType::Sampler>;
 	using TextureInfo = Info<FvkType::Texture>;
-	using DrawInfo = Info<FvkType::Draw>;
 	using ImGuiInfo = Info<FvkType::ImGui>;
 	using ImGuiImageInfo = Info<FvkType::ImGuiImage>;
 

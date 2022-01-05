@@ -29,8 +29,6 @@ namespace FS::Internal {
 		//current scenes
 		std::vector<ClassCode::CodeType> sceneCodes = {};
 
-		/*callループ中で削除を行うとindexが要素数を超える可能性があるため,
-		  一度消すクラスコードを記録して置いて後で消す．*/
 		std::vector<ClassCode::CodeType> deleteSceneCodes = {};
 
 		//sync

@@ -8,8 +8,11 @@ namespace FVK::Internal::Manager {
 
 	class Manager final {
 	public:
-		Manager();
-		~Manager();
+		//DataTuple's constructor may throw an exception.              -> call std::terminate
+		//If the initialization of glfw fails, an exception is thrown. -> call std::terminate
+		Manager() noexcept;
+		
+		~Manager() noexcept;
 		FluidumUtils_Class_Delete_CopyMove(Manager)
 
 	public:
@@ -18,144 +21,294 @@ namespace FVK::Internal::Manager {
 			std::exception
 			CollisionOfKeys
 			FailedToCreate
+			NotSupported
 		*/
 		//strong
 		//if item don't need any other data.
 		template<FvkType Type, IsParameter Parameter>
 		void add(const char* key, Parameter& parameter) {
-			static_assert(GetRequiredDataSize<Type>() == 0);
+			//static_assert(GetRequiredDataSize<Type>() == 0);
 
-			//Same name is not allowed.
-			if (GKeyManager.isKeyCollided(key))
-				Exception::throwCollisionOfKeys(key);
+			////Same name is not allowed.
+			//if (GKeyManager.isKeyCollided(key))
+			//	Exception::throwCollisionOfKeys(key);
 
-			//No duplicate names guaranteed.
-			try {
-				//strong
-				GKeyManager.add<ToHandleType<Type>()>(key);
-			}
-			catch (const FKM::Exception::Error& e) {
-				if (e.code() == FKM::Exception::ErrorType::ReachIndexLimit) {
-					GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "The maximum number of items that can be added has been exceeded.");
-					Exception::throwFailedToCreate();
-				}
-				else {
-					GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "");
-					Exception::throwUnexpected();
-				}
-			}
+			////No duplicate names guaranteed.
+			//try {
+			//	//strong
+			//	GKeyManager.add<ToHandleType<Type>()>(key);
+			//}
+			//catch (const FKM::Exception::Error& e) {
+			//	if (e.code() == FKM::Exception::ErrorType::ReachIndexLimit) {
+			//		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "The maximum number of items that can be added has been exceeded.");
+			//	}
+			//	else {
+			//		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Internal Error.");
+			//	}
+			//	Exception::throwFailedToCreate();
+			//}
 
-			auto ptr = this->getItemVectorPtr<Type>();
-			Data::Data<Type> requiredData({});
+			//try {
+			//	auto ptr = this->getItemVectorPtr<Type>();
+			//	Data::Data<Type> requiredData({});
 
-			//std::vector::value_type(Class of each item).
-			using ValueType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type;
+			//	//std::vector::value_type.
+			//	using ValueType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type;
+			//	//Class of each item
+			//	using ElmType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type::element_type;
 
-			//https://eel.is/c++draft/vector.modifiers
-			//strong
-			static_assert(std::is_nothrow_move_constructible_v<ValueType>);
-			ptr->emplace_back(ValueType(ManagerPassKey{}, requiredData, parameter));
+			//	auto unique = std::make_unique<ValueType>(ValueType(ManagerPassKey{}, requiredData, parameter));
+
+			//	try {
+			//		//https://eel.is/c++draft/vector.modifiers
+			//		//strong
+			//		static_assert(std::is_nothrow_move_constructible_v<ValueType>);
+			//		ptr->emplace_back(std::move(unique));
+			//	}
+			//	catch (...) {
+			//		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "emplace_back throw exception.");
+			//		unique->destroy();//valid
+			//		static_assert(noexcept(unique->destroy()));
+			//		std::rethrow_exception(std::current_exception());
+			//	}
+			//}
+			//catch (...) {
+			//	try {
+			//		GKeyManager.remove(key);
+			//	}
+			//	catch (...) {
+			//		std::terminate();
+			//	}
+			//	std::rethrow_exception(std::current_exception());
+			//}
+
 		}
 
-		//追加する
+		//strong
 		template<FvkType Type, IsParameter Parameter>
-		void add(const char* key, Parameter& parameter, const Key::RequiredDataKeysBase<Type>& keys) {
-			constexpr auto size = GetRequiredDataSize<Type>();
-			static_assert(size > 0, "Size == 0は別の関数addを使う");
-			//keyの被り
-			if (Internal::GKeyManager.isKeyCollision(key))
-				Exception::throwCollisionOfKeys(key);
+		void add(const char* key, Parameter& parameter, const Key::RequiredDataKeys<Type>& keys) {
+			//constexpr Size size = GetRequiredDataSize<Type>();
+			//static_assert(size > 0, "Size == 0.");
 
-			//connection
-			const std::array<std::vector<IndexKey>, size> connections = keys.convert();
+			//if (Internal::GKeyManager.isKeyCollided(key))
+			//	Exception::throwCollisionOfKeys(key);
 
-			//必要なデータ型 DataTypeArray
-			constexpr auto dataTypes = GetRequiredDataTypes<Type>();
+			////connection
+			//const std::array<std::vector<IndexKey>, size> connections = keys.convert();
 
+			////DataTypeArray
+			//constexpr auto dataTypes = GetRequiredDataTypes<Type>();
 
-			/*必要なデータを入れる*/
-			//参照で作るので注意　各クラスで保存しておかないこと erase addを挟まないこと
-			auto filledData = fillData<dataTypes>(std::make_index_sequence<size>(), connections);
-			Data::Data<Type> requiredData(std::move(filledData));
+			////Fill the necessary data.
+			////strong
+			//auto filledData = this->fillData<dataTypes>(std::make_index_sequence<size>(), connections);
+			//Data::Data<Type> requiredData(std::move(filledData));
 
-			auto ptr = getPtr<Type>();
+			////no-throw
+			//auto ptr = this->getItemVectorPtr<Type>();
 
-			//std::vector::value_type 各アイテムのクラス
-			using ValueType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type;
-			ptr->emplace_back(ValueType(ManagerPassKey{}, requiredData, parameter));
+			////register key
+			////No duplicate names guaranteed.
+			//try {
+			//	//strong
+			//	GKeyManager.add_recursive<ToHandleType<Type>()>(key, toKeyAddType<dataTypes>(connections));
+			//}
+			//catch (const ::FKM::Exception::Error& e) {
+			//	if (e.code() == FKM::Exception::ErrorType::ReachIndexLimit) {
+			//		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "The maximum number of items that can be added has been exceeded.");
+			//	}
+			//	else {
+			//		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Internal Error.");
+			//	}
+			//	Exception::throwFailedToCreate();
+			//}
+			//catch (...) {
+			//	std::rethrow_exception(std::current_exception());
+			//}
 
-			//keyを登録
-			GKeyManager.add_recursive<ToObjectType<Type>()>(key, toKeyAddType<dataTypes>(connections));
+			//try {
+			//	//std::vector::value_type.
+			//	using ValueType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type;
+			//	//Class of each item
+			//	using ElmType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type::element_type;
+
+			//	auto unique = std::make_unique<ValueType>(ValueType(ManagerPassKey{}, requiredData, parameter));
+
+			//	try {
+			//		//https://eel.is/c++draft/vector.modifiers
+			//		//strong
+			//		static_assert(std::is_nothrow_move_constructible_v<ValueType>);
+			//		ptr->emplace_back(std::move(unique));
+			//	}
+			//	catch (...) {
+			//		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "emplace_back throw exception.");
+			//		unique->destroy();//valid
+			//		std::rethrow_exception(std::current_exception());
+			//	}
+			//}
+			//catch (...) {
+			//	try {
+			//		GKeyManager.remove(key);
+			//	}
+			//	catch (...) {
+			//		std::terminate();
+			//	}
+			//	std::rethrow_exception(std::current_exception());
+			//}
+
+		}
+
+	public:
+		template<FvkType Type>
+		[[nodiscard]] static consteval bool IsItemNothrowDestructible() {
+			using ElmType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type::element_type;
+			return std::is_nothrow_invocable_v<decltype(&ElmType::destroy), ElmType>;
+		}
+
+	public:
+		//no-throw
+		/*
+		Return true if destructible.Does not always mean destructible,
+		as it may fail due to lack of memory or other reasons.
+		*/
+		template<FvkType Type, Key::IsKey T>
+		[[nodiscard]] bool isItemDestructible(const T& key) const noexcept {
+			//try {
+			//	//NotFound, Unexpected
+			//	//strong
+			//	const IndexKey index = Key::Converter::toIndexKey(key);
+
+			//	//used in other items.
+			//	//strong
+			//	const bool result = GKeyManager.isKeyConnected(Type, index);
+			//	if (!result) {
+			//		return false;
+			//	}
+			//}
+			//catch (...) {
+			//	return false;
+			//}
+			return true;
+		}
+
+		/*
+		Exception:
+			std::exception
+			NotFound
+			FailedToDestroy
+			Unexpected
+		*/
+		//strong
+		//if item don't need any other data.	
+		template<FvkType Type, /*MSVC bug Key::IsKey*/typename T>
+		void destroy(const T& key) {
+
+			////NotFound, Unexpected
+			////strong
+			//const IndexKey index = Key::Converter::toIndexKey(key);
+
+			//try {
+			//	//used in other items.
+			//	//strong
+			//	const bool result = GKeyManager.isKeyConnected(Type, index);
+			//	if (!result) {
+			//		Exception::throwFailedToDestroy();
+			//	}
+			//}
+			//catch (...) {
+			//	Exception::throwFailedToDestroy();
+			//}
+
+			//auto ptr = getItemVectorPtr<Type>();
+
+			//if constexpr (IsRequireWaitIdle<Data::Info<Type>>) {
+			//	vk::Device device = ptr->at(index)->get().device;
+			//	auto result = device.waitIdle();
+			//	if (result != vk::Result::eSuccess) {
+			//		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to waitIdle.");
+			//		Exception::throwFailedToDestroy();
+			//	}
+			//}
+
+			//auto* item = ptr->at(index).get();
+
+			////Most of them are noexcept, but some may throw a FailedToDestroy.
+			//item->destroy();
+
+			////no-throw
+			////https://eel.is/c++draft/vector#modifiers-4
+			//static_assert(std::is_nothrow_move_constructible_v<std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type>);
+			//static_assert(std::is_nothrow_move_assignable_v<std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type>);
+			//ptr->erase(ptr->cbegin() + index);
+
+			////remove key
+			//try {
+			//	//strong
+			//	GKeyManager.remove(Type, index);
+			//}
+			//catch (const ::FKM::Exception::Error& e) {
+			//	if (e.code() == ::FKM::Exception::ErrorType::NotFound) {
+			//		//serious internal error
+			//		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Internal Error.");
+			//		std::terminate();
+			//	}
+			//}
+			//catch (...) { //retry
+			//	GMessenger.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Failed to remove key.");
+			//	try {
+			//		//strong
+			//		GKeyManager.remove(Type, index);
+			//	}
+			//	catch (...) {
+			//	}
+			//	std::terminate();
+			//}
 		}
 
 	public:
 		/*
 		Exception:
-			std::exception
-			CollisionOfKeys
-			FailedToCreate
+			NotFound
+			Unexpected
 		*/
 		//strong
-		//if item don't need any other data.		
-		template<FvkType Type, Key::IsKey T>
-		void erase(const T& key) {
-			//throw NotFound
-			IndexKey index{};
-			try {
-				index = Key::Converter::toIndexKey(key);
-			}
-			catch () {
-
-			}
-
-			auto ptr = getPtr<Type>();
-
-			if constexpr (IsRequireWaitIdle<Data::Info<Type>>) {
-				vk::Device device = ptr->at(index).get().device;
-				auto result = device.waitIdle();
-				if (result != vk::Result::eSuccess) {
-					throw std::runtime_error("Failed to waitIdle.");
-				}
-			}
-
-			ptr->at(index).destroy();
-			ptr->erase(ptr->cbegin() + index);
-
-			//keyを削除
-			GKeyManager.erase(Type, index);
-		}
-
-		//infoをconst参照で返す
-		//addやeraseを挟むと無効なアドレスを指す可能性に注意
-		template<FvkType Type, /*Key::IsKeyコンパイラのバグ*/typename K>
-		_NODISCARD const auto& refInfo(const K& key) const {
+		//return const&
+		template<FvkType Type, /*MSVC bug Key::IsKey*/typename K>
+		[[nodiscard]] const auto& refInfo(const K& key) const {
 			const IndexKey index = Key::Converter::toIndexKey(key);
-			const auto data = getPtr<Type>();
-			return data->at(index).get();
+			const auto data = this->getItemVectorPtr<Type>();
+			if (data->size() <= index)
+				Exception::throwUnexpected();
+			return data->at(index)->get();//return info&
 		}
 
-		//itemをconst参照で返す
-		//addやeraseを挟むと無効なアドレスを指す可能性に注意
-		template<FvkType Type, /*Key::IsKeyコンパイラのバグ*/typename K>
-		_NODISCARD const auto& refItem(const K& key) const {
+		/*
+		Exception:
+			NotFound
+			Unexpected
+		*/
+		//strong
+		//return const&
+		template<FvkType Type, /*MSVC bug Key::IsKey*/typename K>
+		[[nodiscard]] const auto& refItem(const K& key) const {
 			const IndexKey index = Key::Converter::toIndexKey(key);
-			const auto data = getPtr<Type>();
-			return data->at(index);
+			const auto data = getItemVectorPtr<Type>();
+			if (data->size() <= index)
+				Exception::throwUnexpected();
+			return *data->at(index).get();//return item&
 		}
 
-
-		//Command作成
+	public:
+		//make Command
 		template<CommandType Type>
-		_NODISCARD auto makeCommand(const Key::ConnectionCommandKeysBase<Type>& keys, const uint32_t commandBufferIndex) {
-			//必要なデータ型 DataTypeArray
-			constexpr auto size = GetCommandDataTypesSize<Type>();
+		[[nodiscard]] auto makeCommand(const Key::ConnectionCommandKeysBase<Type>& keys, const UI32 commandBufferIndex) {
+			constexpr auto size = GetCommandDataSize<Type>();
 			constexpr auto dataTypes = GetCommandDataTypes<Type>();
 
 			//connection
 			const std::array<std::vector<IndexKey>, size> connections = keys.convert();
 
-			//必要なデータを入れる
-			auto filledData = fillData<dataTypes>(std::make_index_sequence<size>(), connections);
+			auto filledData = this->fillData<dataTypes>(std::make_index_sequence<size>(), connections);
 			Data::CommandData<Type> requiredData(std::move(filledData));
 
 			using Element = Command::CommandElement<Type>;
@@ -163,12 +316,12 @@ namespace FVK::Internal::Manager {
 			return Command::Command<Type>(std::move(elementPtr));
 		}
 
-	private:
+	private://helper
 		template<typename T>
 		static consteval FvkType AnyCommandKeyFvkType() {
-			//std::vectorなら
+			//if std::vector
 			if constexpr (FU::Concept::IsStdVector<T>) {
-				return ToObjectVectorType<T::value_type::Type>();
+				return ToHandleVectorType<T::value_type::Type>();
 			}
 			else {
 				return T::Type;
@@ -176,15 +329,13 @@ namespace FVK::Internal::Manager {
 		}
 
 	public:
-		//AnyCommand作成
+		//make AnyCommand
 		template</*IsKey*/typename... T>
-		_NODISCARD auto makeAnyCommand(const std::array<std::vector<IndexKey>, sizeof...(T)>& connections) {
-			//必要なデータ型 DataTypeArray
+		[[nodiscard]] auto makeAnyCommand(const std::array<std::vector<IndexKey>, sizeof...(T)>& connections) {
 			constexpr auto size = sizeof...(T);
 			constexpr auto dataTypes = std::array<FvkType, size>{AnyCommandKeyFvkType<T>()...};
 
-			//必要なデータを入れる
-			auto filledData = fillData<dataTypes>(std::make_index_sequence<size>(), connections);
+			auto filledData = this->fillData<dataTypes>(std::make_index_sequence<size>(), connections);
 
 			using Element = Command::AnyCommandElement<AnyCommandKeyFvkType<T>()...>;
 			std::shared_ptr<Element> elementPtr(new Element(ManagerPassKey{}, filledData));
@@ -192,32 +343,18 @@ namespace FVK::Internal::Manager {
 		}
 
 	private:
-
 		//no-throw
 		//not const
 		template<FvkType Type>
 		[[nodiscard]] auto getItemVectorPtr() noexcept {
-			return &std::get<CorrespondenceAt<Type>()>(data);
+			return &std::get<CorrespondenceAt<Type>()>(this->data);
 		}
 
 		//no-throw
 		//const
 		template<FvkType Type>
 		[[nodiscard]] auto getItemVectorPtr() const noexcept {
-			return &std::get<CorrespondenceAt<Type>()>(data);
-		}
-
-		/*
-		Exception:
-			std::exception
-		*/
-		//strong
-		template<FvkType Type>
-		[[nodiscard]] auto getItem(const FKM::IndexKey key) const {
-			auto data = getItemVectorPtr<Type>();
-			auto& at = data->at(key);
-			static_assert(noexcept(at.get()));
-			return at.get();
+			return &std::get<CorrespondenceAt<Type>()>(this->data);
 		}
 
 		/*
@@ -229,26 +366,30 @@ namespace FVK::Internal::Manager {
 		[[nodiscard]] Data::CorrespondenceType<Type> getRef(const std::vector<FKM::IndexKey>& keys) const {
 			using T = Data::CorrespondenceType<Type>;
 
-			//no-throw
-			auto data = getItemVectorPtr<Type>();
-
 			if constexpr (FU::Concept::IsStdVector<T>) {
 				std::remove_const_t<T> result{};
 
 				for (Size i = 0, size = keys.size(); i < size; i++) {
-					result.emplace_back(this->getItem(keys[i]));
+					const Key::Key<Type, IndexKey> key(keys[i]);
+					result.emplace_back(this->refInfo<Type>(key));
 				}
 				return result;
 			}
 			else {//not vector
 				assert(keys.size() == 1);
+				const Key::Key<Type, IndexKey> key(keys[0]);
 				//strong
-				return this->getItem(keys.at(0));
+				return this->refInfo<Type>(key);
 			}
 		}
 
-		template<auto DataTypes, FU::Concept::IsStdArray Array, std::size_t... Index>
-		[[nodiscard]] auto fillData(std::index_sequence<Index...>, const Array& connections) {
+		/*
+		Exception:
+			std::exception
+		*/
+		//strong
+		template<auto DataTypes, FU::Concept::IsStdArray Array, Size... Index>
+		[[nodiscard]] auto fillData(std::index_sequence<Index...>, const Array& connections) const {
 			return std::make_tuple(this->getRef<DataTypes.at(Index)>(connections.at(Index))...);
 		}
 
@@ -283,47 +424,44 @@ namespace FVK::Internal::Manager {
 		}
 
 	public://terminate
+		/*
+			FailedToDestroy
+
+			Serious
+		*/
+		//strong or no-exception-safety
 		//must be terminated explicitly.
+		//When FailedToDestroy is thrown, it is strong.
 		void terminate();
 
-	private:
-		template<std::size_t Index = std::tuple_size_v<DataTuple>>
+	private://helper
+		template<Size Index = std::tuple_size_v<DataTuple>>
 		void terminate_recursive() {
 			if constexpr (Index == 0)
 				return;
 			else {
-				//glfwだけはvectorでない
-				if constexpr (Index == 1) {
-					Glfw& glfw = std::get<std::tuple_element_t<Index - 1, DataTuple>>(this->data);
-					glfw.destroy();
-				}
-				else {
-					using ItemsType = std::tuple_element_t<Index - 1, DataTuple>;
-					auto& items = std::get<ItemsType>(this->data);
-					for (int64_t i = items.size() - 1; i >= 0; i--) {
-						items[i].destroy();
-						GKeyManager.erase(ItemTypeToFvkType<ItemsType::value_type>(), IndexKey(static_cast<IndexKey::Type>(i)));
+				using ItemsType = std::tuple_element_t<Index - 1, DataTuple>;
+				auto& items = std::get<ItemsType>(this->data);
+				for (ISize i = static_cast<ISize>(items.size()) - 1; i >= 0; i--) {
+					items[i]->destroy();
+
+					try {
+						GKeyManager.remove(ItemTypeToFvkType<ItemsType::value_type::element_type>(), IndexKey(static_cast<IndexKey::KeyType>(i)));
 					}
-					terminate_recursive<Index - 1>();
+					catch (...) {
+						GMessenger.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Failed to remove key.");
+					}
 				}
+				terminate_recursive<Index - 1>();
 			}
 		}
 
 	private://data
-		DataTuple data = [&]() -> DataTuple {
-			auto element = []<Size Index, bool IsVector>() ->auto {
-				if constexpr (IsVector)
-					return std::tuple_element_t<Index, DataTuple>();
-				else
-					return ManagerPassKey();
-			};
-			return[&]<Size...Index>(std::integer_sequence<Size, Index...>)->DataTuple {
-				return DataTuple(element.operator() < Index, FU::Concept::IsStdVector<std::tuple_element_t<Index, DataTuple>> > ()...);
-			}(std::make_integer_sequence<Size, std::tuple_size_v<DataTuple>>());
-		}();
-
+		Glfw glfw{ ManagerPassKey{} };
+		DataTuple data{};
 
 	};
+
 }
 
 

@@ -8,7 +8,7 @@ void FVK::Internal::Window::framebufferResizeCallback(GLFWwindow* window, int wi
 void FVK::Internal::Window::create(const Data::WindowData& data, const NormalParameter& parameter) {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-	GLFWvidmode* mode = this->getVideoMode();
+	const GLFWvidmode* mode = this->getVideoMode();
 
 	this->info.window = glfwCreateWindow(mode->width, mode->height, parameter.title, nullptr, nullptr);
 
@@ -33,7 +33,7 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const FullScree
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
-	GLFWvidmode* mode = this->getVideoMode();
+	const GLFWvidmode* mode = this->getVideoMode();
 
 	this->info.window = glfwCreateWindow(mode->width, mode->height, parameter.title, nullptr, nullptr);
 
@@ -54,7 +54,7 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const Maximized
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-	GLFWvidmode* mode = this->getVideoMode();
+	const GLFWvidmode* mode = this->getVideoMode();
 
 	this->info.window = glfwCreateWindow(mode->width, mode->height, parameter.title, nullptr, nullptr);
 	checkGlfwCreateWindow();
@@ -109,7 +109,7 @@ void FVK::Internal::Window::destroy() noexcept {
 	glfwDestroyWindow(this->info.window);
 }
 
-GLFWvidmode* FVK::Internal::Window::getVideoMode() const {
+const GLFWvidmode* FVK::Internal::Window::getVideoMode() const {
 
 	//https://www.glfw.org/docs/3.3/group__monitor.html#gac3adb24947eb709e1874028272e5dfc5
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -125,9 +125,12 @@ GLFWvidmode* FVK::Internal::Window::getVideoMode() const {
 		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "A platform-specific error occurred.");
 		Exception::throwFailedToCreate();
 	}
+
+	return mode;
+
 }
 
-std::pair<I32, I32> FVK::Internal::Window::windowSize() const noexcept {
+std::pair<FVK::I32, FVK::I32> FVK::Internal::Window::windowSize() const noexcept {
 	int width{}, height{};
 	glfwGetWindowSize(this->info.window, &width, &height);
 	assert(width > 0 && height > 0);

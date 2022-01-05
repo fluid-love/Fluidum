@@ -172,9 +172,6 @@
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\texture.h">
       <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Draw\draw.h">
-      <Filter>Fluidum\Draw\Vulkan\Source\Draw</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorpool.h">
       <Filter>Fluidum\Draw\Vulkan\Source\Descriptor</Filter>
     </ClInclude>
@@ -373,9 +370,6 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.h">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.h">
-      <Filter>Fluidum\Scene\Utils\Popup</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.h">
       <Filter>Fluidum\Scene\Coding\TextEditor</Filter>
     </ClInclude>
@@ -406,12 +400,6 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Credit\credit.h">
       <Filter>Fluidum\Scene\Bar\Menu\Credit</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\newproject.h">
-      <Filter>Fluidum\Scene\Bar\Menu\Project</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.h">
-      <Filter>Fluidum\Scene\Bar\Menu\Project</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\TextEditor\include.h">
       <Filter>Fluidum\TextEditor</Filter>
     </ClInclude>
@@ -423,9 +411,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\message.h">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\saveas.h">
-      <Filter>Fluidum\Scene\Bar\Menu\Project</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Utils\MessageBox\messagebox.h">
       <Filter>Fluidum\Utils\MessageBox</Filter>
@@ -508,9 +493,6 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Common\log.h">
       <Filter>Fluidum\Scene\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.h">
-      <Filter>Fluidum\Scene\Bar\Title\Exit</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Calc\calc.h">
       <Filter>Fluidum\Data\Calc\Calc</Filter>
     </ClInclude>
@@ -571,21 +553,6 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\filelist.h">
       <Filter>Fluidum\Data\Project\Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\select.h">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\new.h">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\shared_info.h">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\directory.h">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Add\check_path.h">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\Style\var.h">
       <Filter>Fluidum\Data\Gui\Style</Filter>
     </ClInclude>
@@ -615,6 +582,48 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Utils\Exception\exception.h">
       <Filter>Fluidum\Utils\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Manager\Data\log.h">
+      <Filter>Fluidum\Manager\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\gui.h">
+      <Filter>Fluidum\Data\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Exit\exit.h">
+      <Filter>Fluidum\Scene\Bar\Exit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Utils\Exception\terminate.h">
+      <Filter>Fluidum\Utils\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\classcodes.h">
+      <Filter>Fluidum\Scene\Utils\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\File\form.h">
+      <Filter>Fluidum\Scene\Project\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\File\new.h">
+      <Filter>Fluidum\Scene\Project\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\File\saveas.h">
+      <Filter>Fluidum\Scene\Project\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\File\new.h">
+      <Filter>Fluidum\Scene\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\File\select.h">
+      <Filter>Fluidum\Scene\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\File\shared_info.h">
+      <Filter>Fluidum\Scene\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\File\check_path.h">
+      <Filter>Fluidum\Scene\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\File\directory.h">
+      <Filter>Fluidum\Scene\File</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Common\log.h">
+      <Filter>Fluidum\Data\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -692,9 +701,6 @@
     </Filter>
     <Filter Include="Fluidum\Draw\Vulkan\Source\Image">
       <UniqueIdentifier>{b763f403-17eb-4494-a0a8-9de068d4bda6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fluidum\Draw\Vulkan\Source\Draw">
-      <UniqueIdentifier>{282cc32e-1010-47aa-934c-c56fa7f04632}</UniqueIdentifier>
     </Filter>
     <Filter Include="Fluidum\Draw\Vulkan\Source\Pipeline">
       <UniqueIdentifier>{9979c516-1cc9-4618-be50-c939bd4429b7}</UniqueIdentifier>
@@ -837,9 +843,6 @@
     <Filter Include="Fluidum\Scene\Bar\Menu\Credit">
       <UniqueIdentifier>{687f37ff-35a6-4ef0-8805-30c4c9be602b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\Scene\Bar\Menu\Project">
-      <UniqueIdentifier>{c6466eae-7368-4d4b-a646-6f2cc8783273}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\TextEditor">
       <UniqueIdentifier>{150adab6-f349-4719-9eb5-c4e36300d047}</UniqueIdentifier>
     </Filter>
@@ -951,9 +954,6 @@
     <Filter Include="Resources\Log\Lua">
       <UniqueIdentifier>{b18c7184-b42a-4278-bc00-f5a50ed4c859}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\Scene\Bar\Title\Exit">
-      <UniqueIdentifier>{416911c9-7b1a-44c7-8500-741162cd3d69}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\Data\Calc\Calc">
       <UniqueIdentifier>{3dc72f19-0aa8-4e9e-b963-17f4c0253a65}</UniqueIdentifier>
     </Filter>
@@ -983,9 +983,6 @@
     </Filter>
     <Filter Include="Fluidum\Data\Project\Files">
       <UniqueIdentifier>{7746e604-1d55-489e-925c-4cc2b20e892c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fluidum\Scene\Project\Add">
-      <UniqueIdentifier>{95998d8c-c08e-4b55-9560-0aaac41c705a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Fluidum\Data\Gui\Style">
       <UniqueIdentifier>{021e6524-cf66-4c3e-8c89-290102a4e6c1}</UniqueIdentifier>
@@ -1025,6 +1022,15 @@
     </Filter>
     <Filter Include="Fluidum\Utils\Exception">
       <UniqueIdentifier>{56e566eb-bed0-41cd-ab35-df4d71a875b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Bar\Exit">
+      <UniqueIdentifier>{9b33adec-92f7-4e39-babc-cd5e9f63a396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Project\File">
+      <UniqueIdentifier>{d73a121b-b824-4f3d-9dce-c795b057e7de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\File">
+      <UniqueIdentifier>{2452798b-85ea-489c-ae7e-496bb5c78486}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1130,9 +1136,6 @@
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Image\texture.cpp">
       <Filter>Fluidum\Draw\Vulkan\Source\Image</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Draw\draw.cpp">
-      <Filter>Fluidum\Draw\Vulkan\Source\Draw</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorpool.cpp">
       <Filter>Fluidum\Draw\Vulkan\Source\Descriptor</Filter>
     </ClCompile>
@@ -1202,9 +1205,6 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.cpp">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\popupselect.cpp">
-      <Filter>Fluidum\Scene\Utils\Popup</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\TextEditor\texteditor.cpp">
       <Filter>Fluidum\Scene\Coding\TextEditor</Filter>
     </ClCompile>
@@ -1232,20 +1232,11 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Credit\credit.cpp">
       <Filter>Fluidum\Scene\Bar\Menu\Credit</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\newproject.cpp">
-      <Filter>Fluidum\Scene\Bar\Menu\Project</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\projectform.cpp">
-      <Filter>Fluidum\Scene\Bar\Menu\Project</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\TextEditor\Source\texteditor.cpp">
       <Filter>Fluidum\TextEditor\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\message.cpp">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Menu\Project\saveas.cpp">
-      <Filter>Fluidum\Scene\Bar\Menu\Project</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Utils\MessageBox\messagebox.cpp">
       <Filter>Fluidum\Utils\MessageBox</Filter>
@@ -1306,9 +1297,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Project\project.cpp">
       <Filter>Fluidum\Data\Project\Project</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\Exit\exit.cpp">
-      <Filter>Fluidum\Scene\Bar\Title\Exit</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Calc\calc.cpp">
       <Filter>Fluidum\Data\Calc\Calc</Filter>
@@ -1460,18 +1448,6 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\supported.cpp">
       <Filter>Fluidum\Data\Project\Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\select.cpp">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\new.cpp">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\directory.cpp">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Add\check_path.cpp">
-      <Filter>Fluidum\Scene\Project\Add</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\Style\var.cpp">
       <Filter>Fluidum\Data\Gui\Style</Filter>
     </ClCompile>
@@ -1486,6 +1462,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\KeyManager\Source\info.cpp">
       <Filter>Fluidum\KeyManager\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Draw\Source\Exception\exception.cpp">
+      <Filter>Fluidum\Draw\Source\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\gui.cpp">
+      <Filter>Fluidum\Data\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Exit\exit.cpp">
+      <Filter>Fluidum\Scene\Bar\Exit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\File\form.cpp">
+      <Filter>Fluidum\Scene\Project\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\File\new.cpp">
+      <Filter>Fluidum\Scene\Project\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\File\saveas.cpp">
+      <Filter>Fluidum\Scene\Project\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\File\new.cpp">
+      <Filter>Fluidum\Scene\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\File\select.cpp">
+      <Filter>Fluidum\Scene\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\File\check_path.cpp">
+      <Filter>Fluidum\Scene\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\File\directory.cpp">
+      <Filter>Fluidum\Scene\File</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

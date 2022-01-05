@@ -4,13 +4,14 @@
 
 namespace FS {
 
-	class StatusBar final :public Scene {
+	class StatusBar final : public Scene {
 	public:
 		explicit StatusBar(
 			FD::GuiWrite* const guiWrite,
 			const FD::GuiRead* const guiRead,
 			const FD::TaskRead* const taskRead
 		);
+
 		void Constructor(
 			FD::GuiWrite,
 			FD::GuiRead, 
@@ -18,6 +19,8 @@ namespace FS {
 		);
 
 		~StatusBar() noexcept;
+
+		FluidumUtils_Class_Delete_CopyMove(StatusBar);
 
 	public:
 		virtual void call() override;
@@ -28,9 +31,8 @@ namespace FS {
 
 		FD::Text::StatusBar text{};
 
-	private://data
-
-		struct Size final {
+	private:
+		struct {
 			float taskIcon{};
 			float version{};
 
@@ -44,17 +46,16 @@ namespace FS {
 			ImVec2 versionWindowSize{};
 		}style;
 
-
 	private:
-		//左下に今のタスク
 		void taskGui();
 		void taskPopup();
 
-		//中央
+	private:
 		void infoGui();
 
-		//右下のバージョン
+	private:
 		void versionGui();
 
 	};
+
 }

@@ -12,60 +12,47 @@ namespace FVK::Internal::Key {
 
 			auto func = []<typename U>(const U & var)->std::vector<OrderKey> {
 				if (var.index() == 0)
-					return RequiredDataKeysBase<Type>::toOrderKey(std::get<0>(var));
+					return RequiredDataKeys<Type>::toOrderKey(std::get<0>(var));
 				else if (var.index() == 1)
-					return RequiredDataKeysBase<Type>::toOrderKey(std::get<1>(var));
+					return RequiredDataKeys<Type>::toOrderKey(std::get<1>(var));
 				else if (var.index() == 2)
-					return RequiredDataKeysBase<Type>::toOrderKey(std::get<2>(var));
+					return RequiredDataKeys<Type>::toOrderKey(std::get<2>(var));
 				else //SelectKeyType
-					return RequiredDataKeysBase<Type>::toOrderKey(std::get<3>(var));
+					return RequiredDataKeys<Type>::toOrderKey(std::get<3>(var));
 			};
 
-			return RequiredDataKeysBase<Type>(func.operator() < T > (vars)...);
+			return RequiredDataKeys<Type>(func.operator() < T > (vars)...);
 		}
 
-		//VariantKeyかvariant<vector>
-		template<CommandType Type, typename... T>
-		_NODISCARD static auto variantKeysToConnectionCommandKeysBase(const T&... var) {
-
-			auto func = []<IsVariantKey U>(const U & var)->std::vector<OrderKey> {
-				if (var.index() == 0)
-					return ConnectionCommandKeysBase<Type>::toOrderKey(std::get<0>(var));
-				else if (var.index() == 1)
-					return ConnectionCommandKeysBase<Type>::toOrderKey(std::get<1>(var));
-				else if (var.index() == 2)
-					return ConnectionCommandKeysBase<Type>::toOrderKey(std::get<2>(var));
-				else //SelectKeyType
-					return ConnectionCommandKeysBase<Type>::toOrderKey(std::get<3>(var));
-			};
-
-			return ConnectionCommandKeysBase<Type>(func.operator() < T > (var)...);
+		//VariantKey or variant<vector>
+		template<FvkType Type, typename... T>
+		[[nodiscard]] static auto keysToConnectionKeys(const T&... keys) {
+			return RequiredDataKeys<Type>(RequiredDataKeys<Type>::toOrderKey(keys)...);
 		}
 
-
-		//TはKey
+		//T is Key
 		template<FvkType Type, IsKeyType ChangeKeyType, typename T>
-		_NODISCARD static auto changeKey(const T& key) {
+		[[nodiscard]] static auto changeKey(const T& key) {
 			using KeyType = T::KeyType;
 
 			//CharKeyを変換
-			if constexpr (std::same_as<KeyType, CharKeyType>) {
+			if constexpr (std::same_as<KeyType, CharKey>) {
 				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
-					return Key<Type, StringKeyType>(key);
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
+					return Key<Type, StrKey>(key);
 				}
 			}
 			//IndexKeyを変換
-			else if constexpr (std::same_as<KeyType, IndexKeyType>) {
+			else if constexpr (std::same_as<KeyType, IndexKey>) {
 				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
-					return Key<Type, StringKeyType>(GKeyManager.toStrKey(key));
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
+					return Key<Type, StrKey>(GKeyManager.toStrKey(key));
 				}
 			}
 			//StringKeyを変換
-			else if constexpr (std::same_as<KeyType, StringKeyType>) {
+			else if constexpr (std::same_as<KeyType, StrKey>) {
 				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
 					return key;
 				}
 			}
@@ -75,26 +62,26 @@ namespace FVK::Internal::Key {
 
 		//TはKey
 		template<FvkType Type, IsKeyType ChangeKeyType, IsKeyType KeyType>
-		_NODISCARD static ChangeKeyType changeKeyType(const KeyType& key) {
+		[[nodiscard]] static ChangeKeyType changeKeyType(const KeyType& key) {
 
 			//CharKeyを変換
-			if constexpr (std::same_as<KeyType, CharKeyType>) {
+			if constexpr (std::same_as<KeyType, CharKey>) {
 				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
-					return StringKeyType(key);
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
+					return StrKey(key);
 				}
 			}
 			//IndexKeyを変換
-			else if constexpr (std::same_as<KeyType, IndexKeyType>) {
+			else if constexpr (std::same_as<KeyType, IndexKey>) {
 				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
-					return StringKeyType(GKeyManager.toStrKey(key));
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
+					return StrKey(GKeyManager.toStrKey(key));
 				}
 			}
 			//StringKeyを変換
-			else if constexpr (std::same_as<KeyType, StringKeyType>) {
+			else if constexpr (std::same_as<KeyType, StrKey>) {
 				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
 					return key;
 				}
 			}
@@ -104,38 +91,38 @@ namespace FVK::Internal::Key {
 
 
 		template<IsKeyType ChangeKeyType, typename T>
-		_NODISCARD static ChangeKeyType keyToKeyType(const T& key) {
+		[[nodiscard]] static ChangeKeyType keyToKeyType(const T& key) {
 
-			//CharKeyを変換
-			if constexpr (std::same_as<T::KeyType, CharKeyType>) {
-				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
-					return StringKeyType(key);
+			//CharKey
+			if constexpr (std::same_as<T::KeyType, CharKey>) {
+				//StringKey
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
+					return StrKey(key);
 				}
 				//IndexKey
-				else if constexpr (std::same_as<ChangeKeyType, IndexKeyType>) {
+				else if constexpr (std::same_as<ChangeKeyType, IndexKey>) {
 					return GKeyManager.toIndexKey(key.get());
 				}
 			}
 			//IndexKeyを変換
-			else if constexpr (std::same_as<T::KeyType, IndexKeyType>) {
+			else if constexpr (std::same_as<T::KeyType, IndexKey>) {
 				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
-					return StringKeyType(GKeyManager.toStrKey(key));
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
+					return StrKey(GKeyManager.toStrKey(key));
 				}
 				//IndexKey
-				else if constexpr (std::same_as<ChangeKeyType, IndexKeyType>) {
+				else if constexpr (std::same_as<ChangeKeyType, IndexKey>) {
 					return key.get();
 				}
 			}
 			//StringKeyを変換
-			else if constexpr (std::same_as<T::KeyType, StringKeyType>) {
+			else if constexpr (std::same_as<T::KeyType, StrKey>) {
 				//StringKeyに
-				if constexpr (std::same_as<ChangeKeyType, StringKeyType>) {
+				if constexpr (std::same_as<ChangeKeyType, StrKey>) {
 					return key;
 				}
 				//IndexKey
-				else if constexpr (std::same_as<ChangeKeyType, IndexKeyType>) {
+				else if constexpr (std::same_as<ChangeKeyType, IndexKey>) {
 					return GKeyManager.toIndexKey(key.get());
 				}
 			}
@@ -151,44 +138,58 @@ namespace FVK::Internal::Key {
 
 		//複数のvariantからvariant<vector<Key<Type,SringKey>>,...>
 		template<FvkType Type, IsVariantKey T>
-		_NODISCARD static auto variantKeysToVariantStrinKeyTypeVectorKey(const std::vector<T>& vars) {
+		[[nodiscard]] static auto variantKeysToVariantStrinKeyTypeVectorKey(const std::vector<T>& vars) {
 
-			auto func = [&]<IsVariantKey U>(const U & var)-> StringKeyType {
+			auto func = [&]<IsVariantKey U>(const U & var)-> StrKey {
 				if (var.index() == 0)
-					return StringKeyType(std::get<0>(var));
+					return StrKey(std::get<0>(var));
 				else if (var.index() == 1)
-					return StringKeyType(std::get<1>(var));
+					return StrKey(std::get<1>(var));
 				else if (var.index() == 2)//Indexkey
 					return GKeyManager.toStrKey(Type, std::get<2>(var));
 				else //SelectKeyType
-					return StringKeyType();// d::get<3>(var));
+					return StrKey();// d::get<3>(var));
 			};
 
 			using Result = VariantVectorKey<ObjectKeyTypeHelper<Type>::Type>;
-			using ValueType = std::vector<Key<Type, StringKeyType>>;
+			using ValueType = std::vector<Key<Type, StrKey>>;
 
 			ValueType result;
 
 			for (std::size_t i = 0, size = vars.size(); i < size; i++) {
-				result.emplace_back(Key<Type, StringKeyType>(func(vars[i])));
+				result.emplace_back(Key<Type, StrKey>(func(vars[i])));
 			}
 			return Result(std::move(result));
 		}
 
-
-		template</*IsKey コンパイラバグ*/typename T>
-		_NODISCARD static IndexKey toIndexKey(const T& key) {
-			if constexpr (std::same_as<T::KeyType, IndexKeyType>)
-				return GKeyManager.toIndexKey(T::Type, key);
-			else
-				return GKeyManager.toIndexKey(key);
+		/*
+		Exception;
+			NotFound
+			Unexpected
+		*/
+		//strong
+		//Get indexkey from the key.
+		template</*MSVC bug Key::IsKey*/typename T>
+		[[nodiscard]] static IndexKey toIndexKey(const T& key) {
+			try {
+				if constexpr (std::same_as<T::KeyType, IndexKey> || std::same_as<T::KeyType, SelectKey>)
+					return GKeyManager.toIndexKey(T::Type, key);//strong
+				else
+					return GKeyManager.toIndexKey(key);//strong
+			}
+			catch (const std::exception&) {
+				Exception::throwUnexpected();
+			}
+			catch (...) {
+				Exception::throwNotFound();
+			}
 		}
 
 		template<typename T>
-		_NODISCARD static std::vector<IndexKey> toIndexKeyVector(const T& key) {
+		[[nodiscard]] static std::vector<IndexKey> toIndexKeyVector(const T& key) {
 			if constexpr (FU::Concept::IsStdVector<T>) {
 				std::vector<IndexKey> result(key.size());
-				for (std::size_t i = 0, size = key.size(); i < size; i++) {
+				for (Size i = 0, size = key.size(); i < size; i++) {
 					result[i] = keyToKeyType<IndexKey>(key[i]);
 				}
 				return result;
@@ -199,31 +200,28 @@ namespace FVK::Internal::Key {
 		}
 
 		template<typename T>
-		_NODISCARD static StringKeyType keyToStringKeyType(const T& key) {
-			changeKeyType<T::Type, StringKeyType>(key.get());
+		[[nodiscard]] static StrKey keyToStringKeyType(const T& key) {
+			changeKeyType<T::Type, StrKey>(key.get());
 		}
 
 		//Typeに欲しいFvkTypeを入れる
 		template<FvkType Type, typename T>
-		_NODISCARD static IndexKey keyToConnectionIndexKeyType(const T& key) {
+		[[nodiscard]] static IndexKey keyToConnectionIndexKeyType(const T& key) {
 			return GKeyManager.toConnectionIndexKey(key.get(), Type);
 		}
 
 		template<FvkType Type, IsVariantKey T>
-		_NODISCARD static auto variantKeyToIndexKey(const T& var) {
-
+		[[nodiscard]] static auto variantKeyToIndexKey(const T& var) {
 			if (var.index() == 0)
-				return Key<Type, IndexKey>(keyToKeyType<IndexKeyType>(std::get<0>(var)));
+				return Key<Type, IndexKey>(keyToKeyType<IndexKey>(std::get<0>(var)));
 			else if (var.index() == 1)
-				return Key<Type, IndexKey>(keyToKeyType<IndexKeyType>(std::get<1>(var)));
+				return Key<Type, IndexKey>(keyToKeyType<IndexKey>(std::get<1>(var)));
 			else if (var.index() == 2)
-				return Key<Type, IndexKey>(keyToKeyType<IndexKeyType>(std::get<2>(var)));
+				return Key<Type, IndexKey>(keyToKeyType<IndexKey>(std::get<2>(var)));
 			else //SelectKeyType
 				return Key<Type, IndexKey>(UINT32_MAX);
 		}
 
-
 	};
-
 
 }

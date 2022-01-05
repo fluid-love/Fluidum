@@ -31,10 +31,12 @@ namespace FS {
 
 		~TopBar() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(TopBar)
+
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
 		const FD::ProjectRead* const projectRead;
 		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::GuiRead* const guiRead;
@@ -45,8 +47,7 @@ namespace FS {
 		const FD::ImGuiWindowRead* const imguiWindowRead;
 		const FD::LayoutRead* const layoutRead;
 
-	private://data
-
+	private:
 		struct {
 			ImVec2 windowPos = ImVec2();
 			ImVec2 windowSize = ImVec2();
@@ -75,9 +76,7 @@ namespace FS {
 		//}wait;
 		//FS::Parameter::Loading<> loadingParam = {};
 
-
 	private:
-
 		void rightGui();
 
 		void areaGui();
@@ -96,5 +95,7 @@ namespace FS {
 	private:
 		void separator(const float posX, const ImVec4& col4 = { 0.2f, 0.2f, 0.2f, 1.0f });
 		void windowBorder();
+
 	};
+
 }

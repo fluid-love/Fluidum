@@ -6,43 +6,33 @@ namespace FVK::Internal::Command {
 
 	struct CommandBlock final {
 		CommandType type = CommandType::None;
-		//Elementを所持
 		std::shared_ptr<void> element = nullptr;
-		//呼び出す関数
 		std::function<void()> function = []() {};
 	};
 
 	class FunctionIndex final {
 	private:
-		uint32_t index = 0;
+		UIF32 index = 0;
 	public:
 		//index++;
 		void operator++(int) noexcept;
 
-		operator uint32_t() const noexcept;
-		void operator=(uint32_t) noexcept;
+		[[nodiscard]] operator UIF32() const noexcept;
+		void operator=(const UIF32) noexcept;
 	};
-
 
 }
 
-
 namespace FVK::Internal::Command {
 
-
-	/*
-	thread safe	(たぶん...)
-
-	push 末尾にコマンドを入れる
-	push 末尾にコマンドを入れる(any)
-
-	*/
+	//thread safe
 	class Commands final : protected std::vector<CommandBlock> {
 	private://using
 		using Base = std::vector<CommandBlock>;
 		using Block = Base::value_type;
 		using Blocks = Base;
 		using ConstIterator = Blocks::const_iterator;
+
 	public://using
 		using Pos = uint32_t;
 
@@ -52,23 +42,18 @@ namespace FVK::Internal::Command {
 	private:
 		//描写処理以上の命令が来ると意図しないことが起きる．
 		//例->updateBufferをアプリ側で連続で入れるとup->up->up->描写->up->upみたいになって滑らかに動かない
-		std::condition_variable condition;
+		std::condition_variable condition{};
 
 		FunctionIndex index = {};//今どこの関数を指しているかを表す
 
 
 	public://main function
-
-		//関数を呼び出す
 		void call();
 
 	private:
 		void internalCall();
 
-
 	public:
-
-		//追加
 		template<CommandType Type>
 		void push(const Command<Type>& command) {
 			Block block{ Type, command.ptr, std::bind(&Command<Type>::Element::call, command.ptr) };
@@ -76,6 +61,7 @@ namespace FVK::Internal::Command {
 			Blocks::emplace_back(std::move(block));
 		}
 
+		//any command
 		template<FvkType ...T>
 		void push(const AnyCommand<T...>& command) {
 			using Ty = AnyCommand<T...>;
@@ -84,10 +70,9 @@ namespace FVK::Internal::Command {
 			Blocks::emplace_back(std::move(block));
 		}
 
-
 	};
 
-	//
+	//future
 	//	private:
 	//		vector<ui32> onceIndices = {};//一度処理したら消すコマンドを記録する．消される（消すべき）functionIndex , 消すcommandIndex ,...
 	//

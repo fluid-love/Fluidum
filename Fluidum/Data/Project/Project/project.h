@@ -2,91 +2,146 @@
 
 #include "../Files/supported.h"
 
-namespace FD::Project {
-	struct CreateProjectInfo final {
-		const char* projectName;
-		const char* projectFolderPath;
-	};
-
-	enum class ExceptionType {
-		NotFoundProjectFile,
-		NotFoundProjectFolder,
-		NotFoundProjectFiles,
-		AlreadyProjectFolderExist,
-		FailedToOpenProjectFile,
-		IllegalFile,
-		BrokenFile,
-		Unexpected//e.g. when std::basic_string<char>::operator=() throw exception. 
-	};
-
-	struct HistoryInfo final {
-		std::string projectName{};
-		std::string projectFilePath{};
-		std::string ymd_h{};
-	};
-}
-
 namespace FD {
 
-	//現在のプロジェクト
-	//起動時のプロジェクトは勝手に作るが保存しないと破棄
 	class ProjectWrite final {
 	public:
-		//デフォルトで仮のプロジェクトを作成する
-		explicit ProjectWrite(Internal::PassKey);
-		~ProjectWrite() = default;
+		//Create a temporary project.
+		explicit ProjectWrite(Internal::PassKey) noexcept;
+		~ProjectWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ProjectWrite)
 
+	public:
+		struct CreateInfo final {
+			std::string projectName{};
+			std::string projectDirectoryPath{};
+		};
+
+		enum class Exception : UT {
+			NotFoundHistory,
+			NotFoundDirectory,
+			NotFoundProjectFile,
+			NotFoundProjectDirectory,
+			NotFoundProjectFiles,
+			AlreadyProjectDirctoryExist,
+			AlreadyExist,
+			FailedToOpenProjectFile,
+			IllegalFile,
+			BrokenFile,
+			Unexpected//e.g. when std::basic_string<char>::operator=() throw exception. 
+		};
+
+		struct HistoryInfo final {
+			std::string projectName{};
+			std::string projectFilePath{};
+			std::string ymd_h{};
+		};
 
 	public:
-		//現在のプロジェクトを保存せずに，新しいプロジェクトを作成する．
-		void createNewProject(const Project::CreateProjectInfo& info) const;
+		//strong
+		//Create a new project without saving the current one.
+		void createNewProject(const CreateInfo& info);
 
-		//現在のプロジェクトを保存せずに，既存のプロジェクトを読み込む．
-		void loadProject(const char* path) const;
+		/*
+		Exception:
+			Unexpected
+			FailedToOpenProjectFile
+			std::exception
+			std::system_error
+		*/
+		//strong
+		//Load an existing project without saving the current one.
+		void loadProject(const std::string& path);
 
-		//現在のプロジェクトを保存して，現在のプロジェクトを新しいパスへcopyする.
-		void saveAs(const char* newName, const char* dstProjectFolderPath) const;
+		/*
+			NotFoundDirectory
+			AlreadyExist,
+			NotFoundProjectDirectory
+			NotFoundProjectFile
+			std::filesystem::error
+		*/
+		//strong
+		//Save current project. The newly saved project replaces the current project.
+		void saveAs(const std::string& newName, const std::string& dstProjectDirectoryPath);
 
-		//現在の情報を新たにバックアップをとる
-		//アプリ終了時に最新のバックアップ以外は削除される
-		void backup() const;
+		//strong
+		//Make a new backup.
+		//Delete all backups except the latest one when the application is closed.
+		void backup();
 
-		bool eraseProjectHistory(const std::string& fprojPath);
+		/*
+			NotFoundHistory
+			std::filesystem::filesystem_error
+			std::exception
+		*/
+		//strong
+		void removeHistory(const std::string& fprojPath);
 
 	private:
-		void save_tab() const;
-		void save_scene() const;
+		/*
+			std::system_error(std::filesystem::filesystem_error)
+			std::exception
+		*/
+		//strong
+		void save_tab();
+		void save_scene();
+
+		void save_files_recursive(std::ofstream& ofs, const Project::FileList::FileInfo* info);
+		void save_fluidumFiles();
+		void save_projectFiles();
+		void save_userFiles();
+
+		void save_layout();
 
 	private:
-		void save_files_recursive(std::ofstream& ofs, const Project::FileList::FileInfo* info) const;
-		
-		void save_fluidumFiles() const;
-		void save_projectFiles() const;
-		void save_userFiles() const;
-		
-		void save_layout() const;
+		void writeProjectInfo(const std::string& path);
 
 	private:
-		void writeProjectInfo(const char* path) const;
+		/*
+		Exception:
+			std::system_error(std::filesystem::filesystem_error)
+			std::exception
+		*/
+		//no-exception-safety
+		//If an exception is thrown, directories will be left as it is.
+		void tryCreateFluidumDirectory();
+
+		/*
+		Exception:
+			NotFoundProjectFiles
+			std::system_error(std::filesystem::filesystem_error)
+			std::exception
+		*/
+		//no-exception-safety
+		//If an exception is thrown, files will be left as it is.
+		void tryCreateFluidumFiles();
 
 	private:
-		void tryCreateFluidumFolder() const;
-		void tryCreateFluidumFiles() const;
-
-	private:
-		//ProjectFolderが消されたり移動したりしているか
+		/*
+		Exception:
+			NotFoundProjectDirectory
+			Unexpected -> if throw std::silesystem_filesystem_error
+		*/
+		//strong		
 		void checkIsProjectFolderExist() const;
+
+		/*
+		Exception:
+			NotFoundProjectFile
+			Unexpected -> if throw std::silesystem_filesystem_error
+		*/
+		//strong	
 		void checkIsProjectFileExist() const;
 
-
-		void updateHistory() const;
+	private:
+		//strong
+		void updateHistory();
 
 	private://read
 		void readProjectInfo(std::ifstream& ifs) const;
 
 		Project::FileList::FileInfo readFiles_element(std::ifstream& ifs) const;
-	
+
 		void read_files_recursive(std::ifstream& ifs, Project::FileList::FileInfo* parent) const;
 		void read_fluidumFiles() const;
 		void read_projectFiles() const;
@@ -100,29 +155,42 @@ namespace FD {
 	private:
 		void save_thread();
 		const std::jthread saveThread{ &ProjectWrite::save_thread,this };
+
 	};
 
-	//現在のプロジェクト
+}
+
+namespace FD {
+
 	class ProjectRead final {
 	public:
 		explicit ProjectRead(Internal::PassKey) noexcept {};
-		~ProjectRead() = default;
+		~ProjectRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ProjectRead)
 
 	public:
-		_NODISCARD std::array<Project::HistoryInfo, 50> getProjectHistory() const;
+		using HistoryInfo = ProjectWrite::HistoryInfo;
+		using Exception = ProjectWrite::Exception;
 
-		//保存されていない->true
-		_NODISCARD bool isDataChanged() const;
+	public:
+		/*
+		Exception:
+			std::exception
+			Unexpected
+		*/
+		//strong
+		[[nodiscrad]] std::array<HistoryInfo, 50> loadProjectHistory() const;
+		[[nodiscrad]] std::vector<FU::Class::ClassCode::CodeType> loadSceneFile() const;
 
-		_NODISCARD std::string getProjectFolderPath() const;
-		_NODISCARD std::string getBackupFolderPath() const;
-		_NODISCARD std::string getSrcFolderPath() const;
-		_NODISCARD std::string getProjectName() const;
+	public:
+		[[nodiscrad]] std::string projectDirectoryPath() const;
+		[[nodiscrad]] std::string backupDirectoryPath() const;
+		[[nodiscrad]] std::string srcDirectoryPath() const;
+		[[nodiscrad]] std::string projectName() const;
 
-		_NODISCARD bool isDefaultProject() const;
+	public:
+		[[nodiscrad]] bool isDefaultProject() const;
 
-		_NODISCARD std::vector<FU::Class::ClassCode::CodeType> loadSceneFile() const;
 	};
 
 }

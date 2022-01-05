@@ -89,8 +89,8 @@ namespace FKM::Concept {
 //callbacks
 namespace FKM {
 
-	using AddCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey, const std::vector<OrderKey>&);
-	using EraseCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey);
+	using AddCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey, const std::vector<OrderKey>&) noexcept;
+	using RemoveCallbackType = void(*)(const magic_enum::string_view&, const char*, OrderKey) noexcept;
 
 }
 

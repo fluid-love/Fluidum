@@ -4,18 +4,18 @@
 
 namespace FVK::Internal::Key {
 
-	//Parameter‚Ég‚¤
+	//use in parameter
 	template<template<typename>typename T>
-	using VariantKey = std::variant<T<CharKeyType>, T<StringKeyType>, T<IndexKeyType>, T<SelectKeyType>>;
+	using VariantKey = std::variant<T<CharKey>, T<StrKey>, T<IndexKey>, T<SelectKey>>;
 
-	//vector<variant>‚Å‚Í‚È‚­variant<vector>
+	//variant<vector>
 	template<template<typename>typename T>
 	using VariantVectorKey =
 		std::variant<
-		std::vector<T<CharKeyType>>,
-		std::vector<T<StringKeyType>>,
-		std::vector<T<IndexKeyType>>,
-		std::vector<T<SelectKeyType>>
+		std::vector<T<CharKey>>,
+		std::vector<T<StrKey>>,
+		std::vector<T<IndexKey>>,
+		std::vector<T<SelectKey>>
 		>;
 
 	template<typename T>//‚à‚¤‚¿‚å‚¢l‚¦‚é

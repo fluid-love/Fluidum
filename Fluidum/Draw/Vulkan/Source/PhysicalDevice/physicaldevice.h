@@ -134,7 +134,7 @@ namespace FVK::Internal {
 			NotSupported
 		*/
 		//strong
-		[[nodiscard]] static UI32 findMemoryType(const vk::PhysicalDevice physicalDevice, const uint32_t typeFilter, const vk::MemoryPropertyFlags properties);
+		[[nodiscard]] static UI32 findMemoryType(const vk::PhysicalDevice physicalDevice, const UI32 typeFilter, const vk::MemoryPropertyFlags properties);
 
 	private:
 		Data::PhysicalDeviceInfo info = {};

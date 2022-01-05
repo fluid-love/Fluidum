@@ -12,6 +12,8 @@
 
 #include <boost/predef.h>
 
+#include "../Type/type.h"
+
 namespace FU::File {
 
 	//[compile-time] get length of string(const char*)
@@ -122,4 +124,8 @@ namespace FU::File {
 
 	//Windows / or \\  
 	void tryPushSlash(std::string& path);
+
+	//Windows MAX_PATH(260) return 259 (260 - 1null)
+	[[nodiscard]] Size maxPathSize() noexcept;
+
 }

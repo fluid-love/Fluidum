@@ -21,6 +21,8 @@ namespace FS::Project {
 			const FD::SceneRead* const sceneRead,
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
+			FD::Coding::DisplayWrite* const displayWrite,
+			const FD::Coding::DisplayRead* const displayRead,
 			FD::ToolBarWrite* const toolBarWrite
 		);
 		void Constructor(
@@ -37,6 +39,8 @@ namespace FS::Project {
 			FD::SceneRead,
 			FD::Coding::TabWrite,
 			FD::Coding::TabRead,
+			FD::Coding::DisplayWrite,
+			FD::Coding::DisplayRead,
 			FD::ToolBarWrite
 		);
 
@@ -61,6 +65,8 @@ namespace FS::Project {
 		const FD::SceneRead* const sceneRead;
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
+		FD::Coding::DisplayWrite* const displayWrite;
+		const FD::Coding::DisplayRead* const displayRead;
 		FD::ToolBarWrite* const toolBarWrite;
 
 		FD::Text::Project text{};

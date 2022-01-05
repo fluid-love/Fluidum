@@ -2,7 +2,7 @@
 
 #include "include.h"
 
-namespace FVK::Internal::Manager {
+namespace FVK::Internal {
 
 	template<typename T>
 	concept IsWindowParameter = FU::Concept::IsInstanceOfNonType<std::remove_const_t<T>, Window::Parameter>;

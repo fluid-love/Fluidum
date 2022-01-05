@@ -49,7 +49,7 @@ void FD::Coding::TabWrite::remove(const std::string& path) const {
 	{
 		auto itr = std::find(Data::displayFiles.begin(), Data::displayFiles.end(), path);
 		if (itr != Data::displayFiles.end())
-			Data::displayFiles.erase(itr);	
+			Data::displayFiles.erase(itr);
 	}
 
 	this->update();
@@ -177,11 +177,19 @@ bool FD::Coding::TabRead::isTextSaved(const std::string& path) const {
 	return GData.at(path).get()->isTextSaved;
 }
 
-bool FD::Coding::TabRead::isAllTextSaved() const {
+bool FD::Coding::TabRead::isAllTextSaved() const noexcept {
 	using namespace Internal;
-	std::lock_guard<std::mutex> lock(Data::mtx);
-	auto itr = std::find_if(GData.begin(), GData.end(), [](auto& x) { return !x.second.get()->isTextSaved; });
-	return itr == GData.end();
+	try {
+		std::lock_guard<std::mutex> lock(Data::mtx);//system_error
+		auto itr = std::find_if(GData.begin(), GData.end(), [](auto& x) { return !x.second.get()->isTextSaved; });
+		return itr == GData.end();
+	}
+	catch (const std::exception& e) {
+		FluidumData_Log_Internal_StdExceptionError(e);
+	}
+	catch (...) {
+		FluidumData_Log_Internal_InternalError();
+	}
 }
 
 bool FD::Coding::TabRead::update_isTextSaved() const {

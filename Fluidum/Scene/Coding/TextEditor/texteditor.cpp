@@ -61,7 +61,7 @@ void FS::TextEditor::call() {
 
 	if (info.empty()) {
 		this->windowEmpty();
-		if (!tabRead->empty())
+		if (!displayRead->empty())
 			this->setInfo();
 		return;
 	}
@@ -110,7 +110,7 @@ void FS::TextEditor::windowEmpty() {
 }
 
 void FS::TextEditor::setInfo() {
-	auto paths = tabRead->getDisplayFilePaths();
+	auto paths = displayRead->paths();
 
 	for (auto& x : paths) {
 		std::ifstream ifs(x);
@@ -278,10 +278,10 @@ void FS::TextEditor::saveAs() {
 }
 
 void FS::TextEditor::update() {
-	if (!tabRead->isDisplayFileChanged())
+	if (!displayRead->changed())
 		return;
 
-	auto paths = tabRead->getDisplayFilePaths();
+	auto paths = displayRead->paths();
 
 	for (auto& x : paths) {
 		//not new file

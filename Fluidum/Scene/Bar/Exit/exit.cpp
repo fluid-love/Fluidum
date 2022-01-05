@@ -1,5 +1,5 @@
 #include "exit.h"
-#include "../../Menu/Project/saveas.h"
+#include "../../Project/File/saveas.h"
 
 FS::Bar::Exit::Exit(
 	const FD::WindowRead* const windowRead,
@@ -9,8 +9,7 @@ FS::Bar::Exit::Exit(
 	FD::ExitWrite* const exitWrite,
 	const FD::Coding::TabRead* const tabRead,
 	FD::Coding::TabWrite* const tabWrite
-)
-	:
+) :
 	windowWrite(windowWrite),
 	windowRead(windowRead),
 	sceneRead(sceneRead),
@@ -19,11 +18,11 @@ FS::Bar::Exit::Exit(
 	tabRead(tabRead),
 	tabWrite(tabWrite)
 {
-	FluidumScene_Log_Constructor("Bar::Exit");
+	FluidumScene_Log_Constructor(::FS::Bar::Exit);
 }
 
 FS::Bar::Exit::~Exit() noexcept {
-	FluidumScene_Log_Destructor("Bar::Exit");
+	FluidumScene_Log_Destructor(::FS::Bar::Exit);
 }
 
 void FS::Bar::Exit::call() {
@@ -50,8 +49,8 @@ bool FS::Bar::Exit::confirmDefaultProject() {
 
 	auto index = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_projectMessage, text.popup_saveAndExit, text.popup_withoutSaving, text.popup_cancel);
 	if (index == 0) {//save
-		GLog.add<FD::Log::Type::None>("Request add Bar::SaveAsScene.");
-		Scene::addScene<Bar::SaveAs>();
+		FluidumScene_Log_RequestAddScene(::FS::Project::File::SaveAs);
+		Scene::addScene<Project::File::SaveAs>();
 		exitWrite->saveAsAndExit();
 		return false;
 	}
@@ -94,6 +93,6 @@ bool FS::Bar::Exit::confirmTab() {
 }
 
 void FS::Bar::Exit::deleteThis() {
-	GLog.add<FD::Log::Type::None>("Request delete Bar::ExitScene.");
+	FluidumScene_Log_RequestDeleteScene(::FS::Bar::Exit);
 	Scene::deleteScene<Exit>();
 }

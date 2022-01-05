@@ -3,6 +3,9 @@
 #include "resource.h"
 #include "log.h"
 
+//Log
 namespace FS {
-	inline ::FD::LogWrite GLog{};
+
+	inline ::FU::Log::Messenger GLog{};
+
 }

@@ -8,7 +8,8 @@ void FD::ToolBarWrite::lock(const FU::Class::ClassCode::CodeType code) {
 	);
 	itr->select = true;
 	assert(itr != Data::funcs.end());
-	Data::indices.emplace_back(std::distance(Data::funcs.begin(), itr));
+	const auto distance = static_cast<decltype(Data::indices)::size_type>(std::distance(Data::funcs.begin(), itr));
+	Data::indices.emplace_back(distance);
 }
 
 void FD::ToolBarWrite::unlock(const FU::Class::ClassCode::CodeType code) {

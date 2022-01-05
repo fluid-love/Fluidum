@@ -25,17 +25,35 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			FailedToDestroy
+		*/
+		//strong
 		explicit CommandBuffer(ManagerPassKey, const Data::CommandBufferData& data, Parameter& parameter);
-		~CommandBuffer() = default;
+
+		~CommandBuffer() noexcept = default;
 		FluidumUtils_Class_Default_CopyMove(CommandBuffer)
 
 	private:
+		/*
+		Exception:
+			FailedToDestroy
+		*/
+		//strong
 		void allocate(const Data::CommandBufferData& data, Parameter& parameter);
-	public:
-		const Data::CommandBufferInfo& get() const noexcept;
-		void destroy();
 
+	public:
+		//no-throw
+		void destroy() noexcept;
+		
+	public:
+		//no-throw
+		[[nodiscard]] const Data::CommandBufferInfo& get() const noexcept;
+		
 	private:
 		Data::CommandBufferInfo info = {};
+
 	};
+
 }

@@ -8,7 +8,7 @@
 
 std::string FU::File::directoryName(const std::string& path) {
 	std::string result = path;
-	
+
 #ifdef BOOST_OS_WINDOWS
 	if (result.back() == '/' || result.back() == '\\')
 		result.pop_back();
@@ -111,7 +111,7 @@ std::string FU::File::finalName(const std::string& name) {
 	assert(!containForbiddenCharactor(name) && !name.empty());
 
 	std::string result = name;
-	 
+
 	Size count = 0;
 
 	for (auto itr = result.rbegin(), end = result.rend(); itr != end; itr++) {
@@ -137,5 +137,13 @@ void FU::File::tryPushSlash(std::string& path) {
 #else
 	if (path.back() != '/')
 		path.push_back('/');
+#endif
+}
+
+FU::Size FU::File::maxPathSize() noexcept {
+#ifdef BOOST_OS_WINDOWS
+	return MAX_PATH;
+#else
+#error NotSupported
 #endif
 }
