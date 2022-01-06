@@ -3,7 +3,7 @@
 namespace FDR::Internal::Initialization {
 
 	void terminate() {
-		GMessenger.add_simple<FU::Log::Type::Error>("std::terminate is called because FluidumDraw failed to initialize.");
+		GMessenger.add_str<FU::Log::Type::Error>("std::terminate is called because FluidumDraw failed to initialize.");
 		std::terminate();
 	}
 
@@ -21,7 +21,7 @@ namespace FDR::Internal::Initialization {
 		catch (const FVK::Exception::Error& e) {
 			using enum FVK::Exception::ErrorType;
 			if (e.code() == FailedToCreate) {
-				GMessenger.add_simple<FU::Log::Type::Error>("[Window].FluidumDraw failed to initialize because it failed to create the window.");
+				GMessenger.add_str<FU::Log::Type::Error>("[Window].FluidumDraw failed to initialize because it failed to create the window.");
 			}
 			else if (e.code() == NotInitialized || e.code() == NotSupported || e.code() == CollisionOfKeys) {
 				GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "[Window].Internal Error. FluidumVK is not initialized.");
@@ -34,10 +34,10 @@ namespace FDR::Internal::Initialization {
 			}
 		}
 		catch (const std::exception&) {
-			GMessenger.add_simple<FU::Log::Type::Error>("[Window].FluidumDraw failed to initialize due to an unexpected error.");
+			GMessenger.add_str<FU::Log::Type::Error>("[Window].FluidumDraw failed to initialize due to an unexpected error.");
 		}
 		catch (...) {
-			GMessenger.add_simple<FU::Log::Type::Error>("[Window].FluidumDraw failed to initialize due to an unexpected error.");
+			GMessenger.add_str<FU::Log::Type::Error>("[Window].FluidumDraw failed to initialize due to an unexpected error.");
 		}
 		terminate();
 	}
@@ -951,7 +951,7 @@ namespace FDR::Internal::Initialization {
 		catch (const FVK::Exception::Error& e) {
 			using enum FVK::Exception::ErrorType;
 			if (e.code() == FailedToCreate) {
-				GMessenger.add_simple<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize because it failed to create the window.", name);
+				GMessenger.add_str<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize because it failed to create the window.", name);
 			}
 			else if (e.code() == NotInitialized || e.code() == NotSupported || e.code() == CollisionOfKeys) {
 				GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "[{}].Internal Error({}). FluidumVK is not initialized.", name, magic_enum::enum_name(e.code()));
@@ -964,10 +964,10 @@ namespace FDR::Internal::Initialization {
 			}
 		}
 		catch (const std::exception&) {
-			GMessenger.add_simple<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize due to an unexpected error.", name);
+			GMessenger.add_str<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize due to an unexpected error.", name);
 		}
 		catch (...) {
-			GMessenger.add_simple<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize due to an unexpected error.", name);
+			GMessenger.add_str<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize due to an unexpected error.", name);
 		}
 		terminate();
 	}

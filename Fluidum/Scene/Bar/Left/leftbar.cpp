@@ -4,7 +4,6 @@
 #include "../../Coding/Tab/tab.h"
 #include "../../Coding/Debug/debug.h"
 #include "../../Project/project.h"
-#include "../../Project/Add/select.h"
 #include "../../Analysis/Overview/overview.h"
 #include "../../Analysis/Func/function.h"
 #include "../../Analysis/Plot/plot.h"
@@ -34,7 +33,7 @@ FS::LeftBar::LeftBar(
 	tabRead(tabRead),
 	images(images)
 {
-	FluidumScene_Log_Constructor("LeftBar");
+	FluidumScene_Log_Constructor(::FS::LeftBar);
 
 	const auto windowSizeX = guiRead->windowSize().x * 0.03f;
 	style.windowPos = { 0.0f,guiRead->menuBarHeight() + guiRead->topBarHeight() };
@@ -56,7 +55,7 @@ FS::LeftBar::LeftBar(
 }
 
 FS::LeftBar::~LeftBar() noexcept {
-	FluidumScene_Log_Destructor_("LeftBar");
+	FluidumScene_Log_Destructor(::FS::LeftBar);
 }
 
 void FS::LeftBar::call() {
@@ -171,8 +170,8 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 		this->addConsoleScene();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 }
 
@@ -182,37 +181,37 @@ void FS::LeftBar::addCodingScene() {
 	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "tab.png").c_str()));
 	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "debug.png").c_str()));
 
-	FluidumScene_Log_RequestAddScene("TextEditor");
+	FluidumScene_Log_RequestAddScene(::FS::TextEditor);
 	Scene::addScene<TextEditor>();
 }
 
 void FS::LeftBar::addFluScene() {
-	FluidumScene_Log_RequestAddScene("Flu::Node");
+	FluidumScene_Log_RequestAddScene(::FS::Flu::Node);
 	Scene::addScene<::FS::Flu::Node>();
 }
 
 void FS::LeftBar::addAnalysisScene() {
-	FluidumScene_Log_RequestAddScene("Analysys::Overview");
+	FluidumScene_Log_RequestAddScene(::FS::Analysis::Overview);
 	Scene::addScene<::FS::Analysis::Overview>();
 }
 
 void FS::LeftBar::addProjectScene() {
-	FluidumScene_Log_RequestAddScene("Project::Explorer");
+	FluidumScene_Log_RequestAddScene(::FS::Project::Explorer);
 	Scene::addScene<::FS::Project::Explorer>();
 }
 
 void FS::LeftBar::addAnimationScene() {
-	FluidumScene_Log_RequestAddScene("Animation");
+	FluidumScene_Log_RequestAddScene(::FS::Animation);
 	Scene::addScene<::FS::Animation>();
 }
 
 void FS::LeftBar::addGenomeScene() {
-	FluidumScene_Log_RequestAddScene("Genome::Overview");
+	FluidumScene_Log_RequestAddScene(::FS::Genome::Overview);
 	Scene::addScene<::FS::Genome::Overview>();
 }
 
 void FS::LeftBar::addConsoleScene() {
-	FluidumScene_Log_RequestAddScene("Console");
+	FluidumScene_Log_RequestAddScene(::FS::Console);
 	Scene::addScene<::FS::Console>();
 }
 
@@ -221,62 +220,61 @@ void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 		this->deleteCodingScene();
 	}
 	else if (code == Internal::MainScenes[1]) {
-		FluidumScene_Log_RequestDeleteScene("Flu::Node");
+		FluidumScene_Log_RequestDeleteScene(::FS::Flu::Node);
 		Scene::deleteScene<Flu::Node>();
 	}
 	else if (code == Internal::MainScenes[2]) {
-		FluidumScene_Log_RequestDeleteScene("Analysis::Overview");
+		FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Overview);
 		Scene::deleteScene<Analysis::Overview>();
 	}
 	else if (code == Internal::MainScenes[3]) {
-		FluidumScene_Log_RequestDeleteScene("Genome::Overview");
+		FluidumScene_Log_RequestDeleteScene(::FS::Genome::Overview);
 		Scene::deleteScene<Genome::Overview>();
 	}
 	else if (code == Internal::MainScenes[4]) {
-		FluidumScene_Log_RequestDeleteScene("Animation");
+		FluidumScene_Log_RequestDeleteScene(::FS::Animation);
 		Scene::deleteScene<Animation>();
 	}
 	else if (code == Internal::MainScenes[5]) {
-		FluidumScene_Log_RequestDeleteScene("Project::Explorer");
+		FluidumScene_Log_RequestDeleteScene(::FS::Project::Explorer);
 		Scene::deleteScene<Project::Explorer>();
 	}
 	else if (code == Internal::MainScenes[6]) {
-		FluidumScene_Log_RequestDeleteScene("Console");
+		FluidumScene_Log_RequestDeleteScene(::FS::Console);
 		Scene::deleteScene<Console>();
 	}
 	else {
-		FluidumScene_Log_Abort();
-		abort();
+		FluidumScene_Log_InternalError();
+		std::terminate();
 	}
 	sub.codingImages.clear();
 }
 
 void FS::LeftBar::deleteCodingScene() {
 	if (!tabRead->isAllTextSaved()) {
-		GLog.add<FD::Log::Type::None>("Popup MessageBox.");
-		int32_t button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
+		const auto button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
 		if (button == 0) {//save close
-			GLog.add<FD::Log::Type::None>("Save all tab texts.");
+			GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save all tab texts.");
 			tabWrite->saveAllTexts();
 			tabWrite->clear();
 			tabWrite->save();
 		}
 		else if (button == 1) {//without saving
-			GLog.add<FD::Log::Type::None>("Clear tab texts.");
+			GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Clear tab texts.");
 			tabWrite->clear();
 			tabWrite->save();
 		}
 		else if (button == 2)//cancel
 			return;
 		else {//unexpected
-			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-			abort();
+			FluidumScene_Log_InternalWarning();
+			return;
 		}
 	}
 
-	FluidumScene_Log_RequestTryDeleteScene("Coding::Tab");
+	FluidumScene_Log_RequestTryDeleteScene(::FS::Coding::Tab);
 	Scene::tryDeleteScene<Coding::Tab>();
-	FluidumScene_Log_RequestDeleteScene("TextEditor");
+	FluidumScene_Log_RequestDeleteScene(::FS::TextEditor);
 	Scene::deleteScene<TextEditor>();
 }
 
@@ -372,71 +370,69 @@ void FS::LeftBar::subWindowAnalysis() {
 
 void FS::LeftBar::addCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
-		FluidumScene_Log_RequestAddScene("Coding::Tab");
+		FluidumScene_Log_RequestAddScene(::FS::Coding::Tab);
 		Scene::addScene<Coding::Tab>();
 	}
 	else if (code == ClassCode::GetClassCode<Coding::Debug>()) {
-		FluidumScene_Log_RequestAddScene("Coding::Debug");
+		FluidumScene_Log_RequestAddScene(::FS::Coding::Debug);
 		Scene::addScene<Coding::Debug>();
 	}
 	else {
-		FluidumScene_Log_Abort();
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 }
 
 void FS::LeftBar::addAnalysisSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Analysis::Function>()) {
-		FluidumScene_Log_RequestAddScene("Analysis::Function");
+		FluidumScene_Log_RequestAddScene(::FS::Analysis::Function);
 		Scene::addScene<Analysis::Function>();
 	}
 	else if (code == ClassCode::GetClassCode<Analysis::Plot>()) {
-		FluidumScene_Log_RequestAddScene("Analysis::Plot");
+		FluidumScene_Log_RequestAddScene(::FS::Analysis::Plot);
 		Scene::addScene<Analysis::Plot>();
 	}
 	else {
-		FluidumScene_Log_Abort();
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 
 }
 
 void FS::LeftBar::deleteCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
-		FluidumScene_Log_RequestDeleteScene("Coding::Tab");
+		FluidumScene_Log_RequestDeleteScene(::FS::Coding::Tab);
 		Scene::deleteScene<Coding::Tab>();
 	}
 	else {
-		FluidumScene_Log_Abort();
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 }
 
 void FS::LeftBar::deleteAnalysisSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Analysis::Function>()) {
-		FluidumScene_Log_RequestDeleteScene("Analysis::Function");
+		FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Function);
 		Scene::deleteScene<Analysis::Function>();
 	}
 	else if (code == ClassCode::GetClassCode<Analysis::Plot>()) {
-		FluidumScene_Log_RequestDeleteScene("Analysis::Plot");
+		FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Plot);
 		Scene::deleteScene<Analysis::Plot>();
 	}
 	else {
-		FluidumScene_Log_Abort();
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 }
 
 void FS::LeftBar::subWindowHelpSetting() {
-	//余白を取って，横線
+
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
 
 
-	//ボタンのボーダーを消す
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4());
-	//ボタン間の距離を小さく
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x / 4.0f,ImGui::GetStyle().ItemSpacing.y });
 
 	ImGui::SetWindowFontScale(0.8f);

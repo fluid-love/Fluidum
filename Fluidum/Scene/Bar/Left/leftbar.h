@@ -6,7 +6,6 @@ namespace FS {
 
 	class LeftBar final :public Scene {
 	public:
-		//ŠÔ‚ª‚©‚©‚é‚Ì‚Åleftbar‚ÌƒAƒCƒRƒ“‚Í‚ ‚ç‚©‚¶‚ß€”õ‚µ‚Ä‚¨‚¢‚Ä‚à‚ç‚¤
 		explicit LeftBar(
 			const FD::ProjectRead* const projectRead,
 			const FD::FluidumFilesRead* const fluidumFilesRead,
@@ -29,6 +28,8 @@ namespace FS {
 
 		~LeftBar() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(LeftBar)
+
 	public:
 		virtual void call() override;
 
@@ -45,8 +46,7 @@ namespace FS {
 
 		FD::Text::LeftBar text{};
 
-	private://data
-
+	private:
 		const std::vector<FDR::ImGuiImage> images;
 
 		struct {
@@ -83,11 +83,7 @@ namespace FS {
 
 		}sub;
 
-		
-
-
 	private:
-
 		void imageGui();
 		void hoveredIcon(const std::size_t index);
 
@@ -117,8 +113,9 @@ namespace FS {
 		void deleteCodingSubScene(const ClassCode::CodeType code);
 		void deleteAnalysisSubScene(const ClassCode::CodeType code);
 
-
-
+	private:
 		void subWindowHelpSetting();
+
 	};
+
 }

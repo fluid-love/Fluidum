@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "log.h"
+#include "../../Utils/include.h"
 #include "type.h"
 
 namespace FD {

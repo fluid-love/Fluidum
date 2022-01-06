@@ -7,7 +7,7 @@ FS::Console::Console(
 	consoleWrite(consoleWrite),
 	consoleRead(consoleRead)
 {
-	FluidumScene_Log_Constructor("Console");
+	FluidumScene_Log_Constructor(::FS::Console);
 
 	if (inputText.max_size() <= FD::Console::Limits::Characters)
 		inputText.reserve(inputText.max_size());
@@ -17,7 +17,7 @@ FS::Console::Console(
 }
 
 FS::Console::~Console() {
-	FluidumScene_Log_Destructor_("Console");
+	FluidumScene_Log_Destructor(::FS::Console);
 }
 
 void FS::Console::call() {
@@ -99,7 +99,7 @@ void FS::Console::closeWindow() {
 		return;
 
 	//close
-	FluidumScene_Log_RequestDeleteScene("Console");
+	FluidumScene_Log_RequestDeleteScene(::FS::Console);
 	Scene::deleteScene<Console>();
 }
 

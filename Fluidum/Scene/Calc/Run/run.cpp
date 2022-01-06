@@ -7,25 +7,11 @@ FS::Calc::Run::Run(
 ) :
 	fluidumFilesRead(fluidumFilesRead)
 {
-	GLog.add<FD::Log::Type::None>("Construct Calc::RunScene.");
+	FluidumScene_Log_Constructor(::FS::Calc::Run);
 }
 
 FS::Calc::Run::~Run() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Calc::RunScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::Calc::Run);
 }
 
 void FS::Calc::Run::call() {
@@ -41,8 +27,8 @@ void FS::Calc::Run::call() {
 	Scene::addScene<Utils::ResetData<FD::ImPlotWrite,FD::Calc::ArrayWrite>>();
 
 	if (type == Lua) {
-		FluidumScene_Log_RequestAddScene("Lua::Calc");
-		Scene::addAsyncScene<Lua::Calc>();
+		FluidumScene_Log_RequestAddScene(::FS::Calc::Lua::Run);
+		Scene::addAsyncScene<Calc::Lua::Run>();
 	}
 	else if (type == Python) {
 		;
@@ -51,14 +37,13 @@ void FS::Calc::Run::call() {
 		;
 	}
 	else {
-		FluidumScene_Log_Abort();
-		abort();
+		FluidumScene_Log_InternalWarning();
 	}
 
 	this->deleteThis();
 }
 
 void FS::Calc::Run::deleteThis() {
-	FluidumScene_Log_RequestDeleteScene("Calc::RunScene");
+	FluidumScene_Log_RequestDeleteScene(::FS::Calc::Run);
 	Scene::deleteScene<Run>();
 }

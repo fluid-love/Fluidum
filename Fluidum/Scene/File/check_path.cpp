@@ -1,7 +1,7 @@
 ﻿#include "check_path.h"
-#include "../../Utils/Popup/message.h"
+#include "../Utils/Popup/message.h"
 
-FS::Project::Add::CheckPath::CheckPath(
+FS::File::Add::CheckPath::CheckPath(
 	const FD::ProjectRead* const projectRead,
 	const FD::UserFilesRead* const userFilesRead,
 	Info& info
@@ -10,7 +10,7 @@ FS::Project::Add::CheckPath::CheckPath(
 	userFilesRead(userFilesRead),
 	info(info)
 {
-	FluidumScene_Log_Constructor("Project::Add::CheckPath");
+	FluidumScene_Log_Constructor(::FS::File::Add::CheckPath);
 
 	if (info.project)
 		this->project();
@@ -18,23 +18,22 @@ FS::Project::Add::CheckPath::CheckPath(
 		this->user();
 }
 
-FS::Project::Add::CheckPath::~CheckPath() {
-	FluidumScene_Log_Destructor_("Project::Add::CheckPath");
+FS::File::Add::CheckPath::~CheckPath() {
+	FluidumScene_Log_Destructor(::FS::File::Add::CheckPath);
 }
 
-void FS::Project::Add::CheckPath::call() {
+void FS::File::Add::CheckPath::call() {
 	assert(false && "Constructor");
 }
 
-void FS::Project::Add::CheckPath::project() {
+void FS::File::Add::CheckPath::project() {
 
 	std::string parent = FU::File::consistentDirectory(info.parent);
 	FU::File::tryPushSlash(parent);
 
 	//empty
 	if (info.name.empty()) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::CheckPath] Name is empty.");
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_fill, info.pos_name);
 		info.noerror = false;
 		return;
@@ -42,8 +41,8 @@ void FS::Project::Add::CheckPath::project() {
 
 	//forbidden charactor
 	if (FU::File::containForbiddenCharactor(info.name)) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::CheckPath] Name({}) contains forbidden characters.", info.name);
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Name({}) contains forbidden characters.", info.name);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, info.pos_name);
 		info.noerror = false;
 		return;
@@ -57,7 +56,7 @@ void FS::Project::Add::CheckPath::project() {
 			path = FU::File::consistentDirectory(path);
 		}
 		else { //relative
-			path = projectRead->getProjectFolderPath() + parent + userFilesRead->finalName(info.name);
+			path = projectRead->projectDirectoryPath() + parent + userFilesRead->finalName(info.name);
 			path = std::filesystem::weakly_canonical(path).string();
 			path = FU::File::consistentDirectory(path);
 		}
@@ -67,8 +66,8 @@ void FS::Project::Add::CheckPath::project() {
 	}
 
 	if (std::filesystem::exists(path)) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::CheckPath] Path({}) already exists.", path);
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Directory path({}) already exists.", path);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_directoryAlreadyExist, info.pos_create);
 		info.noerror = false;
 		return;
@@ -78,15 +77,15 @@ void FS::Project::Add::CheckPath::project() {
 	info.fullPath = std::move(path);
 }
 
-void FS::Project::Add::CheckPath::user() {
+void FS::File::Add::CheckPath::user() {
 
 	std::string parent = FU::File::consistentDirectory(info.parent);
 	FU::File::tryPushSlash(parent);
 
 	//empty
 	if (info.name.empty()) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::CheckPath] Name is empty.");
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Name is empty.");
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_fill, info.pos_name);
 		info.noerror = false;
 		return;
@@ -95,8 +94,8 @@ void FS::Project::Add::CheckPath::user() {
 
 	//forbidden charactor
 	if (FU::File::containForbiddenCharactor(info.name) || userFilesRead->containForbiddenCharactor(info.name)) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::CheckPath] Name({}) contains forbidden characters.", info.name);
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Name({}) contains forbidden characters.", info.name);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, info.pos_name);
 		info.noerror = false;
 		return;
@@ -111,8 +110,8 @@ void FS::Project::Add::CheckPath::user() {
 			path = FU::File::consistentDirectory(path);
 		}
 		else { //relative
-			absoluteParentPath = projectRead->getProjectFolderPath() + parent;
-			path = projectRead->getProjectFolderPath() + parent + userFilesRead->finalName(info.name);
+			absoluteParentPath = projectRead->projectDirectoryPath() + parent;
+			path = projectRead->projectDirectoryPath() + parent + userFilesRead->finalName(info.name);
 			path = std::filesystem::weakly_canonical(path).string();
 			path = FU::File::consistentDirectory(path);
 		}
@@ -124,8 +123,8 @@ void FS::Project::Add::CheckPath::user() {
 	//parent does not exist
 	if (!info.directory) {//! Fluidum:/
 		if (!std::filesystem::exists(absoluteParentPath)) {
-			GLog.add<FD::Log::Type::None>("[Project::Add::CheckPath] Parent-directory({}) does not exist.", info.parent);
-			FluidumScene_Log_RequestAddScene("Utils::Message");
+			GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Parent directory path({}) does not exist.", info.parent);
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_parentDoesNotExist, info.pos_path);
 			info.noerror = false;
 			return;
@@ -146,10 +145,10 @@ void FS::Project::Add::CheckPath::user() {
 	info.fullPath = std::move(path);
 }
 
-bool FS::Project::Add::CheckPath::user_directory(const std::string& path) {
+bool FS::File::Add::CheckPath::user_directory(const std::string& path) {
 	if (userFilesRead->exist(path)) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Directory path({}) already exists.", path);
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Directory path({}) already exists.", path);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_directoryAlreadyExist, info.pos_create);
 		info.noerror = false;
 		return false;
@@ -157,10 +156,10 @@ bool FS::Project::Add::CheckPath::user_directory(const std::string& path) {
 	return true;
 }
 
-bool FS::Project::Add::CheckPath::user_file(const std::string& path) {
+bool FS::File::Add::CheckPath::user_file(const std::string& path) {
 	if (std::filesystem::exists(path)) {
-		GLog.add<FD::Log::Type::None>("[Project::Add::CheckPath] Path({}) already exists.", path);
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Directory path({}) already exists.", path);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_fileAlreadyExist, info.pos_create);
 		info.noerror = false;
 		return false;

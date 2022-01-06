@@ -28,5 +28,7 @@ namespace FS::Utils {
 
 	private:
 		ImCounter<ImAnimeTime> counter{};
+
 	};
+
 }

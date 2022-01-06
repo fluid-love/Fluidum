@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../Common/common.h"
+#include "../Common/common.h"
 
-namespace FS::Project::Add {
+namespace FS::File::Add {
 
 	class CheckPath final : public Scene {
 	public:
@@ -54,7 +54,6 @@ namespace FS::Project::Add {
 		bool user_directory(const std::string& path);
 		bool user_file(const std::string& path);
 
-
-
 	};
+
 }

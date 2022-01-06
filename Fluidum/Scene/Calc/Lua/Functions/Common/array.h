@@ -2,7 +2,8 @@
 
 #include "../../lua.h"
 
-namespace FS::Lua::Array {
+namespace FS::Calc::Lua::Array {
+
 	template<FD::Calc::Array::ValueType T>
 	auto getVal(State L, const int32_t i) {
 		using enum FD::Calc::Array::ValueType;
@@ -42,7 +43,5 @@ namespace FS::Lua::Array {
 		else
 			FU::Concept::DelayAssert_N<T>;
 	}
-
-
 
 }

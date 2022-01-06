@@ -14,7 +14,7 @@ FS::Layout::Layout(
 	guiRead(guiRead),
 	guiWrite(guiWrite)
 {
-	FluidumScene_Log_Constructor("LeftLayuot");
+	FluidumScene_Log_Constructor(::FS::Layout);
 
 	//default project
 	if (layoutRead->empty()) {
@@ -33,7 +33,7 @@ FS::Layout::Layout(
 }
 
 FS::Layout::~Layout() noexcept {
-	FluidumScene_Log_Destructor_("LeftLayuot")
+	FluidumScene_Log_Destructor(::FS::Layout);
 }
 
 void FS::Layout::call() {
@@ -112,8 +112,8 @@ void FS::Layout::ifRightMouseButtonCliked() {
 
 	select.hovered = select.current;
 
-	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right) || 
-		ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)||
+	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right) ||
+		ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) ||
 		ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
 		)
 		return;
@@ -284,7 +284,7 @@ void FS::Layout::reset() {
 		assert(clicked == 1);
 		return;
 	}
-	GLog.add<FD::Log::Type::None>("Reset layout.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Reset layout.");
 	layoutWrite->reset();
 	layoutWrite->save();
 	this->updateWindows();
@@ -360,7 +360,7 @@ void FS::Layout::updateWindows() {
 }
 
 void FS::Layout::messageLimit() {
-	FluidumScene_Log_RequestAddScene("Utils::Message");
+	FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 	Scene::addScene<Utils::Message>(text.error_max, select.pos);
 }
 

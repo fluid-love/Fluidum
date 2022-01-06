@@ -312,6 +312,7 @@ namespace FD::Text::Internal {
 
 		GuiText error_emptyForm;
 		GuiText error_maxSize;
+		GuiText error_absolute;
 		GuiText error_notFoundDirectory;
 		GuiText error_alreadyExist;
 		GuiText error_failedToCreate;

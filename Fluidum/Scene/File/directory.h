@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../Common/common.h"
+#include "../Common/common.h"
 #include "shared_info.h"
 
-namespace FS::Project::Add {
+namespace FS::File::Add {
 
 	class Directory final : public Scene {
 	public:
@@ -75,4 +75,5 @@ namespace FS::Project::Add {
 		void create();
 
 	};
+
 }

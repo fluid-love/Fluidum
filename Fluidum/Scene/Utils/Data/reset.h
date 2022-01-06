@@ -10,28 +10,14 @@ namespace FS::Utils {
 		explicit ResetData(
 			Data* const... data
 		) : data(std::tuple(data...)) {
-			GLog.add<FD::Log::Type::None>("Construct Utils::ResetData.");
+			FluidumScene_Log_Constructor(::FS::Utils::ResetData<Data...>);
 
 			this->reset<sizeof...(Data)>();
 		}
 		void Constructor(Data...);
 
 		~ResetData() noexcept {
-			try {
-				GLog.add<FD::Log::Type::None>("Destruct Utils::ResetData.");
-			}
-			catch (const std::exception& e) {
-				try {
-					std::cerr << e.what() << std::endl;
-					abort();
-				}
-				catch (...) {
-					abort();
-				}
-			}
-			catch (...) {
-				abort();
-			}
+			FluidumScene_Log_Destructor(::FS::Utils::ResetData<Data...>);
 		}
 
 		FluidumUtils_Class_Delete_CopyMove(ResetData)
@@ -42,8 +28,7 @@ namespace FS::Utils {
 
 	public:
 		virtual void call() override {
-			FluidumScene_Log_RequestDeleteScene("Utils::ResetData");
-			Scene::deleteScene<ResetData>();
+			assert(false);
 		}
 
 		template<std::size_t Size>
@@ -62,10 +47,9 @@ namespace FS::Utils {
 			if constexpr (Size > 1) {
 				this->reset<Size - 1>();
 			}
+
 		}
 
-
-
-
 	};
+
 }

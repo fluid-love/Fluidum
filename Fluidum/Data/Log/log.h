@@ -54,7 +54,7 @@ namespace FD {
 		//no-throw
 		void requestStop() noexcept;
 
-		[[nodiscrad]] bool threadJoinable() const noexcept;
+		[[nodiscard]] bool threadJoinable() const noexcept;
 
 	private:
 		//filepath

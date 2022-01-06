@@ -146,18 +146,18 @@ void FS::Project::File::SaveAs::bottom() {
 
 bool FS::Project::File::SaveAs::save() {
 
-	if (projectRead->isDataChanged()) {
-		//Current project is not saved.
+	//if (projectRead->isDataChanged()) {
+	//	//Current project is not saved.
 
-		//save ignore cancel
-		const auto ret = FU::MB::button_button_cancel(
-			FU::MB::Icon::Warning,
-			text.confirm_notSaved,
-			text.confirm_save,
-			text.confirm_ignore
-		);
-		return false;
-	}
+	//	//save ignore cancel
+	//	const auto ret = FU::MB::button_button_cancel(
+	//		FU::MB::Icon::Warning,
+	//		text.confirm_notSaved,
+	//		text.confirm_save,
+	//		text.confirm_ignore
+	//	);
+	//	return false;
+	//}
 
 	const std::string directoryPath = str.directoryPath.c_str();
 	const std::string projectName = str.projectName.c_str();
@@ -179,15 +179,15 @@ bool FS::Project::File::SaveAs::save() {
 	try {
 		projectWrite->saveAs(directoryPath, projectName);
 	}
-	catch (const FD::Project::ExceptionType type) {
+	catch (const FD::ProjectWrite::Exception type) {
 		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Failed to create new project.");
 
-		if (type == FD::Project::ExceptionType::AlreadyProjectFolderExist) {
+		if (type == FD::ProjectWrite::Exception::AlreadyProjectDirctoryExist) {
 			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_alreadyExist, pos.projectFolder);
 			return false;
 		}
-		else if (type == FD::Project::ExceptionType::NotFoundProjectFolder) {
+		else if (type == FD::ProjectWrite::Exception::NotFoundProjectDirectory) {
 			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_notFound, pos.projectFolder);
 			return false;
@@ -204,7 +204,7 @@ bool FS::Project::File::SaveAs::save() {
 		Scene::addScene<Utils::Message>(text.error_unexpected, pos.save);
 	}
 
-	GLog.add_str<FU::Log::Type::None>("The project has been saved successfully.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__,"The project has been saved successfully.");
 
 	this->checkExit();
 

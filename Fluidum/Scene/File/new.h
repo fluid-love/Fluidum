@@ -1,14 +1,14 @@
 #pragma once
 
-#include "../../Common/common.h"
-#include "../../../TextEditor/include.h"
+#include "../Common/common.h"
+#include "../../TextEditor/include.h"
 #include "shared_info.h"
 
-namespace FS::Project::Add {
+namespace FS::File::Add {
 
-	class NewFile final : public Scene {
+	class New final : public Scene {
 	public:
-		explicit NewFile(
+		explicit New(
 			const FD::ProjectRead* const projectRead,
 			const FD::GuiRead* const guiRead,
 			const FD::Log::FileRead* const fileRead,
@@ -20,14 +20,14 @@ namespace FS::Project::Add {
 			FD::Log::FileRead
 		);
 
-		~NewFile() noexcept;
+		~New() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(NewFile)
+		FluidumUtils_Class_Delete_CopyMove(New)
 
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
 		const FD::ProjectRead* const projectRead;
 
 		FD::Text::ProjectNewFile text{};
@@ -121,5 +121,7 @@ namespace FS::Project::Add {
 	private:
 		std::vector<ButtonInfo> initRecentFileTypes(const std::vector<FD::Log::File::Type>& types);
 		void deleteThisScene();
+
 	};
+
 }

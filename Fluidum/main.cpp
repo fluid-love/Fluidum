@@ -71,6 +71,9 @@ int main() {
 		FD::WindowWrite* window = FluidumMain::GScene->getData<FD::WindowWrite>();
 
 		FDR::setMessengerCallbackFunction(FluidumMain::messengerCallback);
+		FD::Internal::GMessenger.setCallback(FluidumMain::messengerCallback);
+		FS::Calc::setMessengerCallback(FluidumMain::messengerCallback);
+
 		FDR::mainLoop("Fluidum", FluidumMain::loop, window->getCloseFlag());
 	}
 	catch (const std::exception& e) {

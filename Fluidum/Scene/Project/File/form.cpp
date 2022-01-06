@@ -35,9 +35,9 @@ FS::Project::File::Form::~Form() noexcept {
 
 	FluidumScene_Log_RequestTryDeleteScene(::FS::Utils::Message);
 	if (Scene::tryDeleteScene<Utils::Message>())
-		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Delete Utils::MessageScene.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Deleted ::FS::Utils::Message Scene.");
 	else
-		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Utils::MessageScene does not exist. Scene::tryDelete() == false.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "::FS::Utils::MessageScene does not exist. Scene::tryDelete() == false.");
 }
 
 void FS::Project::File::Form::call() {
@@ -99,7 +99,7 @@ void FS::Project::File::Form::title() {
 void FS::Project::File::Form::folderPath() {
 	ImGui::BulletText(text.folderPath);
 	ImGui::InputText("##ppath", str.directoryPath.data(), str.directoryPath.capacity());
-	pos.projectFolder = ImGui::GetItemRectMin();
+	pos.projectDirectory = ImGui::GetItemRectMin();
 
 	ImGui::SameLine();
 	if (!ImGui::Button(ICON_MD_FOLDER_OPEN))
@@ -181,10 +181,10 @@ bool FS::Project::File::Form::createProject() {
 	//save / ignore / cancelÅ@
 //FU::MB
 
-	//check
+	//forbiden
 	if (directoryPath.empty()) {
 		FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
-		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.projectFolder);
+		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.projectDirectory);
 		return false;
 	}
 	if (name.empty()) {
@@ -194,11 +194,24 @@ bool FS::Project::File::Form::createProject() {
 	}
 
 	//max size
-	if (fullPath.size() >= FU::File::maxPathSize()) {
-		FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
-		Scene::addScene<Utils::Message>(text.error_maxSize, pos.create);
-		return false;
+	{
+		if (fullPath.size() > FU::File::maxPathSize()) {
+			FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text.error_maxSize, pos.create);
+			return false;
+		}
 	}
+
+	//must be an absolute
+	{
+		std::filesystem::path path(directoryPath);
+		if (!path.is_absolute()) {
+			FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text.error_absolute, pos.projectDirectory);
+			return false;
+		}
+	}
+
 
 	FD::ProjectWrite::CreateInfo info{
 		.projectName = name,

@@ -1,21 +1,7 @@
 #include "function.h"
 
 FS::Analysis::Function::~Function() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct PlotScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::Analysis::Function);
 }
 
 void FS::Analysis::Function::call() {

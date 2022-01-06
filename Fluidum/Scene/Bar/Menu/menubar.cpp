@@ -129,7 +129,7 @@ void FS::MenuBar::itemCreateNewProject() {
 		return;
 
 	FluidumScene_Log_RequestAddScene(::FS::Project::File::New);
-	Scene::addScene<Bar::NewProject>();
+	Scene::addScene<Project::File::New>();
 }
 
 void FS::MenuBar::itemOpen() {
@@ -138,18 +138,22 @@ void FS::MenuBar::itemOpen() {
 	pos.open = ImGui::GetItemRectMax();
 
 	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
-	GLog.add<FD::Log::Type::None>("Open file dialog.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Open file dialog.");
 	const nfdresult_t result = NFD_OpenDialog(".fproj", nullptr, outPath.get());
 	if (result == NFD_OKAY) {
-		GLog.add<FD::Log::Type::None>("Load project file({}).", *outPath.get());
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Load project file({}).", *outPath.get());
 	}
 	else if (result == NFD_CANCEL) {
-		GLog.add<FD::Log::Type::None>("Dialog has been canceled.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Dialog has been canceled.");
 		return;
 	}
 	else {//NFD_ERROR
-		GLog.add<FD::Log::Type::Error>("Error file dialog.");
-		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+		{
+			auto lock = GLog.getLock();
+			GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Error file dialog.");
+			FluidumScene_Log_InternalWarning();
+		}
+		return;
 	}
 
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
@@ -157,36 +161,41 @@ void FS::MenuBar::itemOpen() {
 	try {
 		projectWrite->loadProject(*outPath.get());
 	}
-	catch (const FD::Project::ExceptionType type) {
+	catch (const FD::ProjectWrite::Exception type) {
+		using enum FD::ProjectWrite::Exception;
 
 		//std::ifstream::operator bool() == false
-		if (type == FD::Project::ExceptionType::FailedToOpenProjectFile) {
-			FluidumScene_Log_RequestAddScene("Utils::Message");
+		if (type == FailedToOpenProjectFile) {
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_openProjectFile, pos.open);
 		}
 		//wrong identifier 
-		else if (type == FD::Project::ExceptionType::IllegalFile) {
-			FluidumScene_Log_RequestAddScene("Utils::Message");
+		else if (type == IllegalFile) {
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_illegalFile, pos.open);
 		}
 		//broken file
-		else if (type == FD::Project::ExceptionType::BrokenFile) {
-			FluidumScene_Log_RequestAddScene("Utils::Message");
+		else if (type == BrokenFile) {
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_brokenFile, pos.open);
 		}
 		else {
-			FluidumScene_Log_Abort();
-			abort();
+			FluidumScene_Log_InternalWarning();
 		}
-		GLog.add<FD::Log::Type::None>("Failed to open .fproj file.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Failed to open .fproj file.");
 		return;
 	}
-	catch (const std::exception&) {
-		GLog.add<FD::Log::Type::Error>("Failed to open .fproj file.");
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+	catch (const std::exception& e) {
+		FluidumScene_Log_StdExceptionError(e);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_internal, pos.open);
 		return;
 	}
+	catch (...) {
+		FluidumScene_Log_InternalWarning();
+		return;
+	}
+
 }
 
 void FS::MenuBar::itemSave() {
@@ -203,8 +212,8 @@ void FS::MenuBar::itemSaveAs() {
 	if (!ImGui::MenuItem(text.saveFileAs))
 		return;
 
-	FluidumScene_Log_RequestAddScene("Bar::SaveAs");
-	Scene::addScene<Bar::SaveAs>();
+	FluidumScene_Log_RequestAddScene(::FS::Project::File::SaveAs);
+	Scene::addScene<Project::File::SaveAs>();
 }
 
 void FS::MenuBar::itemExit() {
@@ -216,9 +225,9 @@ void FS::MenuBar::itemExit() {
 		return;
 	}
 
-	GLog.add<FD::Log::Type::None>("Request Exit.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Exit.");
 
-	FluidumScene_Log_RequestAddScene("Bar::Exit");
+	FluidumScene_Log_RequestAddScene(::FS::Bar::Exit);
 	Scene::addScene<Bar::Exit>();
 
 	ImGui::PopStyleColor();
@@ -268,7 +277,7 @@ void FS::MenuBar::itemRunDebugMode() {
 		calcWrite->save();
 	}
 
-	FluidumScene_Log_RequestAddScene("Calc::Run");
+	FluidumScene_Log_RequestAddScene(::FS::Calc::Run);
 	Scene::addScene<Calc::Run>();
 }
 
@@ -278,7 +287,7 @@ void FS::MenuBar::itemRunNormalMode() {
 		calcWrite->save();
 	}
 
-	FluidumScene_Log_RequestAddScene("Calc::Run");
+	FluidumScene_Log_RequestAddScene(::FS::Calc::Run);
 	Scene::addScene<Calc::Run>();
 }
 
@@ -377,7 +386,7 @@ void FS::MenuBar::itemLayoutTemplates() {
 }
 
 bool FS::MenuBar::layoutConfirm() {
-	GLog.add<FD::Log::Type::None>("Set layout template.");
+	GLog.add_str<FU::Log::Type::None>("Set layout template.");
 
 	const auto clicked = FU::MB::ok_cancel(text.confirm_changeLayout);
 	if (clicked == 0) {//ok
@@ -389,13 +398,13 @@ bool FS::MenuBar::layoutConfirm() {
 
 	//else
 	FluidumScene_Log_InternalError();
-	FluidumScene_Log_CallSceneConstructor("Utils::InternalError");
+	FluidumScene_Log_CallSceneConstructor(::FS::Utils::InternalError);
 	Scene::callConstructor<Utils::InternalError>();
 	return false;
 }
 
 void FS::MenuBar::setLayoutEmpty() {
-	FluidumScene_Log_CallSceneConstructor("Utils::DeleteAllScenes");
+	FluidumScene_Log_CallSceneConstructor(::FS::Utils::DeleteAllScenes);
 	Scene::callConstructor<Utils::DeleteAllScenes>();
 }
 
@@ -418,18 +427,18 @@ void FS::MenuBar::extensionGui() {
 void FS::MenuBar::itemCoding() {
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
-		FluidumScene_Log_RequestTryAddScene("TextEditor");
+		FluidumScene_Log_RequestTryAddScene(::FS::TextEditor);
 		Scene::tryAddScene<TextEditor>();
 		ImGui::CloseCurrentPopup();
 	}
 
 	if (ImGui::MenuItem(text.tab, nullptr, view.tab, view.coding)) {
-		FluidumScene_Log_RequestAddScene("Coding::Tab");
+		FluidumScene_Log_RequestAddScene(::FS::Coding::Tab);
 		Scene::addScene<Coding::Tab>();
 	}
 
 	if (ImGui::MenuItem(text.debugInfo, nullptr, view.debug, view.coding)) {
-		FluidumScene_Log_RequestAddScene("Coding::Debug");
+		FluidumScene_Log_RequestAddScene(::FS::Coding::Debug);
 		Scene::addScene<Coding::Debug>();
 	}
 }
@@ -437,11 +446,11 @@ void FS::MenuBar::itemCoding() {
 void FS::MenuBar::itemFlu() {
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
 		if (view.flu) {
-			FluidumScene_Log_RequestDeleteScene("Flu::Node");
+			FluidumScene_Log_RequestDeleteScene(::FS::Flu::Node);
 			Scene::deleteScene<Flu::Node>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Flu::Node");
+			FluidumScene_Log_RequestAddScene(::FS::Flu::Node);
 			Scene::addScene<Flu::Node>();
 		}
 		ImGui::CloseCurrentPopup();
@@ -451,15 +460,15 @@ void FS::MenuBar::itemFlu() {
 void FS::MenuBar::itemAnalysis() {
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
 		if (view.analysis) {
-			FluidumScene_Log_RequestDeleteScene("Analysis::Plot");
+			FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Plot);
 			Scene::deleteScene<Analysis::Plot>();
-			FluidumScene_Log_RequestDeleteScene("Analysis::Function");
+			FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Function);
 			Scene::deleteScene<Analysis::Function>();
-			FluidumScene_Log_RequestDeleteScene("Analysis::Overview");
+			FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Overview);
 			Scene::deleteScene<Analysis::Overview>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Analysis::Overview");
+			FluidumScene_Log_RequestAddScene(::FS::Analysis::Overview);
 			Scene::addScene<Analysis::Overview>();
 		}
 
@@ -468,22 +477,22 @@ void FS::MenuBar::itemAnalysis() {
 
 	if (ImGui::MenuItem(text.plot, nullptr, view.plot, view.analysis)) {
 		if (view.plot) {
-			FluidumScene_Log_RequestDeleteScene("Analysis::Plot");
+			FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Plot);
 			Scene::deleteScene<Analysis::Plot>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Analysis::Plot");
+			FluidumScene_Log_RequestAddScene(::FS::Analysis::Plot);
 			Scene::addScene<Analysis::Plot>();
 		}
 	}
 
 	if (ImGui::MenuItem(text.function, nullptr, view.function, view.analysis)) {
 		if (view.function) {
-			FluidumScene_Log_RequestDeleteScene("Analysis::Function");
+			FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Function);
 			Scene::deleteScene<Analysis::Function>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Analysis::Function");
+			FluidumScene_Log_RequestAddScene(::FS::Analysis::Function);
 			Scene::addScene<Analysis::Function>();
 		}
 	}
@@ -492,11 +501,11 @@ void FS::MenuBar::itemAnalysis() {
 void FS::MenuBar::itemGenome() {
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
 		if (view.genome) {
-			FluidumScene_Log_RequestDeleteScene("Genome::Overview");
+			FluidumScene_Log_RequestDeleteScene(::FS::Genome::Overview);
 			Scene::deleteScene<Genome::Overview>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Genome::Overview");
+			FluidumScene_Log_RequestAddScene(::FS::Genome::Overview);
 			Scene::addScene<Genome::Overview>();
 		}
 		ImGui::CloseCurrentPopup();
@@ -506,11 +515,11 @@ void FS::MenuBar::itemGenome() {
 void FS::MenuBar::itemAnimation() {
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
 		if (view.animation) {
-			FluidumScene_Log_RequestDeleteScene("Animation");
+			FluidumScene_Log_RequestDeleteScene(::FS::Animation);
 			Scene::deleteScene<Animation>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Animation");
+			FluidumScene_Log_RequestAddScene(::FS::Animation);
 			Scene::addScene<Animation>();
 		}
 		ImGui::CloseCurrentPopup();
@@ -520,11 +529,11 @@ void FS::MenuBar::itemAnimation() {
 void FS::MenuBar::itemProject() {
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
 		if (view.project) {
-			FluidumScene_Log_RequestDeleteScene("Project::Explorer");
+			FluidumScene_Log_RequestDeleteScene(::FS::Project::Explorer);
 			Scene::deleteScene<Project::Explorer>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Project::Explorer");
+			FluidumScene_Log_RequestAddScene(::FS::Project::Explorer);
 			Scene::addScene<Project::Explorer>();
 		}
 		ImGui::CloseCurrentPopup();
@@ -534,11 +543,11 @@ void FS::MenuBar::itemProject() {
 void FS::MenuBar::itemConsole() {
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
 		if (view.console) {
-			FluidumScene_Log_RequestDeleteScene("Console");
+			FluidumScene_Log_RequestDeleteScene(::FS::Console);
 			Scene::deleteScene<Console>();
 		}
 		else {
-			FluidumScene_Log_RequestAddScene("Console");
+			FluidumScene_Log_RequestAddScene(::FS::Console);
 			Scene::addScene<Console>();
 		}
 		ImGui::CloseCurrentPopup();

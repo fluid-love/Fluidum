@@ -2,26 +2,11 @@
 
 FS::Flu::Node::Node()
 {
-	GLog.add<FD::Log::Type::None>("Construct Flu::NodeScene.");
-
+	FluidumScene_Log_Constructor(::FS::Flu::Node);
 }
 
 FS::Flu::Node::~Node() {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Flu::NodeScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::Flu::Node);
 }
 
 void FS::Flu::Node::call() {

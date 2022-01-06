@@ -1,10 +1,10 @@
-﻿#include "newproject.h"
-#include "../../../Utils/Popup/backwindow.h"
-#include "../../../Utils/Popup/message.h"
+﻿#include "new.h"
+#include "../../Utils/Popup/backwindow.h"
+#include "../../Utils/Popup/message.h"
 
 using namespace FU::ImGui::Operators;
 
-namespace FS::Bar::Internal {
+namespace FS::Project::File::Internal {
 	std::vector<FDR::ImGuiImage> makeImages() {
 		std::vector<FDR::ImGuiImage> result;
 		for (uint16_t i = 0; i < 4; i++) {
@@ -16,7 +16,7 @@ namespace FS::Bar::Internal {
 	}
 }
 
-FS::Bar::NewProject::NewProject(
+FS::Project::File::New::New(
 	const FD::SceneRead* const sceneRead,
 	FD::WindowWrite* const windowWrite,
 	const FD::GuiRead* const guiRead,
@@ -29,6 +29,7 @@ FS::Bar::NewProject::NewProject(
 	guiRead(guiRead),
 	guiWrite(guiWrite),
 	projectLogWrite(projectLogWrite),
+
 	images(Internal::makeImages()),
 	emptyTemplates({
 			ButtonInfo{FD::Log::Project::Type::Empty, images.at(0), "_Empty", text.empty.operator const std::string & (), text.emptyDescription},
@@ -41,43 +42,29 @@ FS::Bar::NewProject::NewProject(
 		recentTemplates(this->initRecentTempates(projectLogRead->recent()))
 
 {
-	FluidumScene_Log_Constructor("NewProject");
+	FluidumScene_Log_Constructor(::FS::Project::File::New);
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
 
 	style.buttonSize = ImVec2(style.windowSize.x / 2.1f, style.windowSize.y * 0.09f);
 
-	FluidumScene_Log_RequestAddScene("PopupBackWindow");
-	Scene::addScene<PopupBackWindow>();
+	FluidumScene_Log_RequestAddScene(::FS::Utils::PopupBackWindow);
+	Scene::addScene<Utils::PopupBackWindow>();
 
 	this->searchStr.str.reserve(100);
 }
 
-FS::Bar::NewProject::~NewProject() noexcept {
-	try {
-		FluidumScene_Log_RequestDeleteScene("PopupBackWindow");
-		Scene::deleteScene<PopupBackWindow>();
+FS::Project::File::New::~New() noexcept {
+	FluidumScene_Log_RequestDeleteScene(::FS::Utils::PopupBackWindow);
+	Scene::deleteScene<Utils::PopupBackWindow>();
 
-		FluidumScene_Log_Destructor("NewProject");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::Project::File::New);
 }
 
-void FS::Bar::NewProject::call() {
+void FS::Project::File::New::call() {
 
-	if (!sceneRead->exist<ProjectForm>() && !ImGui::IsPopupOpen("RecentPopup"))
+	if (!sceneRead->exist<Form>() && !ImGui::IsPopupOpen("RecentPopup"))
 		ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);
@@ -123,7 +110,7 @@ void FS::Bar::NewProject::call() {
 	this->checkForm();
 }
 
-void FS::Bar::NewProject::checkForm() {
+void FS::Project::File::New::checkForm() {
 	if (!formInfo)
 		return;
 
@@ -132,14 +119,14 @@ void FS::Bar::NewProject::checkForm() {
 
 	if (formInfo->create) {
 		projectLogWrite->update(formInfo->type);
-		FluidumScene_Log_RequestDeleteScene("NewProject");
-		Scene::deleteScene<Bar::NewProject>();
+		FluidumScene_Log_RequestDeleteScene(::FS::Project::File::New);
+		Scene::deleteScene<New>();
 	}
 
 	formInfo.reset();
 }
 
-void FS::Bar::NewProject::title() {
+void FS::Project::File::New::title() {
 	ImGui::BeginChild("NPtitle", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.07f));
 	ImGui::SetWindowFontScale(1.7f);
 
@@ -156,7 +143,7 @@ void FS::Bar::NewProject::title() {
 	ImGui::EndChild();
 }
 
-void FS::Bar::NewProject::recent() {
+void FS::Project::File::New::recent() {
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
@@ -196,7 +183,7 @@ void FS::Bar::NewProject::recent() {
 	ImGui::PopStyleVar(2);
 }
 
-void FS::Bar::NewProject::select() {
+void FS::Project::File::New::select() {
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
@@ -223,7 +210,7 @@ void FS::Bar::NewProject::select() {
 	ImGui::PopStyleVar(2);
 }
 
-void FS::Bar::NewProject::filter() {
+void FS::Project::File::New::filter() {
 	int32_t layoutIndex = 0;
 
 	constexpr const char* icons[] = { ICON_MD_INBOX" ",ICON_FA_DNA"  " };
@@ -252,7 +239,7 @@ void FS::Bar::NewProject::filter() {
 	}
 }
 
-void FS::Bar::NewProject::buttons() {
+void FS::Project::File::New::buttons() {
 
 	ImGui::BulletText(text.empty);
 	for (auto& x : emptyTemplates) {
@@ -274,33 +261,33 @@ void FS::Bar::NewProject::buttons() {
 
 }
 
-void FS::Bar::NewProject::formScene(const bool isButtonClicked, const ButtonInfo& button) {
+void FS::Project::File::New::formScene(const bool isButtonClicked, const ButtonInfo& button) {
 	if (!isButtonClicked)
 		return;
 
-	ProjectForm::Info info{
+	Form::SharedInfo info{
 		.type = button.type,
 		.name = button.title
 	};
 
-	this->formInfo = std::make_shared<ProjectForm::Info>(std::move(info));
+	this->formInfo = std::make_shared<Form::SharedInfo>(std::move(info));
 
-	FluidumScene_Log_RequestAddScene("ProjectFrom");
-	Scene::addScene<ProjectForm>(formInfo);
+	FluidumScene_Log_RequestAddScene(::FS::Project::File::Form);
+	Scene::addScene<Form>(formInfo);
 }
 
-void FS::Bar::NewProject::bottom() {
+void FS::Project::File::New::bottom() {
 
 	const ImVec2 buttonSize = ImVec2(ImGui::GetWindowSize().x * 0.2f, 0.0f);
 
 	//cancel
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::Button(text.cancel, buttonSize)) {
-		ImGui::CloseCurrentPopup();//popupを終了	
+		ImGui::CloseCurrentPopup();
 
 		//PopupBackWindow -> destructor
-		FluidumScene_Log_RequestDeleteScene("NewProject");
-		Scene::deleteScene<NewProject>();
+		FluidumScene_Log_RequestDeleteScene(::FS::Project::File::New);
+		Scene::deleteScene<New>();
 
 	}
 	ImGui::PopStyleColor();
@@ -309,7 +296,7 @@ void FS::Bar::NewProject::bottom() {
 
 #include <imgui_internal.h>
 
-std::pair<bool, bool> FS::Bar::NewProject::button(
+std::pair<bool, bool> FS::Project::File::New::button(
 	const FDR::ImGuiImage& image,
 	const char* label,
 	const char* title,
@@ -356,7 +343,7 @@ std::pair<bool, bool> FS::Bar::NewProject::button(
 	return click;
 }
 
-void FS::Bar::NewProject::search() {
+void FS::Project::File::New::search() {
 	const std::string data = searchStr.str.data();
 
 	if (data.size() < searchStr.temp.size()) {
@@ -382,7 +369,7 @@ void FS::Bar::NewProject::search() {
 	std::for_each(algorithmTemplates.begin(), algorithmTemplates.end(), func);
 }
 
-std::vector<FS::Bar::NewProject::ButtonInfo> FS::Bar::NewProject::initRecentTempates(const std::vector<FD::Log::Project::Type>& types) {
+std::vector<FS::Project::File::New::ButtonInfo> FS::Project::File::New::initRecentTempates(const std::vector<FD::Log::Project::Type>& types) {
 	using enum FD::Log::Project::Type;
 
 	std::vector<ButtonInfo> result{};
@@ -397,14 +384,13 @@ std::vector<FS::Bar::NewProject::ButtonInfo> FS::Bar::NewProject::initRecentTemp
 			result.emplace_back(ButtonInfo{ x,images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCppDescription });
 
 		else {
-			FluidumScene_Log_Abort();
-			abort();
+			FluidumScene_Log_InternalWarning();
 		}
 	}
 	return result;
 }
 
-void FS::Bar::NewProject::recentPopup() {
+void FS::Project::File::New::recentPopup() {
 	if (recentPopupInfo.flag) {
 		ImGui::OpenPopup("RecentPopup");
 		recentPopupInfo.flag = false;
@@ -425,19 +411,19 @@ void FS::Bar::NewProject::recentPopup() {
 	ImGui::EndPopup();
 }
 
-void FS::Bar::NewProject::recent_clear() {
-	GLog.add<FD::Log::Type::None>("Clear RecentProject log.");
+void FS::Project::File::New::recent_clear() {
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Clear RecentProject log.");
 	projectLogWrite->clear();
 
-	FluidumScene_Log_RequestAddScene("Utils::Message");
+	FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 	Scene::addScene<Utils::Message>(text.recent_message, ImGui::GetItemRectMin());
 }
 
-void FS::Bar::NewProject::recent_erase() {
-	GLog.add<FD::Log::Type::None>("Erase RecentProject log. Log index:{}.", recentPopupInfo.index);
+void FS::Project::File::New::recent_erase() {
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Remove RecentProject log. Log index:{}.", recentPopupInfo.index);
 	projectLogWrite->erase(recentPopupInfo.index);
 
-	FluidumScene_Log_RequestAddScene("Utils::Message");
+	FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 	Scene::addScene<Utils::Message>(text.recent_message, ImGui::GetItemRectMin());
 }
 

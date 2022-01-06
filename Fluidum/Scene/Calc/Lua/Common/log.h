@@ -2,8 +2,9 @@
 
 #include "../../../Common/common.h"
 
-namespace FS::Lua {
-	enum class LogType : uint16_t {
+namespace FS::Calc::Lua::Internal {
+
+	enum class LogType : UIF16 {
 		Initialize,
 		NumOfArgs_Min,
 		NumOfArgs_Max,
@@ -21,6 +22,6 @@ namespace FS::Lua {
 
 	};
 
-	using Message = FU::File::Text<::FS::Resource::LuaMessagePath,LogType>;
+	using Message = FU::File::Text<::FS::Resource::LuaMessagePath, LogType>;
 
 }

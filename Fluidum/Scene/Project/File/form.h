@@ -61,7 +61,7 @@ namespace FS::Project::File {
 		}style;
 
 		struct {
-			ImVec2 projectFolder{};
+			ImVec2 projectDirectory{};
 			ImVec2 projectName{};
 			ImVec2 create{};
 		}pos;
@@ -75,7 +75,7 @@ namespace FS::Project::File {
 
 	private:
 		void createDirectory();
-		[[nodiscrad]] bool createProject();
+		[[nodiscard]] bool createProject();
 
 	};
 

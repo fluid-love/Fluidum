@@ -67,5 +67,7 @@ namespace FS {
 
 	private:
 		void changeFontSize();
+
 	};
+
 }

@@ -186,9 +186,11 @@ bool FD::Coding::TabRead::isAllTextSaved() const noexcept {
 	}
 	catch (const std::exception& e) {
 		FluidumData_Log_Internal_StdExceptionError(e);
+		std::terminate();
 	}
 	catch (...) {
 		FluidumData_Log_Internal_InternalError();
+		std::terminate();
 	}
 }
 

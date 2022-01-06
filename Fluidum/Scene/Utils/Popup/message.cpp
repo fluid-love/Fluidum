@@ -10,11 +10,11 @@ FS::Utils::Message::Message(
 	bgColor(bgColor),
 	size({ ImGui::CalcTextSize(message).x * 1.12f, 0.0f})
 {
-	FluidumScene_Log_Constructor("Utils::Message");
+	FluidumScene_Log_Constructor(::FS::Utils::Message);
 }
 
 FS::Utils::Message::~Message() noexcept {
-	FluidumScene_Log_Destructor_("Utils::Message");
+	FluidumScene_Log_Destructor(::FS::Utils::Message);
 }
 
 void FS::Utils::Message::call() {

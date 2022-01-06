@@ -32,7 +32,7 @@ namespace FD::Style {
 	public://popup window
 		[[nodiscard]] float popupWindowBorderSize() const noexcept;
 
-		[[nodiscrad]] static consteval ImGuiWindowFlags PopupWindowFlags() {
+		[[nodiscard]] static consteval ImGuiWindowFlags PopupWindowFlags() {
 			return
 				ImGuiWindowFlags_NoResize |
 				ImGuiWindowFlags_NoMove |

@@ -116,7 +116,7 @@ void FS::TopBar::calc() {
 	this->mode();
 	ImGui::SameLine();
 
-	bool isRunning = sceneRead->exist<Lua::Calc>();
+	bool isRunning = sceneRead->exist<Calc::Lua::Run>();
 
 	//前のステップまで戻る
 	//一時停止中以外は選択不可
@@ -187,7 +187,7 @@ void FS::TopBar::mode() {
 
 void FS::TopBar::run() {
 	//test
-	Scene::addAsyncScene<Lua::Calc>();
+	Scene::addAsyncScene<Calc::Lua::Run>();
 
 	return;
 	if (!fluidumFilesRead->isMainCodeFileExist()) {

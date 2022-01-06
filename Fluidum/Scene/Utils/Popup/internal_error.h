@@ -15,6 +15,7 @@ namespace FS::Utils {
 
 	public:
 		virtual void call() override;
+
 	};
 
 }

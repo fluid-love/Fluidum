@@ -16,13 +16,10 @@ namespace FS::Coding {
 	public:
 		virtual void call() override;
 
-	private://data
-
-
 	private:
 
-	
-	private:
+
 
 	};
+
 }

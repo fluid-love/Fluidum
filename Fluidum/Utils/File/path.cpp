@@ -52,7 +52,8 @@ std::string FU::File::fileName(const std::string& path) {
 }
 
 std::string FU::File::consistentDirectory(const std::string& dir) {
-	std::string result = std::filesystem::path(dir).lexically_normal().generic_string();
+	std::filesystem::path path(dir);
+	std::string result = path.lexically_normal().generic_string();
 #ifdef BOOST_OS_WINDOWS
 	auto itr = result.begin();
 	while (true) {
@@ -146,4 +147,18 @@ FU::Size FU::File::maxPathSize() noexcept {
 #else
 #error NotSupported
 #endif
+}
+
+std::string FU::File::absolute(const std::string& path) {
+	std::filesystem::path p(path);
+	if (p.is_absolute())
+		return path;
+
+	const auto abso = std::filesystem::absolute(path);
+	return abso.string();
+}
+
+bool FU::File::isAbsolute(const std::string& path) {
+	const std::filesystem::path p(path);
+	return p.is_absolute();
 }

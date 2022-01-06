@@ -822,6 +822,9 @@ FD::Text::Internal::ProjectForm::ProjectForm() {
 	this->error_maxSize = data;
 
 	std::getline(ifs, data);
+	this->error_absolute = data;
+
+	std::getline(ifs, data);
 	this->error_notFoundDirectory = data;
 
 	std::getline(ifs, data);

@@ -55,3 +55,6 @@
 
 #define FluidumScene_Log_StdExceptionError(err) \
 	GLog.add<FU::Log::Type::Error>(__FILE__, __LINE__, "std::exception was thrown({}).", err.what())
+
+#define FluidumScene_Log_StdExceptionWarning(err) \
+	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "std::exception was thrown({}).", err.what())

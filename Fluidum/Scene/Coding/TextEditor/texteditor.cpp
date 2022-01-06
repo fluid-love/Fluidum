@@ -24,7 +24,7 @@ FS::TextEditor::TextEditor(
 	projectRead(projectRead),
 	toolBarWrite(toolBarWrite)
 {
-	FluidumScene_Log_Constructor("TextEditor");
+	FluidumScene_Log_Constructor(::FS::TextEditor);
 
 	this->setInfo();
 
@@ -36,25 +36,11 @@ FS::TextEditor::TextEditor(
 }
 
 FS::TextEditor::~TextEditor() noexcept {
-	try {
-		lua_close(luaState);
+	lua_close(luaState);
 
-		toolBarWrite->remove<TextEditor>();
+	toolBarWrite->remove<TextEditor>();
 
-		FluidumScene_Log_Destructor("TextEditor");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::TextEditor);
 }
 
 void FS::TextEditor::call() {
@@ -256,24 +242,25 @@ void FS::TextEditor::textEditorInfo() {
 }
 
 void FS::TextEditor::saveText() {
-	GLog.add<FD::Log::Type::None>("Save text({}).", current->path);
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save text({}).", current->path);
 	tabWrite->saveText(current->path);
 }
 
 void FS::TextEditor::saveAs() {
 	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
-	GLog.add<FD::Log::Type::None>("Save dialog.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save dialog.");
 	const nfdresult_t result = NFD_SaveDialog(nullptr, nullptr, outPath.get());
 	if (result == NFD_OKAY) {
-		GLog.add<FD::Log::Type::None>("Save file {}.", *outPath.get());
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save file {}.", *outPath.get());
 	}
 	else if (result == NFD_CANCEL) {
-		GLog.add<FD::Log::Type::None>("Cancel save dialog.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Cancel save dialog.");
 		return;
 	}
 	else {//NFD_ERROR
-		GLog.add<FD::Log::Type::Error>("Error file dialog.");
-		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+		GLog.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Error file dialog.");
+		FluidumScene_Log_InternalWarning();
+		return;
 	}
 }
 

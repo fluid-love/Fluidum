@@ -1,15 +1,15 @@
 ﻿#include "new.h"
 #include "check_path.h"
 #include <imgui_internal.h>
-#include "../../Coding/TextEditor/texteditor.h"
+#include "../Coding/TextEditor/texteditor.h"
 #include "select.h"
-#include "../../Utils/Popup/message.h"
-#include "../../Utils/Popup/backwindow.h"
+#include "../Utils/Popup/message.h"
+#include "../Utils/Popup/backwindow.h"
 #include <nfd.h>
 
 using namespace FU::ImGui::Operators;
 
-namespace FS::Project::Add::Internal {
+namespace FS::File::Add::Internal {
 	std::vector<FDR::ImGuiImage> makeImages() {
 		constexpr const char* names[] = {
 			"empty.png",
@@ -28,11 +28,11 @@ namespace FS::Project::Add::Internal {
 	}
 }
 
-FS::Project::Add::NewFile::NewFile(
+FS::File::Add::New::New(
 	const FD::ProjectRead* const projectRead,
 	const FD::GuiRead* const guiRead,
 	const FD::Log::FileRead* const fileRead,
-	std::shared_ptr<Add::SharedInfo>& sharedInfo
+	std::shared_ptr<SharedInfo>& sharedInfo
 ) :
 	projectRead(projectRead),
 	sharedInfo(sharedInfo),
@@ -45,7 +45,7 @@ FS::Project::Add::NewFile::NewFile(
 			ButtonInfo{images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCpp_description, ".cpp",FD::Log::File::Type::Empty_Cpp}
 		})
 {
-	FluidumScene_Log_Constructor("Coding::New");
+	FluidumScene_Log_Constructor(::FS::File::Add::New);
 
 	style.windowPos = guiRead->centerPos() - (guiRead->windowSize() / 3.0f);
 	style.windowSize = guiRead->windowSize() - (style.windowPos * 2.0f);
@@ -56,38 +56,25 @@ FS::Project::Add::NewFile::NewFile(
 	str.directoryPath = sharedInfo->path;
 
 	//capacity
-	str.directoryPath.reserve(200);
-	str.fileName.reserve(200);
+	const auto maxSize = FU::File::maxPathSize();
+	str.directoryPath.reserve(maxSize);
+	str.fileName.reserve(maxSize);
 
 
-	FluidumScene_Log_RequestTryAddScene("PopupBackWindow");
-	this->only = Scene::tryAddScene<PopupBackWindow>();
+	FluidumScene_Log_RequestTryAddScene(::FS::Utils::PopupBackWindow);
+	this->only = Scene::tryAddScene<Utils::PopupBackWindow>();
 }
 
-FS::Project::Add::NewFile::~NewFile() {
-	try {
-		if (this->only) {
-			FluidumScene_Log_RequestDeleteScene("PopupBackWindow");
-			Scene::deleteScene<PopupBackWindow>();
-		}
+FS::File::Add::New::~New() {
+	if (this->only) {
+		FluidumScene_Log_RequestDeleteScene(::FS::Utils::PopupBackWindow);
+		Scene::deleteScene<Utils::PopupBackWindow>();
+	}
 
-		FluidumScene_Log_Destructor("Project::Add::NewFile");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::File::Add::New);
 }
 
-void FS::Project::Add::NewFile::call() {
+void FS::File::Add::New::call() {
 
 	ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
@@ -104,12 +91,12 @@ void FS::Project::Add::NewFile::call() {
 
 
 	//animation
-	if (!only)
+	if (!this->only)
 		ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
 
 	ImGui::Begin("Coding::New", nullptr, flag);
 
-	if (only)
+	if (this->only)
 		ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
 
 
@@ -134,7 +121,7 @@ void FS::Project::Add::NewFile::call() {
 	ImGui::PopStyleVar(3);
 }
 
-void FS::Project::Add::NewFile::title() {
+void FS::File::Add::New::title() {
 	ImGui::BeginChild("NPtitle", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.07f));
 	ImGui::SetWindowFontScale(1.7f);
 
@@ -151,11 +138,11 @@ void FS::Project::Add::NewFile::title() {
 	ImGui::EndChild();
 }
 
-void FS::Project::Add::NewFile::search() {
+void FS::File::Add::New::search() {
 
 }
 
-void FS::Project::Add::NewFile::recent() {
+void FS::File::Add::New::recent() {
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
@@ -194,7 +181,7 @@ void FS::Project::Add::NewFile::recent() {
 	ImGui::PopStyleVar(2);
 }
 
-void FS::Project::Add::NewFile::list() {
+void FS::File::Add::New::list() {
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
@@ -221,7 +208,7 @@ void FS::Project::Add::NewFile::list() {
 	ImGui::PopStyleVar(2);
 }
 
-void FS::Project::Add::NewFile::filter() {
+void FS::File::Add::New::filter() {
 	int32_t layoutIndex = 0;
 
 	constexpr const char* icons[] = { ICON_MD_INBOX" ",ICON_FA_DNA"  " };
@@ -250,7 +237,7 @@ void FS::Project::Add::NewFile::filter() {
 	}
 }
 
-void FS::Project::Add::NewFile::buttons() {
+void FS::File::Add::New::buttons() {
 
 	ImGui::BulletText(text.empty);
 	for (auto& x : emptyFiles) {
@@ -268,7 +255,7 @@ void FS::Project::Add::NewFile::buttons() {
 
 }
 
-void FS::Project::Add::NewFile::form() {
+void FS::File::Add::New::form() {
 	if (!select.ptr) {
 		ImGui::Dummy({ 0.0f,ImGui::GetWindowHeight() * 0.16f });
 		return;
@@ -292,7 +279,7 @@ void FS::Project::Add::NewFile::form() {
 	ImAnime::PopStyleVar();
 }
 
-void FS::Project::Add::NewFile::directoryPath() {
+void FS::File::Add::New::directoryPath() {
 	ImGui::BulletText(text.folderPath); ImGui::Spacing(); ImGui::SameLine();
 
 	if (sharedInfo->project)
@@ -306,7 +293,7 @@ void FS::Project::Add::NewFile::directoryPath() {
 		ImGui::PopStyleVar();
 }
 
-void FS::Project::Add::NewFile::fileName() {
+void FS::File::Add::New::fileName() {
 	ImGui::BulletText(text.fileName); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.6f);
 	ImGui::InputText("##FileName", str.fileName.data(), str.fileName.capacity());
@@ -320,7 +307,7 @@ void FS::Project::Add::NewFile::fileName() {
 	ImGui::InputText("##Extension", str.extension.data(), str.extension.capacity());
 }
 
-void FS::Project::Add::NewFile::bottom() {
+void FS::File::Add::New::bottom() {
 
 	const ImVec2 buttonSize = ImVec2(ImGui::GetWindowSize().x * 0.2f, 0.0f);
 
@@ -338,7 +325,7 @@ void FS::Project::Add::NewFile::bottom() {
 	if (ImGui::Button(text.cancel, buttonSize)) {
 		this->deleteThisScene();
 		if (!this->only) {
-			FluidumScene_Log_RequestDeleteScene("Project::Add::Select");
+			FluidumScene_Log_RequestDeleteScene(::FS::File::Add::Select);
 			Scene::deleteScene<Select>();
 		}
 	}
@@ -358,7 +345,7 @@ void FS::Project::Add::NewFile::bottom() {
 	ImGui::PopStyleColor();
 }
 
-void FS::Project::Add::NewFile::tryCreate() {
+void FS::File::Add::New::tryCreate() {
 
 	if (!this->check())
 		return;//failed
@@ -375,19 +362,20 @@ void FS::Project::Add::NewFile::tryCreate() {
 
 	this->deleteThisScene();
 	if (!this->only) {
-		FluidumScene_Log_RequestDeleteScene("Project::Add::Select");
+		FluidumScene_Log_RequestDeleteScene(::FS::File::Add::Select);
 		Scene::deleteScene<Select>();
 	}
 }
 
-bool FS::Project::Add::NewFile::create() {
+bool FS::File::Add::New::create() {
 	using enum FD::Log::File::Type;
 	assert(!str.fullPath.empty());
 
 	std::ofstream ofs(this->str.fullPath, std::ios::out);
 
 	if (!ofs || !std::filesystem::exists(this->str.fullPath)) {
-		GLog.add<FD::Log::Type::None>("Error Failed to create file.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Error Failed to create file.");
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_unexpected, pos.create);
 		return false;
 	}
@@ -402,14 +390,15 @@ bool FS::Project::Add::NewFile::create() {
 	else if (select.ptr->type == Empty_Cpp)
 		ofs << FD::File::Template::EmptyCpp << std::endl;
 	else {
-		FluidumScene_Log_SeriousError_ThrowException();
+		FluidumScene_Log_InternalError();
+		std::terminate();
 	}
 
 
 	return true;
 }
 
-bool FS::Project::Add::NewFile::check() {
+bool FS::File::Add::New::check() {
 	std::string directoryPath = this->str.directoryPath.data();
 	std::string fileName = this->str.fileName.data();
 	std::string extension = this->str.extension.data();
@@ -426,7 +415,7 @@ bool FS::Project::Add::NewFile::check() {
 		.pos_create = pos.create,
 	};
 
-	FluidumScene_Log_CallSceneConstructor("Project::Add::CheckPath");
+	FluidumScene_Log_CallSceneConstructor(::FS::File::Add::CheckPath);
 	Scene::callConstructor<CheckPath>(info);
 
 	if (info.noerror) {
@@ -438,7 +427,7 @@ bool FS::Project::Add::NewFile::check() {
 	return false;
 }
 
-std::pair<bool, bool> FS::Project::Add::NewFile::button(
+std::pair<bool, bool> FS::File::Add::New::button(
 	const ButtonInfo* const info,
 	const std::optional<float> width
 ) {
@@ -490,7 +479,7 @@ std::pair<bool, bool> FS::Project::Add::NewFile::button(
 	return click;
 }
 
-std::vector<FS::Project::Add::NewFile::ButtonInfo> FS::Project::Add::NewFile::initRecentFileTypes(const std::vector<FD::Log::File::Type>& types) {
+std::vector<FS::File::Add::New::ButtonInfo> FS::File::Add::New::initRecentFileTypes(const std::vector<FD::Log::File::Type>& types) {
 	using enum FD::Log::File::Type;
 
 	std::vector<ButtonInfo> result{};
@@ -505,14 +494,13 @@ std::vector<FS::Project::Add::NewFile::ButtonInfo> FS::Project::Add::NewFile::in
 			result.emplace_back(ButtonInfo{ images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCpp_description ,".cpp",FD::Log::File::Type::Empty_Cpp });
 
 		else {
-			FluidumScene_Log_Abort();
-			abort();
+			FluidumScene_Log_InternalWarning();
 		}
 	}
 	return result;
 }
 
-void FS::Project::Add::NewFile::deleteThisScene() {
-	FluidumScene_Log_RequestDeleteScene("Project::Add::NewFile");
-	Scene::deleteScene<NewFile>();
+void FS::File::Add::New::deleteThisScene() {
+	FluidumScene_Log_RequestDeleteScene(::FS::File::Add::New);
+	Scene::deleteScene<New>();
 }

@@ -16,10 +16,8 @@ namespace FS {
 	public:
 		virtual void call() override;
 
-
-
-	
 	private:
 
 	};
+
 }

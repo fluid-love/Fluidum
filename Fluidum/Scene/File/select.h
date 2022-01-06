@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../Common/common.h"
-#include "../../../TextEditor/include.h"
+#include "../Common/common.h"
+#include "../../TextEditor/include.h"
 #include "new.h"
 #include "directory.h"
 
-namespace FS::Project::Add {
+namespace FS::File::Add {
 
 	class Select final : public Scene {
 	public:
@@ -84,7 +84,6 @@ namespace FS::Project::Add {
 			std::string fullPath{};
 		}quickInfo;
 
-
 	private:
 		void title();
 
@@ -122,7 +121,6 @@ namespace FS::Project::Add {
 	private:
 		void setEmptyFile();
 
-
 		bool createNewFileQuick();
 		[[nodiscard]] bool checkQuickInfo();
 
@@ -132,4 +130,5 @@ namespace FS::Project::Add {
 		void close();
 
 	};
+
 }

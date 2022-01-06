@@ -2,14 +2,14 @@
 #include "check_path.h"
 #include "directory.h"
 #include <imgui_internal.h>
-#include "../../Coding/TextEditor/texteditor.h"
-#include "../../Utils/Popup/message.h"
-#include "../../Utils/Popup/backwindow.h"
+#include "../Coding/TextEditor/texteditor.h"
+#include "../Utils/Popup/message.h"
+#include "../Utils/Popup/backwindow.h"
 #include <nfd.h>
 
 using namespace FU::ImGui::Operators;
 
-FS::Project::Add::Select::Select(
+FS::File::Add::Select::Select(
 	const FD::ProjectRead* const projectRead,
 	const FD::GuiRead* const guiRead,
 	const FD::SceneRead* const sceneRead,
@@ -22,7 +22,7 @@ FS::Project::Add::Select::Select(
 	openImage(FDR::createImGuiImage(Resource::ProjectOpenFilePath)),
 	dirImage(FDR::createImGuiImage(Resource::ProjectDirectoryPath))
 {
-	FluidumScene_Log_Constructor("Coding::Select");
+	FluidumScene_Log_Constructor(::FS::File::Add::Select);
 
 	assert(sharedInfo);
 
@@ -42,34 +42,20 @@ FS::Project::Add::Select::Select(
 
 	quickInfo.fileName = "main";
 
-	GLog.add<FD::Log::Type::None>("Request add PopupBackWindowScene.");
-	Scene::addScene<PopupBackWindow>();
+	FluidumScene_Log_RequestAddScene(::FS::Utils::PopupBackWindow);
+	Scene::addScene<Utils::PopupBackWindow>();
 }
 
-FS::Project::Add::Select::~Select() {
-	try {
-		FluidumScene_Log_RequestDeleteScene("PopupBackWindow");
-		Scene::deleteScene<PopupBackWindow>();
+FS::File::Add::Select::~Select() {
+	FluidumScene_Log_RequestDeleteScene(::FS::Utils::PopupBackWindow);
+	Scene::deleteScene<Utils::PopupBackWindow>();
 
-		FluidumScene_Log_Destructor("Coding::Select");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::File::Add::Select);
 }
 
-void FS::Project::Add::Select::call() {
+void FS::File::Add::Select::call() {
 
-	if (!sceneRead->exist_or<NewFile, Directory>())
+	if (!sceneRead->exist_or<New, Directory>())
 		ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);
@@ -106,7 +92,7 @@ void FS::Project::Add::Select::call() {
 
 }
 
-void FS::Project::Add::Select::title() {
+void FS::File::Add::Select::title() {
 	ImGui::BeginChild("SelectTop", ImVec2(style.windowSize.x, style.windowSize.y * 0.07f));
 
 	ImGui::Text(text.selectPlease);
@@ -115,7 +101,7 @@ void FS::Project::Add::Select::title() {
 	ImGui::EndChild();
 }
 
-void FS::Project::Add::Select::quick() {
+void FS::File::Add::Select::quick() {
 	const ImVec2 windowSize = ImVec2(style.windowSize.x * 0.7f, style.windowSize.y * 0.8f);
 
 	ImGui::BeginChild("Template", ImVec2(style.windowSize.x * 0.6f, style.windowSize.y * 0.85f));
@@ -143,7 +129,7 @@ void FS::Project::Add::Select::quick() {
 	ImGui::EndChild();
 }
 
-void FS::Project::Add::Select::selectTemplate(const ImVec2& size) {
+void FS::File::Add::Select::selectTemplate(const ImVec2& size) {
 	bool isColPushed = false;
 	auto pushCol = [&]() {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.6f, 0.6f, 0.5f));
@@ -199,7 +185,7 @@ void FS::Project::Add::Select::selectTemplate(const ImVec2& size) {
 	ImGui::PopStyleColor();
 }
 
-void FS::Project::Add::Select::right() {
+void FS::File::Add::Select::right() {
 	const ImVec2 windowSize = ImVec2(style.windowSize.x * 0.25f, style.windowSize.y * 0.4f);
 	ImGui::Spacing(); ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
 	ImGui::BeginChild("RightU", windowSize);
@@ -217,7 +203,7 @@ void FS::Project::Add::Select::right() {
 	ImGui::EndChild();
 }
 
-std::pair<bool, bool> FS::Project::Add::Select::button(
+std::pair<bool, bool> FS::File::Add::Select::button(
 	const char* label,
 	const char* description,
 	const FDR::ImGuiImage& image,
@@ -273,7 +259,7 @@ std::pair<bool, bool> FS::Project::Add::Select::button(
 	return ret;
 }
 
-void FS::Project::Add::Select::open(const ImVec2& size) {
+void FS::File::Add::Select::open(const ImVec2& size) {
 	if (style.project)
 		return;
 
@@ -293,20 +279,20 @@ void FS::Project::Add::Select::open(const ImVec2& size) {
 	}
 }
 
-void FS::Project::Add::Select::openDialog() {
+void FS::File::Add::Select::openDialog() {
 	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
-	GLog.add<FD::Log::Type::None>("Open file dialog.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Open file dialog.");
 	const nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, outPath.get());
 	if (result == NFD_OKAY) {
-		GLog.add<FD::Log::Type::None>("Open file({}).", *outPath.get());
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Open file({}).", *outPath.get());
 	}
 	else if (result == NFD_CANCEL) {
-		GLog.add<FD::Log::Type::None>("Cancel file dialog.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Cancel file dialog.");
 		return;
 	}
 	else {//NFD_ERROR
-		GLog.add<FD::Log::Type::Error>("Error file dialog.");
-		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+		GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Error file dialog.");
+		FluidumScene_Log_InternalWarning();
 	}
 
 	//info
@@ -319,7 +305,7 @@ void FS::Project::Add::Select::openDialog() {
 	this->close();
 }
 
-void FS::Project::Add::Select::newFile(const ImVec2& size) {
+void FS::File::Add::Select::newFile(const ImVec2& size) {
 	const auto [hovered, left] = this->button(
 		text.newFile,
 		text.newFileDescription,
@@ -332,12 +318,12 @@ void FS::Project::Add::Select::newFile(const ImVec2& size) {
 
 	if (left && !ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 		this->selectType = Template::None;
-		FluidumScene_Log_RequestAddScene("Project::Add::NewFile");
-		Scene::addScene<NewFile>(this->sharedInfo);
+		FluidumScene_Log_RequestAddScene(::FS::File::Add::New);
+		Scene::addScene<New>(this->sharedInfo);
 	}
 }
 
-void FS::Project::Add::Select::dir(const ImVec2& size) {
+void FS::File::Add::Select::dir(const ImVec2& size) {
 	const auto [hovered, left] = this->button(
 		text.newDirectory,
 		text.newDirectoryDescription,
@@ -351,12 +337,12 @@ void FS::Project::Add::Select::dir(const ImVec2& size) {
 	//double clicked -> [already added]
 	if (left && !ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 		this->selectType = Template::None;
-		FluidumScene_Log_RequestAddScene("Project::Add::Directory");
+		FluidumScene_Log_RequestAddScene(::FS::File::Add::Directory);
 		Scene::addScene<Directory>(this->sharedInfo);
 	}
 }
 
-void FS::Project::Add::Select::bottomRight() {
+void FS::File::Add::Select::bottomRight() {
 	if (selectType == Template::None) {
 		anime.form.reset();
 		return;
@@ -387,7 +373,7 @@ void FS::Project::Add::Select::bottomRight() {
 	ImAnime::PopStyleVar();
 }
 
-void FS::Project::Add::Select::bottom() {
+void FS::File::Add::Select::bottom() {
 
 	const ImVec2 buttonSize = ImVec2(ImGui::GetWindowSize().x * 0.2f, 0.0f);
 
@@ -395,7 +381,7 @@ void FS::Project::Add::Select::bottom() {
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
 	if (ImGui::Button(text.cancel, buttonSize)) {
 		ImGui::CloseCurrentPopup();
-		FluidumScene_Log_RequestDeleteScene("Coding::Select");
+		FluidumScene_Log_RequestDeleteScene(::FS::File::Add::Select);
 		Scene::deleteScene<Select>();
 	}
 	ImGui::PopStyleColor();
@@ -423,7 +409,7 @@ void FS::Project::Add::Select::bottom() {
 	ImGui::PopStyleColor();
 }
 
-void FS::Project::Add::Select::setEmptyFile() {
+void FS::File::Add::Select::setEmptyFile() {
 	using namespace FD::File::Template;
 
 	if (this->selectType == Template::Empty_Lua)
@@ -436,13 +422,13 @@ void FS::Project::Add::Select::setEmptyFile() {
 		abort();
 }
 
-bool FS::Project::Add::Select::createNewFileQuick() {
+bool FS::File::Add::Select::createNewFileQuick() {
 	using namespace FD::File::Template;
 
 	std::ofstream ofs(quickInfo.fullPath, std::ios::out);
 
 	if (!ofs || !std::filesystem::exists(quickInfo.fullPath)) {
-		GLog.add<FD::Log::Type::None>("Error Failed to create file.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Failed to create file.");
 		Scene::addScene<Utils::Message>(text.error_unexpected, pos.create);
 		return false;
 	}
@@ -455,7 +441,8 @@ bool FS::Project::Add::Select::createNewFileQuick() {
 	else if (this->selectType == Template::Empty_Cpp)
 		ofs << EmptyCpp << std::endl;
 	else {
-		FluidumScene_Log_SeriousError_ThrowException();
+		FluidumScene_Log_InternalError();
+		std::terminate();
 	}
 
 	//info
@@ -468,7 +455,7 @@ bool FS::Project::Add::Select::createNewFileQuick() {
 	return true;
 }
 
-bool FS::Project::Add::Select::checkQuickInfo() {
+bool FS::File::Add::Select::checkQuickInfo() {
 
 	std::string directoryPath = this->quickInfo.directoryPath.data();
 	std::string fileName = this->quickInfo.fileName.data();
@@ -484,7 +471,7 @@ bool FS::Project::Add::Select::checkQuickInfo() {
 		.pos_create = pos.create,
 	};
 
-	FluidumScene_Log_CallSceneConstructor("Project::Add::CheckPath");
+	FluidumScene_Log_CallSceneConstructor(::FS::File::Add::CheckPath);
 	Scene::callConstructor<CheckPath>(info);
 
 	if (!info.noerror) {
@@ -496,9 +483,9 @@ bool FS::Project::Add::Select::checkQuickInfo() {
 	return false;
 }
 
-void FS::Project::Add::Select::close() {
-	FluidumScene_Log_RequestDeleteScene("Coding::Select");
+void FS::File::Add::Select::close() {
+	FluidumScene_Log_RequestDeleteScene(::FS::File::Add::Select);
 	Scene::deleteScene<Select>();
-	FluidumScene_Log_RequestAddScene("TextEditor");
+	FluidumScene_Log_RequestAddScene(::FS::TextEditor);
 	Scene::addScene<TextEditor>();
 }

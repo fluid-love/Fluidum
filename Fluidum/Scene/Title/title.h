@@ -79,7 +79,7 @@ namespace FS {
 
 	private:
 		//no-throw
-		[[nodiscrad]] std::array<FD::ProjectRead::HistoryInfo, 50> getProjectHistory() noexcept;
+		[[nodiscard]] std::array<FD::ProjectRead::HistoryInfo, 50> getProjectHistory() noexcept;
 
 	private:
 		//The constructor hasn't finished initializing FluidumDraw yet. Therefore, call it only once in the loop.
@@ -104,7 +104,7 @@ namespace FS {
 
 	private:
 		void documentLink();
-		[[nodiscrad]] bool checkIsShellAvailable() const;
+		[[nodiscard]] bool checkIsShellAvailable() const;
 
 	};
 

@@ -179,17 +179,17 @@ namespace FD {
 			Unexpected
 		*/
 		//strong
-		[[nodiscrad]] std::array<HistoryInfo, 50> loadProjectHistory() const;
-		[[nodiscrad]] std::vector<FU::Class::ClassCode::CodeType> loadSceneFile() const;
+		[[nodiscard]] std::array<HistoryInfo, 50> loadProjectHistory() const;
+		[[nodiscard]] std::vector<FU::Class::ClassCode::CodeType> loadSceneFile() const;
 
 	public:
-		[[nodiscrad]] std::string projectDirectoryPath() const;
-		[[nodiscrad]] std::string backupDirectoryPath() const;
-		[[nodiscrad]] std::string srcDirectoryPath() const;
-		[[nodiscrad]] std::string projectName() const;
+		[[nodiscard]] std::string projectDirectoryPath() const;
+		[[nodiscard]] std::string backupDirectoryPath() const;
+		[[nodiscard]] std::string srcDirectoryPath() const;
+		[[nodiscard]] std::string projectName() const;
 
 	public:
-		[[nodiscrad]] bool isDefaultProject() const;
+		[[nodiscard]] bool isDefaultProject() const;
 
 	};
 

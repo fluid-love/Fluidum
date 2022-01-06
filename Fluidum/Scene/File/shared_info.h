@@ -1,22 +1,23 @@
 #pragma once
 
-#include "../../Common/common.h"
+#include "../Common/common.h"
 
-namespace FS::Project::Add {
+namespace FS::File::Add {
 
 	struct SharedInfo final {
 		std::string path{};
 
-		bool project = true;//project or user
-		bool create = false;//true -> create, false -> cancel 
+		bool project = true; //project or user
+		bool create = false; //true -> create, false -> cancel 
 
 	public:
-		enum class Type : uint8_t {
+		enum class Type : UIF8 {
 			File,
 			Directory,
 			Open
 		};
 		Type type{};
+
 	};
 
 }

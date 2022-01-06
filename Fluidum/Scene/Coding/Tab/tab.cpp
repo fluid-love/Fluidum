@@ -22,7 +22,7 @@ FS::Coding::Tab::Tab(
 	displayRead(displayRead),
 	projectRead(projectRead)
 {
-	FluidumScene_Log_Constructor("Coding::Tab");
+	FluidumScene_Log_Constructor(::FS::Coding::Tab);
 
 	style.topBarSize = { 0.0f,ImGui::CalcTextSize(ICON_MD_FOLDER_OPEN).y * 1.7f };
 
@@ -30,7 +30,7 @@ FS::Coding::Tab::Tab(
 }
 
 FS::Coding::Tab::~Tab() noexcept {
-	FluidumScene_Log_Destructor_("Coding::Tab");
+	FluidumScene_Log_Destructor(::FS::Coding::Tab);
 }
 
 void FS::Coding::Tab::call() {
@@ -60,7 +60,7 @@ void FS::Coding::Tab::checkWindowShouldClose() {
 	if (this->windowCloseFlag)
 		return;
 
-	FluidumScene_Log_RequestDeleteScene("Coding::Tab");
+	FluidumScene_Log_RequestDeleteScene(::FS::Coding::Tab);
 	Scene::deleteScene<Tab>();
 }
 
@@ -189,10 +189,10 @@ void FS::Coding::Tab::display() {
 	if (frontFisplayPath == path)
 		return;
 
-	GLog.add<FD::Log::Type::None>("Erase display file {}.", path);
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Remove display file({}).", path);
 	displayWrite->remove(frontFisplayPath);
 
-	GLog.add<FD::Log::Type::None>("Add display file {}.", frontFisplayPath);
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Add display file({}).", frontFisplayPath);
 	displayWrite->add(path);
 }
 
@@ -229,8 +229,7 @@ void FS::Coding::Tab::close() {
 		return;
 	}
 
-	GLog.add<FD::Log::Type::None>("Popup MessageBox.");
-	int32_t button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
+	const auto button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
 	if (button == 0) {//save close
 		tabWrite->saveText(current.path);
 		tabWrite->remove(current.path);
@@ -241,8 +240,8 @@ void FS::Coding::Tab::close() {
 	else if (button == 2)//cancel
 		return;
 	else {//unexpected
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-		abort();
+		FluidumScene_Log_InternalWarning();
+		return;
 	}
 
 	tabWrite->save();

@@ -128,4 +128,8 @@ namespace FU::File {
 	//Windows MAX_PATH(260) return 259 (260 - 1null)
 	[[nodiscard]] Size maxPathSize() noexcept;
 
+	[[nodiscard]] std::string absolute(const std::string& path);
+
+	[[nodiscard]] bool isAbsolute(const std::string& path);
+
 }

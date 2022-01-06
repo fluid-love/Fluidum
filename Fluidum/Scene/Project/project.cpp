@@ -3,7 +3,7 @@
 #include "../Coding/Tab/tab.h"
 #include "../Coding/TextEditor/texteditor.h"
 #include <imgui_internal.h>
-#include "Add/select.h"
+#include "../File/select.h"
 
 FS::Project::Explorer::Explorer(
 	const FD::Style::ColorRead* const colorRead,
@@ -40,12 +40,12 @@ FS::Project::Explorer::Explorer(
 	displayRead(displayRead),
 	toolBarWrite(toolBarWrite)
 {
-	FluidumScene_Log_Constructor("Project::Explorer");
+	FluidumScene_Log_Constructor(::FS::Project::Explorer);
 
 	style.topBarHeight = ImGui::CalcTextSize(ICON_MD_FOLDER_OPEN).x + 2.0f;
 
 	//sync
-	projectFilesWrite->sync(projectRead->getProjectFolderPath());
+	projectFilesWrite->sync(projectRead->projectDirectoryPath());
 	userFilesWrite->sync();
 
 	changeName.name.reserve(100);
@@ -56,22 +56,8 @@ FS::Project::Explorer::Explorer(
 }
 
 FS::Project::Explorer::~Explorer() noexcept {
-	try {
-		toolBarWrite->remove<Explorer>();
-		FluidumScene_Log_Destructor("Project::Explorer");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	toolBarWrite->remove<Explorer>();
+	FluidumScene_Log_Destructor(::FS::Project::Explorer);
 }
 
 void FS::Project::Explorer::call() {
@@ -104,7 +90,7 @@ void FS::Project::Explorer::closeWindow() {
 	if (this->windowFlag)
 		return;
 
-	FluidumScene_Log_RequestDeleteScene("Project::Explorer");
+	FluidumScene_Log_RequestDeleteScene(::FS::Project::Explorer);
 	Scene::deleteScene<Explorer>();
 }
 
@@ -545,7 +531,7 @@ void FS::Project::Explorer::addDirectory() {
 
 	if (popupTop) {
 		if (project)
-			parent = projectRead->getProjectFolderPath();
+			parent = projectRead->projectDirectoryPath();
 		else
 			parent = userFilesRead->rootDirectory();
 	}
@@ -615,16 +601,16 @@ void FS::Project::Explorer::addFile() {
 	const bool project = (select.tab == TabType::Project);
 	const bool popupTop = (popup.type == PopupType::Top);
 
-	Add::SharedInfo info{};
+	File::Add::SharedInfo info{};
 
 	if (project) {
-		info.path = popupTop ? projectRead->getProjectFolderPath() : select.current()->path;
+		info.path = popupTop ? projectRead->projectDirectoryPath() : select.current()->path;
 	}
 	info.project = project;
 
-	add.info = std::make_shared<Add::SharedInfo>(std::move(info));
-	FluidumScene_Log_RequestAddScene("Project::NewFile");
-	Scene::addScene<Add::NewFile>(add.info);
+	add.info = std::make_shared<File::Add::SharedInfo>(std::move(info));
+	FluidumScene_Log_RequestAddScene(::FS::File::Add::New);
+	Scene::addScene<File::Add::New>(add.info);
 
 	add.popup = true;
 }
@@ -635,19 +621,19 @@ void FS::Project::Explorer::addSelect() {
 	const bool project = (select.tab == TabType::Project);
 	const bool popupTop = (popup.type == PopupType::Top);
 
-	Add::SharedInfo info{};
+	File::Add::SharedInfo info{};
 
 	if (project) {
-		info.path = popupTop ? projectRead->getProjectFolderPath() : select.current()->path;
+		info.path = popupTop ? projectRead->projectDirectoryPath() : select.current()->path;
 	}
 	else {
-		info.path = projectRead->getSrcFolderPath();
+		info.path = projectRead->srcDirectoryPath();
 	}
 	info.project = project;
 
-	add.info = std::make_shared<Add::SharedInfo>(std::move(info));
-	FluidumScene_Log_RequestAddScene("Project::NewFile");
-	Scene::addScene<Add::Select>(add.info);
+	add.info = std::make_shared<File::Add::SharedInfo>(std::move(info));
+	FluidumScene_Log_RequestAddScene(::FS::File::Add::New);
+	Scene::addScene<File::Add::Select>(add.info);
 
 	add.popup = true;
 }
@@ -664,7 +650,7 @@ void FS::Project::Explorer::addFileQuick() {
 	const bool popupTop = (popup.type == PopupType::Top);
 
 	if (popupTop) {
-		parent = projectRead->getProjectFolderPath();
+		parent = projectRead->projectDirectoryPath();
 	}
 	else {
 		parent = select.current()->path;
@@ -730,7 +716,7 @@ void FS::Project::Explorer::catchAdd() {
 		select.current()->open = true;
 
 	//add file
-	if (add.info->type == Add::SharedInfo::Type::File) {
+	if (add.info->type == File::Add::SharedInfo::Type::File) {
 		if (FD::Project::File::isFileFormatSupported(add.info->path)) {
 			FD::Project::FileList::SupportedInfo info{};
 			if (project)
@@ -748,7 +734,7 @@ void FS::Project::Explorer::catchAdd() {
 	}
 
 	//add directory
-	else if (add.info->type == Add::SharedInfo::Type::Directory) {
+	else if (add.info->type == File::Add::SharedInfo::Type::Directory) {
 		FD::Project::FileList::DirectoryInfo info{};
 		if (project)
 			select.projectFiles = projectFilesWrite->add(parent, add.info->path, info);
@@ -757,7 +743,7 @@ void FS::Project::Explorer::catchAdd() {
 	}
 
 	//open file
-	else if (add.info->type == Add::SharedInfo::Type::Open) {
+	else if (add.info->type == File::Add::SharedInfo::Type::Open) {
 		assert(!project);
 		if (FD::Project::File::isFileFormatSupported(add.info->path)) {
 			FD::Project::FileList::SupportedInfo info{};
@@ -770,7 +756,7 @@ void FS::Project::Explorer::catchAdd() {
 	}
 
 	else {
-		FluidumScene_Log_SeriousError_ThrowException();
+		FluidumScene_Log_InternalWarning();
 	}
 
 	//save
@@ -973,7 +959,7 @@ void FS::Project::Explorer::displayCode() {
 
 	//too huge
 	if (fileSize >= FD::Coding::Limits::FileSizeMax) {
-		FluidumScene_Log_RequestAddScene("Utils::Message");
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_tabFileSize, pos.selectedTree);
 		return;
 	}
@@ -998,12 +984,12 @@ void FS::Project::Explorer::displayCode() {
 
 	if (!sceneRead->exist<TextEditor>()) {
 		displayWrite->add(path);
-		FluidumScene_Log_RequestAddScene("TextEditor");
+		FluidumScene_Log_RequestAddScene(::FS::TextEditor);
 		Scene::addScene<TextEditor>();
 	}
 
 	if (!sceneRead->exist<Coding::Tab>()) {
-		FluidumScene_Log_RequestAddScene("Coding::Tab");
+		FluidumScene_Log_RequestAddScene(::FS::Coding::Tab);
 		Scene::addScene<Coding::Tab>();
 	}
 }
@@ -1376,16 +1362,16 @@ void FS::Project::Explorer::syncProjectFiles() {
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
 	if (select.tab == TabType::Project)
-		projectFilesWrite->sync(projectRead->getProjectFolderPath());
+		projectFilesWrite->sync(projectRead->projectDirectoryPath());
 	else if (select.tab == TabType::User)
 		userFilesWrite->sync();
 	else {
-		FluidumScene_Log_Abort();
-		abort();
+		FluidumScene_Log_InternalWarning();
+
 	}
 }
 
-int32_t FS::Project::Explorer::popupSpacing() {
+FS::I32 FS::Project::Explorer::popupSpacing() {
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x,ImGui::GetStyle().ItemSpacing.y * 2.2f });
 	return 1;
 }

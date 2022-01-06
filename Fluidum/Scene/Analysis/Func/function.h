@@ -8,7 +8,6 @@ namespace FS::Analysis {
 	public:
 		template<FD::Calc::Language Lang>
 		explicit Function(const FD::FunctionRead<Lang>* const functionRead) {
-			GLog.add<FD::Log::Type::None>("Construct Analysis::FunctionScene.");
 
 			this->functionRead<Lang> = functionRead;
 		}

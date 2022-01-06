@@ -379,9 +379,6 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.h">
       <Filter>Fluidum\Scene\Calc\Lua</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Check\check.h">
-      <Filter>Fluidum\Scene\Calc\Lua\Check</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Bar\Left\leftbar.h">
       <Filter>Fluidum\Scene\Bar\Left</Filter>
     </ClInclude>
@@ -406,9 +403,6 @@
     <ClInclude Include="..\..\..\Fluidum\TextEditor\Source\texteditor.h">
       <Filter>Fluidum\TextEditor\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Log\log.h">
-      <Filter>Fluidum\Scene\Calc\Lua\Log</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\message.h">
       <Filter>Fluidum\Scene\Utils\Popup</Filter>
     </ClInclude>
@@ -432,9 +426,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Analysis\Plot\plot.h">
       <Filter>Fluidum\Scene\Analysis\Plot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\type.h">
-      <Filter>Fluidum\Scene\Calc\Lua</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.h">
       <Filter>Fluidum\Data\Calc\Plot\ImPlot</Filter>
@@ -538,9 +529,6 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Array\type.h">
       <Filter>Fluidum\Data\Calc\Array</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Commoon\array.h">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Utils\File\file.h">
       <Filter>Fluidum\Utils\File</Filter>
     </ClInclude>
@@ -583,9 +571,6 @@
     <ClInclude Include="..\..\..\Fluidum\Utils\Exception\exception.h">
       <Filter>Fluidum\Utils\Exception</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Manager\Data\log.h">
-      <Filter>Fluidum\Manager\Data</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\gui.h">
       <Filter>Fluidum\Data\Gui</Filter>
     </ClInclude>
@@ -624,6 +609,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Data\Common\log.h">
       <Filter>Fluidum\Data\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Common\check.h">
+      <Filter>Fluidum\Scene\Calc\Lua\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Common\exception.h">
+      <Filter>Fluidum\Scene\Calc\Lua\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Common\messenger.h">
+      <Filter>Fluidum\Scene\Calc\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Common\log.h">
+      <Filter>Fluidum\Scene\Calc\Lua\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Common\type.h">
+      <Filter>Fluidum\Scene\Calc\Lua\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Common\array.h">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -816,9 +819,6 @@
     <Filter Include="Fluidum\Scene\Calc\Lua">
       <UniqueIdentifier>{eb2b3f93-5fa6-40d4-bdaa-7a400c1fb10b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\Scene\Calc\Lua\Check">
-      <UniqueIdentifier>{d246ac7e-a929-4c3f-a9ac-95b663ad233a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\Scene\Calc\Lua\Functions">
       <UniqueIdentifier>{e122e0e9-3d68-4217-989f-77d306a30981}</UniqueIdentifier>
     </Filter>
@@ -848,9 +848,6 @@
     </Filter>
     <Filter Include="Fluidum\TextEditor\Source">
       <UniqueIdentifier>{4e9e34dc-8ba8-4a86-a6eb-b2148d99f7e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fluidum\Scene\Calc\Lua\Log">
-      <UniqueIdentifier>{aff7fc4b-99bf-4fe0-8a2b-53f2a9ad59b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{08178a90-3343-484d-b450-cb21a61f5355}</UniqueIdentifier>
@@ -1031,6 +1028,12 @@
     </Filter>
     <Filter Include="Fluidum\Scene\File">
       <UniqueIdentifier>{2452798b-85ea-489c-ae7e-496bb5c78486}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Calc\Lua\Common">
+      <UniqueIdentifier>{d246ac7e-a929-4c3f-a9ac-95b663ad233a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Calc\Common">
+      <UniqueIdentifier>{9c7b2c26-5bf0-4e96-a87b-b89bda8cae43}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1322,27 +1325,6 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Layout\layout.cpp">
       <Filter>Fluidum\Scene\Layout</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.make.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\plot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.make_plot.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\plot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.marker.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\plot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.plot.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\plot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.push_back.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\plot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.display.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\plot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Plot\plot.hide.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\plot</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\External\imgui\imgui.cpp">
       <Filter>External\ImGui</Filter>
     </ClCompile>
@@ -1376,68 +1358,17 @@
     <ClCompile Include="..\..\..\External\imgui\misc\freetype\imgui_freetype.cpp">
       <Filter>External\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.make.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Array\array.cpp">
       <Filter>Fluidum\Data\Calc\Array</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.front.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.back.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_back.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__index.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__newindex.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.clear.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.erase.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_back.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_front.cpp">
       <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__gc.cpp">
       <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.size.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.empty.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.set.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_front.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Utils\File\file.cpp">
       <Filter>Fluidum\Utils\File</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.sleep_seconds.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.terminate.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.print.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.sleep_milliseconds.cpp">
-      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\files.cpp">
       <Filter>Fluidum\Data\Project\Files</Filter>

@@ -41,7 +41,7 @@ namespace FS::Project::File {
 		FD::Text::NewProject text{};
 
 	private:
-		std::shared_ptr<ProjectForm::Info> formInfo{};
+		std::shared_ptr<Form::SharedInfo> formInfo{};
 		void checkForm();
 
 	private:
@@ -123,6 +123,8 @@ namespace FS::Project::File {
 		void recent_erase();
 
 	private:
-		std::vector<ButtonInfo> initRecentTempates(const std::vector<FD::Log::Project::Type>& types);
+		[[nodiscard]] std::vector<ButtonInfo> initRecentTempates(const std::vector<FD::Log::Project::Type>& types);
+
 	};
+
 }

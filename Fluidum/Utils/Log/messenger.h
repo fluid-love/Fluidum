@@ -52,7 +52,7 @@ namespace FU::Log {
 				this->callback(result);
 
 				//no-throw
-				this->message = std::move(result);
+				this->message = std::move(msg);
 			}
 			catch (const std::exception&) {//error
 				try {

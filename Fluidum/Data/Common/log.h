@@ -5,7 +5,7 @@
 //Log
 namespace FD::Internal {
 
-	FU::Log::Messenger GMessenger{};
+	inline FU::Log::Messenger GMessenger{};
 
 }
 

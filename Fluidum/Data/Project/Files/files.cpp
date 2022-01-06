@@ -124,7 +124,7 @@ void FD::ProjectFilesWrite_Lock::sync(const std::string& top) {
 		const std::string path = entry.path().string();
 
 		if (entry.is_directory()) {
-			if (name == Project::Internal::Name::FluidumHiddenFolder)
+			if (name == Project::Internal::Name::FluidumHiddenDirectory)
 				continue;
 			Project::FileList::DirectoryInfo dir{};
 			Info* elm = ProjectFilesData::projectFiles.add({}, path, dir);

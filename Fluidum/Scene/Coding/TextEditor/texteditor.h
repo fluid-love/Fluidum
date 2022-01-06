@@ -51,7 +51,6 @@ namespace FS {
 
 		FD::Text::TextEditor text{};
 
-
 	private://data
 
 		struct Size final {
@@ -102,4 +101,5 @@ namespace FS {
 		lua_State* luaState = nullptr;
 
 	};
+
 }

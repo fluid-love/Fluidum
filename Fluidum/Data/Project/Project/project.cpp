@@ -47,31 +47,31 @@ void FD::ProjectWrite::save_thread() {
 		if (Scene::Internal::Data::save) {
 			Scene::Internal::Data::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
-			std::lock_guard<std::mutex> lock(::FD::Scene::Internal::Data::mtx);
+			std::lock_guard<std::mutex> lockScene(::FD::Scene::Internal::Data::mtx);
 			this->save_scene();
 		}
 		if (Project::Internal::FluidumFilesData::save) {
 			Project::Internal::FluidumFilesData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
-			std::lock_guard<std::mutex> lock(Project::Internal::FluidumFilesData::mtx);
+			std::lock_guard<std::mutex> lockFiles(Project::Internal::FluidumFilesData::mtx);
 			this->save_fluidumFiles();
 		}
 		if (Project::Internal::ProjectFilesData::save) {
 			Project::Internal::ProjectFilesData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
-			std::lock_guard<std::mutex> lock(Project::Internal::ProjectFilesData::mtx);
+			std::lock_guard<std::mutex> lockFiles(Project::Internal::ProjectFilesData::mtx);
 			this->save_projectFiles();
 		}
 		if (Project::Internal::UserFilesData::save) {
 			Project::Internal::UserFilesData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
-			std::lock_guard<std::mutex> lock(Project::Internal::UserFilesData::mtx);
+			std::lock_guard<std::mutex> lockFiles(Project::Internal::UserFilesData::mtx);
 			this->save_userFiles();
 		}
 		if (Layout::Internal::LayoutData::save) {
 			Layout::Internal::LayoutData::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
-			std::lock_guard<std::mutex> lock(Layout::Internal::LayoutData::mtx);
+			std::lock_guard<std::mutex> lockLayout(Layout::Internal::LayoutData::mtx);
 			this->save_layout();
 		}
 	}
@@ -152,9 +152,11 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 	static_assert(FU::Concept::IsNothrowMoveConstructibleAssignable<Data>);
 
 	try {
-		GCurrentData.reset();
-
+		GCurrentData.reset();		
 		GCurrentData.projectDirectoryPath = FU::File::consistentDirectory(info.projectDirectoryPath);
+
+		assert(FU::File::isAbsolute(GCurrentData.projectDirectoryPath));
+
 		GCurrentData.projectName = info.projectName;
 
 		//check
@@ -241,12 +243,12 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 	//layout
 	std::vector<Layout::Internal::History> temp_layout_history{};
 
-	std::lock_guard<std::mutex> lock(FluidumFilesData::mtx);
-	std::lock_guard<std::mutex> lock(ProjectFilesData::mtx);
-	std::lock_guard<std::mutex> lock(UserFilesData::mtx);
-	std::lock_guard<std::mutex> lock(Layout::Internal::LayoutData::mtx);
-	std::lock_guard<std::mutex> lock(Coding::Internal::Data::mtx);
-	std::lock_guard<std::mutex> lock(Scene::Internal::Data::mtx);
+	std::lock_guard<std::mutex> lock1(FluidumFilesData::mtx);
+	std::lock_guard<std::mutex> lock2(ProjectFilesData::mtx);
+	std::lock_guard<std::mutex> lock3(UserFilesData::mtx);
+	std::lock_guard<std::mutex> lock4(Layout::Internal::LayoutData::mtx);
+	std::lock_guard<std::mutex> lock5(Coding::Internal::Data::mtx);
+	std::lock_guard<std::mutex> lock6(Scene::Internal::Data::mtx);
 
 	try {//copy
 		temp = GCurrentData;
@@ -773,7 +775,7 @@ void FD::ProjectWrite::checkIsProjectFileExist() const {
 }
 
 namespace FD::Project::Internal {
-	[[nodiscrad]] std::string getYMDH() {
+	[[nodiscard]] std::string getYMDH() {
 		auto time1 = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now()).get_local_time();
 		auto time2 = std::chrono::floor<std::chrono::days>(time1);
 		std::chrono::year_month_day ymd(time2);

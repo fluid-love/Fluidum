@@ -1,9 +1,9 @@
 ﻿#include "directory.h"
-#include "../../Utils/Popup/message.h"
+#include "../Utils/Popup/message.h"
 #include "select.h"
 #include "check_path.h"
 
-FS::Project::Add::Directory::Directory(
+FS::File::Add::Directory::Directory(
 	const FD::GuiRead* const guiRead,
 	const FD::SceneRead* const sceneRead,
 	const FD::UserFilesRead* const userFilesRead,
@@ -13,7 +13,7 @@ FS::Project::Add::Directory::Directory(
 	sharedInfo(sharedInfo),
 	userFilesRead(userFilesRead)
 {
-	FluidumScene_Log_Constructor("Project::Add::Directory");
+	FluidumScene_Log_Constructor(::FS::File::Add::Directory);
 
 	assert(sharedInfo);
 
@@ -27,11 +27,11 @@ FS::Project::Add::Directory::Directory(
 	str.name.reserve(100);
 }
 
-FS::Project::Add::Directory::~Directory() {
-	FluidumScene_Log_Destructor_("Project::Add::Directory");
+FS::File::Add::Directory::~Directory() {
+	FluidumScene_Log_Destructor(::FS::File::Add::Directory);
 }
 
-void FS::Project::Add::Directory::call() {
+void FS::File::Add::Directory::call() {
 
 	ImGui::SetNextWindowFocus();
 	ImGui::SetNextWindowPos(style.windowPos);
@@ -77,7 +77,7 @@ void FS::Project::Add::Directory::call() {
 
 }
 
-void FS::Project::Add::Directory::title() {
+void FS::File::Add::Directory::title() {
 	ImGui::BeginChild("DirTitle", ImVec2(style.windowSize.x / 2.0f, style.windowSize.y * 0.07f));
 	ImGui::SetWindowFontScale(1.7f);
 
@@ -86,20 +86,20 @@ void FS::Project::Add::Directory::title() {
 	ImGui::EndChild();
 }
 
-void FS::Project::Add::Directory::parent() {
+void FS::File::Add::Directory::parent() {
 	ImGui::BulletText(text.parent);
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
 	ImGui::InputText("##Parent", str.parent.data(), str.parent.capacity(), ImGuiInputTextFlags_ReadOnly);
 	ImGui::PopStyleVar();
 }
 
-void FS::Project::Add::Directory::name() {
+void FS::File::Add::Directory::name() {
 	ImGui::BulletText(text.name);
 	ImGui::InputText("##DirName", str.name.data(), str.name.capacity());
 	pos.name = ImGui::GetItemRectMin();
 }
 
-void FS::Project::Add::Directory::bottom() {
+void FS::File::Add::Directory::bottom() {
 	ImGui::Dummy({ 0.0f,(style.windowPos.y + style.windowSize.y) - style.innerPosHeight - 50.0f });
 	ImGui::BeginChild("Bottom");
 
@@ -119,7 +119,7 @@ void FS::Project::Add::Directory::bottom() {
 		sharedInfo->create = false;
 		this->deleteThisScene();
 		if (sceneRead->exist<Select>()) {
-			FluidumScene_Log_RequestDeleteScene("Project::Add::Select");
+			FluidumScene_Log_RequestDeleteScene(::FS::File::Add::Select);
 			Scene::deleteScene<Select>();
 		}
 	}
@@ -138,13 +138,13 @@ void FS::Project::Add::Directory::bottom() {
 	ImGui::EndChild();
 }
 
-void FS::Project::Add::Directory::deleteThisScene() {
-	FluidumScene_Log_RequestDeleteScene("Project::Add::Directory");
+void FS::File::Add::Directory::deleteThisScene() {
+	FluidumScene_Log_RequestDeleteScene(::FS::File::Add::Directory);
 	Scene::deleteScene<Directory>();
 }
 
-void FS::Project::Add::Directory::create() {
-	GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Create directory.");
+void FS::File::Add::Directory::create() {
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Create directory.");
 
 	const std::string typedName = str.name.c_str();
 	std::string parent = sharedInfo->path;
@@ -160,7 +160,7 @@ void FS::Project::Add::Directory::create() {
 		.pos_create = pos.create,
 	};
 
-	FluidumScene_Log_CallSceneConstructor("Project::Add::CheckPath");
+	FluidumScene_Log_CallSceneConstructor(::FS::File::Add::CheckPath);
 	Scene::callConstructor<CheckPath>(info);
 
 	if (!info.noerror)
@@ -168,8 +168,8 @@ void FS::Project::Add::Directory::create() {
 
 	if (sharedInfo->project) {
 		if (!std::filesystem::create_directory(info.fullPath)) {
-			GLog.add<FD::Log::Type::None>("[Project::Add::Directory] Failed to create directory.");
-			FluidumScene_Log_RequestAddScene("Utils::Message");
+			GLog.add<FU::Log::Type::None>(__FILE__,__LINE__,"Failed to create directory.");
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_unexpected, pos.create);
 			return;
 		}
@@ -184,7 +184,7 @@ void FS::Project::Add::Directory::create() {
 
 	this->deleteThisScene();
 	if (sceneRead->exist<Select>()) {
-		FluidumScene_Log_RequestDeleteScene("Project::Add::Select");
+		FluidumScene_Log_RequestDeleteScene(::FS::File::Add::Select);
 		Scene::deleteScene<Select>();
 	}
 }

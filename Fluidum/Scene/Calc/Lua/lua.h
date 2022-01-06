@@ -1,14 +1,18 @@
 ﻿#pragma once
 
-#include "Check/check.h"
+#include "Common/check.h"
 
+#ifndef Fluidum_Lua_Api
 #define Fluidum_Lua_Api
+#else
+#error AlreadyDefined
+#endif
 
-namespace FS::Lua {
+namespace FS::Calc::Lua {
 
-	class Calc final : public Scene {
+	class Run final : public Scene {
 	public:
-		explicit Calc(
+		explicit Run(
 			const FD::ProjectRead* const projectRead,
 			const FD::FluidumFilesRead* const fluidumFilesRead,
 			FD::ConsoleWrite* const consoleWrite,
@@ -29,15 +33,19 @@ namespace FS::Lua {
 			FD::Calc::ArrayRead
 		);
 
-		~Calc() noexcept;
+		~Run() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Calc)
+		FluidumUtils_Class_Delete_CopyMove(Run)
 
 	public:
 		virtual void call() override;
 
 	private:
 		using Type = FD::Calc::Lua::FunctionType;
+		
+		//log
+		using Message = ::FS::Calc::Lua::Internal::Message;
+		using LogType = ::FS::Calc::Lua::Internal::LogType;
 
 	private:
 		const FD::ProjectRead* const projectRead;
@@ -80,7 +88,7 @@ namespace FS::Lua {
 		template<FD::Calc::Array::ValueType>
 		Fluidum_Lua_Api Ret array_size(State L);
 
-		
+
 		template<FD::Calc::Array::ValueType>
 		Fluidum_Lua_Api Ret array_front(State L);
 
@@ -224,12 +232,11 @@ namespace FS::Lua {
 
 	};
 
-
 	namespace Internal {
-		using MenberFunction = ::FS::Lua::Ret(Calc::*)(::FS::Lua::State L);
+		using MenberFunction = ::FS::Calc::Lua::Ret(Run::*)(::FS::Calc::Lua::State L);
 		template <MenberFunction Func>
-		::FS::Lua::Ret dispatch(::FS::Lua::State L) {
-			Calc* ptr = *static_cast<Calc**>(lua_getextraspace(L));
+		::FS::Calc::Lua::Ret dispatch(::FS::Calc::Lua::State L) {
+			Run* ptr = *static_cast<Run**>(lua_getextraspace(L));
 			return ((*ptr).*Func)(L);
 		}
 	}

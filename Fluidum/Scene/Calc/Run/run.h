@@ -25,5 +25,7 @@ namespace FS::Calc {
 
 	private:
 		void deleteThis();
+
 	};
+
 }

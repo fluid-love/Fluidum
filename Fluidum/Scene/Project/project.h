@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Common/common.h"
-#include "Add/new.h"
+#include "../File/new.h"
 
 namespace FS::Project {
 
@@ -142,7 +142,7 @@ namespace FS::Project {
 
 		struct {
 			bool popup = false;
-			std::shared_ptr<Add::SharedInfo> info{};
+			std::shared_ptr<::FS::File::Add::SharedInfo> info{};
 		}add;
 
 		struct {
@@ -206,7 +206,8 @@ namespace FS::Project {
 
 	private:
 		void syncProjectFiles();
-		int32_t popupSpacing();
+		I32 popupSpacing();
+
 	};
 
 }

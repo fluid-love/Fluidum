@@ -10,7 +10,6 @@ namespace FS::Analysis {
 			const FD::ImPlotRead_Lock* const implotRead,
 			FD::ImPlotWrite* const implotWrite
 		);
-
 		void Constructor(
 			FD::ImPlotRead_Lock,
 			FD::ImPlotWrite
@@ -36,4 +35,5 @@ namespace FS::Analysis {
 		void plot();
 
 	};
+
 }

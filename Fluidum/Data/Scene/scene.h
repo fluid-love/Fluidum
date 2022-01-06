@@ -46,7 +46,7 @@ namespace FD {
 
 		template<typename Scene>
 		[[nodiscard]] bool exist() const noexcept {
-			using namespace Internal::Scene;
+			using namespace ::FD::Scene::Internal;
 			std::lock_guard<std::mutex> lock(Data::mtx);
 			constexpr CodeType code = FU::Class::ClassCode::GetClassCode<Scene>();
 			const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), code);
@@ -58,7 +58,7 @@ namespace FD {
 		//[!scene1 exists] [!scene2 exists] -> false
 		template<typename... Scene>
 		[[nodiscard]] bool exist_or() const noexcept {
-			using namespace Internal::Scene;
+			using namespace ::FD::Scene::Internal;
 			std::lock_guard<std::mutex> lock(Data::mtx);
 			constexpr std::array<CodeType, sizeof...(Scene)> codes = { FU::Class::ClassCode::GetClassCode<Scene>()... };
 
@@ -75,7 +75,7 @@ namespace FD {
 		//[!scene1 exists] [!scene2 exists] -> false
 		template<typename... Scene>
 		[[nodiscard]] bool exist_and() const noexcept {
-			using namespace Internal::Scene;
+			using namespace ::FD::Scene::Internal;
 			std::lock_guard<std::mutex> lock(Data::mtx);
 			constexpr std::array<CodeType, sizeof...(Scene)> codes = { FU::Class::ClassCode::GetClassCode<Scene>()... };
 
@@ -89,7 +89,7 @@ namespace FD {
 
 		template<FU::Class::ClassCode::CodeType Code>
 		[[nodiscard]] bool exist() const noexcept {
-			using namespace Internal::Scene;
+			using namespace ::FD::Scene::Internal;
 			std::lock_guard<std::mutex> lock(Data::mtx);
 			const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), Code);
 			return itr != Data::codes.cend();
