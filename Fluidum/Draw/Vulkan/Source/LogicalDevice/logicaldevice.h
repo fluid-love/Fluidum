@@ -20,7 +20,7 @@ namespace FVK::Internal {
 		explicit LogicalDevice(ManagerPassKey, const Data::LogicalDeviceData& data, const Parameter& parameter);
 
 		~LogicalDevice() = default;
-		FluidumUtils_Class_Default_CopyMove(LogicalDevice)
+		FluidumUtils_Class_Default_CopyMove(LogicalDevice);
 
 	private:
 		/*

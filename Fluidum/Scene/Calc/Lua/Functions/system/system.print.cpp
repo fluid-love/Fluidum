@@ -1,6 +1,6 @@
 #include "../../lua.h"
 
-FS::Lua::Ret FS::Lua::Calc::system_print(State L) {
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::system_print(State L) {
 	using enum LuAssist::Type;
 
 	const auto types = LuAssist::Utils::types(L);
@@ -45,6 +45,9 @@ FS::Lua::Ret FS::Lua::Calc::system_print(State L) {
 		}
 		else if (type == Thread) {
 			str += "thread";
+		}
+		else {
+			FluidumScene_Log_InternalWarning();
 		}
 		
 		str += " ";

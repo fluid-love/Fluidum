@@ -18,7 +18,7 @@ namespace FVK::Internal {
 		explicit Texture(ManagerPassKey, const Data::TextureData& data, const Parameter& parameter);
 
 		~Texture() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(Texture)
+		FluidumUtils_Class_Default_CopyMove(Texture);
 
 	private:
 		void create(const Data::TextureData& data, const Parameter& parameter);

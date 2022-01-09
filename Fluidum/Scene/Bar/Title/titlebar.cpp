@@ -38,7 +38,7 @@ FS::TitleBar::TitleBar(
 	style.projectNameWindowPos = { guiRead->windowSize().x * 0.6f, 0.0f };
 	style.projectNameWindowSize = { guiRead->windowSize().x * 0.3f ,windowHeight };
 
-	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.86f;
+	style.iconSize = ImVec2{ windowHeight ,windowHeight } * 0.86f;
 
 	style.buttonSize = { style.windowSize.x / 3.0f, style.windowSize.y };
 }
@@ -80,7 +80,6 @@ void FS::TitleBar::bar() {
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2());
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2());
-
 
 	ImGui::SetNextWindowPos(style.windowPos);
 	ImGui::SetNextWindowSize(style.windowSize);

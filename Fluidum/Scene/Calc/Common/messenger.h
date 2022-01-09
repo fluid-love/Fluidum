@@ -4,7 +4,13 @@
 
 namespace FS::Calc::Internal {
 
-	inline FU::Log::Messenger GMessenger{};
+	inline ::FU::Log::Messenger GMessenger{};
+
+}
+
+namespace FS::Calc::Lua::Internal {
+
+	inline ::FU::Log::Messenger& GMessenger = ::FS::Calc::Internal::GMessenger;
 
 }
 

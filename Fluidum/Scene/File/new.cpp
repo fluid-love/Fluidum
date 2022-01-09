@@ -31,7 +31,7 @@ namespace FS::File::Add::Internal {
 FS::File::Add::New::New(
 	const FD::ProjectRead* const projectRead,
 	const FD::GuiRead* const guiRead,
-	const FD::Log::FileRead* const fileRead,
+	const FD::History::FileRead* const fileRead,
 	std::shared_ptr<SharedInfo>& sharedInfo
 ) :
 	projectRead(projectRead),
@@ -39,10 +39,10 @@ FS::File::Add::New::New(
 	recentButtons(initRecentFileTypes(fileRead->recent())),
 	images(Internal::makeImages()),
 	emptyFiles({
-			ButtonInfo{images.at(0), "_Empty", text.empty.operator const std::string & (), text.empty_description, "",FD::Log::File::Type::Empty },
-			ButtonInfo{images.at(1), "_ELua", text.emptyLua.operator const std::string & (), text.emptyLua_description, ".lua",FD::Log::File::Type::Empty_Lua},
-			ButtonInfo{images.at(2), "_EPy", text.emptyPython.operator const std::string & (), text.emptyPython_description, ".py",FD::Log::File::Type::Empty_Python},
-			ButtonInfo{images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCpp_description, ".cpp",FD::Log::File::Type::Empty_Cpp}
+			ButtonInfo{images.at(0), "_Empty", text.empty.operator const std::string & (), text.empty_description, "",FD::History::File::Type::Empty },
+			ButtonInfo{images.at(1), "_ELua", text.emptyLua.operator const std::string & (), text.emptyLua_description, ".lua",FD::History::File::Type::Empty_Lua},
+			ButtonInfo{images.at(2), "_EPy", text.emptyPython.operator const std::string & (), text.emptyPython_description, ".py",FD::History::File::Type::Empty_Python},
+			ButtonInfo{images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCpp_description, ".cpp",FD::History::File::Type::Empty_Cpp}
 		})
 {
 	FluidumScene_Log_Constructor(::FS::File::Add::New);
@@ -299,7 +299,7 @@ void FS::File::Add::New::fileName() {
 	ImGui::InputText("##FileName", str.fileName.data(), str.fileName.capacity());
 	pos.fileName = ImGui::GetItemRectMin();
 
-	if (!select.ptr || select.ptr->type == FD::Log::File::Type::Empty)
+	if (!select.ptr || select.ptr->type == FD::History::File::Type::Empty)
 		return;
 
 	ImGui::SameLine();
@@ -368,7 +368,7 @@ void FS::File::Add::New::tryCreate() {
 }
 
 bool FS::File::Add::New::create() {
-	using enum FD::Log::File::Type;
+	using enum FD::History::File::Type;
 	assert(!str.fullPath.empty());
 
 	std::ofstream ofs(this->str.fullPath, std::ios::out);
@@ -384,11 +384,11 @@ bool FS::File::Add::New::create() {
 	if (select.ptr->type == Empty)
 		;
 	else if (select.ptr->type == Empty_Lua)
-		ofs << FD::File::Template::EmptyLua << std::endl;
+		ofs << FD::History::File::Template::EmptyLua << std::endl;
 	else if (select.ptr->type == Empty_Python)
-		ofs << FD::File::Template::EmptyPy << std::endl;
+		ofs << FD::History::File::Template::EmptyPy << std::endl;
 	else if (select.ptr->type == Empty_Cpp)
-		ofs << FD::File::Template::EmptyCpp << std::endl;
+		ofs << FD::History::File::Template::EmptyCpp << std::endl;
 	else {
 		FluidumScene_Log_InternalError();
 		std::terminate();
@@ -439,7 +439,7 @@ std::pair<bool, bool> FS::File::Add::New::button(
 	//cliked
 	if (info == select.ptr) {
 		const ImVec2 windowPos = ImGui::GetWindowPos();
-		constexpr ImU32 col = FU::ImGui::convertImVec4ToImU32(0.1f, 0.4f, 0.9f, 0.2f);
+		constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.1f, 0.4f, 0.9f, 0.2f);
 		ImGui::GetWindowDrawList()->AddRectFilled(windowPos, windowPos + ImGui::GetWindowSize(), col);
 	}
 
@@ -479,19 +479,19 @@ std::pair<bool, bool> FS::File::Add::New::button(
 	return click;
 }
 
-std::vector<FS::File::Add::New::ButtonInfo> FS::File::Add::New::initRecentFileTypes(const std::vector<FD::Log::File::Type>& types) {
-	using enum FD::Log::File::Type;
+std::vector<FS::File::Add::New::ButtonInfo> FS::File::Add::New::initRecentFileTypes(const std::vector<FD::History::File::Type>& types) {
+	using enum FD::History::File::Type;
 
 	std::vector<ButtonInfo> result{};
 	for (const auto x : types) {
 		if (x == Empty)
-			result.emplace_back(ButtonInfo{ images.at(0), "_Empty", text.empty.operator const std::string & (), text.empty_description, "",FD::Log::File::Type::Empty });
+			result.emplace_back(ButtonInfo{ images.at(0), "_Empty", text.empty.operator const std::string & (), text.empty_description, "",FD::History::File::Type::Empty });
 		else if (x == Empty_Lua)
-			result.emplace_back(ButtonInfo{ images.at(1), "_ELua", text.emptyLua.operator const std::string & (), text.emptyLua_description,".lua",FD::Log::File::Type::Empty_Lua });
+			result.emplace_back(ButtonInfo{ images.at(1), "_ELua", text.emptyLua.operator const std::string & (), text.emptyLua_description,".lua",FD::History::File::Type::Empty_Lua });
 		else if (x == Empty_Python)
-			result.emplace_back(ButtonInfo{ images.at(2), "_EPy", text.emptyPython.operator const std::string & (), text.emptyPython_description ,".py",FD::Log::File::Type::Empty_Python });
+			result.emplace_back(ButtonInfo{ images.at(2), "_EPy", text.emptyPython.operator const std::string & (), text.emptyPython_description ,".py",FD::History::File::Type::Empty_Python });
 		else if (x == Empty_Cpp)
-			result.emplace_back(ButtonInfo{ images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCpp_description ,".cpp",FD::Log::File::Type::Empty_Cpp });
+			result.emplace_back(ButtonInfo{ images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCpp_description ,".cpp",FD::History::File::Type::Empty_Cpp });
 
 		else {
 			FluidumScene_Log_InternalWarning();

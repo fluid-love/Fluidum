@@ -34,7 +34,7 @@ namespace FD::Plot::Limits {
 
 	//ImPlot
 	struct Plot final {
-		FluidumUtils_Class_Delete_ConDestructor(Plot)
+		FluidumUtils_Class_Delete_ConDestructor(Plot);
 	public:
 		static constexpr UIF8 PlotMax = 20;
 		static constexpr UIF8 FigureMax = 20;
@@ -62,5 +62,12 @@ namespace FD::Console::Limits {
 
 	constexpr inline UIF16 Characters = 10'000;
 	constexpr inline UIF16 Lines = 10'000;
+
+}
+
+namespace FD::History::Limits {
+
+	constexpr inline UIF8 ProjectLogMax = 50;
+	constexpr inline UIF8 FileLogMax = 50;
 
 }

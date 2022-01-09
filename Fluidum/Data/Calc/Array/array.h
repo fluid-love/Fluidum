@@ -9,7 +9,7 @@ namespace FD::Calc {
 
 namespace FD::Calc::Array::Internal {
 	struct Data final {
-		FluidumUtils_Class_Delete_ConDestructor(Data)
+		FluidumUtils_Class_Delete_ConDestructor(Data);
 	private:
 		static inline std::vector<std::vector<LuAssist::Num>> numbers{};
 		static inline std::vector<std::vector<std::string>> strings{};
@@ -42,7 +42,7 @@ namespace FD::Calc {
 	public:
 		explicit ArrayWrite(::FD::Internal::PassKey) noexcept {};
 		~ArrayWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(ArrayWrite)
+		FluidumUtils_Class_Delete_CopyMove(ArrayWrite);
 
 	public:
 		enum class Exception : uint8_t {
@@ -209,7 +209,7 @@ namespace FD::Calc {
 	public:
 		explicit ArrayRead(::FD::Internal::PassKey) noexcept {};
 		~ArrayRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ArrayRead)
+		FluidumUtils_Class_Delete_CopyMove(ArrayRead);
 	public:
 		enum class Exception : uint8_t {
 			Range

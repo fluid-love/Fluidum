@@ -29,7 +29,7 @@ namespace FVK::Internal {
 		explicit CommandPool(ManagerPassKey, const Data::CommandPoolData& data, const Parameter& parameter);
 
 		~CommandPool() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(CommandPool)
+		FluidumUtils_Class_Default_CopyMove(CommandPool);
 
 	private:
 		/*

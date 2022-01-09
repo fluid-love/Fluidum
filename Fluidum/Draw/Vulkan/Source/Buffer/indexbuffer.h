@@ -47,7 +47,7 @@ namespace FVK::Internal {
 		explicit IndexBuffer(ManagerPassKey, const Data::IndexBufferData& data, const Parameter& parameter);
 
 		~IndexBuffer() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(IndexBuffer)
+		FluidumUtils_Class_Default_CopyMove(IndexBuffer);
 
 	private:
 		/*

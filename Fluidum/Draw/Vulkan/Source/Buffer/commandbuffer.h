@@ -33,7 +33,7 @@ namespace FVK::Internal {
 		explicit CommandBuffer(ManagerPassKey, const Data::CommandBufferData& data, Parameter& parameter);
 
 		~CommandBuffer() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(CommandBuffer)
+		FluidumUtils_Class_Default_CopyMove(CommandBuffer);
 
 	private:
 		/*

@@ -8,16 +8,20 @@ namespace FS {
 	public:
 		explicit Console(
 			FD::ConsoleWrite* const consoleWrite,
-			const FD::ConsoleRead* const consoleRead
+			const FD::ConsoleRead* const consoleRead,
+			const FD::Style::VarRead* const varRead,
+			FD::ToolBarWrite* const toolBarWrite
 		);
 		void Constructor(
 			FD::ConsoleWrite,
-			FD::ConsoleRead
+			FD::ConsoleRead,
+			FD::Style::VarRead,
+			FD::ToolBarWrite
 		);
 
 		~Console() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Console)
+		FluidumUtils_Class_Delete_CopyMove(Console);
 
 	public:
 		virtual void call() override;
@@ -25,6 +29,8 @@ namespace FS {
 	private:
 		FD::ConsoleWrite* const consoleWrite;
 		const FD::ConsoleRead* const consoleRead;
+		const FD::Style::VarRead* const varRead;
+		FD::ToolBarWrite* const toolBarWrite;
 
 		const FD::Text::Console text{};
 
@@ -40,6 +46,8 @@ namespace FS {
 		struct {
 			float fontSize = ImGui::GetFontSize();
 			float fontSizeScale = 1.0f;
+
+			float inputTextWindowHeight{};
 		}style;
 
 		struct {
@@ -47,6 +55,9 @@ namespace FS {
 			bool popupTitle = false;
 			bool popupRight = false;
 		}flag;
+
+	private:
+		void toolBar();
 
 	private:
 		void closeWindow();
@@ -60,7 +71,7 @@ namespace FS {
 
 	private:
 		void popupTitle();
-		
+
 		void popupRight();
 		void popup_clear();
 		void popup_backcolor();

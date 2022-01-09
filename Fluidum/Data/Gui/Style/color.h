@@ -9,8 +9,7 @@ namespace FD::Style {
 	public:
 		explicit ColorWrite(Internal::PassKey) noexcept {};
 		~ColorWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(ColorWrite)
-
+		FluidumUtils_Class_Delete_CopyMove(ColorWrite);
 
 	};
 
@@ -19,16 +18,19 @@ namespace FD::Style {
 	public:
 		explicit ColorRead(Internal::PassKey) noexcept {};
 		~ColorRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ColorRead)
+		FluidumUtils_Class_Delete_CopyMove(ColorRead);
 
 	public:
-		void pushButtonDisabled() const;
-		void popButtonDisabled() const;
+		void pushButtonDisabled() const noexcept;
+		void popButtonDisabled() const noexcept;
 
+	public:
+		void pushSelectableDisabled() const noexcept;
+		void popSelectableDisabled() const noexcept;
+
+	public:
+		[[nodiscard]] ImU32 toolBarVerticalSeparator() const noexcept;
 
 	};
-
-
-
 
 }

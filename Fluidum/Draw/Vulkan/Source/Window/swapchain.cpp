@@ -67,7 +67,7 @@ bool FVK::Internal::Swapchain::isPresentModeSupport(const vk::PresentModeKHR pre
 }
 
 vk::Extent2D FVK::Internal::Swapchain::getCorrectSwapchainExtent(GLFWwindow* window, const vk::SurfaceCapabilitiesKHR& capabilities) {
-	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+	if (capabilities.currentExtent.width != std::numeric_limits<UI32>::max()) {
 		return capabilities.currentExtent;
 	}
 
@@ -75,8 +75,8 @@ vk::Extent2D FVK::Internal::Swapchain::getCorrectSwapchainExtent(GLFWwindow* win
 	glfwGetFramebufferSize(window, &width, &height);
 
 	vk::Extent2D actualExtent = {
-		static_cast<uint32_t>(width),
-		static_cast<uint32_t>(height)
+		static_cast<UI32>(width),
+		static_cast<UI32>(height)
 	};
 
 	actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);

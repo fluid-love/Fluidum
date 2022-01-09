@@ -17,8 +17,8 @@ namespace FD::Console {
 namespace FD::Console::Internal {
 	class Data final {
 	private:
-		FluidumUtils_Class_Delete_ConDestructor(Data)
-			FluidumUtils_Class_Delete_CopyMove(Data)
+		FluidumUtils_Class_Delete_ConDestructor(Data);
+			FluidumUtils_Class_Delete_CopyMove(Data);
 
 	private:
 		static inline std::vector<::FD::Console::Info> texts{};
@@ -38,7 +38,7 @@ namespace FD {
 			Console::Internal::Data::texts.reserve(2000);
 		};
 		~ConsoleWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(ConsoleWrite)
+		FluidumUtils_Class_Delete_CopyMove(ConsoleWrite);
 
 
 	public:
@@ -99,7 +99,7 @@ namespace FD {
 	public:
 		explicit ConsoleRead(Internal::PassKey) {};
 		~ConsoleRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ConsoleRead)
+		FluidumUtils_Class_Delete_CopyMove(ConsoleRead);
 
 	public:
 		//return !out_of_range, text

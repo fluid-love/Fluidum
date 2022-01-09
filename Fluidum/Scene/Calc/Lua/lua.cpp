@@ -66,10 +66,10 @@ void FS::Calc::Lua::Run::call() {
 		catch (const std::exception& e) {//runtime error
 			FluidumScene_Log_StdExceptionWarning(e);
 		}
-		catch (const Internal::Exception) {
-			GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Lua RuntimeError.");
+		catch (const Internal::Exception::Exception&) {
+			GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Lua RuntimeError.");
 		}
-		catch (const Internal::InternalError&) {
+		catch (const Internal::Exception::InternalError&) {
 			GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Lua Fluidum InternalError.");
 		}
 	}
@@ -127,7 +127,7 @@ bool FS::Calc::Lua::Run::init() {
 		return true;
 
 	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Failed to init Lua.");
-	Message message(LogType::Initialize);
+	Internal::Message message(Internal::LogType::Initialize);
 	consoleWrite->push(message.operator const std::string & ());
 	return false;
 }

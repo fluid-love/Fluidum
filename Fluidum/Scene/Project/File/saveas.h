@@ -23,7 +23,7 @@ namespace FS::Project::File {
 
 		~SaveAs() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(SaveAs)
+		FluidumUtils_Class_Delete_CopyMove(SaveAs);
 
 	public:
 		virtual void call() override;

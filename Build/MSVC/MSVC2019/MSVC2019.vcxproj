@@ -35,21 +35,24 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\gui.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\layout.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\Style\color.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\Style\theme.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\Style\var.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\text.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\tool.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\History\file.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\History\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\include.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Limits\limits.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\console.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\log.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\file.h" />
-    <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Log\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\filelist.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\files.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\supported.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\name.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\project.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Property\lua.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Property\property.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Scene\scene.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Scene\window.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Task\task.h" />
@@ -249,16 +252,19 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\gui.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\layout.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\Style\color.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\Style\theme.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\Style\var.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\text.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Gui\tool.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\History\file.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\History\project.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Log\log.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\file.cpp" />
-    <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\project.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\filelist.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\files.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Files\supported.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Project\project.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Property\lua.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Property\property.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Scene\scene.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Scene\window.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Task\task.cpp" />
@@ -322,8 +328,22 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Status\statusbar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Title\titlebar.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Bar\Top\topbar.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.back.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.clear.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.empty.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.erase.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.front.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.make.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_back.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_front.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_back.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_front.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.set.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.size.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__gc.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__index.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__newindex.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.print.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\lua.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Run\run.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Coding\Debug\debug.cpp" />
@@ -443,15 +463,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>../../Exe/MSVC2019_Debug/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>../../Exe/MSVC2019_Release/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>../../Exe/MSVC2019_Debug/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>../../Exe/MSVC2019_Release/</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

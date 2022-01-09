@@ -23,7 +23,7 @@ namespace FVK::Internal {
 		explicit ImGuiImage(ManagerPassKey, const Data::ImGuiImageData& data, const Parameter& parameter);
 
 		~ImGuiImage() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(ImGuiImage)
+		FluidumUtils_Class_Default_CopyMove(ImGuiImage);
 
 	private:
 		/*

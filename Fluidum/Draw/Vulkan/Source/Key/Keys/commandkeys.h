@@ -88,7 +88,7 @@ namespace FVK::Internal::Key {
 
 	template<CommandType>
 	struct ConnectionCommandKeys final {
-		FluidumUtils_Class_Delete_ConDestructor(ConnectionCommandKeys)
+		FluidumUtils_Class_Delete_ConDestructor(ConnectionCommandKeys);
 	};
 
 	template<>

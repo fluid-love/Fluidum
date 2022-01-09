@@ -35,7 +35,7 @@ namespace FVK::Internal {
 		explicit GraphicsPipelineLayout(ManagerPassKey, const Data::GraphicsPipelineLayoutData& data, Parameter& parameter);
 		
 		~GraphicsPipelineLayout() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(GraphicsPipelineLayout)
+		FluidumUtils_Class_Default_CopyMove(GraphicsPipelineLayout);
 
 	private:
 		/*

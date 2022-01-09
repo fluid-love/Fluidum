@@ -28,7 +28,7 @@ namespace FS {
 
 		~LeftBar() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(LeftBar)
+		FluidumUtils_Class_Delete_CopyMove(LeftBar);
 
 	public:
 		virtual void call() override;
@@ -76,6 +76,7 @@ namespace FS {
 			bool isIconHovered = false;
 			bool isSubWindowHovered = false;
 			ImVec2 selectWindowPos = ImVec2();
+			std::pair<ImVec2, ImVec2> hoveringImageRect{};
 			SceneIndex current = SceneIndex::None;
 
 			std::vector<FDR::ImGuiImage> codingImages{};
@@ -85,7 +86,7 @@ namespace FS {
 
 	private:
 		void imageGui();
-		void hoveredIcon(const std::size_t index);
+		void hoveredIcon(const Size index);
 
 		void addScene(const ClassCode::CodeType code);
 		void addCodingScene();

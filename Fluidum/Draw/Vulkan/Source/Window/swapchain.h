@@ -45,7 +45,7 @@ namespace FVK::Internal {
 		explicit Swapchain(ManagerPassKey, const Data::SwapchainData& data, Parameter& parameter);
 		
 		~Swapchain() = default;
-		FluidumUtils_Class_Default_CopyMove(Swapchain)
+		FluidumUtils_Class_Default_CopyMove(Swapchain);
 
 	private:
 		/*

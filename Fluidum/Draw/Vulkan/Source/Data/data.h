@@ -17,7 +17,7 @@ namespace FVK::Internal::Data {
 		explicit Data(Tuple&& data) : data(std::move(data)) {}
 
 		~Data() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(Data)
+		FluidumUtils_Class_Default_CopyMove(Data);
 
 	public:
 		template<FvkType T> requires(!FU::Concept::IsStdVector<CorrespondenceType<T>>)
@@ -82,7 +82,7 @@ namespace FVK::Internal::Data {
 		explicit CommandData(Tuple&& data) : data(std::move(data)) {}
 
 		~CommandData() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(CommandData)
+		FluidumUtils_Class_Default_CopyMove(CommandData);
 
 	public:
 		template<FvkType T> requires(!FU::Concept::IsStdVector<CorrespondenceType<T>>)

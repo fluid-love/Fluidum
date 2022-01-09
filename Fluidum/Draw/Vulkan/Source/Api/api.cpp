@@ -229,7 +229,7 @@ void FVK::createGraphicsPipelineLayout(const char* key, GraphicsPipelineLayoutPa
 	using namespace Internal;
 	LockGuard lock(GMutex);
 	Api::checkManagerEmpty();
-	//connections‚ğì¬
+	//connections
 	const auto connections = Key::Converter::variantKeysToConnectionKeysBase<FvkType::GraphicsPipelineLayout>(
 		parameter.logicalDevice.value(),
 		parameter.pInfo->descriptorSetLayoutKeys
@@ -470,7 +470,8 @@ ImTextureID FVK::createImGuiImage(const char* key, const ImGuiImageParameter& pa
 	}
 	catch (...) {
 		try {
-			Api::destroyBase<FvkType::ImGuiImage>(key);
+			const ImGuiKey<const char*> imguiKey(key);
+			Api::destroyBase<FvkType::ImGuiImage>(imguiKey);
 		}
 		catch (...) {
 			std::terminate();

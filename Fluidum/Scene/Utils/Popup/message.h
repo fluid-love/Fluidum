@@ -15,7 +15,7 @@ namespace FS::Utils {
 
 		~Message() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Message)
+		FluidumUtils_Class_Delete_CopyMove(Message);
 
 	public:
 		virtual void call() override;

@@ -87,8 +87,10 @@ void FD::LogWrite::write() noexcept {
 		//wait
 		while (!Log::Internal::Data::writeFlag.load()) {
 			const bool request = this->writeLogThread.get_stop_token().stop_requested();
-			if (request)//finish. Write the remaining logs to a file.
+			if (request) { //finish. Write the remaining logs to a file.
 				breakFlag = true;
+				break;
+			}
 		}
 
 		if (!breakFlag) {
@@ -137,13 +139,13 @@ FD::LogWrite::LogWrite() noexcept
 		//If there is no directory, create.
 		if (!std::filesystem::is_directory(Internal::Log::FluidumLogFolderDirectory)) {
 			if (!std::filesystem::create_directory(Internal::Log::FluidumLogFolderDirectory))
-				throw -1;
+				throw - 1;
 		}
 
 		this->writeLogThread = std::jthread(&LogWrite::write, this);
 	}
 	catch (...) {
-		try { 
+		try {
 			std::cerr << "[Serious Error] Failed to construct ::FD::LogWrite.";
 		}
 		catch (...) {
@@ -154,6 +156,10 @@ FD::LogWrite::LogWrite() noexcept
 }
 
 void FD::LogWrite::add(const std::string& message) {
+#ifndef NDEBUG
+	std::cout << message << std::endl;
+#endif
+
 	try {
 		Log::Internal::Data::insert(message);
 	}
@@ -163,6 +169,7 @@ void FD::LogWrite::add(const std::string& message) {
 }
 
 void FD::LogWrite::requestStop() noexcept {
+	Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Stop log thread.");
 	this->writeLogThread.request_stop();
 }
 

@@ -2,15 +2,15 @@
 #include "../Common/array.h"
 
 template<FD::Calc::Array::ValueType T>
-FS::Lua::Ret FS::Lua::Calc::array_front(State L) {
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_front(State L) {
 	static_assert(FD::Calc::Array::IsValueType<T>);
 
 	using Elm = ::FD::Calc::Array::ElmType<T>;
 
 	const auto types = LuAssist::Utils::types(L);
 	if (types.size() != 2 && types[0] == LuAssist::Type::Integer) {
-		FluidumScene_Log_InternalError();
-		throw Internal::InternalError(__FILE__);
+		FluidumScene_Log_InternalWarning();
+		Internal::Exception::throwInternalError();
 	}
 
 	const FD::Calc::Array::Key key = static_cast<FD::Calc::Array::Key>(lua_tointeger(L, 1));
@@ -22,10 +22,10 @@ FS::Lua::Ret FS::Lua::Calc::array_front(State L) {
 		LuAssist::Utils::popAll(L);
 		if (empty) {
 			//{}関数{}によって{}番目の要素にアクセスしようとしましたが範囲外でした．要素のサイズ{}．
-			Message message(LogType::OutOfRange);
-			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, 0);
-			consoleWrite->push(std::move(log));
-			throw Internal::Exception();
+			Internal::Message message(Internal::LogType::OutOfRange);
+			Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, 0);
+			consoleWrite->push(Internal::GMessenger.getMessage());
+			Internal::Exception::throwException();
 		}
 		else {
 			using enum FD::Calc::Array::ValueType;
@@ -41,10 +41,10 @@ FS::Lua::Ret FS::Lua::Calc::array_front(State L) {
 
 		if (types[1] != luaType) {
 			//{}関数{}の{}番目の引数の型に誤りがあります．渡された引数の型: {}．正しい引数の型: {}．
-			Message message(LogType::Type);
-			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, LuAssist::Utils::typeName(types.at(1)), LuAssist::Utils::typeName(luaType));
-			consoleWrite->push(std::move(log));
-			throw Internal::Exception();
+			Internal::Message message(Internal::LogType::Type);
+			Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, LuAssist::Utils::typeName(types.at(1)), LuAssist::Utils::typeName(luaType));
+			consoleWrite->push(Internal::GMessenger.getMessage());
+			Internal::Exception::throwException();
 		}
 	}
 
@@ -52,10 +52,10 @@ FS::Lua::Ret FS::Lua::Calc::array_front(State L) {
 
 	if (empty) {//error
 		//{}関数{}によって{}番目の要素にアクセスしようとしましたが範囲外でした．要素のサイズ{}．
-		Message message(LogType::OutOfRange);
-		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, 0);
-		consoleWrite->push(std::move(log));
-		throw Internal::Exception();
+		Internal::Message message(Internal::LogType::OutOfRange);
+		Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), "front", 1, 0);
+		consoleWrite->push(Internal::GMessenger.getMessage());
+		Internal::Exception::throwException();
 	}
 
 	const Elm front = arrayRead->front<T>(key);
@@ -66,8 +66,8 @@ FS::Lua::Ret FS::Lua::Calc::array_front(State L) {
 }
 
 template
-FS::Lua::Ret FS::Lua::Calc::array_front<FD::Calc::Array::ValueType::Number>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_front<FD::Calc::Array::ValueType::Number>(State L);
 template
-FS::Lua::Ret FS::Lua::Calc::array_front<FD::Calc::Array::ValueType::String>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_front<FD::Calc::Array::ValueType::String>(State L);
 template
-FS::Lua::Ret FS::Lua::Calc::array_front<FD::Calc::Array::ValueType::Bit>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_front<FD::Calc::Array::ValueType::Bit>(State L);

@@ -132,4 +132,15 @@ namespace FU::File {
 
 	[[nodiscard]] bool isAbsolute(const std::string& path);
 
+	/*
+		C:/test/hoge/huga.txt
+
+		(aaa, 0)
+		C:/test/hoge/aaa
+
+		(aaa, 1)
+		C:/test/aaa/huga.txt
+	*/
+	[[nodiscard]] std::string changeName(const std::string& path, const std::string& newName, const Size depth);
+
 }

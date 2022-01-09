@@ -279,6 +279,41 @@ bool FD::Project::Internal::FileList::sameName(const std::string& path, const st
 	return f != itr.value()->dir_internal.end();
 }
 
+std::pair<bool, FD::Size> FD::Project::Internal::FileList::childExists(const std::string& parent, const std::string& child) {
+	auto itr = this->find(parent);
+
+	assert(itr.value()->type == Type::Directory);
+
+	for (auto& x : itr.value()->dir_internal) {
+		if (x.path == child)
+			return { true, 1 };
+
+		if (!x.dir_internal.empty()) {
+			const auto result = this->childExists_helper(2, x, child);
+			if (result.first)
+				return result;
+		}
+	}
+
+	return { false, 0 };
+}
+
+std::pair<bool, FD::Size> FD::Project::Internal::FileList::childExists_helper(const Size depth, const Ref& ref, const std::string& child) {
+
+	for (auto& x : ref.dir_internal) {
+		if (x.path == child)
+			return { true, depth };
+
+		if (!x.dir_internal.empty()) {
+			const auto result = this->childExists_helper(depth + 1, x, child);
+			if (result.first)
+				return result;
+		}
+	}
+
+	return {false, depth};
+}
+
 std::vector<FD::Project::Internal::FileList::Ref>* FD::Project::Internal::FileList::get() noexcept {
 	return &refs;
 }

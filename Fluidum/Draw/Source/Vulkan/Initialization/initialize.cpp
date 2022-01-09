@@ -88,7 +88,7 @@ namespace FDR::Internal::Initialization {
 
 		vk::SurfaceFormatKHR surfaceFormat = {
 			vk::Format::eR8G8B8A8Srgb,
-			vk::ColorSpaceKHR::eVkColorspaceSrgbNonlinear
+			vk::ColorSpaceKHR::eSrgbNonlinear
 		};
 		if (!FVK::isSurfaceSupportedFormat(BasePhysicalDeviceKey, surfaceFormat.format, surfaceFormat.colorSpace)) {
 			surfaceFormat = FVK::getSupportedSurfaceFormats(BasePhysicalDeviceKey).at(0);
@@ -951,23 +951,23 @@ namespace FDR::Internal::Initialization {
 		catch (const FVK::Exception::Error& e) {
 			using enum FVK::Exception::ErrorType;
 			if (e.code() == FailedToCreate) {
-				GMessenger.add_str<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize because it failed to create the window.", name);
+				GMessenger.add_str<FU::Log::Type::Error>("[{}] FluidumDraw failed to initialize because it failed to create the window.", name);
 			}
 			else if (e.code() == NotInitialized || e.code() == NotSupported || e.code() == CollisionOfKeys) {
-				GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "[{}].Internal Error({}). FluidumVK is not initialized.", name, magic_enum::enum_name(e.code()));
+				GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "[{}] Internal Error({}). FluidumVK is not initialized.", name, magic_enum::enum_name(e.code()));
 			}
 			else if (e.code() == Unknown) {
-				GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "[{}].Internal Error. FluidumVK is not initialized.", name);
+				GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "[{}] Internal Error.", name);
 			}
 			else {
-				GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "[{}].Internal Error. FluidumVK is not initialized.", name);
+				GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "[{}] Internal Error.", name);
 			}
 		}
 		catch (const std::exception&) {
-			GMessenger.add_str<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize due to an unexpected error.", name);
+			GMessenger.add_str<FU::Log::Type::Error>("[{}] FluidumDraw failed to initialize due to an unexpected error.", name);
 		}
 		catch (...) {
-			GMessenger.add_str<FU::Log::Type::Error>("[{}].FluidumDraw failed to initialize due to an unexpected error.", name);
+			GMessenger.add_str<FU::Log::Type::Error>("[{}] FluidumDraw failed to initialize due to an unexpected error.", name);
 		}
 		terminate();
 	}

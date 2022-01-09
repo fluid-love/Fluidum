@@ -5,8 +5,8 @@
 namespace FD::Project::Internal {
 	class FileList final {
 	public:
-		FluidumUtils_Class_Default_ConDestructor(FileList)
-			FluidumUtils_Class_Default_CopyMove(FileList)
+		FluidumUtils_Class_Default_ConDestructor(FileList);
+		FluidumUtils_Class_Default_CopyMove(FileList);
 
 	public:
 		struct Directory final {
@@ -67,21 +67,33 @@ namespace FD::Project::Internal {
 		void changePath(const std::string& path, const std::string& newPath);
 		void changeName(const std::string& path, const std::string& newName);
 
-		//C:/test/test test
+		//C:/test/test hoge
 		//---------------
-		//path:    C:/test/hoge
+		//path: C:/test/hoge
 		//name: hoge
 		void changePathAndName(const std::string& path, const std::string& newName);
 
+	public:
 		void sync();
 	private:
 		void sync(std::vector<Ref>& info);
+
 	public:
 		//all
 		[[nodiscard]] bool samePath(const std::string& path);
 
 		//same directory
 		[[nodiscard]] bool sameName(const std::string& path, const std::string& name);
+
+	public:
+		/*
+		return:
+			first  : exists
+			second : depth
+		*/
+		[[nodiscard]] std::pair<bool, Size> childExists(const std::string& parent, const std::string& child);
+	private:
+		[[nodiscard]] std::pair<bool, Size> childExists_helper(const Size depth, const Ref& ref, const std::string& child);
 
 	public:
 		[[nodiscard]] std::vector<Ref>* get() noexcept;
@@ -92,7 +104,7 @@ namespace FD::Project::Internal {
 
 	public:
 		void forEach(void(*function)(Ref&));
-		void forEach(void(*function)(Ref&, void*),void* userData);
+		void forEach(void(*function)(Ref&, void*), void* userData);
 
 	private:
 		std::optional<RefIterator> find_recursive(RefIterator rec, const std::string& path);
@@ -125,7 +137,7 @@ namespace FD::Project::Internal {
 
 namespace FD::Project::FileList {
 	using Type = Internal::FileList::Type;
-	
+
 	using FileInfo = Internal::FileList::Ref;
 
 	using DirectoryInfo = Internal::FileList::Directory;

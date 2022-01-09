@@ -7,7 +7,7 @@ using namespace FU::ImGui::Operators;
 namespace FS::Project::File::Internal {
 	std::vector<FDR::ImGuiImage> makeImages() {
 		std::vector<FDR::ImGuiImage> result;
-		for (uint16_t i = 0; i < 4; i++) {
+		for (UIF16 i = 0; i < 4; i++) {
 			std::string path = Resource::NewProjectIconsFolderPath;
 			path += std::to_string(i + 1) += ".png";
 			result.emplace_back(FDR::createImGuiImage(path.c_str()));
@@ -21,8 +21,8 @@ FS::Project::File::New::New(
 	FD::WindowWrite* const windowWrite,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
-	const FD::Log::ProjectRead* const projectLogRead,
-	FD::Log::ProjectWrite* const projectLogWrite
+	const FD::History::ProjectRead* const projectLogRead,
+	FD::History::ProjectWrite* const projectLogWrite
 ) :
 	sceneRead(sceneRead),
 	windowWrite(windowWrite),
@@ -32,10 +32,10 @@ FS::Project::File::New::New(
 
 	images(Internal::makeImages()),
 	emptyTemplates({
-			ButtonInfo{FD::Log::Project::Type::Empty, images.at(0), "_Empty", text.empty.operator const std::string & (), text.emptyDescription},
-			ButtonInfo{FD::Log::Project::Type::Empty_Lua, images.at(1), "_ELua", text.emptyLua.operator const std::string & (), text.emptyLuaDescription},
-			ButtonInfo{FD::Log::Project::Type::Empty_Python, images.at(2), "_EPy", text.emptyPython.operator const std::string & (), text.emptyPythonDescription},
-			ButtonInfo{FD::Log::Project::Type::Empty_Cpp, images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCppDescription}
+			ButtonInfo{FD::History::Project::Type::Empty, images.at(0), "_Empty", text.empty.operator const std::string & (), text.emptyDescription},
+			ButtonInfo{FD::History::Project::Type::Empty_Lua, images.at(1), "_ELua", text.emptyLua.operator const std::string & (), text.emptyLuaDescription},
+			ButtonInfo{FD::History::Project::Type::Empty_Python, images.at(2), "_EPy", text.emptyPython.operator const std::string & (), text.emptyPythonDescription},
+			ButtonInfo{FD::History::Project::Type::Empty_Cpp, images.at(3), "_ECpp", text.emptyCpp.operator const std::string & (), text.emptyCppDescription}
 		}),
 	algorithmTemplates({
 		}),
@@ -369,8 +369,8 @@ void FS::Project::File::New::search() {
 	std::for_each(algorithmTemplates.begin(), algorithmTemplates.end(), func);
 }
 
-std::vector<FS::Project::File::New::ButtonInfo> FS::Project::File::New::initRecentTempates(const std::vector<FD::Log::Project::Type>& types) {
-	using enum FD::Log::Project::Type;
+std::vector<FS::Project::File::New::ButtonInfo> FS::Project::File::New::initRecentTempates(const std::vector<FD::History::Project::Type>& types) {
+	using enum FD::History::Project::Type;
 
 	std::vector<ButtonInfo> result{};
 	for (const auto x : types) {

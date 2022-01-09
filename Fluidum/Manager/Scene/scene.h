@@ -29,7 +29,7 @@ namespace FS {
 				}
 			}
 		}
-		FluidumUtils_Class_Delete_CopyMove(FluidumScene)
+		FluidumUtils_Class_Delete_CopyMove(FluidumScene);
 
 	public:
 		using SceneBaseType = SceneBase<Data...>;

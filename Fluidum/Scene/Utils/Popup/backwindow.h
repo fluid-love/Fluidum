@@ -11,7 +11,7 @@ namespace FS::Utils {
 
 		~PopupBackWindow() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(PopupBackWindow)
+		FluidumUtils_Class_Delete_CopyMove(PopupBackWindow);
 
 	public:
 		virtual void call() override;

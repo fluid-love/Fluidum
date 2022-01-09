@@ -16,8 +16,8 @@ namespace FKM {
 		static_assert(std::is_move_constructible_v<Internal::Element<Enum>>);
 
 	public:
-		FluidumUtils_Class_Default_ConDestructor(KeyManager)
-			FluidumUtils_Class_Delete_CopyMove(KeyManager)
+		FluidumUtils_Class_Default_ConDestructor(KeyManager);
+			FluidumUtils_Class_Delete_CopyMove(KeyManager);
 
 	private://using
 		using Element = Internal::Element<Enum>;

@@ -60,7 +60,7 @@ namespace FVK::Internal {
 		explicit PhysicalDevice(ManagerPassKey, const Data::PhysicalDeviceSwapchainData& data, const SwapchainParameter& parameter);
 
 		~PhysicalDevice() = default;
-		FluidumUtils_Class_Default_CopyMove(PhysicalDevice)
+		FluidumUtils_Class_Default_CopyMove(PhysicalDevice);
 
 	private:
 		/*

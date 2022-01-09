@@ -12,21 +12,21 @@ namespace FS::Project::File {
 			FD::WindowWrite* const windowWrite,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
-			const FD::Log::ProjectRead* const projectLogRead,
-			FD::Log::ProjectWrite* const projectLogWrite
+			const FD::History::ProjectRead* const projectLogRead,
+			FD::History::ProjectWrite* const projectLogWrite
 		);
 		void Constructor(
 			FD::SceneRead,
 			FD::WindowWrite,
 			FD::GuiRead,
 			FD::GuiWrite,
-			FD::Log::ProjectRead,
-			FD::Log::ProjectWrite
+			FD::History::ProjectRead,
+			FD::History::ProjectWrite
 		);
 
 		~New() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(New)
+		FluidumUtils_Class_Delete_CopyMove(New);
 
 	public:
 		virtual void call() override;
@@ -36,7 +36,7 @@ namespace FS::Project::File {
 		FD::WindowWrite* const windowWrite;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
-		FD::Log::ProjectWrite* const projectLogWrite;
+		FD::History::ProjectWrite* const projectLogWrite;
 
 		FD::Text::NewProject text{};
 
@@ -59,13 +59,13 @@ namespace FS::Project::File {
 
 		}style;
 
-		enum class Template : uint8_t {
+		enum class Template : UIF8 {
 			Empty,
 			Algorithm
 		};
 
 		struct ButtonInfo final {
-			FD::Log::Project::Type type;
+			FD::History::Project::Type type;
 			FDR::ImGuiImage image;
 			const char* label;
 			const std::string& title;
@@ -89,7 +89,7 @@ namespace FS::Project::File {
 		}searchStr;
 
 		struct {
-			uint16_t index{};
+			UIF16 index{};
 			bool flag = false;
 		}recentPopupInfo;
 
@@ -123,7 +123,7 @@ namespace FS::Project::File {
 		void recent_erase();
 
 	private:
-		[[nodiscard]] std::vector<ButtonInfo> initRecentTempates(const std::vector<FD::Log::Project::Type>& types);
+		[[nodiscard]] std::vector<ButtonInfo> initRecentTempates(const std::vector<FD::History::Project::Type>& types);
 
 	};
 

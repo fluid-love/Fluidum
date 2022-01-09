@@ -1,6 +1,7 @@
 #include "menubar.h"
 #include <nfd.h>
 
+#include "../../Layout/layout.h"
 #include "../Exit/exit.h"
 
 #include "../../Project/File/new.h"
@@ -195,6 +196,10 @@ void FS::MenuBar::itemOpen() {
 		FluidumScene_Log_InternalWarning();
 		return;
 	}
+
+	//reset Layout
+	FluidumScene_Log_RecreateScene(::FS::Layout);
+	Scene::recreateScene<Layout>();
 
 }
 
@@ -404,6 +409,7 @@ bool FS::MenuBar::layoutConfirm() {
 }
 
 void FS::MenuBar::setLayoutEmpty() {
+	//delete all view-scenes.
 	FluidumScene_Log_CallSceneConstructor(::FS::Utils::DeleteAllScenes);
 	Scene::callConstructor<Utils::DeleteAllScenes>();
 }

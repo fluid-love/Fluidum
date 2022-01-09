@@ -36,7 +36,7 @@ namespace FS::File::Add {
 
 		~CheckPath() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(CheckPath)
+		FluidumUtils_Class_Delete_CopyMove(CheckPath);
 
 	public:
 		virtual void call() override;

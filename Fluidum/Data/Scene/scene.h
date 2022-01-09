@@ -37,7 +37,7 @@ namespace FD {
 	public:
 		explicit SceneRead(Internal::PassKey) noexcept {};
 		~SceneRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(SceneRead)
+		FluidumUtils_Class_Delete_CopyMove(SceneRead);
 
 	private:
 		using CodeType = FU::Class::ClassCode::CodeType;

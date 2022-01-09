@@ -11,7 +11,7 @@ namespace FS::Coding {
 
 		~Debug() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Debug)
+		FluidumUtils_Class_Delete_CopyMove(Debug);
 
 	public:
 		virtual void call() override;

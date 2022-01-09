@@ -439,12 +439,6 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Scene\add.h">
       <Filter>Fluidum\Scene\Utils\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\project.h">
-      <Filter>Fluidum\Data\Log\Recent</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Fluidum\Data\Log\Recent\file.h">
-      <Filter>Fluidum\Data\Log\Recent</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Utils\Cursor\cursor.h">
       <Filter>Fluidum\Utils\Cursor</Filter>
     </ClInclude>
@@ -627,6 +621,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\Common\array.h">
       <Filter>Fluidum\Scene\Calc\Lua\Functions\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Gui\Style\theme.h">
+      <Filter>Fluidum\Data\Gui\Style</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\History\project.h">
+      <Filter>Fluidum\Data\History</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\History\file.h">
+      <Filter>Fluidum\Data\History</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Property\property.h">
+      <Filter>Fluidum\Data\Project\Property</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Property\lua.h">
+      <Filter>Fluidum\Data\Project\Property</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -885,9 +894,6 @@
     <Filter Include="Fluidum\Scene\Utils\Scene">
       <UniqueIdentifier>{889d9eca-759b-4f59-b5ea-c6cc29862d97}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fluidum\Data\Log\Recent">
-      <UniqueIdentifier>{ce5ca040-e313-4fec-9733-d12c882ca062}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fluidum\Utils\Cursor">
       <UniqueIdentifier>{4efbf0a1-ded0-470a-860d-67b6f4013346}</UniqueIdentifier>
     </Filter>
@@ -1034,6 +1040,12 @@
     </Filter>
     <Filter Include="Fluidum\Scene\Calc\Common">
       <UniqueIdentifier>{9c7b2c26-5bf0-4e96-a87b-b89bda8cae43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Data\History">
+      <UniqueIdentifier>{ab1b4183-427e-42ee-a211-2c30d6c9e949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Data\Project\Property">
+      <UniqueIdentifier>{5592229b-f373-4cba-bc63-d4d6375e7c88}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1265,12 +1277,6 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Scene\add.cpp">
       <Filter>Fluidum\Scene\Utils\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\project.cpp">
-      <Filter>Fluidum\Data\Log\Recent</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Fluidum\Data\Log\Recent\file.cpp">
-      <Filter>Fluidum\Data\Log\Recent</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Utils\Cursor\cursor.cpp">
       <Filter>Fluidum\Utils\Cursor</Filter>
     </ClCompile>
@@ -1423,6 +1429,63 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Fluidum\Scene\File\directory.cpp">
       <Filter>Fluidum\Scene\File</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.back.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.clear.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.__newindex.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.erase.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.front.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.make.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.empty.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_back.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.push_front.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.set.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.size.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_back.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\array\array.pop_front.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\array</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Calc\Lua\Functions\system\system.print.cpp">
+      <Filter>Fluidum\Scene\Calc\Lua\Functions\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Gui\Style\theme.cpp">
+      <Filter>Fluidum\Data\Gui\Style</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\History\file.cpp">
+      <Filter>Fluidum\Data\History</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\History\project.cpp">
+      <Filter>Fluidum\Data\History</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Property\property.cpp">
+      <Filter>Fluidum\Data\Project\Property</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Data\Project\Property\lua.cpp">
+      <Filter>Fluidum\Data\Project\Property</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

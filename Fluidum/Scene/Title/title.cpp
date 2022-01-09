@@ -68,7 +68,8 @@ FS::Title::Title(
 	const FD::SceneRead* const sceneRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::GuiRead* const guiRead,
-	const FD::Style::VarRead* const varRead
+	const FD::Style::VarRead* const varRead,
+	FD::Style::ThemeWrite* const themeWrite
 ) :
 	projectWrite(projectWrite),
 	projectRead(projectRead),
@@ -76,6 +77,7 @@ FS::Title::Title(
 	guiWrite(guiWrite),
 	guiRead(guiRead),
 	varRead(varRead),
+	themeWrite(themeWrite),
 
 	recentProjectInfo(getProjectHistory())
 {
@@ -101,6 +103,9 @@ void FS::Title::writeGuiData() {
 
 	//operators
 	using namespace FU::ImGui::Operators;
+
+	//ImGui Theme
+	themeWrite->setTheme();
 
 	const auto [width, height] = FDR::getWindowSize();
 	const ImVec2 size = { static_cast<float>(width),static_cast<float>(height) };

@@ -78,9 +78,17 @@ void FD::ProjectWrite::save_thread() {
 
 }
 
+void FD::ProjectWrite::requestStop() noexcept {
+	this->saveThread.request_stop();
+}
+
+bool FD::ProjectWrite::joinable() const noexcept {
+	return this->saveThread.joinable();
+}
+
 namespace FD::Project::Internal {
 
-	[[nodiscard]] std::string getCurrentTime() {
+	[[nodiscard]] std::string getCurrentZoneTime() {
 		const auto zone = std::chrono::current_zone()->name();
 		const auto time1 = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now()).get_local_time();
 		const auto time2 = std::chrono::floor<std::chrono::days>(time1);
@@ -90,6 +98,19 @@ namespace FD::Project::Internal {
 
 		std::stringstream ss;
 		ss << zone << '_' << ymd.year() << '_' << ymd.month() << '_' << ymd.day() << '_'
+			<< time.hours().count() << '_' << time.minutes().count() << '_' << time.seconds().count() << '_' << time.subseconds().count();
+		return ss.str();
+	}
+
+	[[nodiscard]] std::string getCurrentTime() {
+		const auto time1 = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now()).get_local_time();
+		const auto time2 = std::chrono::floor<std::chrono::days>(time1);
+		std::chrono::year_month_day ymd(time2);
+
+		std::chrono::hh_mm_ss time(std::chrono::floor< std::chrono::milliseconds>(time1 - time2));
+
+		std::stringstream ss;
+		ss << ymd.year() << '_' << ymd.month() << '_' << ymd.day() << '_'
 			<< time.hours().count() << '_' << time.minutes().count() << '_' << time.seconds().count() << '_' << time.subseconds().count();
 		return ss.str();
 	}
@@ -127,7 +148,7 @@ FD::ProjectWrite::ProjectWrite(Internal::PassKey) noexcept {
 		this->tryCreateFluidumDirectory();
 		this->tryCreateFluidumFiles();
 
-		this->writeProjectInfo(path.c_str());
+		this->writeProjectInfo(path);
 	}
 	catch (...) {
 		try {
@@ -152,7 +173,7 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 	static_assert(FU::Concept::IsNothrowMoveConstructibleAssignable<Data>);
 
 	try {
-		GCurrentData.reset();		
+		GCurrentData.reset();
 		GCurrentData.projectDirectoryPath = FU::File::consistentDirectory(info.projectDirectoryPath);
 
 		assert(FU::File::isAbsolute(GCurrentData.projectDirectoryPath));
@@ -196,7 +217,7 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 		std::string path = GCurrentData.projectDirectoryPath;
 		path += (GCurrentData.projectName + ".fproj");
 		GCurrentData.projectFilePath = path;
-		this->writeProjectInfo(path.c_str());
+		this->writeProjectInfo(path);
 		this->updateHistory();
 	}
 	catch (const Exception) {
@@ -235,7 +256,7 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 
 	//tab
 	std::vector<std::string> temp_tab_filePaths{};
-	std::vector<std::string> temp_tab_displayFiles{};
+	std::vector<FD::Coding::DisplayInfo> temp_tab_displayInfo{};
 
 	//scene
 	std::vector<FU::Class::ClassCode::CodeType> temp_scene_codes{};
@@ -246,7 +267,7 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 	std::lock_guard<std::mutex> lock1(FluidumFilesData::mtx);
 	std::lock_guard<std::mutex> lock2(ProjectFilesData::mtx);
 	std::lock_guard<std::mutex> lock3(UserFilesData::mtx);
-	std::lock_guard<std::mutex> lock4(Layout::Internal::LayoutData::mtx);
+	std::unique_lock<std::mutex> lock4(Layout::Internal::LayoutData::mtx);
 	std::lock_guard<std::mutex> lock5(Coding::Internal::Data::mtx);
 	std::lock_guard<std::mutex> lock6(Scene::Internal::Data::mtx);
 
@@ -256,7 +277,7 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		temp_files_projectFiles = Project::Internal::ProjectFilesData::projectFiles;
 		temp_files_userFiles = Project::Internal::UserFilesData::userFiles;
 		temp_layout_history = Layout::Internal::LayoutData::history;
-		temp_tab_displayFiles = Coding::Internal::Data::displayFiles;
+		temp_tab_displayInfo = Coding::Internal::Data::displayInfo;
 		temp_tab_filePaths = Coding::Internal::Data::filePaths;
 		temp_scene_codes = Scene::Internal::Data::codes;
 	}
@@ -290,6 +311,7 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		this->read_scene();
 
 		this->updateHistory();
+
 	}
 	catch (const Exception) {
 		//no-throw
@@ -299,7 +321,7 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		Project::Internal::FluidumFilesData::mainCodeFilePath = std::move(temp_files_mainCodeFilePath);
 		Project::Internal::ProjectFilesData::projectFiles = std::move(temp_files_userFiles);
 		Project::Internal::UserFilesData::userFiles = std::move(temp_files_projectFiles);
-		Coding::Internal::Data::displayFiles = std::move(temp_tab_displayFiles);
+		Coding::Internal::Data::displayInfo = std::move(temp_tab_displayInfo);
 		Coding::Internal::Data::filePaths = std::move(temp_tab_filePaths);
 		Scene::Internal::Data::codes = std::move(temp_scene_codes);
 
@@ -313,17 +335,14 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		Project::Internal::FluidumFilesData::mainCodeFilePath = std::move(temp_files_mainCodeFilePath);
 		Project::Internal::ProjectFilesData::projectFiles = std::move(temp_files_userFiles);
 		Project::Internal::UserFilesData::userFiles = std::move(temp_files_projectFiles);
-		Coding::Internal::Data::displayFiles = std::move(temp_tab_displayFiles);
+		Coding::Internal::Data::displayInfo = std::move(temp_tab_displayInfo);
 		Coding::Internal::Data::filePaths = std::move(temp_tab_filePaths);
 		Scene::Internal::Data::codes = std::move(temp_scene_codes);
-
 		Layout::Internal::LayoutData::history = std::move(temp_layout_history);
 
 		throw Exception::Unexpected;
 	}
 
-	//make layout
-	FD::Layout::Internal::LayoutData::remake();
 
 	GCurrentData.isTempProject = false;
 }
@@ -390,8 +409,9 @@ void FD::ProjectWrite::save_tab() {
 			throw std::runtime_error("Failed to open .tab file.");
 
 		//DisplayFiles
-		for (const auto& x : Coding::Internal::Data::displayFiles) {
-			ofs << x << std::endl;
+		for (const auto& x : Coding::Internal::Data::displayInfo) {
+			ofs << x.path << std::endl;
+			ofs << x.zoomRatio << std::endl;
 		}
 		ofs << Name::Delimiter << std::endl;
 
@@ -402,12 +422,18 @@ void FD::ProjectWrite::save_tab() {
 		ofs << Name::Delimiter << std::endl;
 	}
 
+	//This function may be called continuously. 
+	//Copying file is a time-consuming operation.
+	if (::FD::Scene::Internal::Data::save.load())
+		return;
+
 	//success
 	{
 		//std::filesystem::error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::Project_Temp_Tab, //old
-			GCurrentData.projectDirectoryPath + Name::Project_Tab       //new
+		std::filesystem::copy(
+			GCurrentData.projectDirectoryPath + Name::Project_Temp_Tab, //from
+			GCurrentData.projectDirectoryPath + Name::Project_Tab,      //new
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 }
@@ -423,22 +449,31 @@ void FD::ProjectWrite::save_scene() {
 		if (!ofs)
 			throw std::runtime_error("Failed to open .scene file.");
 
+		bool copy = false;
 		for (const auto& x : ::FD::Scene::Internal::Data::codes) {
 			const auto find = std::find(std::begin(::FS::Utils::Class::ClassCodesView), std::end(::FS::Utils::Class::ClassCodesView), x);
 			if (find != std::end(::FS::Utils::Class::ClassCodesView)) {
 				const auto distance = std::distance(std::begin(::FS::Utils::Class::ClassCodesView), find);
 				ofs << ::FS::Utils::Class::ClassCodesViewNames[distance] << std::endl;
+				copy = true;
 			}
 		}
+
+		//If we do not need to save the file, do not copy it.
+		//std::filesystem_copy_file is slow.
+		if (!copy)
+			return;
+
 		ofs << Project::Internal::Name::Delimiter << std::endl;
 	}
 
 	//success
 	{
 		//std::filesystem::filesystem_error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::Project_Temp_Scene, //old
-			GCurrentData.projectDirectoryPath + Name::Project_Scene       //new
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::Project_Temp_Scene, //from
+			GCurrentData.projectDirectoryPath + Name::Project_Scene,      //to
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 }
@@ -483,9 +518,10 @@ void FD::ProjectWrite::save_fluidumFiles() {
 	//success
 	{
 		//std::filesystem::filesystem_error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::Project_Temp_FluidumFiles, //old
-			GCurrentData.projectDirectoryPath + Name::Project_FluidumFiles       //new
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::Project_Temp_FluidumFiles, //from
+			GCurrentData.projectDirectoryPath + Name::Project_FluidumFiles,      //to
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 }
@@ -512,9 +548,10 @@ void FD::ProjectWrite::save_projectFiles() {
 	//success
 	{
 		//std::filesystem::filesystem_error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::Project_Temp_ProjectFiles, //old
-			GCurrentData.projectDirectoryPath + Name::Project_ProjectFiles       //new
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::Project_Temp_ProjectFiles, //from
+			GCurrentData.projectDirectoryPath + Name::Project_ProjectFiles,      //to
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 }
@@ -541,9 +578,10 @@ void FD::ProjectWrite::save_userFiles() {
 	//success
 	{
 		//std::filesystem::filesystem_error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::Project_Temp_UserFiles, //old
-			GCurrentData.projectDirectoryPath + Name::Project_UserFiles       //new
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::Project_Temp_UserFiles, //from
+			GCurrentData.projectDirectoryPath + Name::Project_UserFiles,      //to
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 
@@ -561,21 +599,31 @@ void FD::ProjectWrite::save_layout() {
 		if (!ofs)
 			throw std::runtime_error("Failed to open .layout file.");
 
-		ofs << *LayoutData::mainFrameLeft << std::endl;
-		ofs << *LayoutData::mainFrameRight << std::endl;
-		ofs << *LayoutData::mainFrameTop << std::endl;
-		ofs << *LayoutData::mainFrameBottom << std::endl;
+		//Save the file as a ratio, since the screen size may be different.
+		auto toRatio = [&](const bool horizonal, const float pos) -> float {
+			if (horizonal) {
+				return (pos - *LayoutData::mainFrameTop) / (*LayoutData::mainFrameBottom - *LayoutData::mainFrameTop);
+			}
+			else {
+				return (pos - *LayoutData::mainFrameLeft) / (*LayoutData::mainFrameRight - *LayoutData::mainFrameLeft);
+			}
+		};
 
 		for (auto& x : LayoutData::history) {
-			if (x.horizonal)
+			if (x.horizonal) {
 				ofs << "true" << std::endl;
-			else
+				ofs << toRatio(true, *x.pos) << std::endl;
+
+				//midpoint
+				ofs << toRatio(false, (*x.pos_side1 + ((*x.pos_side2 - *x.pos_side1) / 2.0f))) << std::endl;
+			}
+			else {
 				ofs << "false" << std::endl;
+				ofs << toRatio(false, *x.pos) << std::endl;
 
-			ofs << *x.pos << std::endl;
-
-			//midpoint
-			ofs << (*x.pos_side1 + ((*x.pos_side2 - *x.pos_side1) / 2.0f)) << std::endl;
+				//midpoint
+				ofs << toRatio(true, (*x.pos_side1 + ((*x.pos_side2 - *x.pos_side1) / 2.0f))) << std::endl;
+			}
 		}
 
 		ofs << Project::Internal::Name::Delimiter << std::endl;
@@ -584,9 +632,10 @@ void FD::ProjectWrite::save_layout() {
 	//success
 	{
 		//std::filesystem::filesystem_error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::Project_Temp_Layout, //old
-			GCurrentData.projectDirectoryPath + Name::Project_Layout       //new
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::Project_Temp_Layout, //from
+			GCurrentData.projectDirectoryPath + Name::Project_Layout,      //to
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 }
@@ -651,9 +700,10 @@ void FD::ProjectWrite::removeHistory(const std::string& fprojPath) {
 	//success
 	{
 		//std::filesystem::filesystem_error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::HistoryTempPath, //old
-			Internal::Resource::RecentProjectHistoryFilePath           //new
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::HistoryTempPath, //from
+			Internal::Resource::RecentProjectHistoryFilePath,          //to
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 
@@ -662,7 +712,7 @@ void FD::ProjectWrite::removeHistory(const std::string& fprojPath) {
 void FD::ProjectWrite::writeProjectInfo(const std::string& path) {
 	using namespace Project::Internal;
 
-	std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::ProjectFileTempPath, std::ios::out | std::ios::binary);
+	std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::ProjectFileTempPath, std::ios::out | std::ios::binary | std::ios::trunc);
 
 	if (!ofs)
 		throw Exception::Unexpected;
@@ -676,7 +726,7 @@ void FD::ProjectWrite::writeProjectInfo(const std::string& path) {
 	ofs << GCurrentData.projectFilePath << std::endl;
 
 	ofs << "Time" << std::endl;
-	ofs << getCurrentTime() << std::endl;
+	ofs << getCurrentZoneTime() << std::endl;
 
 	ofs << "ProjectName" << std::endl;
 	ofs << GCurrentData.projectName << std::endl;
@@ -689,9 +739,10 @@ void FD::ProjectWrite::writeProjectInfo(const std::string& path) {
 	//success
 	{
 		//std::filesystem::filesystem_error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::ProjectFileTempPath, //old
-			path												           //new
+		std::filesystem::copy(
+			GCurrentData.projectDirectoryPath + Name::ProjectFileTempPath, //from
+			path,												           //to
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 }
@@ -844,9 +895,10 @@ void FD::ProjectWrite::updateHistory() {
 	//success
 	{
 		//std::filesystem::filesystem_error
-		std::filesystem::rename(
-			GCurrentData.projectDirectoryPath + Name::HistoryTempPath, //old
-			Internal::Resource::RecentProjectHistoryFilePath           //new												           //new
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::HistoryTempPath, //from
+			Internal::Resource::RecentProjectHistoryFilePath,          //to	
+			std::filesystem::copy_options::overwrite_existing
 		);
 	}
 
@@ -928,8 +980,8 @@ void FD::ProjectWrite::read_files_recursive(std::ifstream& ifs, Project::FileLis
 
 	//size
 	std::getline(ifs, data);
-	std::size_t size = std::stoull(data);
-	for (std::size_t i = 0; i < size; i++) {
+	Size size = std::stoull(data);
+	for (Size i = 0; i < size; i++) {
 		this->read_files_recursive(ifs, &parent->dir_internal.back());
 	}
 }
@@ -1025,22 +1077,7 @@ void FD::ProjectWrite::read_layout() const {
 
 	std::string buf{};
 
-	//main frame
-	try {
-		std::getline(ifs, buf);
-		LayoutData::mainFrameLeft = std::make_shared<float>(std::stof(buf));
-		std::getline(ifs, buf);
-		LayoutData::mainFrameRight = std::make_shared<float>(std::stof(buf));
-		std::getline(ifs, buf);
-		LayoutData::mainFrameTop = std::make_shared<float>(std::stof(buf));
-		std::getline(ifs, buf);
-		LayoutData::mainFrameBottom = std::make_shared<float>(std::stof(buf));
-	}
-	catch (const std::exception&) {
-		throw Exception::BrokenFile;
-	}
-
-	std::size_t counter = 0;
+	Size counter = 0;
 	while (true) {
 		std::getline(ifs, buf);
 		if (buf == Name::Delimiter)
@@ -1058,15 +1095,15 @@ void FD::ProjectWrite::read_layout() const {
 		try {
 			if (his.horizonal) {
 				std::getline(ifs, buf);
-				his.readPos.y = std::stof(buf);
+				his.readPosRatio.y = std::stof(buf);
 				std::getline(ifs, buf);
-				his.readPos.x = std::stof(buf);
+				his.readPosRatio.x = std::stof(buf);
 			}
 			else {
 				std::getline(ifs, buf);
-				his.readPos.x = std::stof(buf);
+				his.readPosRatio.x = std::stof(buf);
 				std::getline(ifs, buf);
-				his.readPos.y = std::stof(buf);
+				his.readPosRatio.y = std::stof(buf);
 			}
 		}
 		catch (const std::exception&) {
@@ -1097,12 +1134,21 @@ void FD::ProjectWrite::read_tab() const {
 
 	//TabDisplayFile
 	{
-		uint16_t counter = 0;
+		UIF16 counter = 0;
 		while (true) {
 			std::getline(ifs, data);
 			if (data == Name::Delimiter)
 				break;
-			Coding::Internal::Data::displayFiles.emplace_back(data);
+
+			Coding::DisplayInfo info{};
+			info.path = data;
+			std::getline(ifs, data);
+			info.zoomRatio = std::stof(data);
+
+			if (counter == 0)//first
+				Coding::Internal::Data::firstEditorZoomRatio = info.zoomRatio;
+
+			Coding::Internal::Data::displayInfo.emplace_back(std::move(info));
 
 			counter++;
 			if (counter > 1000)
@@ -1112,7 +1158,7 @@ void FD::ProjectWrite::read_tab() const {
 
 	//TabFilePathes
 	{
-		uint16_t counter = 0;
+		UIF16 counter = 0;
 		while (true) {
 			std::getline(ifs, data);
 			if (data == Name::Delimiter)
@@ -1194,6 +1240,9 @@ std::vector<FU::Class::ClassCode::CodeType> FD::ProjectRead::loadSceneFile() con
 	std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 
 	std::ifstream ifs(Project::Internal::GCurrentData.projectDirectoryPath + Project::Internal::Name::Project_Scene);
+
+	if (FU::File::empty(ifs))
+		return {};
 
 	std::string data{};
 

@@ -60,13 +60,16 @@ void FS::Layout::call() {
 }
 
 void FS::Layout::dockGui() {
-	for (uint16_t i = 0, size = static_cast<uint16_t>(windows.size()); i < size; i++) {
+
+	for (UIF16 i = 0, size = static_cast<UIF16>(windows.size()); i < size; i++) {
 		select.resizedWindowIndex = i;
 		select.current = &windows[i];
 		std::string label = "##Lay" + std::to_string(i);
 
 		this->dockSpace(label.c_str());
+
 	}
+
 }
 
 void FS::Layout::dockSpace(const char* label) {
@@ -83,6 +86,8 @@ void FS::Layout::dockSpace(const char* label) {
 	ImGui::SetNextWindowSizeConstraints(select.current->minSize, select.current->maxSize);
 	ImGui::SetNextWindowPos(select.current->pos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(select.current->size, ImGuiCond_Always);
+
+
 	ImGui::Begin(label, nullptr, windowFlags | (flag.noresize ? ImGuiWindowFlags_NoResize : ImGuiWindowFlags_None));
 
 	select.current->pos = ImGui::GetWindowPos();
@@ -93,8 +98,6 @@ void FS::Layout::dockSpace(const char* label) {
 
 	ImGuiID dockingID = ImGui::DockSpace(id, ImVec2{}, ImGuiDockNodeFlags_PassthruCentralNode);
 
-
-
 	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowFocused()) {
 		flag.mouseDown = true;
 		const auto border = layoutWrite->update(*select.current, ImGui::GetMousePos(), select.resizeBorder);
@@ -102,6 +105,8 @@ void FS::Layout::dockSpace(const char* label) {
 			select.resizeBorder = border;
 		this->updateWindows();
 	}
+
+	this->focusedWindowBackground();
 
 	ImGui::End();
 }
@@ -111,12 +116,21 @@ void FS::Layout::ifRightMouseButtonCliked() {
 		return;
 
 	select.hovered = select.current;
+	select.focused = false;
 
-	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right) ||
+	if (
 		ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) ||
-		ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
-		)
+		ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+	{
 		return;
+	}
+
+	select.focused = true;
+
+	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+		return;
+
+
 
 	flag.popup = true;
 	select.pos = ImGui::GetMousePos();
@@ -364,15 +378,26 @@ void FS::Layout::messageLimit() {
 	Scene::addScene<Utils::Message>(text.error_max, select.pos);
 }
 
+void FS::Layout::focusedWindowBackground() {
+	if (select.focused) {
+		const ImVec2 padding = ImGui::GetStyle().WindowPadding;
+		const ImVec2 pos = select.current->pos;
+		const ImVec2 size = select.current->size;
+		constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.00f, 0.004f, 0.004f, 1.0f);
+		ImGui::GetWindowDrawList()->AddRectFilled(pos + padding, pos + size - padding, col);
+	}
+}
+
 void FS::Layout::drawSeparators() {
 	ImDrawList* list = ImGui::GetBackgroundDrawList();
-	constexpr ImU32 col = FU::ImGui::convertImVec4ToImU32(0.366f, 0.366f, 0.366f, 1.000f);
-	constexpr ImU32 colResize = FU::ImGui::convertImVec4ToImU32(1.0f, 0.6f, 0.4f, 1.0f);
+	constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.366f, 0.366f, 0.366f, 1.000f);
+	constexpr ImU32 colResize = FU::ImGui::ConvertImVec4ToImU32(0.3f, 1.0f, 0.4f, 1.0f);
 
 	for (auto& x : separators) {
 		if (x.resize)
 			list->AddLine(x.pos1, x.pos2, select.resizeBorder != FD::Layout::ResizedBorder::None ? colResize : col);
-		else
+		else {
 			list->AddLine(x.pos1, x.pos2, col);
+		}
 	}
 }

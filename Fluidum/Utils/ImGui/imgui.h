@@ -12,7 +12,8 @@ namespace FU::ImGui {
 }
 
 namespace FU::ImGui {
-	consteval ImU32 convertImVec4ToImU32(const float x, const float y, const float z, const float w) {
+
+	consteval ImU32 ConvertImVec4ToImU32(const float x, const float y, const float z, const float w) {
 		auto saturate = [](const float f) { return (f < 0.0f) ? 0.0f : (f > 1.0f) ? 1.0f : f; };
 
 		ImU32 out;
@@ -38,4 +39,5 @@ namespace FU::ImGui {
 			::ImGui::PushStyleColor(x, col);
 		return sizeof...(Colors);
 	}*/
+
 }

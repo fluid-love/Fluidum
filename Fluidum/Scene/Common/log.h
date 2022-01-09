@@ -1,23 +1,14 @@
 #pragma once
 
-#include "boost/predef.h"
+//this->consoleWirte
 
-//Microsoft Visual C/C++
-#ifdef BOOST_COMP_MSVC
-
-#define FluidumScene_Log_EnumClass_Error(value)\
-	GLog.add_str<FU::Log::Type::Error>("Failed. {}. {}." ,__FUNCSIG__, magic_enum::enum_name(value))
-
-#else 
-
-#define FluidumScene_Log_EnumClassException(value)\
-	GLog.add_str<FU::Log::Type::Error>("Failed. {}. {}." ,__func__, magic_enum::enum_name(value))
-
-#endif 
-
-
-#define FluidumScene_Console_InternalError \
+#define FluidumScene_Console_InternalError() \
 	this->consoleWrite->push(std::string("Internal Error."))
+
+//GLog
+
+#define FluidumScene_Log_InternalWarning_Enum(value) \
+	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Internal Enum Error. Value:({}).", ::magic_enum::enum_name(value))
 
 #define FluidumScene_Log_RequestAddScene(name) \
 	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_RequestAddScene");	   \
@@ -39,6 +30,10 @@
 	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_CallSceneConstructor");  \
 	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Call constructor " #name ".")
 
+#define FluidumScene_Log_RecreateScene(name) \
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_RecreateScene");  \
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Recreate " #name " Scene.")
+
 #define FluidumScene_Log_InternalError() \
 	GLog.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Internal Error.")
 
@@ -58,3 +53,10 @@
 
 #define FluidumScene_Log_StdExceptionWarning(err) \
 	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "std::exception was thrown({}).", err.what())
+
+#define FluidumScene_Log_UnexpectedExceptionWarning() \
+	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "An unexpected exception was thrown.")
+
+#define FluidumScene_Log_SeriousError() \
+	GLog.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Serious Error.")
+

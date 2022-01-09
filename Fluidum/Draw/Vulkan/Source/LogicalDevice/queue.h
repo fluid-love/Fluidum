@@ -21,7 +21,7 @@ namespace FVK::Internal {
 		explicit Queue(ManagerPassKey, const Data::QueueData& data, const Parameter& parameter) noexcept;
 
 		~Queue() = default;
-		FluidumUtils_Class_Default_CopyMove(Queue)
+		FluidumUtils_Class_Default_CopyMove(Queue);
 
 	private:
 		//no-throw

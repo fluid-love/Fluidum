@@ -7,7 +7,7 @@ FS::Calc::Lua::Ret FS::Calc::Lua::Run::array___gc(State L) {
 	const auto types = LuAssist::Utils::types(L);
 	if (types.size() != 1 && types[0] == LuAssist::Type::Integer) {
 		FluidumScene_Log_InternalWarning();
-		Internal::throwInternalError();
+		Internal::Exception::throwInternalError();
 	}
 
 	const FD::Calc::Array::Key key = static_cast<FD::Calc::Array::Key>(lua_tointeger(L, 1));

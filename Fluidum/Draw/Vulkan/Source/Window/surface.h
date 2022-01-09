@@ -20,7 +20,7 @@ namespace FVK::Internal {
 		explicit Surface(ManagerPassKey, const Data::SurfaceData& data, const Parameter& parameter);
 		
 		~Surface() = default;
-		FluidumUtils_Class_Default_CopyMove(Surface)
+		FluidumUtils_Class_Default_CopyMove(Surface);
 
 	private:
 		/*

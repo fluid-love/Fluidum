@@ -48,7 +48,7 @@ namespace FVK::Internal {
 		explicit Instance(ManagerPassKey, const Data::InstanceData& data, const MessengerParameter& parameter);
 
 		~Instance() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(Instance)
+		FluidumUtils_Class_Default_CopyMove(Instance);
 
 	private:
 		void create(const Data::InstanceData& data, const Parameter& parameter);

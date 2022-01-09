@@ -21,7 +21,7 @@ namespace FS {
 
 		~Layout() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Layout)
+		FluidumUtils_Class_Delete_CopyMove(Layout);
 
 	public:
 		virtual void call() override;
@@ -39,9 +39,10 @@ namespace FS {
 
 		struct {
 			FD::Layout::DockSpaceWindow* current{};
+			bool focused{};
 			FD::Layout::DockSpaceWindow* right{};
 
-			uint16_t resizedWindowIndex = 0;
+			UIF16 resizedWindowIndex = 0;
 
 			FD::Layout::DockSpaceWindow* hovered{};
 
@@ -64,7 +65,6 @@ namespace FS {
 
 			bool mouseDown = false;
 		}flag;
-
 
 	private:
 		void dockGui();
@@ -96,6 +96,7 @@ namespace FS {
 		void messageLimit();
 
 	private:
+		void focusedWindowBackground();
 		void drawSeparators();
 
 	};

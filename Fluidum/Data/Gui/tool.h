@@ -18,7 +18,7 @@ namespace FD {
 		};
 		class Data final {
 			static inline std::vector<Info> funcs{};
-			static inline std::vector<uint16_t> indices{};
+			static inline std::vector<UIF16> indices{};
 		private:
 			friend class ::FD::ToolBarWrite;
 			friend class ::FD::ToolBarRead;
@@ -33,7 +33,7 @@ namespace FD {
 	public:
 		ToolBarWrite(Internal::PassKey) {}
 		~ToolBarWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(ToolBarWrite)
+		FluidumUtils_Class_Delete_CopyMove(ToolBarWrite);
 
 	public:
 		template<typename Scene>
@@ -117,12 +117,12 @@ namespace FD {
 	public:
 		ToolBarRead(Internal::PassKey) {}
 		~ToolBarRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ToolBarRead)
+		FluidumUtils_Class_Delete_CopyMove(ToolBarRead);
 
 	public:
 		[[nodiscard]] const std::vector<TopBar::Info>* getInfo() const noexcept;
-		[[nodiscard]] const std::vector<uint16_t>* getIndices() const noexcept;
-		void call(const uint16_t index) const;
+		[[nodiscard]] const std::vector<UIF16>* getIndices() const noexcept;
+		void call(const UIF16 index) const;
 
 	};
 

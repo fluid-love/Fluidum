@@ -16,7 +16,8 @@ namespace FS {
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			const FD::ProjectFilesRead* const projectFilesRead,
-			FD::ToolBarWrite* const toolBarWrite
+			FD::ToolBarWrite* const toolBarWrite,
+			const FD::Style::ColorRead* const colorRead
 		);
 		void Constructor(
 			FD::Style::VarRead,
@@ -28,12 +29,13 @@ namespace FS {
 			FD::ProjectWrite,
 			FD::ProjectRead,
 			FD::ProjectFilesRead,
-			FD::ToolBarWrite
+			FD::ToolBarWrite,
+			FD::Style::ColorRead
 		);
 
 		~TextEditor() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(TextEditor)
+		FluidumUtils_Class_Delete_CopyMove(TextEditor);
 
 	public:
 		virtual void call() override;
@@ -48,27 +50,46 @@ namespace FS {
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
 		FD::ToolBarWrite* const toolBarWrite;
+		const FD::Style::ColorRead* const colorRead;
 
 		FD::Text::TextEditor text{};
 
-	private://data
+	private:
+		struct {
+			float infoWindowHeight{};
+		}style;
 
-		struct Size final {
-			ImVec2 windowPos = ImVec2();
-			ImVec2 windowSize = ImVec2();
-		}size;
+		struct {
+			std::string input{};
+		}zoom;
+
+		struct {
+			ImCounter<ImAnimeTime> tool_save{};
+			ImCounter<ImAnimeTime> tool_undo{};
+			ImCounter<ImAnimeTime> tool_redo{};
+
+		}anime;
+
+		struct {
+
+		}pos;
 
 		struct Info final {
 			FTE::TextEditor* editor = nullptr;
-			std::string path{};
+			FD::Coding::DisplayInfo info{};
 			FD::Project::File::SupportedFileType language{};
 		};
 		std::vector<Info> info{};
 
 		Info* current = nullptr;
+		Info* selected = nullptr;
 
 	private:
 		void toolBar();
+		void tool_separator();
+
+	private:
+		void isWindowFocused();
 
 	private:
 		void windowEmpty();
@@ -82,11 +103,14 @@ namespace FS {
 
 		void textEditor();
 		void breakPoint();
+
+	private://info
 		void textEditorInfo();
+		void editorInfo_zoom();
 
 	private:
-		void saveText();
-		void saveAs();
+		void saveText(const Info* const  info);
+		void saveAs(const Info* const  info);
 
 		void update();
 		void textChange();
@@ -99,6 +123,10 @@ namespace FS {
 		void checkPython();
 		void checkAngelScript();
 		lua_State* luaState = nullptr;
+
+	private://shortcut
+		void shortcut();
+		void shortcut_zoom();
 
 	};
 

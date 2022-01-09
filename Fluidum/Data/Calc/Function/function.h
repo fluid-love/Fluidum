@@ -52,11 +52,11 @@ namespace FD {
 
 	template<Calc::Language>
 	class FunctionWrite final {
-		FluidumUtils_Class_Delete_ConDestructor(FunctionWrite)
+		FluidumUtils_Class_Delete_ConDestructor(FunctionWrite);
 	};
 	template<Calc::Language>
 	class FunctionRead final {
-		FluidumUtils_Class_Delete_ConDestructor(FunctionRead)
+		FluidumUtils_Class_Delete_ConDestructor(FunctionRead);
 	};
 
 	//一定回数のpushでファイルへ出力
@@ -65,7 +65,7 @@ namespace FD {
 	public:
 		explicit FunctionWrite(Internal::PassKey) noexcept {};
 		~FunctionWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(FunctionWrite)
+		FluidumUtils_Class_Delete_CopyMove(FunctionWrite);
 
 
 	private:
@@ -99,7 +99,7 @@ namespace FD {
 	public:
 		explicit FunctionRead(Internal::PassKey) noexcept {};
 		~FunctionRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(FunctionRead)
+		FluidumUtils_Class_Delete_CopyMove(FunctionRead);
 
 	public:
 

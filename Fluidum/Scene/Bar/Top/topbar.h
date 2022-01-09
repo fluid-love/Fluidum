@@ -31,7 +31,7 @@ namespace FS {
 
 		~TopBar() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(TopBar)
+		FluidumUtils_Class_Delete_CopyMove(TopBar);
 
 	public:
 		virtual void call() override;
@@ -46,6 +46,8 @@ namespace FS {
 		FD::ToolBarWrite* const toolBarWrite;
 		const FD::ImGuiWindowRead* const imguiWindowRead;
 		const FD::LayoutRead* const layoutRead;
+
+		FD::Text::TopBar text{};
 
 	private:
 		struct {
@@ -64,17 +66,10 @@ namespace FS {
 			ImVec2 run{};
 		}pos;
 
-		FD::Text::TopBar text{};
+		struct {
+			ImCounter<ImAnimeTime> run{};
 
-		//struct {
-		//	void reset() {
-		//		isPlayButtonClicked = false;
-		//		time = std::chrono::system_clock::time_point();
-		//	}
-		//	bool isPlayButtonClicked = false;
-		//	std::chrono::system_clock::time_point time{};
-		//}wait;
-		//FS::Parameter::Loading<> loadingParam = {};
+		}anime;
 
 	private:
 		void rightGui();

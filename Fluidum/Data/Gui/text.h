@@ -158,6 +158,8 @@ namespace FD::Text::Internal {
 		GuiText newProject;
 		GuiText includeFile;
 
+		GuiText run;
+
 		GuiText error_mainfile;
 
 	};
@@ -360,6 +362,7 @@ namespace FD::Text::Internal {
 
 		GuiText file;
 		GuiText save;
+		GuiText save_icon;
 		GuiText saveAs;
 		GuiText load;
 		GuiText create;
@@ -368,7 +371,9 @@ namespace FD::Text::Internal {
 		GuiText edit;
 		GuiText readOnly;
 		GuiText undo;
+		GuiText undo_icon;
 		GuiText redo;
+		GuiText redo_icon;
 		GuiText copy;
 		GuiText cut;
 		GuiText del;
@@ -393,14 +398,15 @@ namespace FD::Text::Internal {
 
 		GuiText tab;
 
-		GuiText error_limitMaxSize;
-		GuiText error_alreadyExist;
-
 		GuiText popup_save;
 		GuiText popup_saveAndClose;
 		GuiText popup_withoutSaving;
 		GuiText popup_cancel;
 
+		GuiText error_limitMaxSize;
+		GuiText error_alreadyExist;
+		GuiText error_notExist;
+		GuiText error_unexpected;
 	};
 
 	struct Project final {
@@ -442,6 +448,7 @@ namespace FD::Text::Internal {
 		GuiText close;
 		GuiText remove;
 		GuiText release;
+		GuiText setAsMainFile;
 
 		GuiText error_maxSize;
 
@@ -528,7 +535,7 @@ namespace FD {
 	public:
 		GuiTextRead(Internal::PassKey);
 		~GuiTextRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(GuiTextRead)
+		FluidumUtils_Class_Delete_CopyMove(GuiTextRead);
 
 	public:
 		_NODISCARD Text::Language getType() const noexcept;
@@ -541,7 +548,7 @@ namespace FD {
 	//		StyleColorWrite(Internal::
 	// ) {}
 	//		~StyleColorWrite() = default;
-	//		FluidumUtils_Class_Delete_CopyMove(StyleColorWrite)
+	//		FluidumUtils_Class_Delete_CopyMove(StyleColorWrite);
 	//
 	//#ifdef FluidumData_DebugMode
 	//			StyleColorWrite() = default;

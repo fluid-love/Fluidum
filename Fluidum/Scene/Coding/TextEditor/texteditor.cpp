@@ -12,7 +12,8 @@ FS::TextEditor::TextEditor(
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
 	const FD::ProjectFilesRead* const projectFilesRead,
-	FD::ToolBarWrite* const toolBarWrite
+	FD::ToolBarWrite* const toolBarWrite,
+	const FD::Style::ColorRead* const colorRead
 ) :
 	varRead(varRead),
 	tabWrite(tabWrite),
@@ -22,7 +23,8 @@ FS::TextEditor::TextEditor(
 	guiRead(guiRead),
 	projectWrite(projectWrite),
 	projectRead(projectRead),
-	toolBarWrite(toolBarWrite)
+	toolBarWrite(toolBarWrite),
+	colorRead(colorRead)
 {
 	FluidumScene_Log_Constructor(::FS::TextEditor);
 
@@ -33,6 +35,10 @@ FS::TextEditor::TextEditor(
 	toolBarWrite->add(&TextEditor::toolBar, this, text.editor.operator const std::string & ());
 
 	this->luaState = luaL_newstate();
+
+	style.infoWindowHeight = ImGui::GetFontSize() * 5.0f;
+
+	zoom.input.reserve(4);
 }
 
 FS::TextEditor::~TextEditor() noexcept {
@@ -58,12 +64,14 @@ void FS::TextEditor::call() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
 
-	for (std::size_t i = 0; auto & x : this->info) {
+	for (Size i = 0; auto & x : this->info) {
 		current = &info[i];
 
 		std::string label = text.editor.operator const char* ();
 		(label += "##") += std::to_string(i++);
 		ImGui::Begin(label.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar);
+
+		this->isWindowFocused();
 
 		this->textEditorMenu();
 		this->textEditor();
@@ -81,28 +89,71 @@ void FS::TextEditor::call() {
 
 	this->textChange();
 	this->update();
+	this->shortcut();
 }
 
 void FS::TextEditor::toolBar() {
+	if (info.empty())
+		return;
 
+	//save
+	if (ImGui::Button(ICON_FA_SAVE)) {
+		FU::ImGui::tooltip(anime.tool_save, text.save);
+		this->saveText(this->selected);
+	}
+
+	this->tool_separator();
+	ImGui::SameLine();
+
+	if (ImGui::Button(ICON_FA_UNDO)) {
+		FU::ImGui::tooltip(anime.tool_undo, text.undo);
+		this->saveText(this->selected);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button(ICON_FA_REDO)) {
+		FU::ImGui::tooltip(anime.tool_redo, text.redo);
+		this->saveText(this->selected);
+	}
+}
+
+void FS::TextEditor::tool_separator() {
+	const ImVec2 pos1 = { ImGui::GetItemRectMax().x , ImGui::GetItemRectMin().y };
+	const ImVec2 pos2 = ImGui::GetItemRectMax();
+
+	ImGui::GetWindowDrawList()->AddLine(pos1, pos2, colorRead->toolBarVerticalSeparator());
+
+}
+
+void FS::TextEditor::isWindowFocused() {
+	if (!ImGui::IsWindowFocused())
+		return;
+
+	this->selected = current;
+
+	if (displayRead->isEditorFocused(current->editor))
+		return;
+
+	displayWrite->focusedEditor(current->info.path);
 }
 
 void FS::TextEditor::windowEmpty() {
 	std::string label = text.editor.operator const char* ();
 	label += "##0";
-	ImGui::Begin(label.c_str());
+	ImGui::Begin(label.c_str(), nullptr);
 
 	ImGui::End();
 }
 
 void FS::TextEditor::setInfo() {
-	auto paths = displayRead->paths();
+	auto displayInfo = displayRead->info();
 
-	for (auto& x : paths) {
-		std::ifstream ifs(x);
+	for (auto& x : displayInfo) {
+		std::ifstream ifs(x.path);
 		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
-		auto info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,x, FD::Project::File::getSupportedFileType(x) });
+		auto info_ = this->info.emplace_back(Info{ tabWrite->getEditor(x.path) ,x , FD::Project::File::getSupportedFileType(x.path) });
 		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 		info_.editor->SetText(str);
 		info_.editor->SetPalette(FTE::getDarkPalette());
@@ -125,12 +176,12 @@ void FS::TextEditor::fileMenu() {
 	if (!ImGui::BeginMenu(text.file))
 		return;
 
-	if (ImGui::MenuItem(text.save))
-		this->saveText();
+	if (ImGui::MenuItem(text.save_icon))
+		this->saveText(current);
 
 	varRead->iconDummy();
 	if (ImGui::MenuItem(text.saveAs))
-		this->saveAs();
+		this->saveAs(current);
 
 	ImGui::EndMenu();
 }
@@ -145,9 +196,9 @@ void FS::TextEditor::editMenu() {
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem(text.undo, "ALT-Backspace", nullptr, !ro && current->editor->CanUndo()))
+	if (ImGui::MenuItem(text.undo_icon, "ALT-Backspace", nullptr, !ro && current->editor->CanUndo()))
 		current->editor->Undo();
-	if (ImGui::MenuItem(text.redo, "Ctrl-Y", nullptr, !ro && current->editor->CanRedo()))
+	if (ImGui::MenuItem(text.redo_icon, "Ctrl-Y", nullptr, !ro && current->editor->CanRedo()))
 		current->editor->Redo();
 
 	ImGui::Separator();
@@ -189,12 +240,22 @@ void FS::TextEditor::themeMenu() {
 }
 
 void FS::TextEditor::textEditor() {
-	current->editor->Render("TextEditor", { ImGui::GetWindowWidth(),ImGui::GetWindowHeight() * 0.86f });
+	ImGui::BeginChild("##Editor", { 0.0f, ImGui::GetWindowHeight() - style.infoWindowHeight });
+	ImGui::SetWindowFontScale(current->info.zoomRatio);
+	current->editor->Render(current->info.path.c_str());
+	ImGui::EndChild();
+
+	ImGui::Spacing();
 }
 
 void FS::TextEditor::textEditorInfo() {
 	ImGui::BeginChild("TextEditorInfo");
 	auto cpos = current->editor->GetCursorPosition();
+
+	//zoom percentage
+	this->editorInfo_zoom();
+
+	ImGui::SameLine(); ImGui::Separator(); ImGui::SameLine();
 
 	//line
 	ImGui::Text(text.line); ImGui::SameLine();
@@ -241,12 +302,36 @@ void FS::TextEditor::textEditorInfo() {
 	ImGui::EndChild();
 }
 
-void FS::TextEditor::saveText() {
-	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save text({}).", current->path);
-	tabWrite->saveText(current->path);
+void FS::TextEditor::editorInfo_zoom() {
+	constexpr const char* percent[] = {
+		" 30 % ", " 50 % ", " 70 % ", " 100 % ", " 120 % ", " 150 % ", " 200 % ", " 300 % "
+	};
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2());
+	ImGui::PopStyleVar();
+	const std::string preview = std::to_string(std::roundf(current->info.zoomRatio * 100.0f)) + " %";
+
+	ImGui::InputText("##ZoomInput", zoom.input.data(), zoom.input.capacity(), ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsDecimal);
+
+	ImGui::SameLine();
+
+	//combo
+	if (!ImGui::BeginCombo("##ZoomCombo", "", ImGuiComboFlags_NoPreview))
+		return;
+
+	for (auto x : percent) {
+		ImGui::Selectable(x);
+	}
+
+	ImGui::EndCombo();
 }
 
-void FS::TextEditor::saveAs() {
+void FS::TextEditor::saveText(const Info* const info) {
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save text({}).", current->info.path);
+	tabWrite->saveText(current->info.path);
+}
+
+void FS::TextEditor::saveAs(const Info* const info) {
 	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
 	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save dialog.");
 	const nfdresult_t result = NFD_SaveDialog(nullptr, nullptr, outPath.get());
@@ -272,7 +357,7 @@ void FS::TextEditor::update() {
 
 	for (auto& x : paths) {
 		//not new file
-		auto itr = std::find_if(info.begin(), info.end(), [&](auto& y) {return y.path == x; });
+		auto itr = std::find_if(info.begin(), info.end(), [&](auto& y) {return y.info.path == x; });
 		if (itr != info.end()) {
 			continue;
 		}
@@ -287,7 +372,7 @@ void FS::TextEditor::update() {
 	for (const auto& x : paths) {
 		auto itr = std::erase_if(info, [&](auto& y)
 			{
-				auto itr = std::find_if(info.begin(), info.end(), [&](auto&) {return y.path == x; });
+				auto itr = std::find_if(info.begin(), info.end(), [&](auto&) {return y.info.path == x; });
 				return itr == info.end();
 			});
 	}
@@ -297,12 +382,12 @@ void FS::TextEditor::textChange() {
 	if (!current->editor->IsTextChanged())
 		return;
 
-	tabWrite->setIsTextSaved(current->path, false);
+	tabWrite->setIsTextSaved(current->info.path, false);
 }
 
 std::string FS::TextEditor::getCurrentEditorPath() {
 	const auto itr = std::find_if(info.cbegin(), info.cend(), [&](auto& x) {return x.editor == current->editor; });
-	return itr->path;
+	return itr->info.path;
 }
 
 void FS::TextEditor::breakPoint() {
@@ -381,3 +466,56 @@ void FS::TextEditor::checkPython() {
 void FS::TextEditor::checkAngelScript() {
 
 }
+
+void FS::TextEditor::shortcut() {
+	this->shortcut_zoom();
+}
+
+void FS::TextEditor::shortcut_zoom() {
+	const auto& io = ImGui::GetIO();
+
+	if (!io.KeyCtrl || (io.MouseWheel == 0.0f))
+		return;
+
+	if (io.MouseWheel > 0.0f) {
+		selected->info.zoomRatio += 0.1f;
+	}
+	else {
+		selected->info.zoomRatio -= 0.1f;
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,27 +1,6 @@
 #include "color.h"
 
-//future
-//namespace FD {
-//	Style::StyleType getType() {
-//		std::ifstream ifs(Internal::Resource::GuiStyleFilePath, std::ios::in);
-//
-//		std::string data{};
-//		std::getline(ifs, data);
-//
-//		if (data == "Default")
-//			return Style::StyleType::Default;
-//		else if (data == "Dark")
-//			return Style::StyleType::Dark;
-//		else if (data == "Light")
-//			return Style::StyleType::Light;
-//		else
-//			throw std::runtime_error("Failed to read GuiStyleType.");
-//
-//		return{};
-//	}
-//}
-
-void FD::Style::ColorRead::pushButtonDisabled() const {
+void FD::Style::ColorRead::pushButtonDisabled() const noexcept {
 	ImVec4 colDisabled = ImGui::GetStyle().Colors[ImGuiCol_Button];
 	ImGui::PushStyleColor(ImGuiCol_Button, colDisabled);
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colDisabled);
@@ -29,6 +8,38 @@ void FD::Style::ColorRead::pushButtonDisabled() const {
 	ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,0.3f });
 }
 
-void FD::Style::ColorRead::popButtonDisabled() const {
+void FD::Style::ColorRead::popButtonDisabled() const noexcept {
 	ImGui::PopStyleColor(4);
 }
+
+void FD::Style::ColorRead::pushSelectableDisabled() const noexcept {
+	ImVec4 colDisabled = ImGui::GetStyle().Colors[ImGuiCol_Button];
+	ImGui::PushStyleColor(ImGuiCol_Header, colDisabled);
+	//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colDisabled);
+	//ImGui::PushStyleColor(ImGuiCol_ButtonActive, colDisabled);
+	//ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,0.3f });
+}
+
+void FD::Style::ColorRead::popSelectableDisabled() const noexcept {
+	ImGui::PopStyleColor();
+}
+
+ImU32 FD::Style::ColorRead::toolBarVerticalSeparator() const noexcept {
+	constexpr ImU32 color = FU::ImGui::ConvertImVec4ToImU32(0.01f, 0.01f, 0.01f, 1.0f);
+	return color;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -22,7 +22,7 @@ namespace FVK::Internal {
 		DeviceMemory(ManagerPassKey, const Data::DeviceMemoryData& data, const Parameter& parameter);
 
 		~DeviceMemory() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(DeviceMemory)
+		FluidumUtils_Class_Default_CopyMove(DeviceMemory);
 
 	public:
 		/*

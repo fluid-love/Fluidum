@@ -30,7 +30,7 @@ namespace FVK::Internal {
 		explicit ShaderModule(ManagerPassKey, const Data::ShaderModuleData& data, const Parameter& parameter);
 		
 		~ShaderModule() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(ShaderModule)
+		FluidumUtils_Class_Default_CopyMove(ShaderModule);
 
 	private:
 		/*

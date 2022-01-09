@@ -39,7 +39,7 @@ namespace FS::Utils {
 			FluidumScene_Log_Destructor(::FS::Utils::DeleteScenes<T...>);
 		}
 
-		FluidumUtils_Class_Delete_CopyMove(DeleteScenes)
+		FluidumUtils_Class_Delete_CopyMove(DeleteScenes);
 
 	public:
 		virtual void call() override {

@@ -12,7 +12,8 @@ namespace FS {
 			const FD::SceneRead* const sceneRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::GuiRead* const guiRead,
-			const FD::Style::VarRead* const varRead
+			const FD::Style::VarRead* const varRead,
+			FD::Style::ThemeWrite* const themeWrite
 		);
 		void Constructor(
 			FD::ProjectWrite,
@@ -20,12 +21,13 @@ namespace FS {
 			FD::SceneRead,
 			FD::GuiWrite,
 			FD::GuiRead,
-			FD::Style::VarRead
+			FD::Style::VarRead,
+			FD::Style::ThemeWrite
 		);
 
 		~Title() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Title)
+		FluidumUtils_Class_Delete_CopyMove(Title);
 
 	public:
 		virtual void call() override;
@@ -37,6 +39,7 @@ namespace FS {
 		FD::GuiWrite* const guiWrite;
 		const FD::GuiRead* const guiRead;
 		const FD::Style::VarRead* const varRead;
+		FD::Style::ThemeWrite* const themeWrite;
 
 		FD::Text::Title text{};
 

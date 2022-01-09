@@ -37,7 +37,7 @@ namespace FVK::Internal::Command {
 		using Pos = uint32_t;
 
 	public:
-		FluidumUtils_Class_Default_ConDestructor(Commands)
+		FluidumUtils_Class_Default_ConDestructor(Commands);
 
 	private:
 		//•`Êˆ—ˆÈã‚Ì–½—ß‚ª—ˆ‚é‚ÆˆÓ}‚µ‚È‚¢‚±‚Æ‚ª‹N‚«‚éD

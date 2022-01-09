@@ -26,17 +26,17 @@ namespace FS::Calc::Lua::Internal {
 			//ŠÖ”{}‚Ìˆø”‚Ì”‚ª­‚È‚·‚¬‚Ü‚·D“n‚³‚ê‚½ˆø”‚Ì”:{}D³‚µ‚¢ˆø”‚Ì”:{}D
 			if (size < min) {
 				Message message(LogType::NumOfArgs_Min);
-				GLog.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), size, correctSize);
+				GMessenger.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), size, correctSize);
 				//consoleWrite->add
-				throw Exception();
+				Exception::throwException();
 			}
 
 
 			//ŠÖ”{}‚Ìˆø”‚Ì”‚ª‘½‚·‚¬‚Ü‚·D“n‚³‚ê‚½ˆø”‚Ì”:{}D³‚µ‚¢ˆø”‚Ì”:{}D
 			if (size < min) {
 				Message message(LogType::NumOfArgs_Min);
-				GLog.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), size, correctSize);
-				throw Exception();
+				GMessenger.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), size, correctSize);
+				Exception::throwException();
 			}
 		}
 
@@ -48,8 +48,8 @@ namespace FS::Calc::Lua::Internal {
 				return;
 
 			Message message(LogType::NumOfArgs_Min);
-			GLog.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), size, correctSize);
-			throw Exception();
+			GMessenger.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), size, correctSize);
+			Exception::throwException();
 		}
 
 		template<FD::Calc::Lua::FunctionType Type>
@@ -60,7 +60,7 @@ namespace FS::Calc::Lua::Internal {
 
 			//numOfArgs
 			if (correctTypes.size() != types.size())
-				throw Internal::InternalError(__FILE__);
+				Exception::throwInternalError();
 
 
 			for (Size i = 0, size = types.size(); i < size; i++) {
@@ -68,8 +68,8 @@ namespace FS::Calc::Lua::Internal {
 				if (!same) {
 					//ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
 					Message message(LogType::Type);
-					GLog.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), i + 1, LuAssist::Utils::typeName(types[i]), LuAssist::Utils::typeName(correctTypes[i]));
-					throw Exception();
+					GMessenger.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), i + 1, LuAssist::Utils::typeName(types[i]), LuAssist::Utils::typeName(correctTypes[i]));
+					Exception::throwException();
 				}
 			}
 
@@ -83,7 +83,7 @@ namespace FS::Calc::Lua::Internal {
 
 			//numOfArgs
 			if (correctTypes.size() != types.size())
-				throw Internal::InternalError(__FILE__);
+				Exception::throwInternalError();
 
 			for (Size i = 0, size = types.size(); i < size; i++) {
 				bool same = (correctTypes[i] == types[i]);
@@ -93,8 +93,8 @@ namespace FS::Calc::Lua::Internal {
 					else {
 						//ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
 						Message message(LogType::Type);
-						GLog.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), i + 1, LuAssist::Utils::typeName(types[i]), LuAssist::Utils::typeName(correctTypes[i]));
-						throw Exception();
+						GMessenger.add_str<FU::Log::Type::None>(message, magic_enum::enum_name<Type>(), i + 1, LuAssist::Utils::typeName(types[i]), LuAssist::Utils::typeName(correctTypes[i]));
+						Exception::throwException();
 					}
 				}
 			}

@@ -184,13 +184,13 @@ std::unique_lock<std::mutex> FD::ProjectFilesWrite_Lock::getLock() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::size_t FD::ProjectFilesRead_Lock::numOfDirectories(const std::string& parent) const {
+FD::Size FD::ProjectFilesRead_Lock::numOfDirectories(const std::string& parent) const {
 	using namespace Project::Internal;
-	std::size_t result = 0;
+	Size result = 0;
 	ProjectFilesData::projectFiles.forEach([](Project::FileList::FileInfo& info, void* data)
 		{
 			if (info.type == Project::FileList::Type::Directory) {
-				std::size_t* count = static_cast<std::size_t*>(data);
+				Size* count = static_cast<Size*>(data);
 				(*count)++;
 			}
 		},
@@ -198,18 +198,23 @@ std::size_t FD::ProjectFilesRead_Lock::numOfDirectories(const std::string& paren
 	return result;
 }
 
-std::size_t FD::ProjectFilesRead_Lock::numOfFiles(const std::string& parent) const {
+FD::Size FD::ProjectFilesRead_Lock::numOfFiles(const std::string& parent) const {
 	using namespace Project::Internal;
-	std::size_t result = 0;
+	Size result = 0;
 	ProjectFilesData::projectFiles.forEach([](Project::FileList::FileInfo& info, void* data)
 		{
 			if (info.type != Project::FileList::Type::Directory) {
-				std::size_t* count = static_cast<std::size_t*>(data);
+				Size* count = static_cast<Size*>(data);
 				(*count)++;
 			}
 		},
 		&result);
 	return result;
+}
+
+std::pair<bool, FD::Size> FD::ProjectFilesRead_Lock::childExists(const std::string& parent, const std::string& child) const {
+	using namespace Project::Internal;
+	return ProjectFilesData::projectFiles.childExists(parent, child);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

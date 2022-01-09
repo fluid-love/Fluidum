@@ -27,20 +27,21 @@ namespace FU::File {
 
 			this->text = data;
 		}
-		~Text() = default;
+
+		~Text() noexcept = default;
 
 	private:
 		std::string text = "";
 
 	public:
-		operator const std::string& ()const noexcept {
+		operator const std::string& () const noexcept {
 			return this->text;
 		}
 
-		operator std::string& ()const noexcept {
+		operator std::string& () const noexcept {
 			return this->text;
 		}
+
 	};
-
 
 }

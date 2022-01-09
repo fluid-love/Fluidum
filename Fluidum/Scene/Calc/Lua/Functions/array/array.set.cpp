@@ -2,15 +2,15 @@
 #include "../Common/array.h"
 
 template<FD::Calc::Array::ValueType T>
-FS::Lua::Ret FS::Lua::Calc::array_set(State L) {
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_set(State L) {
 	static_assert(FD::Calc::Array::IsValueType<T>);
 
 	using Elm = FD::Calc::Array::ElmType<T>;
 
 	const auto types = LuAssist::Utils::types(L);
 	if (types[0] == LuAssist::Type::Integer) {
-		FluidumScene_Log_InternalError();
-		throw Internal::InternalError(__FILE__);
+		FluidumScene_Log_InternalWarning();
+		Internal::Exception::throwInternalError();
 	}
 
 	const FD::Calc::Array::Key key = static_cast<FD::Calc::Array::Key>(lua_tointeger(L, 1));
@@ -28,12 +28,12 @@ FS::Lua::Ret FS::Lua::Calc::array_set(State L) {
 		}
 		else {
 			//{}ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
-			Message message(LogType::Type);
+			Internal::Message message(Internal::LogType::Type);
 			std::string type = LuAssist::Utils::typeName(LuAssist::Type::Table);
 			(type += ',') += LuAssist::Utils::typeName(Array::ToLuaType<T>());	
-			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "set", 1, LuAssist::Utils::typeName(types.at(1)), type);
-			consoleWrite->push(std::move(log));
-			throw Internal::Exception();
+			Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), "set", 1, LuAssist::Utils::typeName(types.at(1)), type);
+			consoleWrite->push(Internal::GMessenger.getMessage());
+			Internal::Exception::throwException();
 		}
 	}
 
@@ -60,10 +60,10 @@ FS::Lua::Ret FS::Lua::Calc::array_set(State L) {
 	while (lua_isnone(L, count)) {
 		if (types[count - 1] != Array::ToLuaType<T>()) {
 			//{}ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
-			Message message(LogType::Type);
-			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "set", count - 1, LuAssist::Utils::typeName(types[count - 1]), LuAssist::Utils::typeName(Array::ToLuaType<T>()));
-			consoleWrite->push(std::move(log));
-			throw Internal::Exception();
+			Internal::Message message(Internal::LogType::Type);
+			Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), "set", count - 1, LuAssist::Utils::typeName(types[count - 1]), LuAssist::Utils::typeName(Array::ToLuaType<T>()));
+			consoleWrite->push(Internal::GMessenger.getMessage());
+			Internal::Exception::throwException();
 		}
 
 		vals.emplace_back(Array::getVal<T>(L, count));
@@ -78,8 +78,8 @@ FS::Lua::Ret FS::Lua::Calc::array_set(State L) {
 }
 
 template
-FS::Lua::Ret FS::Lua::Calc::array_set<FD::Calc::Array::ValueType::Number>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_set<FD::Calc::Array::ValueType::Number>(State L);
 template
-FS::Lua::Ret FS::Lua::Calc::array_set<FD::Calc::Array::ValueType::String>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_set<FD::Calc::Array::ValueType::String>(State L);
 template
-FS::Lua::Ret FS::Lua::Calc::array_set<FD::Calc::Array::ValueType::Bit>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_set<FD::Calc::Array::ValueType::Bit>(State L);

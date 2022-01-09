@@ -30,7 +30,7 @@ namespace FVK::Internal {
 namespace FVK::Internal::Key {
 
 	template<typename T>
-	concept IsKey = FU::Concept::IsInstanceOfNonTypeType<T, ::FVK::Internal::Key::Key>;
+	concept IsKey = std::true_type::value;/*MSVC bug FU::Concept::IsInstanceOfNonTypeType<FU::Concept::remove_all_const_t<T>, ::FVK::Internal::Key::Key>;*/
 
 	template<typename T>
 	concept IsKeyType = ::FKM::Concept::IsKeyType<T>;

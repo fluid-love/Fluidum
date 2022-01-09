@@ -23,7 +23,7 @@ namespace FS::Coding {
 
 		~Tab() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Tab)
+		FluidumUtils_Class_Delete_CopyMove(Tab);
 
 	public:
 		virtual void call() override;
@@ -41,11 +41,11 @@ namespace FS::Coding {
 		bool windowCloseFlag = true;
 
 		struct {
-			ImVec2 topBarSize{};
 		}style;
 
 		struct {
 			ImVec2 center{};
+			ImVec2 clicked{};
 		}pos;
 
 		struct File final {
@@ -60,17 +60,16 @@ namespace FS::Coding {
 
 		struct {
 			std::vector<File> files{};
-			std::size_t currentIndex = 0;
+			Size currentIndex = 0;
 		}info;
 
 		struct {
-			uint16_t index = 0;
-			int32_t hovered = -1;
+			UIF16 index = 0;
+			UIF32 hovered = -1;
 		}select;
 
 	private:
 		void checkWindowShouldClose();
-
 
 	private:
 		void update();
@@ -79,8 +78,16 @@ namespace FS::Coding {
 
 	private:
 		void fileList();
-		void display();
 
+	private:
+		void display();
+		//no-throw
+		[[nodiscard]] bool addDisplayPath(const std::string& path) noexcept;
+		[[nodiscard]] bool removeDisplayPath(const std::string& path) noexcept;
+		[[nodiscard]] bool checkExistsFile(const std::string& path) noexcept;
+
+
+	private:
 		void closeButton();
 		void close();
 

@@ -27,7 +27,7 @@ namespace FVK::Internal {
 		explicit Semaphore(ManagerPassKey, const Data::SemaphoreData& data, const Parameter& parameter);
 
 		~Semaphore() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(Semaphore)
+		FluidumUtils_Class_Default_CopyMove(Semaphore);
 
 	private:
 		/*

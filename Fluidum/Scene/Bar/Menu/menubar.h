@@ -35,7 +35,7 @@ namespace FS {
 
 		~MenuBar() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(MenuBar)
+		FluidumUtils_Class_Delete_CopyMove(MenuBar);
 
 	public:
 		virtual void call() override;

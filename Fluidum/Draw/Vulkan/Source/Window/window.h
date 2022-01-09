@@ -15,7 +15,7 @@ namespace FVK::Internal {
 		template<WindowMode>
 		struct Parameter {
 		private:
-			FluidumUtils_Class_Delete_ConDestructor(Parameter)
+			FluidumUtils_Class_Delete_ConDestructor(Parameter);
 		};
 
 		template<>
@@ -53,7 +53,7 @@ namespace FVK::Internal {
 		}
 
 		~Window() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(Window)
+		FluidumUtils_Class_Default_CopyMove(Window);
 
 	public:
 		[[nodiscard]] const Data::WindowInfo& get() const noexcept;
@@ -89,7 +89,7 @@ namespace FVK::Internal {
 			FailedToCreate
 		*/
 		//basic
-		void setResizedCallback();
+		void setResizedCallback() noexcept;
 
 		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 

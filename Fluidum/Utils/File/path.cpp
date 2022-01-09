@@ -162,3 +162,39 @@ bool FU::File::isAbsolute(const std::string& path) {
 	const std::filesystem::path p(path);
 	return p.is_absolute();
 }
+
+std::string FU::File::changeName(const std::string& path, const std::string& newName, const Size depth) {
+	std::string back{};
+	back.resize(path.size());
+	{
+		std::string temp = path;
+		auto itr = temp.rbegin();
+		Size dis = 0;
+
+		for (Size i = 0; i < depth; i++) {
+
+#ifdef BOOST_OS_WINDOWS
+			auto find = std::find_if(itr, temp.rend(), [](auto& x) {return (x == '/') || (x == '\\'); });
+#endif
+			if (find == temp.rend())
+				return newName;
+
+			std::copy((find + 1).base(), itr.base(), std::inserter(back, back.begin()));
+
+			dis += static_cast<Size>(std::distance(itr, find));
+			itr = (find + 1);
+		}
+
+	}
+
+	std::string front = path;
+
+	for (Size i = 0; i < depth + 1; i++) {
+		front = ::FU::File::directory(front);
+		front.pop_back();
+	}
+	front.push_back('/');
+
+	(front += newName) += back;
+	return front;
+}

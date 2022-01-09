@@ -27,7 +27,7 @@ namespace FS::Bar {
 
 		~Exit() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Exit)
+		FluidumUtils_Class_Delete_CopyMove(Exit);
 
 	public:
 		virtual void call() override;

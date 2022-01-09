@@ -11,7 +11,7 @@ namespace FS {
 
 		~Animation() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Animation)
+		FluidumUtils_Class_Delete_CopyMove(Animation);
 
 	public:
 		virtual void call() override;

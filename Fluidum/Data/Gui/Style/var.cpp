@@ -25,7 +25,13 @@ float FD::Style::VarRead::popupWindowBorderSize() const noexcept {
 	return GData.popupWindowBorderSize;
 }
 
+float FD::Style::VarRead::inputTextHeight() const noexcept {
+	return ImGui::GetFontSize() * 5.0f;
+}
 
+ImVec2 FD::Style::VarRead::viewWindowSizeConstraints() const noexcept {
+	return { 150.0f, 150.0f };
+}
 
 
 

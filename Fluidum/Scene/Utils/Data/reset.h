@@ -20,7 +20,7 @@ namespace FS::Utils {
 			FluidumScene_Log_Destructor(::FS::Utils::ResetData<Data...>);
 		}
 
-		FluidumUtils_Class_Delete_CopyMove(ResetData)
+		FluidumUtils_Class_Delete_CopyMove(ResetData);
 
 	private:
 		using Tuple = std::tuple<Data* const...>;

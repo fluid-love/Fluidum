@@ -45,7 +45,7 @@ namespace FVK::Internal {
 		explicit VertexBuffer(ManagerPassKey, const Data::VertexBufferData& data,const Parameter& parameter);
 	
 		~VertexBuffer() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(VertexBuffer)
+		FluidumUtils_Class_Default_CopyMove(VertexBuffer);
 
 	private:
 		/*

@@ -35,7 +35,7 @@ namespace FS::Calc::Lua {
 
 		~Run() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Run)
+		FluidumUtils_Class_Delete_CopyMove(Run);
 
 	public:
 		virtual void call() override;
@@ -43,10 +43,6 @@ namespace FS::Calc::Lua {
 	private:
 		using Type = FD::Calc::Lua::FunctionType;
 		
-		//log
-		using Message = ::FS::Calc::Lua::Internal::Message;
-		using LogType = ::FS::Calc::Lua::Internal::LogType;
-
 	private:
 		const FD::ProjectRead* const projectRead;
 		const FD::FluidumFilesRead* const fluidumFilesRead;

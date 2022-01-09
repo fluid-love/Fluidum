@@ -6,7 +6,7 @@ namespace FVK::Internal::Data {
 
 	template<FvkType Type>
 	struct Info final {
-		FluidumUtils_Class_Delete_ConDestructor(Info)
+		FluidumUtils_Class_Delete_ConDestructor(Info);
 	};
 
 	template<>

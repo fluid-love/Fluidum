@@ -26,7 +26,7 @@ namespace FVK::Internal {
 		explicit UniformBuffer(ManagerPassKey, const Data::UniformBufferData& data, const Parameter& parameter);
 		
 		~UniformBuffer() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(UniformBuffer)
+		FluidumUtils_Class_Default_CopyMove(UniformBuffer);
 
 	private:
 		/*

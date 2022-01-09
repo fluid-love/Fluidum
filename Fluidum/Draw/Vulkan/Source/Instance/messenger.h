@@ -37,7 +37,7 @@ namespace FVK::Internal {
 		explicit Messenger(ManagerPassKey, const Data::MessengerData& data, const Parameter& parameter);
 		
 		~Messenger() = default;
-		FluidumUtils_Class_Default_CopyMove(Messenger)
+		FluidumUtils_Class_Default_CopyMove(Messenger);
 
 	private:
 		/*

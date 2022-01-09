@@ -1,13 +1,13 @@
 #include "../../lua.h"
 
 template<FD::Calc::Array::ValueType T>
-FS::Lua::Ret FS::Lua::Calc::array_pop_front(State L) {
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_pop_front(State L) {
 	static_assert(FD::Calc::Array::IsValueType<T>);
 
 	const auto types = LuAssist::Utils::types(L);
 	if (types.size() != 1 && types[0] == LuAssist::Type::Integer) {
-		FluidumScene_Log_InternalError();
-		throw Internal::InternalError(__FILE__);
+		FluidumScene_Log_InternalWarning();
+		Internal::Exception::throwInternalError();
 	}
 
 	const FD::Calc::Array::Key key = static_cast<FD::Calc::Array::Key>(lua_tointeger(L, 1));
@@ -15,10 +15,10 @@ FS::Lua::Ret FS::Lua::Calc::array_pop_front(State L) {
 	const bool empty = arrayRead->empty<T>(key);
 	if (empty) {
 		//{}関数{}によって{}番目の要素にアクセスしようとしましたが範囲外でした．要素のサイズ{}．
-		Message message(LogType::OutOfRange);
-		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "pop_front", 1, 0);
-		consoleWrite->push(std::move(log));
-		throw Internal::Exception();
+		Internal::Message message(Internal::LogType::OutOfRange);
+		Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), "pop_front", 1, 0);
+		consoleWrite->push(Internal::GMessenger.getMessage());
+		Internal::Exception::throwException();
 	}
 
 	arrayWrite->pop_front<T>(key);
@@ -27,8 +27,8 @@ FS::Lua::Ret FS::Lua::Calc::array_pop_front(State L) {
 }
 
 template
-FS::Lua::Ret FS::Lua::Calc::array_pop_front<FD::Calc::Array::ValueType::Number>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_pop_front<FD::Calc::Array::ValueType::Number>(State L);
 template
-FS::Lua::Ret FS::Lua::Calc::array_pop_front<FD::Calc::Array::ValueType::String>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_pop_front<FD::Calc::Array::ValueType::String>(State L);
 template
-FS::Lua::Ret FS::Lua::Calc::array_pop_front<FD::Calc::Array::ValueType::Bit>(State L);
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_pop_front<FD::Calc::Array::ValueType::Bit>(State L);

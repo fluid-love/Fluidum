@@ -8,6 +8,8 @@ FS::Calc::Run::Run(
 	fluidumFilesRead(fluidumFilesRead)
 {
 	FluidumScene_Log_Constructor(::FS::Calc::Run);
+
+	this->run();
 }
 
 FS::Calc::Run::~Run() noexcept {
@@ -15,16 +17,20 @@ FS::Calc::Run::~Run() noexcept {
 }
 
 void FS::Calc::Run::call() {
+	assert(false);
+}
+
+void FS::Calc::Run::run() {
 	const FD::Project::File::SupportedFileType type = fluidumFilesRead->getCurrentMainCodeType();
 	using enum FD::Project::File::SupportedFileType;
 
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
 	if (type == None) {
-		this->deleteThis();
+		return;
 	}
 
-	Scene::addScene<Utils::ResetData<FD::ImPlotWrite,FD::Calc::ArrayWrite>>();
+	Scene::addScene<Utils::ResetData<FD::ImPlotWrite, FD::Calc::ArrayWrite>>();
 
 	if (type == Lua) {
 		FluidumScene_Log_RequestAddScene(::FS::Calc::Lua::Run);
@@ -39,11 +45,4 @@ void FS::Calc::Run::call() {
 	else {
 		FluidumScene_Log_InternalWarning();
 	}
-
-	this->deleteThis();
-}
-
-void FS::Calc::Run::deleteThis() {
-	FluidumScene_Log_RequestDeleteScene(::FS::Calc::Run);
-	Scene::deleteScene<Run>();
 }

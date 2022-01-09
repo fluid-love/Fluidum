@@ -410,7 +410,7 @@ void FS::File::Add::Select::bottom() {
 }
 
 void FS::File::Add::Select::setEmptyFile() {
-	using namespace FD::File::Template;
+	using namespace FD::History::File::Template;
 
 	if (this->selectType == Template::Empty_Lua)
 		textEditor.SetText(EmptyLua);
@@ -423,7 +423,7 @@ void FS::File::Add::Select::setEmptyFile() {
 }
 
 bool FS::File::Add::Select::createNewFileQuick() {
-	using namespace FD::File::Template;
+	using namespace FD::History::File::Template;
 
 	std::ofstream ofs(quickInfo.fullPath, std::ios::out);
 

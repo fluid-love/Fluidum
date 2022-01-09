@@ -41,7 +41,7 @@ namespace FD::Calc::Lua::Internal {
 
 	template<FunctionType>
 	struct RetArgInfo final {
-		FluidumUtils_Class_Delete_ConDestructor(RetArgInfo)
+		FluidumUtils_Class_Delete_ConDestructor(RetArgInfo);
 	};
 
 	template<>

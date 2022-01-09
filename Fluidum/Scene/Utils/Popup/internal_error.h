@@ -11,7 +11,7 @@ namespace FS::Utils {
 
 		~InternalError() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(InternalError)
+		FluidumUtils_Class_Delete_CopyMove(InternalError);
 
 	public:
 		virtual void call() override;

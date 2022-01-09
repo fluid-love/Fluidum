@@ -34,7 +34,7 @@ namespace FVK::Internal {
 		explicit RenderPass(ManagerPassKey, const Data::RenderPassData& data, const Parameter& parameter);
 
 		~RenderPass() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(RenderPass)
+		FluidumUtils_Class_Default_CopyMove(RenderPass);
 
 	private:
 		/*

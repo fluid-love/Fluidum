@@ -12,8 +12,8 @@ namespace FU::GuiText {
 		explicit Text(std::string&& text) noexcept;
 		explicit Text(const char* text);
 
-		FluidumUtils_Class_Default_ConDestructor(Text)
-		FluidumUtils_Class_Default_CopyMove(Text)
+		FluidumUtils_Class_Default_ConDestructor(Text);
+		FluidumUtils_Class_Default_CopyMove(Text);
 
 	private:
 		std::string text{};

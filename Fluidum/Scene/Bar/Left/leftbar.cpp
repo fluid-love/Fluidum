@@ -48,7 +48,7 @@ FS::LeftBar::LeftBar(
 	guiWrite->leftBarWidth(style.windowSize.x);
 
 	//set analysis icons
-	for (uint16_t i = 0; i < 2; i++) {
+	for (UIF16 i = 0; i < 2; i++) {
 		sub.analysisImages.emplace_back(images.at(images.size() - 2 + i));
 	}
 
@@ -115,11 +115,11 @@ void FS::LeftBar::imageGui() {
 		if (sceneRead->exist(Internal::MainScenes[i])) {
 
 			ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.main);
+			this->hoveredIcon(i);
 
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
 				this->deleteScene(Internal::MainScenes[i]);
 
-			this->hoveredIcon(i);
 		}
 		else {
 			//ボタンが押されたら == シーンの追加を要請
@@ -127,23 +127,32 @@ void FS::LeftBar::imageGui() {
 
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
 				this->addScene(Internal::MainScenes[i]);
+
 		}
 
-		//つめつめなので少し空ける
 		ImGui::Spacing(); ImGui::Spacing();
 	}
 
 }
 
-void FS::LeftBar::hoveredIcon(const std::size_t index) {
-	if (ImGui::IsMouseHoveringRect(ImGui::GetItemRectMin(), { ImGui::GetItemRectMax().x + 20.0f,ImGui::GetItemRectMax().y })) {
+void FS::LeftBar::hoveredIcon(const Size index) {
+	const ImVec2 rectMin = ImGui::GetItemRectMin();
+	const ImVec2 rectMax = { ImGui::GetItemRectMax().x + 20.0f,ImGui::GetItemRectMax().y };
+
+	if (ImGui::IsMouseHoveringRect(rectMin, rectMax)) {
+		sub.hoveringImageRect = { rectMin, rectMax };
 		sub.current = static_cast<SceneIndex>(index + 1);
 		sub.selectWindowPos = ImVec2(ImGui::GetItemRectMax().x + 1.0f, ImGui::GetItemRectMin().y);
 		sub.isIconHovered = true;
 	}
 	else {
-		if (!sub.isSubWindowHovered)
+		if (
+			!sub.isSubWindowHovered &&
+			!ImGui::IsMouseHoveringRect(sub.hoveringImageRect.first, sub.hoveringImageRect.second)
+			)
+		{
 			sub.isIconHovered = false;
+		}
 	}
 }
 
@@ -291,13 +300,14 @@ void FS::LeftBar::subWindow() {
 
 	sub.isSubWindowHovered = ImGui::IsWindowHovered();
 
-	if (sub.current == SceneIndex::Coding)
+	if (sub.current == SceneIndex::Coding) {
 		this->subWindowCoding();
-	else if (sub.current == SceneIndex::AnalysisOverview)
+	}
+	else if (sub.current == SceneIndex::AnalysisOverview) {
 		this->subWindowAnalysis();
+	}
 
 	this->subWindowHelpSetting();
-
 
 	ImGui::End();
 
@@ -310,7 +320,7 @@ void FS::LeftBar::subWindowCoding() {
 		ClassCode::GetClassCode<Coding::Tab>()
 	};
 
-	for (std::size_t i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
+	for (Size i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
 
 		//選択されているなら
 		if (sceneRead->exist(scenes[i])) {

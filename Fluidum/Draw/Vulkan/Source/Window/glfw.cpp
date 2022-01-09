@@ -24,11 +24,6 @@ void FVK::Internal::Glfw::init() const {
 
 	{
 		auto result = glfwSetErrorCallback(Internal::Exception::glfwErrorCallback);
-		if (result == NULL) {
-			this->destroy();
-			GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to set callback.");
-			Exception::throwFailedToCreate();
-		}
 	}
 
 }

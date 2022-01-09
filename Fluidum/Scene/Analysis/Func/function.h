@@ -16,7 +16,7 @@ namespace FS::Analysis {
 
 		~Function() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Function)
+		FluidumUtils_Class_Delete_CopyMove(Function);
 
 	public:
 		virtual void call() override;

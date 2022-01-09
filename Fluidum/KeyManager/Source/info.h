@@ -27,8 +27,8 @@ namespace FKM::Internal {
 
 		~Element() = default;
 
-		FluidumUtils_Class_Default_Move(Element)
-			FluidumUtils_Class_Delete_Copy(Element)
+		FluidumUtils_Class_Default_Move(Element);
+			FluidumUtils_Class_Delete_Copy(Element);
 
 	public://data
 		Enum type;

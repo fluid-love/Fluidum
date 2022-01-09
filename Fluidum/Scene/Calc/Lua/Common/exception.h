@@ -2,7 +2,7 @@
 
 #include "../../Common/messenger.h"
 
-namespace FS::Calc::Lua::Internal {
+namespace FS::Calc::Lua::Internal::Exception {
 
 	//This is thrown when a user error occurs.
 	class Exception final {};
@@ -12,7 +12,7 @@ namespace FS::Calc::Lua::Internal {
 
 }
 
-namespace FS::Calc::Lua::Internal {
+namespace FS::Calc::Lua::Internal::Exception {
 
 	[[noreturn]] inline void throwException() {
 		throw Exception();

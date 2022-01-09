@@ -31,7 +31,7 @@ namespace FS {
 
 		~TitleBar() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(TitleBar)
+		FluidumUtils_Class_Delete_CopyMove(TitleBar);
 
 	public:
 		virtual void call() override;

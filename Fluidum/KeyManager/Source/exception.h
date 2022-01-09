@@ -16,7 +16,7 @@ namespace FKM::Exception {
 		explicit Error(const ErrorType val) noexcept : val(val) {}
 
 	public:
-		[[nodiscard]] inline ErrorType code() const noexcept;
+		[[nodiscard]] ErrorType code() const noexcept;
 
 	private:
 		const ErrorType val;

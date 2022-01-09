@@ -11,7 +11,7 @@ namespace FS::Bar {
 
 		~Credit() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Credit)
+		FluidumUtils_Class_Delete_CopyMove(Credit);
 
 	public:
 		virtual void call() override;

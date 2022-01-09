@@ -121,6 +121,7 @@ namespace FVK {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
+		static_assert(Internal::Key::IsKey<decltype(key)>);
 		const Window& item = GManager->refItem<FvkType::Window>(key);
 		return item.windowSize();//no-throw
 	}
@@ -1050,7 +1051,7 @@ namespace FVK {
 
 	FluidumVK_API [[nodiscard]] NextCommand makeNextCommand();
 
-	template<typename /*Internal::Key::IsKey MSVC bug*/ ...T>
+	template<Internal::Key::IsKey ...T>
 	FluidumVK_API [[nodiscard]] auto makeAnyCommand(const T&... keys) {
 		using namespace Internal;
 		LockGuard lock(GMutex);

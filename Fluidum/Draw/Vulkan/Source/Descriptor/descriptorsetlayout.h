@@ -30,7 +30,7 @@ namespace FVK::Internal {
 		explicit DescriptorSetLayout(ManagerPassKey, const Data::DescriptorSetLayoutData data, const Parameter& parameter);
 		
 		~DescriptorSetLayout() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(DescriptorSetLayout)
+		FluidumUtils_Class_Default_CopyMove(DescriptorSetLayout);
 
 	private:
 		/*

@@ -14,7 +14,7 @@ namespace FVK::Internal {
 		//strong
 		Glfw(ManagerPassKey);//initialize GLFW
 		~Glfw() = default;
-		FluidumUtils_Class_Default_CopyMove(Glfw)
+		FluidumUtils_Class_Default_CopyMove(Glfw);
 
 	public:
 		//no-throw

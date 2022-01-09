@@ -31,7 +31,7 @@ namespace FVK::Internal {
 		explicit DescriptorPool(ManagerPassKey, const Data::DescriptorPoolData& data, const Parameter& parameter);
 
 		~DescriptorPool() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(DescriptorPool)
+		FluidumUtils_Class_Default_CopyMove(DescriptorPool);
 
 	private:
 		/*

@@ -468,6 +468,9 @@ FD::Text::Internal::TopBar::TopBar() {
 	this->includeFile = data;
 
 	std::getline(ifs, data);
+	this->run = data;
+
+	std::getline(ifs, data);
 	this->error_mainfile = data;
 
 }
@@ -923,7 +926,8 @@ FD::Text::Internal::TextEditor::TextEditor() {
 	this->file = data;
 
 	std::getline(ifs, data);
-	this->save = ICON_FA_SAVE "  " + data;
+	this->save = data;
+	this->save_icon = ICON_FA_SAVE "  " + data;
 
 	std::getline(ifs, data);
 	this->saveAs = data;
@@ -944,10 +948,12 @@ FD::Text::Internal::TextEditor::TextEditor() {
 	this->readOnly = ICON_FA_BOOK_OPEN "  " + data;
 
 	std::getline(ifs, data);
-	this->undo = ICON_FA_UNDO "  " + data;
+	this->undo = data;
+	this->undo_icon = ICON_FA_UNDO "  " + data;
 
 	std::getline(ifs, data);
-	this->redo = ICON_FA_REDO "  " + data;
+	this->redo = data;
+	this->redo_icon = ICON_FA_REDO "  " + data;
 
 	std::getline(ifs, data);
 	this->copy = ICON_FA_CLIPBOARD "  " + data;
@@ -1003,12 +1009,6 @@ FD::Text::Internal::CodingTab::CodingTab() {
 	this->tab = data;
 
 	std::getline(ifs, data);
-	this->error_limitMaxSize = data;
-
-	std::getline(ifs, data);
-	this->error_alreadyExist = data;
-
-	std::getline(ifs, data);
 	this->popup_save = data;
 
 	std::getline(ifs, data);
@@ -1019,6 +1019,18 @@ FD::Text::Internal::CodingTab::CodingTab() {
 
 	std::getline(ifs, data);
 	this->popup_cancel = data;
+
+	std::getline(ifs, data);
+	this->error_limitMaxSize = data;
+
+	std::getline(ifs, data);
+	this->error_alreadyExist = data;
+
+	std::getline(ifs, data);
+	this->error_notExist = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
 
 }
 
@@ -1121,6 +1133,9 @@ FD::Text::Internal::Project::Project() {
 
 	std::getline(ifs, data);
 	this->release = ICON_FA_TRASH_ALT "  " + data;
+
+	std::getline(ifs, data);
+	this->setAsMainFile = ICON_FA_FLAG "  " + data;
 
 	std::getline(ifs, data);
 	this->error_maxSize = data;

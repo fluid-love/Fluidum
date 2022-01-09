@@ -40,7 +40,7 @@ namespace FVK::Internal {
 		DescriptorSet(ManagerPassKey, const Data::DescriptorSetData& data, Parameter& parameter);
 
 		~DescriptorSet() = default;
-		FluidumUtils_Class_Default_CopyMove(DescriptorSet)
+		FluidumUtils_Class_Default_CopyMove(DescriptorSet);
 
 	private:
 		/*

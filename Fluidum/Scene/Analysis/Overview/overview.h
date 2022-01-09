@@ -33,7 +33,7 @@ namespace FS::Analysis {
 
 		~Overview() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Overview)
+		FluidumUtils_Class_Delete_CopyMove(Overview);
 
 	public:
 		virtual void call() override;

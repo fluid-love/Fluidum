@@ -39,7 +39,7 @@ namespace FVK::Internal {
 		explicit FrameBuffer(ManagerPassKey, const Data::FrameBufferData& data, Parameter& parameter);
 
 		~FrameBuffer() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(FrameBuffer)
+		FluidumUtils_Class_Default_CopyMove(FrameBuffer);
 
 	private:
 		/*

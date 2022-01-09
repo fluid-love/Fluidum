@@ -169,7 +169,7 @@ namespace FVK::Internal::Key {
 		*/
 		//strong
 		//Get indexkey from the key.
-		template</*MSVC bug Key::IsKey*/typename T>
+		template<::FVK::Internal::Key::IsKey T>
 		[[nodiscard]] static IndexKey toIndexKey(const T& key) {
 			try {
 				if constexpr (std::same_as<T::KeyType, IndexKey> || std::same_as<T::KeyType, SelectKey>)

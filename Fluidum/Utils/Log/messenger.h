@@ -21,8 +21,8 @@ namespace FU::Log {
 
 	class Messenger final {
 	public:
-		FluidumUtils_Class_Default_ConDestructor_Noexcept(Messenger)
-			FluidumUtils_Class_Delete_CopyMove(Messenger)
+		FluidumUtils_Class_Default_ConDestructor_Noexcept(Messenger);
+			FluidumUtils_Class_Delete_CopyMove(Messenger);
 
 	public:
 		//no-throw
@@ -36,7 +36,7 @@ namespace FU::Log {
 
 				//file, line
 				if (file)
-					((((result += '<') += file) += ',') += std::to_string(line)) += "> ";
+					((((result += '<') += file) += ", ") += std::to_string(line)) += "> ";
 
 				//make message
 				std::string msg = std::format(message, std::forward<U>(values)...);
@@ -95,7 +95,7 @@ namespace FU::Log {
 			Lock(Lock&&) noexcept;
 			Lock& operator=(Lock&&) noexcept;
 
-			FluidumUtils_Class_Delete_Copy(Lock)
+			FluidumUtils_Class_Delete_Copy(Lock);
 
 		private:
 			bool own;
@@ -121,6 +121,7 @@ namespace FU::Log {
 	private://assert
 		static_assert(std::is_nothrow_constructible_v<std::mutex>);
 		static_assert(std::is_nothrow_constructible_v<std::string>);
+
 	};
 
 }

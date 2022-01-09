@@ -23,7 +23,7 @@ namespace FS::File::Add {
 
 		~Select() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Select)
+		FluidumUtils_Class_Delete_CopyMove(Select);
 
 	public:
 		virtual void call() override;

@@ -24,8 +24,6 @@ FS::Coding::Tab::Tab(
 {
 	FluidumScene_Log_Constructor(::FS::Coding::Tab);
 
-	style.topBarSize = { 0.0f,ImGui::CalcTextSize(ICON_MD_FOLDER_OPEN).y * 1.7f };
-
 	this->updateInfo();
 }
 
@@ -64,42 +62,6 @@ void FS::Coding::Tab::checkWindowShouldClose() {
 	Scene::deleteScene<Tab>();
 }
 
-//void FS::Coding::Tab::include() {
-//	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
-//	GLog.add<FD::Log::Type::None>("Open file dialog.");
-//	const nfdresult_t result = NFD_OpenDialog(".lua,.py,.as", NULL, outPath.get());
-//	if (result == NFD_OKAY) {
-//		GLog.add<FD::Log::Type::None>("Selected file path is {}.", *outPath.get());
-//	}
-//	else if (result == NFD_CANCEL) {
-//		GLog.add<FD::Log::Type::None>("Cancel file dialog.");
-//		return;
-//	}
-//	else {//NFD_ERROR
-//		GLog.add<FD::Log::Type::Error>("Error file dialog.");
-//		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
-//	}
-//
-//	using enum FD::Coding::TabWrite::Exception;
-//	try {
-//		tabWrite->add(*outPath.get());
-//	}
-//	catch (const FD::Coding::TabWrite::Exception type) {
-//		if (type == AlreadyExist) {
-//			GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
-//			Scene::addScene<Utils::Message>(text.error_alreadyExist, pos.center);
-//		}
-//		else if (type == LimitFileSizeMax) {
-//			GLog.add<FD::Log::Type::None>("Request add Utils::MessageScene.");
-//			Scene::addScene<Utils::Message>(text.error_limitMaxSize, pos.center);
-//		}
-//		else {
-//			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-//			abort();
-//		}
-//	}
-//}
-
 void FS::Coding::Tab::update() {
 	if (!tabRead->update())
 		return;
@@ -110,7 +72,7 @@ void FS::Coding::Tab::updateInfo() {
 	std::vector<std::string> paths = tabRead->paths();
 
 	info.files.resize(paths.size());
-	for (std::size_t i = 0, size = paths.size(); i < size; i++) {
+	for (Size i = 0, size = paths.size(); i < size; i++) {
 		std::string name = FU::File::fileName(paths[i]);
 		info.files[i] = { std::move(paths[i]),  std::move(name) };
 	}
@@ -143,11 +105,12 @@ void FS::Coding::Tab::fileList() {
 
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f,0.4f,0.9f,0.4f });
 
-	for (uint16_t i = 0; auto & x : info.files) {
+	for (UIF16 i = 0; auto & x : info.files) {
 		if (i == select.index) {
 			ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f,0.3f,0.9f,0.5f });
 
 			if (ImGui::Button(x.name.c_str(), size)) {
+				pos.clicked = FU::ImGui::messagePos();
 				select.index = i;
 				this->display();
 			}
@@ -184,16 +147,180 @@ void FS::Coding::Tab::fileList() {
 }
 
 void FS::Coding::Tab::display() {
-	const std::string path = info.files.at(select.index).path;
-	const auto frontFisplayPath = displayRead->paths().at(0);
-	if (frontFisplayPath == path)
+	const std::string& path = info.files.at(select.index).path;
+
+	//Not exists
+	{
+		const bool exist = this->checkExistsFile(path);
+		if (!exist) {
+			FU::MB::error(text.error_notExist);
+			return;
+		}
+	}
+
+	//None of the editors are displayed.
+	if (displayRead->empty()) {
+		const bool success = this->addDisplayPath(path);
+		if (!success) {
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+		}
 		return;
+	}
 
+	try {
+		//The currently displayed editor is the same as the selected editor.
+		const bool focused = displayRead->isEditorFocused(path);
+		if (focused)
+			return;
+	}
+	catch (...) {
+		FluidumScene_Log_UnexpectedExceptionWarning();
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+		return;
+	}
+
+	std::string current{};
+	try {
+		current = displayRead->focusedFilePath();
+	}
+	catch (...) {
+		FluidumScene_Log_UnexpectedExceptionWarning();
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+		return;
+	}
+
+	//None of the editors are focused.
+	if (current.empty()) {
+		std::vector<std::string> paths{};
+		try {
+			paths = displayRead->paths();
+		}
+		catch (...) {
+			FluidumScene_Log_UnexpectedExceptionWarning();
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+			return;
+		}
+
+		if (paths.empty()) {
+			const bool success = this->addDisplayPath(path);
+			if (!success) {
+				FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+				Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+			}
+			return;
+		}
+		else {
+			{
+				const bool success = this->addDisplayPath(path);
+				if (!success) {
+					FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+					Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+					return;
+				}
+			}
+			//remove front
+			{
+				const bool success = this->removeDisplayPath(paths[0]);
+				if (!success) {
+					try { displayWrite->remove(path); }
+					catch (...) {
+						FluidumScene_Log_SeriousError();
+						std::terminate();
+					}
+					FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+					Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+					return;
+				}
+			}
+		}
+	}
+	else {
+		{
+			const bool success = this->addDisplayPath(path);
+			if (!success) {
+				FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+				Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+				return;
+			}
+		}
+
+		//remove focused editor
+		{
+			const bool success = this->removeDisplayPath(path);
+			if (!success) {
+				try { displayWrite->remove(path); }
+				catch (...) {
+					FluidumScene_Log_SeriousError();
+					std::terminate();
+				}
+				FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+				Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
+				return;
+			}
+		}
+	}
+
+}
+
+bool FS::Coding::Tab::addDisplayPath(const std::string& path) noexcept {
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Add display file({}).", path);
+
+	try {
+		displayWrite->add(path);
+	}
+	catch (const FD::Coding::DisplayWrite::Exception val) {
+		if (val == FD::Coding::DisplayWrite::Exception::NotFound) {
+			;
+		}
+		else {
+			FluidumScene_Log_InternalWarning_Enum(val);
+		}
+		FluidumScene_Log_InternalWarning();
+		return false;
+	}
+	catch (...) {
+		FluidumScene_Log_UnexpectedExceptionWarning();
+		return false;
+	}
+	return true;
+}
+
+bool FS::Coding::Tab::removeDisplayPath(const std::string& path) noexcept {
 	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Remove display file({}).", path);
-	displayWrite->remove(frontFisplayPath);
 
-	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Add display file({}).", frontFisplayPath);
-	displayWrite->add(path);
+	try {
+		displayWrite->remove(path);
+	}
+	catch (const FD::Coding::DisplayWrite::Exception val) {
+		if (val == FD::Coding::DisplayWrite::Exception::NotFound) {
+			;
+		}
+		else {
+			FluidumScene_Log_InternalWarning_Enum(val);
+		}
+		FluidumScene_Log_InternalWarning();
+		return false;
+	}
+	catch (...) {
+		FluidumScene_Log_UnexpectedExceptionWarning();
+		return false;
+	}
+	return true;
+}
+
+bool FS::Coding::Tab::checkExistsFile(const std::string& path) noexcept {
+	try {
+		return std::filesystem::exists(path);
+	}
+	catch (const std::filesystem::filesystem_error& error) {
+		GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "std::filesystem::filesystem_error was thrown({}).", error.what());
+	}
+
+	return false;
 }
 
 void FS::Coding::Tab::closeButton() {
@@ -207,7 +334,7 @@ void FS::Coding::Tab::closeButton() {
 	const auto min = ImGui::GetItemRectMin();
 	const auto max = ImGui::GetItemRectMax();
 
-	constexpr ImU32 hoveredCol = FU::ImGui::convertImVec4ToImU32(0.8f, 0.2f, 0.2f, 0.6f);
+	constexpr ImU32 hoveredCol = FU::ImGui::ConvertImVec4ToImU32(0.8f, 0.2f, 0.2f, 0.6f);
 	const ImVec2 pos = { max.x - ImGui::GetFontSize() - 3.0f,min.y };
 	const ImVec2 pos2 = pos + ImGui::CalcTextSize(ICON_MD_CLOSE);
 

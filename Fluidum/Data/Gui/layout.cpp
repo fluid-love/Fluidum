@@ -288,16 +288,22 @@ void FD::Layout::Internal::LayoutData::remake() {
 
 	LayoutWrite::reset();
 
+	const float layoutWindowWidth = *LayoutData::mainFrameRight - *LayoutData::mainFrameLeft;
+	const float layoutWindowHeight = *LayoutData::mainFrameBottom - *LayoutData::mainFrameTop;
+
 	try {
 		for (auto& x : copy) {
-			DockSpaceWindow* win = findWindow(x.readPos);
+			const float readPosX = *LayoutData::mainFrameLeft + (layoutWindowWidth * x.readPosRatio.x);
+			const float readPosY = *LayoutData::mainFrameTop + (layoutWindowHeight * x.readPosRatio.y);
+
+			DockSpaceWindow* win = findWindow({ readPosX, readPosY });
 			if (!win)
 				throw std::runtime_error("findWindow() returned nullptr.");
 
 			if (x.horizonal)
-				LayoutWrite::splitHorizonal(*win, x.readPos.y);
+				LayoutWrite::splitHorizonal(*win, readPosY);
 			else
-				LayoutWrite::splitVertical(*win, x.readPos.x);
+				LayoutWrite::splitVertical(*win, readPosX);
 
 			LayoutWrite::remakeAllWindows();
 		}
@@ -467,7 +473,7 @@ bool FD::LayoutWrite::splitVertical(const Layout::DockSpaceWindow& window, const
 	Layout::updateSeparators_Vertical();
 
 	//history
-	History his{};
+	::FD::Layout::Internal::History his{};
 	auto itr = std::find_if(LayoutData::windows.begin(), LayoutData::windows.end(), [&](auto& x) {return x.get() == window.window; });
 	assert(itr != LayoutData::windows.end());
 	his.horizonal = false;
@@ -549,7 +555,7 @@ bool FD::LayoutWrite::splitHorizonal(const Layout::DockSpaceWindow& window, cons
 	Layout::updateSeparators_Horizonal();
 
 	//history
-	History his{};
+	::FD::Layout::Internal::History his{};
 	his.horizonal = true;
 	auto itr = std::find_if(LayoutData::windows.begin(), LayoutData::windows.end(), [&](auto& x) {return x.get() == window.window; });
 	his.pos_side1 = left_right[0].get();

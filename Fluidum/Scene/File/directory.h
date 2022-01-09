@@ -21,7 +21,7 @@ namespace FS::File::Add {
 
 		~Directory() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Directory)
+		FluidumUtils_Class_Delete_CopyMove(Directory);
 
 	public:
 		virtual void call() override;

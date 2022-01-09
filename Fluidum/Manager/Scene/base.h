@@ -18,7 +18,7 @@ namespace FS::Internal {
 	public:
 		SceneBase() = default;//As an abstract class, it cannot be created without inheritance.
 		virtual ~SceneBase() = default;
-		FluidumUtils_Class_Delete_CopyMove(SceneBase)
+		FluidumUtils_Class_Delete_CopyMove(SceneBase);
 
 	public:
 		virtual void call() = 0;
@@ -37,7 +37,7 @@ namespace FS::Internal {
 			try {
 				this->addScene<Scene>(std::forward<Args>(args)...);
 			}
-			catch (const ::FS::Exception::AlreadyAdded&) {
+			catch (const ::FS::Exception::Error&) {
 				return false;
 			}
 			return true;
@@ -60,7 +60,7 @@ namespace FS::Internal {
 			try {
 				this->deleteScene<Scene>();
 			}
-			catch (const ::FS::Exception::AlreadyDeleted&) {
+			catch (const ::FS::Exception::Error&) {
 				return false;
 			}
 			return true;
@@ -95,7 +95,18 @@ namespace FS::Internal {
 	public:
 		template<IsSceneAble<Data...> Scene, typename... Args>
 		void callConstructor(Args&&... args) {
-			GManager<Data...>->callConstructor<Scene>(args...);
+			GManager<Data...>->callConstructor<Scene>(std::forward<Args>(args)...);
+		}
+
+		//Delete once and add again.
+		/*
+		Scenes are deleted at the end of the loop,
+		so consecutive calls to deleteScene and addScene will result in an error.		
+		*/
+		//Calling it from the same scene can be dangerous because it may access the freed memory.
+		template<IsSceneAble<Data...> Scene, typename... Args>
+		void recreateScene(Args&&... args) {
+			GManager<Data...>->recreate<Scene>(std::forward<Args>(args)...);
 		}
 
 	};

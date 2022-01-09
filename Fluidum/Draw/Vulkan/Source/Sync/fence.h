@@ -28,7 +28,7 @@ namespace FVK::Internal {
 		explicit Fence(ManagerPassKey, const Data::FenceData& data, const Parameter& parameter);
 
 		~Fence() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(Fence)
+		FluidumUtils_Class_Default_CopyMove(Fence);
 
 	private:
 		/*

@@ -8,7 +8,7 @@ namespace FS::Project::File {
 	public:
 		struct SharedInfo final {
 		public://arg
-			const FD::Log::Project::Type type;
+			const FD::History::Project::Type type;
 			const std::string name;
 		public://return
 			bool create = false;
@@ -29,7 +29,7 @@ namespace FS::Project::File {
 
 		~Form() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Form)
+		FluidumUtils_Class_Delete_CopyMove(Form);
 
 	public:
 		virtual void call() override;

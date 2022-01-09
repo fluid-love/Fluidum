@@ -15,7 +15,7 @@ namespace FVK::Internal::Key {
 
 	public:
 		constexpr explicit Key(const KType key) noexcept : key(key) {}
-		FluidumUtils_Class_Default_CopyMove(Key)
+		FluidumUtils_Class_Default_CopyMove(Key);
 
 	public:
 		//no-throw
@@ -49,7 +49,7 @@ namespace FVK::Internal::Key {
 	public:
 		explicit Key(const std::string& key) : key(key) {}
 		explicit Key(std::string&& key) noexcept : key(std::move(key)) {}
-		FluidumUtils_Class_Default_CopyMove(Key)
+		FluidumUtils_Class_Default_CopyMove(Key);
 
 	public:
 		//std::exception

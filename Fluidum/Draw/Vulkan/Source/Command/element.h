@@ -12,7 +12,7 @@ namespace FVK::Internal::Command {
 
 	template<CommandType>
 	class CommandElement final {
-		FluidumUtils_Class_Delete_ConDestructor(CommandElement)
+		FluidumUtils_Class_Delete_ConDestructor(CommandElement);
 	};
 
 	template<>
@@ -22,7 +22,7 @@ namespace FVK::Internal::Command {
 			: commandBuffer(data.get<FvkType::CommandBuffer>().commandBuffers.at(index))
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		//strong
@@ -50,7 +50,7 @@ namespace FVK::Internal::Command {
 			: commandBuffer(data.get<FvkType::CommandBuffer>().commandBuffers.at(index))
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		//strong
@@ -76,7 +76,7 @@ namespace FVK::Internal::Command {
 			vertexBuffer(data.get<FvkType::VertexBuffer>().vertexBuffer)
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -113,7 +113,7 @@ namespace FVK::Internal::Command {
 			frameBuffer(data.get<FvkType::FrameBuffer>().frameBuffer)
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -177,7 +177,7 @@ namespace FVK::Internal::Command {
 			descriptorSet(data.get<FvkType::DescriptorSet>().descriptorSet)
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -218,7 +218,7 @@ namespace FVK::Internal::Command {
 			graphicsPipeline(data.get<FvkType::GraphicsPipeline>().graphicsPipeline)
 		{}
 		~CommandElement() = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() {
@@ -239,7 +239,7 @@ namespace FVK::Internal::Command {
 			indexBuffer(data.get<FvkType::IndexBuffer>().indexBuffer)
 		{}
 		~CommandElement() = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -260,7 +260,7 @@ namespace FVK::Internal::Command {
 			: commandBuffer(data.get<FvkType::CommandBuffer>().commandBuffers.at(index))
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -290,7 +290,7 @@ namespace FVK::Internal::Command {
 			: commandBuffer(data.get<FvkType::CommandBuffer>().commandBuffers.at(index))
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -311,7 +311,7 @@ namespace FVK::Internal::Command {
 			: commandBuffer(data.get<FvkType::CommandBuffer>().commandBuffers.at(index))
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -371,7 +371,7 @@ namespace FVK::Internal::Command {
 			: commandBuffer(data.get<FvkType::CommandBuffer>().commandBuffers.at(index))
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	public:
 		void call() const noexcept {
@@ -430,7 +430,7 @@ namespace FVK::Internal::Command {
 			: commandBuffer(data.get<FvkType::CommandBuffer>().commandBuffers.at(index))
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const {
@@ -454,7 +454,7 @@ namespace FVK::Internal::Command {
 		{}
 
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() {
@@ -477,7 +477,7 @@ namespace FVK::Internal::Command {
 			vertexBuffer(data.get<FvkType::VertexBuffer>().vertexBuffer)
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -522,7 +522,7 @@ namespace FVK::Internal::Command {
 			indexBuffer(data.get<FvkType::IndexBuffer>().indexBuffer)
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -567,7 +567,7 @@ namespace FVK::Internal::Command {
 			image(data.get<FvkType::Image>().image)
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() const noexcept {
@@ -624,7 +624,7 @@ namespace FVK::Internal::Command {
 			//graphicsQueue(data.get<FvkType::Queue>().queue)
 		{}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		//strong
@@ -653,7 +653,7 @@ namespace FVK::Internal::Command {
 	public:
 		explicit CommandElement(ManagerPassKey, const Data::NextData& data, const UI32 index) {}
 		~CommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(CommandElement)
+		FluidumUtils_Class_Delete_CopyMove(CommandElement);
 
 	private:
 		void call() {}
@@ -697,7 +697,7 @@ namespace FVK::Internal::Command {
 			: data(infoTupleToArgTuple(info, std::make_index_sequence<sizeof...(T)>()))
 		{}
 		~AnyCommandElement() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(AnyCommandElement)
+		FluidumUtils_Class_Delete_CopyMove(AnyCommandElement);
 
 	private:
 		const ArgTuple data;

@@ -50,7 +50,7 @@ namespace FVK::Internal {
 		explicit ImageView(ManagerPassKey, const Data::ImageViewSwapchainData& data, const SwapchainParameter& parameter);
 
 		~ImageView() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(ImageView)
+		FluidumUtils_Class_Default_CopyMove(ImageView);
 
 	private:
 		/*

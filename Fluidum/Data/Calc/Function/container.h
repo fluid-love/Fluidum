@@ -7,8 +7,8 @@ namespace FD::Calc::Internal {
 	template<typename...Data>
 	class FunctionContainer final {
 	public:
-		FluidumUtils_Class_Default_ConDestructor(FunctionContainer)
-			FluidumUtils_Class_Delete_CopyMove(FunctionContainer)
+		FluidumUtils_Class_Default_ConDestructor(FunctionContainer);
+			FluidumUtils_Class_Delete_CopyMove(FunctionContainer);
 	private:
 		struct Ref final {
 			FU::Class::ClassCode::CodeType type{};

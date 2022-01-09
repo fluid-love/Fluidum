@@ -2,10 +2,14 @@
 
 FS::Console::Console(
 	FD::ConsoleWrite* const consoleWrite,
-	const FD::ConsoleRead* const consoleRead
+	const FD::ConsoleRead* const consoleRead,
+	const FD::Style::VarRead* const varRead,
+	FD::ToolBarWrite* const toolBarWrite
 ) :
 	consoleWrite(consoleWrite),
-	consoleRead(consoleRead)
+	consoleRead(consoleRead),
+	varRead(varRead),
+	toolBarWrite(toolBarWrite)
 {
 	FluidumScene_Log_Constructor(::FS::Console);
 
@@ -14,13 +18,20 @@ FS::Console::Console(
 	else
 		inputText.reserve(FD::Console::Limits::Characters);
 
+	style.inputTextWindowHeight = varRead->inputTextHeight();
+
+	toolBarWrite->add(&Console::toolBar, this, text.console.operator const std::string &());
+
 }
 
 FS::Console::~Console() {
+	toolBarWrite->remove<Console>();
 	FluidumScene_Log_Destructor(::FS::Console);
 }
 
 void FS::Console::call() {
+	ImGui::SetNextWindowContentSize(varRead->viewWindowSizeConstraints());
+
 	ImGui::Begin(text.console, &flag.windowFlag);
 
 	//main
@@ -37,6 +48,10 @@ void FS::Console::call() {
 	this->closeWindow();
 }
 
+void FS::Console::toolBar() {
+	ImGui::Button("test");
+}
+
 void FS::Console::console() {
 	using namespace FU::ImGui::Operators;
 
@@ -45,17 +60,18 @@ void FS::Console::console() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding * 2.0f);
 
 	const auto size = ImGui::GetWindowSize();
-	ImGui::BeginChild("ConsoleText", { size.x * 0.98f,size.y * 0.9f }, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+	ImGui::BeginChild("ConsoleText", { size.x - ImGui::GetStyle().ScrollbarSize, size.y - style.inputTextWindowHeight }, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 	ImGui::SetWindowFontScale(style.fontSizeScale);
 
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows))
 		flag.popupRight = true;
 
 	ImGuiListClipper clipper;
-	const int32_t clipperSize = static_cast<int32_t>(consoleRead->size() < 100 ? consoleRead->size() : 100);
+	const IF32 clipperSize = static_cast<IF32>(consoleRead->size() < 100 ? consoleRead->size() : 100);
 	clipper.Begin(clipperSize);
 	while (clipper.Step()) {
-		for (int32_t i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+		for (IF32 i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
 
 			auto [valid, message] = consoleRead->get(i);
 			if (valid)//read_only
@@ -80,7 +96,9 @@ void FS::Console::console() {
 }
 
 void FS::Console::input() {
+
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.8f);
+
 	ImGui::InputText("##InputText", inputText.data(), inputText.capacity());
 
 	if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && ImGui::IsItemFocused()) {

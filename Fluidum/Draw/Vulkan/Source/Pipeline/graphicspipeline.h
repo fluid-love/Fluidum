@@ -69,7 +69,7 @@ namespace FVK::Internal {
 		explicit GraphicsPipeline(ManagerPassKey, const Data::GraphicsPipelineData& data, Parameter& parameter);
 
 		~GraphicsPipeline() = default;
-		FluidumUtils_Class_Default_CopyMove(GraphicsPipeline)
+		FluidumUtils_Class_Default_CopyMove(GraphicsPipeline);
 
 	private:
 		/*

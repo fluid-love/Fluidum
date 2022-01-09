@@ -98,10 +98,9 @@ namespace FVK::Internal::Api {
 		}
 	}
 
-	template<FvkType Type, /*MSVC bug ::FVK::Internal::Key::IsKey*/typename T>
+	template<FvkType Type, ::FVK::Internal::Key::IsKey T>
 	void destroyBase(const T& key) {
 		using namespace Internal;
-		LockGuard lock(GMutex);
 		try {
 			GManager->destroy<Type>(key);
 		}

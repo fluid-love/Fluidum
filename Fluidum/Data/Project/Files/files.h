@@ -80,7 +80,7 @@ namespace FD {
 	public:
 		explicit LuaFilesWrite_Lock(Internal::PassKey) {}
 		~LuaFilesWrite_Lock() = default;
-		FluidumUtils_Class_Delete_CopyMove(LuaFilesWrite_Lock)
+		FluidumUtils_Class_Delete_CopyMove(LuaFilesWrite_Lock);
 
 	public:
 		void collapseAll();
@@ -100,7 +100,7 @@ namespace FD {
 	public:
 		explicit LuaFilesRead(Internal::PassKey) {}
 		~LuaFilesRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(LuaFilesRead)
+		FluidumUtils_Class_Delete_CopyMove(LuaFilesRead);
 
 
 	};
@@ -112,7 +112,7 @@ namespace FD {
 	public:
 		explicit FluidumFilesWrite(Internal::PassKey) {}
 		~FluidumFilesWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(FluidumFilesWrite)
+		FluidumUtils_Class_Delete_CopyMove(FluidumFilesWrite);
 
 	public:
 		void setMainCodePath(const std::string& path) const;
@@ -127,7 +127,7 @@ namespace FD {
 	public:
 		explicit FluidumFilesRead(Internal::PassKey) noexcept {}
 		~FluidumFilesRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(FluidumFilesRead)
+		FluidumUtils_Class_Delete_CopyMove(FluidumFilesRead);
 
 	public:
 
@@ -147,7 +147,7 @@ namespace FD {
 	public:
 		explicit ProjectFilesWrite_Lock(Internal::PassKey) {}
 		~ProjectFilesWrite_Lock() = default;
-		FluidumUtils_Class_Delete_CopyMove(ProjectFilesWrite_Lock)
+		FluidumUtils_Class_Delete_CopyMove(ProjectFilesWrite_Lock);
 
 	public:
 		template<Project::Internal::IsFileInfoElm T>
@@ -184,7 +184,7 @@ namespace FD {
 	public:
 		explicit ProjectFilesRead_Lock(Internal::PassKey) noexcept {}
 		~ProjectFilesRead_Lock() = default;
-		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead_Lock)
+		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead_Lock);
 
 	public:
 		/*
@@ -198,7 +198,7 @@ namespace FD {
 							|
 							-> ...
 		*/
-		[[nodiscard]] std::size_t numOfDirectories(const std::string& parent) const;
+		[[nodiscard]] Size numOfDirectories(const std::string& parent) const;
 
 		/*
 		return 2
@@ -211,7 +211,15 @@ namespace FD {
 							|
 							-> ...
 		*/
-		[[nodiscard]] std::size_t numOfFiles(const std::string& parent) const;
+		[[nodiscard]] Size numOfFiles(const std::string& parent) const;
+
+	public:
+		/*
+		return:
+			first  : exists
+			second : depth
+		*/
+		[[nodiscard]] std::pair<bool, Size> childExists(const std::string& parent, const std::string& child) const;
 
 	};
 
@@ -219,7 +227,7 @@ namespace FD {
 	public:
 		explicit ProjectFilesRead(Internal::PassKey) noexcept {}
 		~ProjectFilesRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead)
+		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead);
 
 	public:
 
@@ -233,7 +241,7 @@ namespace FD {
 	public:
 		explicit UserFilesWrite_Lock(Internal::PassKey) {}
 		~UserFilesWrite_Lock() = default;
-		FluidumUtils_Class_Delete_CopyMove(UserFilesWrite_Lock)
+		FluidumUtils_Class_Delete_CopyMove(UserFilesWrite_Lock);
 
 	public:
 		template<Project::Internal::IsFileInfoElm T>
@@ -267,7 +275,7 @@ namespace FD {
 	public:
 		explicit UserFilesRead_Lock(Internal::PassKey) noexcept {}
 		~UserFilesRead_Lock() = default;
-		FluidumUtils_Class_Delete_CopyMove(UserFilesRead_Lock)
+		FluidumUtils_Class_Delete_CopyMove(UserFilesRead_Lock);
 
 	public:
 		//see ProjectFilesRead_Lock::numOfDirectories and ProjectFilesRead_Lock::numOfFiles
@@ -280,7 +288,7 @@ namespace FD {
 
 	public:
 		[[nodiscard]] bool containForbiddenCharactor(const std::string& name) const;
-		
+
 		[[nodiscard]] std::string finalName(const std::string& name) const;
 
 	public:
@@ -291,7 +299,7 @@ namespace FD {
 	public:
 		explicit UserFilesRead(Internal::PassKey) noexcept {}
 		~UserFilesRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(UserFilesRead)
+		FluidumUtils_Class_Delete_CopyMove(UserFilesRead);
 
 	public:
 		//return "Fluidum:/"

@@ -12,17 +12,19 @@ namespace FKM {
 	public:
 		OrderKey() = default;
 		OrderKey(const KeyType val) noexcept;
-		FluidumUtils_Class_Default_CopyMove(OrderKey)
+		FluidumUtils_Class_Default_CopyMove(OrderKey);
+
 	private:
 		KeyType index = 0;
+
 	public:
-		[[nodiscard]] operator KeyType()const noexcept;
-		void operator=(const KeyType val)noexcept;
-		[[nodiscard]] bool operator==(const OrderKey key)const noexcept;
+		[[nodiscard]] operator KeyType() const noexcept;
+		void operator=(const KeyType val) noexcept;
+		[[nodiscard]] bool operator==(const OrderKey key) const noexcept;
 
 		void operator++(int) noexcept;
 
-		[[nodiscard]] bool operator==(KeyType val)const noexcept;
+		[[nodiscard]] bool operator==(KeyType val) const noexcept;
 
 	};
 
@@ -33,15 +35,15 @@ namespace FKM {
 	public:
 		IndexKey() = default;
 		IndexKey(const KeyType val) noexcept;
-		FluidumUtils_Class_Default_CopyMove(IndexKey)
+		FluidumUtils_Class_Default_CopyMove(IndexKey);
 	private:
 		KeyType order = 0;
 	public:
-		[[nodiscard]] operator KeyType()const noexcept;
-		void operator=(const KeyType val)noexcept;
-		[[nodiscard]] bool operator==(const IndexKey key)const noexcept;
-		[[nodiscard]] bool operator!=(const IndexKey key)const noexcept;
-		[[nodiscard]] bool operator==(const KeyType val)const noexcept;
+		[[nodiscard]] operator KeyType() const noexcept;
+		void operator=(const KeyType val) noexcept;
+		[[nodiscard]] bool operator==(const IndexKey key) const noexcept;
+		[[nodiscard]] bool operator!=(const IndexKey key) const noexcept;
+		[[nodiscard]] bool operator==(const KeyType val) const noexcept;
 
 	};
 

@@ -8,7 +8,7 @@ void FD::ToolBarWrite::lock(const FU::Class::ClassCode::CodeType code) {
 	);
 	itr->select = true;
 	assert(itr != Data::funcs.end());
-	const auto distance = static_cast<decltype(Data::indices)::size_type>(std::distance(Data::funcs.begin(), itr));
+	const UIF16 distance = static_cast<UIF16>(std::distance(Data::funcs.begin(), itr));
 	Data::indices.emplace_back(distance);
 }
 
@@ -29,12 +29,12 @@ const std::vector<FD::TopBar::Info>* FD::ToolBarRead::getInfo() const noexcept {
 	return &Data::funcs;
 }
 
-const std::vector<uint16_t>* FD::ToolBarRead::getIndices() const noexcept {
+const std::vector<FD::UIF16>* FD::ToolBarRead::getIndices() const noexcept {
 	using namespace ::FD::TopBar::Internal;
 	return &Data::indices;
 }
 
-void FD::ToolBarRead::call(const uint16_t index) const {
+void FD::ToolBarRead::call(const UIF16 index) const {
 	using namespace ::FD::TopBar::Internal;
 	Data::funcs.at(index).func();
 }

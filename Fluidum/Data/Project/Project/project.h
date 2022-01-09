@@ -9,7 +9,7 @@ namespace FD {
 		//Create a temporary project.
 		explicit ProjectWrite(Internal::PassKey) noexcept;
 		~ProjectWrite() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(ProjectWrite)
+		FluidumUtils_Class_Delete_CopyMove(ProjectWrite);
 
 	public:
 		struct CreateInfo final {
@@ -152,9 +152,13 @@ namespace FD {
 		void read_tab() const;
 		void read_scene() const;
 
+	public://thread
+		void requestStop() noexcept;
+		[[nodiscard]] bool joinable() const noexcept;
+
 	private:
 		void save_thread();
-		const std::jthread saveThread{ &ProjectWrite::save_thread,this };
+		std::jthread saveThread{ &ProjectWrite::save_thread,this };
 
 	};
 
@@ -166,7 +170,7 @@ namespace FD {
 	public:
 		explicit ProjectRead(Internal::PassKey) noexcept {};
 		~ProjectRead() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(ProjectRead)
+		FluidumUtils_Class_Delete_CopyMove(ProjectRead);
 
 	public:
 		using HistoryInfo = ProjectWrite::HistoryInfo;

@@ -9,7 +9,7 @@ namespace FD {
 	public:
 		GuiWrite(Internal::PassKey) {};
 		~GuiWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(GuiWrite)
+		FluidumUtils_Class_Delete_CopyMove(GuiWrite);
 
 	public:
 		void centerPos(const ImVec2& vec2) const noexcept;
@@ -25,7 +25,7 @@ namespace FD {
 	public:
 		GuiRead(Internal::PassKey) {};
 		~GuiRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(GuiRead)
+		FluidumUtils_Class_Delete_CopyMove(GuiRead);
 
 	public:
 		const ImVec2& centerPos() const noexcept;
@@ -46,7 +46,7 @@ namespace FD {
 	public:
 		ImGuiWindowWrite(Internal::PassKey) {};
 		~ImGuiWindowWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowWrite)
+		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowWrite);
 
 	public:
 		//require: std::same_as<T, ImGuiWindow*>
@@ -60,7 +60,7 @@ namespace FD {
 	public:
 		ImGuiWindowRead(Internal::PassKey) {};
 		~ImGuiWindowRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowRead)
+		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowRead);
 
 	public:
 		//return ImGuiWindow*

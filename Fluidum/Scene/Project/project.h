@@ -23,7 +23,8 @@ namespace FS::Project {
 			const FD::Coding::TabRead* const tabRead,
 			FD::Coding::DisplayWrite* const displayWrite,
 			const FD::Coding::DisplayRead* const displayRead,
-			FD::ToolBarWrite* const toolBarWrite
+			FD::ToolBarWrite* const toolBarWrite,
+			const FD::Style::VarRead* const varRead
 		);
 		void Constructor(
 			FD::Style::ColorRead,
@@ -41,12 +42,13 @@ namespace FS::Project {
 			FD::Coding::TabRead,
 			FD::Coding::DisplayWrite,
 			FD::Coding::DisplayRead,
-			FD::ToolBarWrite
+			FD::ToolBarWrite,
+			FD::Style::VarRead
 		);
 
 		~Explorer() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Explorer)
+		FluidumUtils_Class_Delete_CopyMove(Explorer);
 
 	public:
 		virtual void call() override;
@@ -68,6 +70,7 @@ namespace FS::Project {
 		FD::Coding::DisplayWrite* const displayWrite;
 		const FD::Coding::DisplayRead* const displayRead;
 		FD::ToolBarWrite* const toolBarWrite;
+		const FD::Style::VarRead* const varRead;
 
 		FD::Text::Project text{};
 
@@ -151,7 +154,12 @@ namespace FS::Project {
 			ImCounter<ImAnimeTime> displayCode{};
 		}anime;
 
+		struct {
+			FD::Project::File::SupportedFileType fileType{};
+		}supportedPopupInfo;
+
 		bool windowFlag = true;
+
 	private:
 		void closeWindow();
 		void toolBar();
@@ -189,6 +197,7 @@ namespace FS::Project {
 		void flipOpen();
 		void collapseAll();
 		void rename();
+		void setMainFile();
 
 	private:
 		void openPopup();

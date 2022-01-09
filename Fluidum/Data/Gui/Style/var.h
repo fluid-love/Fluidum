@@ -9,7 +9,7 @@ namespace FD::Style {
 	public:
 		explicit VarWrite(Internal::PassKey) noexcept {};
 		~VarWrite() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(VarWrite)
+		FluidumUtils_Class_Delete_CopyMove(VarWrite);
 
 	public:
 		//Title Scene
@@ -21,13 +21,19 @@ namespace FD::Style {
 	public:
 		explicit VarRead(Internal::PassKey) noexcept {};
 		~VarRead() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(VarRead)
+		FluidumUtils_Class_Delete_CopyMove(VarRead);
 
 	public:
 		[[nodiscard]] float iconDummyWidth() const noexcept;
 
 		//Insert a dummy equal to the width of the icon.
 		void iconDummy() const;
+
+	public:
+		[[nodiscard]] float inputTextHeight() const noexcept;
+
+	public:
+		[[nodiscard]] ImVec2 viewWindowSizeConstraints() const noexcept;
 
 	public://popup window
 		[[nodiscard]] float popupWindowBorderSize() const noexcept;

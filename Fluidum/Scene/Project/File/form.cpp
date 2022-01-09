@@ -16,6 +16,7 @@ FS::Project::File::Form::Form(
 	projectRead(projectRead),
 	guiRead(guiRead),
 	info(info)
+
 {
 	FluidumScene_Log_Constructor(::FS::Project::File::Form);
 
@@ -25,7 +26,10 @@ FS::Project::File::Form::Form(
 	const auto maxSize = FU::File::maxPathSize();
 	str.name.reserve(maxSize);
 
-	str.directoryPath = (std::filesystem::current_path().string() + '/');
+	auto path = std::filesystem::current_path();
+	path += "/../../../Projects/";
+	
+	str.directoryPath = FU::File::consistentDirectory(path.string());
 	str.directoryPath.reserve(maxSize);
 
 }

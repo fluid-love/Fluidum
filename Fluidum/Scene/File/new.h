@@ -11,18 +11,18 @@ namespace FS::File::Add {
 		explicit New(
 			const FD::ProjectRead* const projectRead,
 			const FD::GuiRead* const guiRead,
-			const FD::Log::FileRead* const fileRead,
+			const FD::History::FileRead* const fileRead,
 			std::shared_ptr<SharedInfo>& sharedInfo
 		);
 		void Constructor(
 			FD::ProjectRead,
 			FD::GuiRead,
-			FD::Log::FileRead
+			FD::History::FileRead
 		);
 
 		~New() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(New)
+		FluidumUtils_Class_Delete_CopyMove(New);
 
 	public:
 		virtual void call() override;
@@ -72,7 +72,7 @@ namespace FS::File::Add {
 			const std::string& title;
 			const char* description;
 			const char* extension;
-			FD::Log::File::Type type{};
+			FD::History::File::Type type{};
 
 			bool hide = false;
 		};
@@ -119,7 +119,7 @@ namespace FS::File::Add {
 			const std::optional<float> width = std::nullopt
 		);
 	private:
-		std::vector<ButtonInfo> initRecentFileTypes(const std::vector<FD::Log::File::Type>& types);
+		std::vector<ButtonInfo> initRecentFileTypes(const std::vector<FD::History::File::Type>& types);
 		void deleteThisScene();
 
 	};

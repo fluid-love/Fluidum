@@ -7,8 +7,8 @@ namespace FS::Internal {
 	template<typename... Data>
 	class Manager final {
 	public:
-		FluidumUtils_Class_Default_ConDestructor(Manager)
-			FluidumUtils_Class_Delete_CopyMove(Manager)
+		FluidumUtils_Class_Default_ConDestructor(Manager);
+		FluidumUtils_Class_Delete_CopyMove(Manager);
 
 	private:
 		using DataTuple = std::tuple<Data...>;
@@ -25,6 +25,8 @@ namespace FS::Internal {
 		FD::Manager<Data...> data{};
 
 		std::vector<SceneUniquePtr> scenes = {};
+
+		Size currentSceneIndex = 0;
 
 		//current scenes
 		std::vector<ClassCode::CodeType> sceneCodes = {};
@@ -51,8 +53,8 @@ namespace FS::Internal {
 			void async() {
 				th = std::jthread(&Async::call, this);
 			}
-			FluidumUtils_Class_Delete_Copy(Async)
-				FluidumUtils_Class_Default_Move(Async)
+			FluidumUtils_Class_Delete_Copy(Async);
+			FluidumUtils_Class_Default_Move(Async);
 		public:
 			void requestStop() noexcept {
 				th.request_stop();
@@ -89,6 +91,7 @@ namespace FS::Internal {
 
 			std::lock_guard<std::mutex> sceneLock(sceneMtx);
 			for (Size i = 0, size = scenes.size(); i < size; i++) {
+				this->currentSceneIndex = i;
 				scenes[i]->call();
 			}
 		}
@@ -189,6 +192,36 @@ namespace FS::Internal {
 			this->makeScenePtr<Scene>(std::forward<Arg>(arg)...);
 		}
 
+		template<IsSceneAble<Data...> Scene, typename... Arg>
+		void recreate(Arg&&... arg) {
+			constexpr auto classCode = FU::Class::ClassCode::GetClassCode<Scene>();
+
+			std::lock_guard<std::mutex> lock(this->mtx);
+
+			const bool sameScene = this->sceneCodes[currentSceneIndex] == classCode;
+			if (sameScene) {
+				/*
+				Calling it from the same scene can be dangerous because it may access the freed memory.
+				This will result in undefined behavior.
+				*/
+				std::terminate();
+			}
+
+			//recreate
+
+			//not exists
+			auto find = std::find(sceneCodes.cbegin(), sceneCodes.cend(), classCode);
+			if (find == sceneCodes.cend())
+				::FS::Exception::Internal::throwAlreadyDeleted<Scene>();
+
+			const Size index = static_cast<Size>(std::distance(sceneCodes.cbegin(), find));
+
+			this->scenes.at(index).reset();
+			this->scenes.at(index) = this->makeScenePtr<Scene>(std::forward<Arg>(arg)...);
+
+		}
+
+	public:
 		//set callback
 		void setAddCallback(CallBackType callback) {
 			std::lock_guard<std::mutex> lock(this->mtx);
@@ -207,22 +240,28 @@ namespace FS::Internal {
 			if (this->deleteSceneCodes.empty())
 				return;
 
-			for (Size i = 0, size = deleteSceneCodes.size(); i < size; i++) {
+			//Deletion of the scene may be requested in the destructor function.
+			Size oldSize = 0;
+			do {
+				const auto size = deleteSceneCodes.size();
+				for (Size i = oldSize; i < size; i++) {
 
-				//Find the code to delete from the current scene codes.
-				auto itr = std::find(sceneCodes.cbegin(), sceneCodes.cend(), deleteSceneCodes[i]);
-				auto distance = std::distance(sceneCodes.cbegin(), itr);
+					//Find the code to delete from the current scene codes.
+					auto itr = std::find(sceneCodes.cbegin(), sceneCodes.cend(), deleteSceneCodes[i]);
+					auto distance = std::distance(sceneCodes.cbegin(), itr);
 
-				//Requesting deletion by destructor is a deadlock, so release it once.
-				std::unique_lock<std::mutex> sceneLock(sceneMtx);
-				lock.unlock();
-				this->scenes.erase(scenes.cbegin() + distance);
-				lock.lock();
-				sceneLock.unlock();
+					//Requesting deletion by destructor is a deadlock, so release it once.
+					std::unique_lock<std::mutex> sceneLock(sceneMtx);
+					lock.unlock();
+					this->scenes.erase(scenes.cbegin() + distance);
+					lock.lock();
+					sceneLock.unlock();
 
-				this->sceneCodes.erase(itr);
-				this->deleteCallback(false, deleteSceneCodes[i]);
-			}
+					this->sceneCodes.erase(itr);
+					this->deleteCallback(false, deleteSceneCodes[i]);
+				}
+				oldSize = size;
+			} while (oldSize != deleteSceneCodes.size());
 
 			//It's done.
 			this->deleteSceneCodes.clear();
@@ -260,13 +299,13 @@ namespace FS::Internal {
 			{
 				auto result = std::find(sceneCodes.cbegin(), sceneCodes.cend(), classCode);
 				if (result != sceneCodes.cend())
-					::FS::Exception::Internal::throwAlreadyAdded<Scene>();
+					::FS::Exception::Internal::throwAlreadyAdded();
 			}
 			//async
 			{
 				auto result = std::find_if(asyncs.cbegin(), asyncs.cend(), [=](const auto& x) {return x->code == classCode; });
 				if (result != asyncs.cend())
-					::FS::Exception::Internal::throwAlreadyAdded<Scene>();
+					::FS::Exception::Internal::throwAlreadyAdded();
 			}
 
 		}

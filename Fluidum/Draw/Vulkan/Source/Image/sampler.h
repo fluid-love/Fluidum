@@ -43,7 +43,7 @@ namespace FVK::Internal {
 		explicit Sampler(ManagerPassKey, const Data::SamplerData& data, const Parameter& parameter);
 
 		~Sampler() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(Sampler)
+		FluidumUtils_Class_Default_CopyMove(Sampler);
 
 	private:
 		/*

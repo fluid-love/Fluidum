@@ -15,7 +15,7 @@ namespace FS::Calc {
 
 		~Run() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Run)
+		FluidumUtils_Class_Delete_CopyMove(Run);
 
 	public:
 		virtual void call() override;
@@ -24,7 +24,7 @@ namespace FS::Calc {
 		const FD::FluidumFilesRead* const fluidumFilesRead;
 
 	private:
-		void deleteThis();
+		void run();
 
 	};
 

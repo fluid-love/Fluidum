@@ -17,14 +17,27 @@ namespace FD {
 
 }
 
+namespace FD::Coding {
+
+	struct DisplayInfo final {
+		std::string path{};
+		float zoomRatio = 1.0f;
+	};
+
+}
+
 namespace FD::Coding::Internal {
 
 	class Data final {
 	private:
 		static inline std::vector<std::string> filePaths{};
-		static inline std::vector<std::string> displayFiles{};
-		static inline std::mutex mtx{};
 
+	private:
+		static inline std::vector<DisplayInfo> displayInfo{};
+		static inline float firstEditorZoomRatio = 1.0f;
+
+	private:
+		static inline std::mutex mtx{};
 		static inline std::atomic_bool save = false;
 
 	private:
@@ -43,10 +56,10 @@ namespace FD::Coding {
 	public:
 		explicit TabWrite(::FD::Internal::PassKey) noexcept {}
 		~TabWrite() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(TabWrite)
+		FluidumUtils_Class_Delete_CopyMove(TabWrite);
 
 	public:
-		enum class Exception : uint8_t {
+		enum class Exception : UT {
 			LimitFileSizeMax,
 			NotFound,
 			AlreadyExist,
@@ -56,32 +69,37 @@ namespace FD::Coding {
 		//LimitFileSizeMax == 1000
 		//AlreadyExist
 		//NotFound(file)
-		void add(const std::string& path) const;
+		void add(const std::string& path);
 
 		//NotFound
-		void remove(const std::string& path) const;
+		void remove(const std::string& path);
 
-		void clear() const;
+		void clear();
 
 	public:
-		void setIsTextSaved(const std::string& path, const bool val) const;
-		void setAllIsTextSaved(const bool val) const;
-		void releaseAllEditor() const;
+		void setIsTextSaved(const std::string& path, const bool val);
+		void setAllIsTextSaved(const bool val);
 
 	public:
 		//NotFound
-		void saveText(const std::string& path) const;
+		void saveText(const std::string& path);
 
-		void saveAllTexts() const;
+		void saveAllTexts();
 
-		//NotFound
+		/*
+		Exception:
+			std::exception
+			NotFound			
+		*/
+		//strong
+		//Be careful with multi-threading.
 		[[nodiscard]] FTE::TextEditor* getEditor(const std::string& path) const;
 
 	public:
-		void save() const;
+		void save();
 
 	private:
-		void update() const;
+		void update();
 
 	};
 
@@ -93,7 +111,7 @@ namespace FD::Coding {
 	public:
 		explicit TabRead(::FD::Internal::PassKey) noexcept {};
 		~TabRead() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(TabRead)
+		FluidumUtils_Class_Delete_CopyMove(TabRead);
 
 	public:
 		[[nodiscard]] bool update() const;
@@ -121,10 +139,10 @@ namespace FD::Coding {
 	public:
 		explicit DisplayWrite(::FD::Internal::PassKey) noexcept {};
 		~DisplayWrite() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(DisplayWrite)
+		FluidumUtils_Class_Delete_CopyMove(DisplayWrite);
 
 	public:
-		enum class Exception : uint8_t {
+		enum class Exception : UT {
 			LimitFileSizeMax,
 			NotFound,
 			AlreadyExist,
@@ -136,6 +154,16 @@ namespace FD::Coding {
 		void remove(const std::string& path) const;
 
 		bool tryRemove(const std::string& path) const;
+
+	public:
+		/*
+		Exception:
+			std::exception
+			NotFound
+		*/
+		//strong
+		void focusedEditor(const std::string& path);
+
 	};
 
 }
@@ -146,14 +174,35 @@ namespace FD::Coding {
 	public:
 		explicit DisplayRead(::FD::Internal::PassKey) noexcept {};
 		~DisplayRead() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(DisplayRead)
+		FluidumUtils_Class_Delete_CopyMove(DisplayRead);
 
 	public:
 		[[nodiscard]] bool changed() const;
 
 	public:
 		[[nodiscard]] std::vector<std::string> paths() const;
-		[[nodiscard]] bool empty() const;
+		[[nodiscard]] std::vector<DisplayInfo> info() const;
+
+	public:
+		//no-throw
+		[[nodiscard]] bool empty() const noexcept;
+
+		/*
+		Exception:
+			std::exception
+		*/
+		//strong
+		[[nodiscard]] bool isEditorFocused(const std::string& path) const;
+		[[nodiscard]] bool isEditorFocused(const FTE::TextEditor* editor) const noexcept;
+
+		/*
+		Exception:
+			std::exception
+		*/
+		//strong
+		//Returns an empty string if no editor is focused.
+		[[nodiscard]] std::string focusedFilePath() const;
+
 
 	};
 

@@ -17,13 +17,7 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const NormalPar
 	//set pos
 	glfwSetWindowPos(this->info.window, parameter.posX, parameter.posY);
 
-	try {
-		this->setResizedCallback();
-	}
-	catch (const ::FVK::Exception::Error&) {
-		this->destroy();
-		Exception::throwFailedToCreate();
-	}
+	this->setResizedCallback();
 }
 
 void FVK::Internal::Window::create(const Data::WindowData& data, const FullScreenParameter& parameter) {
@@ -39,13 +33,7 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const FullScree
 
 	checkGlfwCreateWindow();
 
-	try {
-		this->setResizedCallback();
-	}
-	catch (const ::FVK::Exception::Error&) {
-		this->destroy();
-		Exception::throwFailedToCreate();
-	}
+	this->setResizedCallback();
 }
 
 void FVK::Internal::Window::create(const Data::WindowData& data, const MaximizedParameter& parameter) {
@@ -59,13 +47,7 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const Maximized
 	this->info.window = glfwCreateWindow(mode->width, mode->height, parameter.title, nullptr, nullptr);
 	checkGlfwCreateWindow();
 
-	try {
-		this->setResizedCallback();
-	}
-	catch (const ::FVK::Exception::Error&) {
-		this->destroy();
-		Exception::throwFailedToCreate();
-	}
+	this->setResizedCallback();
 }
 
 void FVK::Internal::Window::checkGlfwCreateWindow() const {
@@ -87,15 +69,11 @@ void FVK::Internal::Window::checkGlfwCreateWindow() const {
 	Exception::throwFailedToCreate();
 }
 
-void FVK::Internal::Window::setResizedCallback() {
+void FVK::Internal::Window::setResizedCallback() noexcept {
+
 	glfwSetWindowUserPointer(this->info.window, this);
 
 	auto result = glfwSetFramebufferSizeCallback(this->info.window, framebufferResizeCallback);
-	if (result == NULL) {
-		glfwSetWindowUserPointer(NULL, NULL);
-		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to set callback.");
-		Exception::throwFailedToCreate();
-	}
 
 }
 

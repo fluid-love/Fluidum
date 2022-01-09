@@ -1,13 +1,14 @@
 #include "../../lua.h"
 
-namespace FS::Lua {
+namespace FS::Calc::Lua {
+
 	constexpr const char* ArrayValueNames[] = {
 		"number","Number","num","Num",
 		"string","String","str","Str",
 		"bit","Bit","binary","Binary",
 	};
 
-	std::string concatArrayValueNames() {
+	[[nodiscard]] std::string concatArrayValueNames() {
 		std::string ret{};
 		for (auto x : ArrayValueNames) {
 			(ret += x) += ',';
@@ -15,7 +16,7 @@ namespace FS::Lua {
 		return ret;
 	}
 
-	std::optional<FD::Calc::Array::ValueType> stringToArrayValueType(const std::string& arg) {
+	[[nodiscard]] std::optional<FD::Calc::Array::ValueType> stringToArrayValueType(const std::string& arg) {
 
 		using enum FD::Calc::Array::ValueType;
 		constexpr FD::Calc::Array::ValueType types[] = {
@@ -24,7 +25,7 @@ namespace FS::Lua {
 			Bit
 		};
 
-		for (uint16_t i = 0, j = 0; i < std::extent_v<decltype(ArrayValueNames), 0>; i++) {
+		for (UIF16 i = 0, j = 0; i < std::extent_v<decltype(ArrayValueNames), 0>; i++) {
 			if (arg == ArrayValueNames[i])
 				return types[i];
 
@@ -34,17 +35,20 @@ namespace FS::Lua {
 
 		return std::nullopt;
 	}
+
 }
 
-FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
+FS::Calc::Lua::Ret FS::Calc::Lua::Run::array_make(State L) {
+
 	const bool argTypes = LuAssist::Utils::checkArgTypes<LuAssist::Type::String>(L);
 	if (!argTypes) {
 		//{}ŠÖ”{}‚Ì{}”Ô–Ú‚Ìˆø”‚ÌŒ^‚ÉŒë‚è‚ª‚ ‚è‚Ü‚·D“n‚³‚ê‚½ˆø”‚ÌŒ^: {}D³‚µ‚¢ˆø”‚ÌŒ^: {}D
-		Message message(LogType::Type);
+		Internal::Message message(Internal::LogType::Type);
 		const auto types = LuAssist::Utils::types(L);
 		assert(types.size() == 1);
-		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "make", 1, LuAssist::Utils::typeName(types.at(0)), LuAssist::Utils::typeName(LuAssist::Type::String));
-		consoleWrite->push(std::move(log));
+		Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), "make", 1, LuAssist::Utils::typeName(types.at(0)), LuAssist::Utils::typeName(LuAssist::Type::String));
+		consoleWrite->push(Internal::GMessenger.getMessage());
+		Internal::Exception::throwException();
 	}
 
 	const String str = lua_tostring(L, 1);
@@ -52,10 +56,10 @@ FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
 
 	if (!type.has_value()) {//not match
 		//{}ŠÖ”{}‚Ìˆø”‚É–³Œø‚È•¶š—ñ‚ª“n‚³‚ê‚Ü‚µ‚½D“n‚³‚ê‚½•¶š—ñ{}D³‚µ‚¢•¶š—ñ{}D
-		Message message(LogType::NotMatch);
-		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), str, concatArrayValueNames());
-		consoleWrite->push(std::move(log));
-		throw Internal::Exception();
+		Internal::Message message(Internal::LogType::NotMatch);
+		Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), str, concatArrayValueNames());
+		consoleWrite->push(Internal::GMessenger.getMessage());
+		Internal::Exception::throwException();
 	}
 
 	FD::Calc::Array::Key key;
@@ -67,17 +71,16 @@ FS::Lua::Ret FS::Lua::Calc::array_make(State L) {
 		using enum FD::Calc::ArrayWrite::Exception;
 		if (val == MaxSize) {
 			//{}ŠÖ”{}‚ªŒÄ‚Î‚ê‚Ü‚µ‚½‚ªì¬‚Å‚«‚é{}‚ÌÅ‘å”‚ğ’´‚¦‚Ä‚¢‚Ü‚·DÅ‘å’l{}D
-			Message message(LogType::NotMatch);
-			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "make", FD::Calc::Array::Limits::MaxSize);
-			consoleWrite->push(std::move(log));
-			throw Internal::Exception();
+			Internal::Message message(Internal::LogType::NotMatch);
+			Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, message, LuAssist::Utils::getSrcCurrentLine(L, 2), "make", FD::Calc::Array::Limits::MaxSize);
+			consoleWrite->push(Internal::GMessenger.getMessage());
+			Internal::Exception::throwException();
 		}
 		else {
-			FluidumScene_Log_EnumClass_Error(val);
+			FluidumScene_Log_InternalWarning_Enum(val);
 		}
-
-		FluidumScene_Console_InternalError;
-		throw Lua::Internal::InternalError(__FILE__);
+		FluidumScene_Console_InternalError();
+		Internal::Exception::throwInternalError();
 	}
 
 	lua_pushinteger(L, key);

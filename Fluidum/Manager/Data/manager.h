@@ -29,8 +29,8 @@ namespace FD {
 		std::mutex mtx{};
 
 	public:
-		FluidumUtils_Class_Default_ConDestructor(Manager)
-			FluidumUtils_Class_Delete_CopyMove(Manager)
+		FluidumUtils_Class_Default_ConDestructor(Manager);
+			FluidumUtils_Class_Delete_CopyMove(Manager);
 
 	public:
 		//get data

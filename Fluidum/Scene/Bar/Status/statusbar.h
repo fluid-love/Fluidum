@@ -20,7 +20,7 @@ namespace FS {
 
 		~StatusBar() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(StatusBar);
+		FluidumUtils_Class_Delete_CopyMove(StatusBar);;
 
 	public:
 		virtual void call() override;

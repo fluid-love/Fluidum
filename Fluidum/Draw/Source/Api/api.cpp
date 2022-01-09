@@ -109,15 +109,17 @@ void FDR::minimizeWindow() {
 }
 
 FDR::ImGuiImage FDR::createImGuiImage(const char* filePath) {
+
 	try {
 		ImGuiImage image = Internal::createImGuiImage(filePath);
 		Internal::GMessenger.add_str<FU::Log::Type::None>("ImGuiImage({}) was created successfully.", filePath);
 		return image;
 	}
 	catch (const std::exception& e) {
-		Internal::GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__,"Failed to create ImGuiImage. Exception message is {}.", e.what());
+		Internal::GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to create ImGuiImage. Exception message is {}.", e.what());
 		Exception::Internal::throwFailed();
 	}
+
 }
 
 ImFont* FDR::getDefaultFontMiniSize() {

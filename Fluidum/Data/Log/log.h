@@ -35,7 +35,7 @@ namespace FD {
 	public:
 		LogWrite() noexcept;
 		~LogWrite() noexcept = default;
-		FluidumUtils_Class_Delete_CopyMove(LogWrite)
+		FluidumUtils_Class_Delete_CopyMove(LogWrite);
 
 	public:
 		enum class Exception : UT {
@@ -74,7 +74,7 @@ namespace FD {
 	public:
 		LogRead(Internal::PassKey) {}
 		~LogRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(LogRead)
+		FluidumUtils_Class_Delete_CopyMove(LogRead);
 
 	public:
 		//Get the last message added.

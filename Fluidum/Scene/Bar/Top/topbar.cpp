@@ -116,11 +116,9 @@ void FS::TopBar::calc() {
 	this->mode();
 	ImGui::SameLine();
 
-	bool isRunning = sceneRead->exist<Calc::Lua::Run>();
+	const bool running = sceneRead->exist<Calc::Lua::Run>();
 
-	//前のステップまで戻る
-	//一時停止中以外は選択不可
-	if (isRunning) {
+	if (running) {
 		ImGui::Button(ICON_MD_SKIP_PREVIOUS);
 	}
 	else {
@@ -131,7 +129,7 @@ void FS::TopBar::calc() {
 
 	ImGui::SameLine();
 
-	if (isRunning) {
+	if (running) {
 
 		//request pause
 		bool pause = ImGui::Button(ICON_MD_STOP);
@@ -139,10 +137,10 @@ void FS::TopBar::calc() {
 		ImGui::SameLine();
 	}
 	else {
-
 		bool run = ImGui::Button(ICON_MD_PLAY_ARROW);
+		//FU::ImGui::tooltip(text.);
 		if (run) {
-			pos.run = ImGui::GetItemRectMax();
+			pos.run = FU::ImGui::messagePos();
 			this->run();
 		}
 	}
@@ -150,7 +148,7 @@ void FS::TopBar::calc() {
 	ImGui::SameLine();
 
 	//next step
-	if (isRunning) {
+	if (running) {
 		ImGui::Button(ICON_MD_SKIP_NEXT);
 
 	}
@@ -181,22 +179,17 @@ void FS::TopBar::mode() {
 	if (ImGui::Selectable("Standard"))
 		std::cout << "a";
 
-
 	ImGui::EndCombo();
 }
 
 void FS::TopBar::run() {
-	//test
-	Scene::addAsyncScene<Calc::Lua::Run>();
-
-	return;
 	if (!fluidumFilesRead->isMainCodeFileExist()) {
 		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_mainfile, pos.run);
 	}
 
-	FluidumScene_Log_RequestAddScene(::FS::Calc::Run);
-	Scene::addScene<Calc::Run>();
+	FluidumScene_Log_CallSceneConstructor(::FS::Calc::Run);
+	Scene::callConstructor<Calc::Run>();
 }
 
 void FS::TopBar::playCheck() {
@@ -247,7 +240,6 @@ void FS::TopBar::combo() {
 		return;
 
 	for (auto& x : *info) {
-
 		if (ImGui::Selectable(x.sceneName.c_str(), x.select)) {
 			if (!x.select)
 				toolBarWrite->lock(x.code);
@@ -265,13 +257,20 @@ void FS::TopBar::func() {
 
 	const auto* indices = toolBarRead->getIndices();
 
-	for (auto x : *indices) {
+	if (indices->empty())
+		return;
+
+	for (auto itr = indices->begin(), end = (indices->end() - 1); itr != end; itr++) {
 		ImGui::Spacing(); ImGui::SameLine();
-		toolBarRead->call(x);
+		toolBarRead->call(*itr);
 		ImGui::SameLine(); ImGui::Spacing();
-		this->separator(ImGui::GetItemRectMax().x + 10.0f);
+		this->separator(ImGui::GetItemRectMax().x + 10.0f, { 0.4f, 0.2f, 0.2f, 1.0f });
 		ImGui::SameLine();
 	}
+
+	ImGui::Spacing(); ImGui::SameLine();
+
+	toolBarRead->call(indices->back());
 
 }
 
@@ -285,7 +284,7 @@ void FS::TopBar::separator(const float posX, const ImVec4& col4) {
 
 #include <imgui_internal.h>
 void FS::TopBar::windowBorder() {
-	constexpr ImU32 col = FU::ImGui::convertImVec4ToImU32(0.4f, 0.4f, 0.4f, 1.0f);
+	constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.4f, 0.4f, 0.4f, 1.0f);
 	ImGui::GetWindowDrawList()->AddLine(
 		{ style.windowPos.x ,style.windowPos.y + style.windowSize.y },
 		{ style.windowPos.x + style.windowSize.x ,style.windowPos.y + style.windowSize.y },

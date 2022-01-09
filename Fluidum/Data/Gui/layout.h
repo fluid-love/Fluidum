@@ -60,7 +60,7 @@ namespace FD::Layout {
 			float* pos_side2 = nullptr;
 
 			bool horizonal = false;
-			ImVec2 readPos{};
+			ImVec2 readPosRatio{};
 		};
 
 		enum class ResizedBorder : uint8_t {
@@ -72,7 +72,7 @@ namespace FD::Layout {
 		};
 
 		struct LayoutData final {
-			FluidumUtils_Class_Delete_ConDestructor(LayoutData)
+			FluidumUtils_Class_Delete_ConDestructor(LayoutData);
 		private:
 			static inline std::shared_ptr<float> mainFrameLeft{};
 			static inline std::shared_ptr<float> mainFrameRight{};
@@ -106,7 +106,7 @@ namespace FD {
 	public:
 		LayoutWrite(Internal::PassKey) {};
 		~LayoutWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(LayoutWrite)
+		FluidumUtils_Class_Delete_CopyMove(LayoutWrite);
 
 	public:
 		void mainFrameLeft(const float val) const;
@@ -152,7 +152,7 @@ namespace FD {
 	public:
 		LayoutRead(Internal::PassKey) {};
 		~LayoutRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(LayoutRead)
+		FluidumUtils_Class_Delete_CopyMove(LayoutRead);
 
 	public:
 		[[nodiscard]] float mainFrameLeft() const;

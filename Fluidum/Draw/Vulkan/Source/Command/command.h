@@ -17,7 +17,7 @@ namespace FVK::Internal::Command {
 		explicit Command(SharedPtr&& ptr) noexcept : ptr(std::move(ptr)) {}//Manager
 	public:
 		~Command() noexcept = default;
-		FluidumUtils_Class_Default_CopyMove(Command)
+		FluidumUtils_Class_Default_CopyMove(Command);
 
 	public:
 		[[nodiscard]] Element* operator->() const noexcept {
@@ -47,7 +47,7 @@ namespace FVK::Internal::Command {
 		explicit AnyCommand(SharedPtr&& ptr) noexcept : ptr(std::move(ptr)) {}//Manager
 	public:
 		~AnyCommand() = default;
-		FluidumUtils_Class_Default_CopyMove(AnyCommand)
+		FluidumUtils_Class_Default_CopyMove(AnyCommand);
 
 	public:
 		[[nodiscard]] Element* operator->() const noexcept {

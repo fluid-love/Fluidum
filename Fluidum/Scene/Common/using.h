@@ -17,6 +17,8 @@ namespace FS {
 		FD::ExitWrite,
 		FD::ExitRead,
 		FD::GuiTextRead,
+		FD::Style::ThemeWrite,
+		FD::Style::ThemeRead,
 		FD::Style::ColorWrite,
 		FD::Style::ColorRead,
 		FD::Style::VarWrite,
@@ -56,13 +58,13 @@ namespace FS {
 		FD::ImGuiWindowRead,
 		FD::TaskWrite,
 		FD::TaskRead,
-		FD::Log::FileWrite,
-		FD::Log::FileRead,
-		FD::Log::ProjectWrite,
-		FD::Log::ProjectRead
+		FD::History::FileWrite,
+		FD::History::FileRead,
+		FD::History::ProjectWrite,
+		FD::History::ProjectRead
 	> ;
 
-	//ŠeƒV[ƒ“‚ÅpublicŒp³‚·‚é upcast‚·‚é‚Ì‚Åpublic
+	//public inheritance in each scene.
 	using Scene = MainFluidumScene::SceneBaseType;
 
 }
