@@ -15,6 +15,20 @@ namespace FD::Coding::Internal {
 	std::map<std::string, std::unique_ptr<EditorInfo>> GData;
 }
 
+void FD::Coding::Internal::Data::ProjectWrite::initializeInternalData() {
+	//already locked
+
+	for (const auto& x : filePaths) {
+		GData.insert({ x, std::make_unique<EditorInfo>() });
+	}
+}
+
+void FD::Coding::Internal::Data::ProjectWrite::clearInternalData() {
+	//already locked
+
+	GData.clear();
+}
+
 void FD::Coding::TabWrite::add(const std::string& path) {
 	using namespace Internal;
 	std::lock_guard<std::mutex> lock(Data::mtx);
@@ -132,6 +146,7 @@ void FD::Coding::TabWrite::saveText(const std::string& path) {
 	ofs << text;
 
 	info->isTextSaved = true;
+	Update_textSaved = true;
 }
 
 void FD::Coding::TabWrite::saveAllTexts() {
@@ -151,6 +166,8 @@ void FD::Coding::TabWrite::saveAllTexts() {
 
 		info->isTextSaved = true;
 	}
+
+	Update_textSaved = true;
 }
 
 bool FD::Coding::TabRead::update() const {
@@ -224,7 +241,7 @@ bool FD::Coding::TabRead::exist(const std::string& path) const {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FD::Coding::DisplayWrite::add(const std::string& path) const {
+void FD::Coding::DisplayWrite::add(const std::string& path) {
 	using namespace Internal;
 	std::lock_guard<std::mutex> lock(Data::mtx);
 
@@ -245,15 +262,10 @@ void FD::Coding::DisplayWrite::add(const std::string& path) const {
 	DisplayFileChanged = true;
 }
 
-void FD::Coding::DisplayWrite::remove(const std::string& path) const {
+void FD::Coding::DisplayWrite::remove(const std::string& path) {
 	using namespace Internal;
 	std::lock_guard<std::mutex> lock(Data::mtx);
-	auto itr = std::find_if(Data::displayInfo.begin(), Data::displayInfo.end(),
-		[&](auto& x)
-		{
-			return path == x.path;
-		}
-	);
+	auto itr = this->find(path);
 	if (itr == Data::displayInfo.end())
 		throw Exception::NotFound;
 
@@ -262,15 +274,10 @@ void FD::Coding::DisplayWrite::remove(const std::string& path) const {
 	DisplayFileChanged = true;
 }
 
-bool FD::Coding::DisplayWrite::tryRemove(const std::string& path) const {
+bool FD::Coding::DisplayWrite::tryRemove(const std::string& path) {
 	using namespace Internal;
 	std::lock_guard<std::mutex> lock(Data::mtx);
-	auto itr = std::find_if(Data::displayInfo.begin(), Data::displayInfo.end(),
-		[&](auto& x)
-		{
-			return path == x.path;
-		}
-	);
+	auto itr = this->find(path);
 	if (itr == Data::displayInfo.end())
 		return false;
 
@@ -279,6 +286,40 @@ bool FD::Coding::DisplayWrite::tryRemove(const std::string& path) const {
 	DisplayFileChanged = true;
 
 	return true;
+}
+
+void FD::Coding::DisplayWrite::theme(const std::string& path, const DisplayInfo::Theme theme) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	auto itr = this->find(path);
+	if (itr == Data::displayInfo.end())
+		throw Exception::NotFound;
+
+	itr->theme = theme;
+}
+
+void FD::Coding::DisplayWrite::zoomRatio(const std::string& path, const float ratio) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	auto itr = this->find(path);
+	if (itr == Data::displayInfo.end())
+		throw Exception::NotFound;
+
+	itr->zoomRatio = ratio;
+}
+
+std::vector<FD::Coding::DisplayInfo>::iterator FD::Coding::DisplayWrite::find(const std::string& path) const {
+	using namespace Internal;
+
+	auto itr = std::find_if(Data::displayInfo.begin(), Data::displayInfo.end(),
+		[&](auto& x)
+		{
+			return path == x.path;
+		}
+	);
+	return itr;
 }
 
 void FD::Coding::DisplayWrite::focusedEditor(const std::string& path) {

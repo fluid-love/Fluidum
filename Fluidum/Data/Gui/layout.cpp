@@ -415,6 +415,10 @@ void FD::LayoutWrite::reset() {
 	remakeAllWindows();
 }
 
+void FD::LayoutWrite::remake() {
+	Layout::Internal::LayoutData::remake();
+}
+
 bool FD::LayoutWrite::splitVertical(const Layout::DockSpaceWindow& window, const float posX) {
 	using namespace Layout::Internal;
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);

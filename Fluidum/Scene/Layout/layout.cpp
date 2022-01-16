@@ -23,7 +23,7 @@ FS::Layout::Layout(
 		layoutWrite->mainFrameRight(guiRead->windowSize().x);
 		layoutWrite->mainFrameTop(pos.y);
 		layoutWrite->mainFrameBottom(guiRead->windowSize().y - guiRead->statusBarHeight());
-		layoutWrite->reset();
+		layoutWrite->remake();
 	}
 
 	layoutWrite->widthLimit(guiRead->windowSize().x * 0.13f);

@@ -47,3 +47,11 @@ namespace FU::ImGui {
 	}*/
 
 }
+
+namespace FU::ImGui {
+
+	[[nodiscard]] bool isTitleBarClicked(const ImGuiMouseButton mouse) noexcept;
+
+	[[nodiscard]] bool isMouseHoveringRect(const ImVec2& min, const ImVec2& max) noexcept;
+
+}

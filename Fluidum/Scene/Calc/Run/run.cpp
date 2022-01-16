@@ -5,10 +5,12 @@
 FS::Calc::Run::Run(
 	const FD::Project::PropertyRead* const propertyRead,
 	const FD::Project::PropertyLuaRead* const propertyLuaRead,
+	FD::Coding::TabWrite* const tabWrite,
 	Info& info
 ) :
 	propertyRead(propertyRead),
 	propertyLuaRead(propertyLuaRead),
+	tabWrite(tabWrite),
 
 	info(info)
 {
@@ -44,6 +46,9 @@ void FS::Calc::Run::run() {
 			info.errorType = InfoErrorType::NotExistsEntryFile;
 			return;
 		}
+		//save all texts
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save all texts.");
+		tabWrite->saveAllTexts();
 		FluidumScene_Log_RequestAddScene(::FS::Calc::Lua::Run);
 		Scene::addAsyncScene<Calc::Lua::Run>(propertyLuaRead->entryFilePath());
 	}

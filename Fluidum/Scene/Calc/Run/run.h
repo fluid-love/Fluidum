@@ -21,11 +21,13 @@ namespace FS::Calc {
 		explicit Run(
 			const FD::Project::PropertyRead* const propertyRead,
 			const FD::Project::PropertyLuaRead* const propertyLuaRead,
+			FD::Coding::TabWrite* const tabWrite,
 			Info& info
 		);
 		void Constructor(
 			FD::Project::PropertyRead,
-			FD::Project::PropertyLuaRead
+			FD::Project::PropertyLuaRead,
+			FD::Coding::TabWrite
 		);
 
 		~Run() noexcept;
@@ -38,7 +40,8 @@ namespace FS::Calc {
 	private:
 		const FD::Project::PropertyRead* const propertyRead;
 		const FD::Project::PropertyLuaRead* const propertyLuaRead;
-
+		FD::Coding::TabWrite* const tabWrite;
+		
 		Info& info;
 
 	private:

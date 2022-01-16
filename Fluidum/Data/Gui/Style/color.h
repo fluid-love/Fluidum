@@ -39,6 +39,9 @@ namespace FD::Style {
 
 	public:
 		[[nodiscard]] ImVec4 noerror() const noexcept;
+		[[nodiscard]] ImVec4 error() const noexcept;
+		[[nodiscard]] ImVec4 warning() const noexcept;
+		[[nodiscard]] ImVec4 info() const noexcept;
 
 	};
 

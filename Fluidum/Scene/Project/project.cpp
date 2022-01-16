@@ -333,14 +333,14 @@ std::pair<ImVec2, ImVec2> FS::Project::Explorer::projectFilesTree(std::vector<FD
 		constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.27f, 0.67f, 0.87f, 0.14f);
 		ImGui::GetWindowDrawList()->AddRectFilled({ nRect.Min.x ,nRect.Min.y - 2.0f }, { nRect.Max.x,nRect.Max.y + 2.0f }, col);
 
-		if (popup.ChangeName) {
+		if (changeName.popup) {
 			changeName.pos = { nRect.Min.x + 48.0f, nRect.Min.y + ImGui::GetStyle().FramePadding.y - 1.0f };
 			changeName.size = { nRect.Max.x - changeName.pos.x - 1.0f, nRect.Max.y - changeName.pos.y - ImGui::GetStyle().FramePadding.y + 1.0f };
 		}
 	}
 
 	//select
-	if (!popup.ChangeName && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect({ nRect.Min.x + 18.0f,nRect.Min.y }, nRect.Max)) {
+	if (!changeName.popup && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && FU::ImGui::isMouseHoveringRect({ nRect.Min.x + 18.0f, nRect.Min.y }, nRect.Max)) {
 		select.projectFiles = info;
 		pos.selectedTree = ImGui::GetItemRectMax();
 	}
@@ -472,7 +472,7 @@ std::pair<ImVec2, ImVec2> FS::Project::Explorer::userFilesTree(std::vector<FD::P
 	}
 
 	//select
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect({ nRect.Min.x + 18.0f,nRect.Min.y }, nRect.Max)) {
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && FU::ImGui::isMouseHoveringRect({ nRect.Min.x + 18.0f,nRect.Min.y }, nRect.Max)) {
 		select.userFiles = info;
 		pos.selectedTree = ImGui::GetItemRectMax();
 	}
@@ -490,7 +490,7 @@ std::pair<ImVec2, ImVec2> FS::Project::Explorer::userFilesTree(std::vector<FD::P
 	}
 
 	//double click
-	if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(nRect.Min, nRect.Max)) {
+	if (!changeName.popup && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(nRect.Min, nRect.Max)) {
 		if (info->type == FD::Project::FileList::Type::Directory) {
 			info->open ^= 1;//if opened -> close, if closed -> open 
 			userFilesWrite->save();
@@ -997,18 +997,35 @@ void FS::Project::Explorer::displayCode() {
 		return;
 	}
 
-	tabWrite->save();
-
 	if (!sceneRead->exist<TextEditor>()) {
 		displayWrite->add(path);
 		FluidumScene_Log_RequestAddScene(::FS::TextEditor);
 		Scene::addScene<TextEditor>();
+	}
+	else {
+		const std::string focusedPath = displayRead->focusedFilePath();
+		if (!focusedPath.empty()) { //Exists focused editor.
+			displayWrite->remove(focusedPath);
+		}
+		else { //remove first editor
+			const auto paths = displayRead->paths();
+			if (paths.empty()) { //There is no editor.
+				;
+			}
+			else {
+				//remove front elm.
+				displayWrite->remove(paths.front());
+			}
+		}
+		displayWrite->add(path);
 	}
 
 	if (!sceneRead->exist<Coding::Tab>()) {
 		FluidumScene_Log_RequestAddScene(::FS::Coding::Tab);
 		Scene::addScene<Coding::Tab>();
 	}
+
+	tabWrite->save();
 }
 
 void FS::Project::Explorer::flipOpen() {

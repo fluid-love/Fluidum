@@ -58,7 +58,8 @@ namespace FS::Internal::Bar {
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoScrollWithMouse;
+		ImGuiWindowFlags_NoScrollWithMouse |
+		ImGuiWindowFlags_NoSavedSettings;
 }
 
 void FS::TopBar::call() {
@@ -141,6 +142,7 @@ void FS::TopBar::calc() {
 		FU::ImGui::tooltip(anime.run, text.run);
 		if (run) {
 			consoleWrite->push_input("flu run");
+			consoleWrite->busy(true);
 			pos.run = FU::ImGui::messagePos();
 			this->run();
 		}
@@ -199,16 +201,20 @@ void FS::TopBar::run() {
 	FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 	if (info.errorType == NotSetProjectType) {
 		Scene::addScene<Utils::Message>(text.error_notSetProperty, pos.run);
+		consoleWrite->push<FU::Log::Type::Error>(text.error_notSetProperty.operator const std::string & ());
 	}
 	else if (info.errorType == NotExistsEntryFile) {
 		Scene::addScene<Utils::Message>(text.error_mainfile, pos.run);
+		consoleWrite->push<FU::Log::Type::Error>(text.error_mainfile.operator const std::string & ());
 	}
 	else if (info.errorType == InternalError) {
 		FluidumScene_Log_InternalWarning();
 		FD::Text::Common errorText(FD::Text::CommonText::InternalError);
 		Scene::addScene<Utils::Message>(errorText, pos.run);
+		consoleWrite->push<FU::Log::Type::Error>(errorText.string_cr());
 	}
 
+	consoleWrite->busy(false);
 }
 
 void FS::TopBar::playCheck() {

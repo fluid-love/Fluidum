@@ -7,6 +7,7 @@ namespace FS {
 	class MenuBar final : public Scene {
 	public:
 		explicit MenuBar(
+			const FD::Style::ColorRead* const colorRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			FD::WindowWrite* const windowWrite,
@@ -19,6 +20,7 @@ namespace FS {
 			const FD::SceneRead* const sceneRead
 		);
 		void Constructor(
+			FD::Style::ColorRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
 			FD::WindowWrite,
@@ -38,7 +40,8 @@ namespace FS {
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		const FD::Style::ColorRead* const colorRead;
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
 		FD::WindowWrite* const windowWrite;

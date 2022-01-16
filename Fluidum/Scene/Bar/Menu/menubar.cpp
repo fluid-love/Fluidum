@@ -20,6 +20,7 @@
 using namespace FU::ImGui::Operators;
 
 FS::MenuBar::MenuBar(
+	const FD::Style::ColorRead* const colorRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
 	FD::WindowWrite* const windowWrite,
@@ -31,6 +32,7 @@ FS::MenuBar::MenuBar(
 	FD::CalcWrite* const calcWrite,
 	const FD::SceneRead* const sceneRead
 ) :
+	colorRead(colorRead),
 	projectWrite(projectWrite),
 	projectRead(projectRead),
 	windowWrite(windowWrite),
@@ -76,7 +78,8 @@ void FS::MenuBar::call() {
 		ImGuiWindowFlags_NoBackground |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoMove;
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoSavedSettings;
 
 	ImGui::Begin("MenuBar", nullptr, flag);
 	if (ImGui::BeginMenuBar()) {
@@ -115,7 +118,6 @@ void FS::MenuBar::fileGui() {
 	this->itemSaveAs();
 
 	ImGui::Separator();
-	ImGui::Spacing();
 
 	this->itemExit();
 
@@ -222,7 +224,7 @@ void FS::MenuBar::itemSaveAs() {
 
 void FS::MenuBar::itemExit() {
 	//red
-	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colorRead->error());
 
 	if (!ImGui::MenuItem(text.terminate)) {
 		ImGui::PopStyleColor();

@@ -978,7 +978,7 @@ FD::Text::Internal::TextEditor::TextEditor() {
 	this->save_icon = ICON_FA_SAVE "  " + data;
 
 	std::getline(ifs, data);
-	this->saveAs = data;
+	this->saveAs = ICON_FA_SAVE "  " + data;
 
 	std::getline(ifs, data);
 	this->load = data;

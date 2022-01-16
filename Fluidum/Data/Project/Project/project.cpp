@@ -239,7 +239,7 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 		GCurrentData = std::move(temp);
 		throw Exception::Unexpected;
 	}
-
+	
 	GCurrentData.isTempProject = false;
 }
 
@@ -327,8 +327,11 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 
 		Project::Internal::ProjectFilesData::projectFiles = std::move(temp_files_userFiles);
 		Project::Internal::UserFilesData::userFiles = std::move(temp_files_projectFiles);
+		
 		Coding::Internal::Data::displayInfo = std::move(temp_tab_displayInfo);
 		Coding::Internal::Data::filePaths = std::move(temp_tab_filePaths);
+		Coding::Internal::Data::ProjectWrite::clearInternalData();
+
 		Scene::Internal::Data::codes = std::move(temp_scene_codes);
 		Layout::Internal::LayoutData::history = std::move(temp_layout_history);
 
@@ -391,33 +394,64 @@ void FD::ProjectWrite::saveAs(const std::string& newName, const std::string& dst
 
 void FD::ProjectWrite::save_tab() {
 	using namespace Project::Internal;
+	namespace json = boost::json;
 
 	//already locked
 
+	std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::Project_Temp_Tab, std::ios::trunc);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to open .tab file.");
+
+	json::object obj{};
+
+	//display files
 	{
-		std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::Project_Temp_Tab, std::ios::trunc);
+		json::object& files = obj["DisplayFiles"].emplace_object();
+		for (Size i = 0; const auto & x : Coding::Internal::Data::displayInfo) {
+			i++;
+			json::object& item = files[std::to_string(i)].emplace_object();
+			item["FilePath"] = x.path;
+			item["ZoomRatio"] = x.zoomRatio;
 
-		if (!ofs)
-			throw std::runtime_error("Failed to open .tab file.");
-
-		//DisplayFiles
-		for (const auto& x : Coding::Internal::Data::displayInfo) {
-			ofs << x.path << std::endl;
-			ofs << x.zoomRatio << std::endl;
+			//theme
+			{
+				using enum FD::Coding::DisplayInfo::Theme;
+				if (x.theme == Default)
+					item["Theme"] = "Default";
+				else if (x.theme == Dark)
+					item["Theme"] = "Dark";
+				else if (x.theme == Light)
+					item["Theme"] = "Light";
+				else if (x.theme == Blue)
+					item["Theme"] = "Blue";
+				else {
+					FluidumData_Log_Internal_InternalWarning();
+				}
+			}
 		}
-		ofs << Name::Delimiter << std::endl;
+	}
 
-		//TabFilePathes
-		for (const auto& x : Coding::Internal::Data::filePaths) {
-			ofs << x << std::endl;
+	//tab files
+	{
+		json::object& files = obj["TabFiles"].emplace_object();
+		for (Size i = 0; const auto & x : Coding::Internal::Data::filePaths) {
+			i++;
+			json::object& item = files[std::to_string(i)].emplace_object();
+			item["FilePath"] = x;
 		}
-		ofs << Name::Delimiter << std::endl;
 	}
 
 	//This function may be called continuously. 
 	//Copying file is a time-consuming operation.
 	if (::FD::Scene::Internal::Data::save.load())
 		return;
+
+	{
+		const std::string text = json::serialize(obj);
+		ofs << text;
+		ofs.close();
+	}
 
 	//success
 	{
@@ -573,42 +607,40 @@ void FD::ProjectWrite::save_layout() {
 	using namespace Layout::Internal;
 	using namespace Project::Internal;
 
+	namespace json = boost::json;
+
 	//already locked
 
-	{
-		std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::Project_Temp_Layout, std::ios::trunc);
+	std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::Project_Temp_Layout, std::ios::trunc);
 
-		if (!ofs)
-			throw std::runtime_error("Failed to open .layout file.");
+	if (!ofs)
+		throw std::runtime_error("Failed to open .layout file.");
 
-		//Save the file as a ratio, since the screen size may be different.
-		auto toRatio = [&](const bool horizonal, const float pos) -> float {
-			if (horizonal) {
-				return (pos - *LayoutData::mainFrameTop) / (*LayoutData::mainFrameBottom - *LayoutData::mainFrameTop);
-			}
-			else {
-				return (pos - *LayoutData::mainFrameLeft) / (*LayoutData::mainFrameRight - *LayoutData::mainFrameLeft);
-			}
-		};
-
-		for (auto& x : LayoutData::history) {
-			if (x.horizonal) {
-				ofs << "true" << std::endl;
-				ofs << toRatio(true, *x.pos) << std::endl;
-
-				//midpoint
-				ofs << toRatio(false, (*x.pos_side1 + ((*x.pos_side2 - *x.pos_side1) / 2.0f))) << std::endl;
-			}
-			else {
-				ofs << "false" << std::endl;
-				ofs << toRatio(false, *x.pos) << std::endl;
-
-				//midpoint
-				ofs << toRatio(true, (*x.pos_side1 + ((*x.pos_side2 - *x.pos_side1) / 2.0f))) << std::endl;
-			}
+	//Save the file as a ratio, since the screen size may be different.
+	auto toRatio = [&](const bool horizonal, const float pos) -> float {
+		if (horizonal) {
+			return (pos - *LayoutData::mainFrameTop) / (*LayoutData::mainFrameBottom - *LayoutData::mainFrameTop);
 		}
+		else {
+			return (pos - *LayoutData::mainFrameLeft) / (*LayoutData::mainFrameRight - *LayoutData::mainFrameLeft);
+		}
+	};
 
-		ofs << Project::Internal::Name::Delimiter << std::endl;
+	json::object obj{};
+
+	for (Size i = 0; auto & x : LayoutData::history) {
+		i++;
+
+		json::object& item = obj[std::to_string(i)].emplace_object();
+		item["Horizonal"] = x.horizonal;
+		item["Pos"] = toRatio(x.horizonal, *x.pos);
+		item["MidPos"] = toRatio(!x.horizonal, (*x.pos_side1 + ((*x.pos_side2 - *x.pos_side1) / 2.0f)));
+	}
+
+	{
+		const std::string text = json::serialize(obj);
+		ofs << text;
+		ofs.close();
 	}
 
 	//success
@@ -670,9 +702,8 @@ void FD::ProjectWrite::save_projectProperty() {
 	{
 		const std::string text = json::serialize(obj);
 		ofs << text;
+		ofs.close();
 	}
-
-	ofs.close();
 
 	//success
 	{
@@ -1111,111 +1142,122 @@ void FD::ProjectWrite::read_userFiles() const {
 void FD::ProjectWrite::read_layout() const {
 	using namespace Project::Internal;
 	using namespace Layout::Internal;
+	namespace json = boost::json;
 
-	std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_Layout);
-	if (!ifs)
-		throw Exception::NotFoundProjectFiles;
+	json::value val{};
+	try {
+		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_Layout);
+	}
+	catch (const Exception v) {
+		if (v == Exception::FileEmpty)
+			return;
+		FU::Exception::rethrow();
+	}
 
 	LayoutData::history.clear();
 
-	if (FU::File::empty(ifs))
-		return;
+	if (!val.is_object())
+		throw Exception::BrokenFile;
 
-	std::string buf{};
+	const json::object& obj = val.get_object();
 
-	Size counter = 0;
-	while (true) {
-		std::getline(ifs, buf);
-		if (buf == Name::Delimiter)
-			break;
-
+	for (auto itr = obj.cbegin(), end = obj.cend(); itr != end; itr++) {
 		Layout::Internal::History his{};
 
-		if (buf == "true")
-			his.horizonal = true;
-		else if (buf == "false")
-			his.horizonal = false;
-		else
-			throw Exception::BrokenFile;
+		his.horizonal = itr->value().at("Horizonal").get_bool();
+		const float pos1 = static_cast<float>(itr->value().at("Pos").get_double());
+		const float pos2 = static_cast<float>(itr->value().at("MidPos").get_double());
 
-		try {
-			if (his.horizonal) {
-				std::getline(ifs, buf);
-				his.readPosRatio.y = std::stof(buf);
-				std::getline(ifs, buf);
-				his.readPosRatio.x = std::stof(buf);
-			}
-			else {
-				std::getline(ifs, buf);
-				his.readPosRatio.x = std::stof(buf);
-				std::getline(ifs, buf);
-				his.readPosRatio.y = std::stof(buf);
-			}
+		if (his.horizonal) {
+			his.readPosRatio.y = pos1;
+			his.readPosRatio.x = pos2;
 		}
-		catch (const std::exception&) {
-			throw Exception::BrokenFile;
+		else {
+			his.readPosRatio.x = pos1;
+			his.readPosRatio.y = pos2;
 		}
-
 
 		LayoutData::history.emplace_back(his);
-
-
-		counter++;
-		if (counter > 200)
-			throw Exception::BrokenFile;
 	}
+
 }
 
 void FD::ProjectWrite::read_tab() const {
 	using namespace Project::Internal;
+	namespace json = boost::json;
 
-	std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_Tab);
-	if (!ifs)
-		throw Exception::NotFoundProjectFiles;
+	json::value val{};
+	try {
+		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_Tab);
+	}
+	catch (const Exception v) {
+		if (v == Exception::FileEmpty)
+			return;
+		FU::Exception::rethrow();
+	}
 
-	std::string data{};
+	Coding::Internal::Data::displayInfo.clear();
 
-	if (FU::File::empty(ifs))
-		return;
-
-	//TabDisplayFile
+	//display files
 	{
-		UIF16 counter = 0;
-		while (true) {
-			std::getline(ifs, data);
-			if (data == Name::Delimiter)
-				break;
-
+		const json::value files = val.at("DisplayFiles");
+		if (!files.is_object())
+			throw Exception::BrokenFile;
+		const json::object& obj = files.get_object();
+		for (auto itr = obj.cbegin(), end = obj.cend(); itr != end; itr++) {
+			const json::object& elm = itr->value().get_object();
 			Coding::DisplayInfo info{};
-			info.path = data;
-			std::getline(ifs, data);
-			info.zoomRatio = std::stof(data);
+			info.path = elm.at("FilePath").get_string();
 
-			if (counter == 0)//first
-				Coding::Internal::Data::firstEditorZoomRatio = info.zoomRatio;
+			//zoom
+			info.zoomRatio = static_cast<float>(elm.at("ZoomRatio").get_double());
+			if (info.zoomRatio * 100.0f < Coding::TextEditor::Limits::ZoomMin)
+				info.zoomRatio = Coding::TextEditor::Limits::ZoomMin / 100.0f;
+			else if (info.zoomRatio * 100.0f > Coding::TextEditor::Limits::ZoomMax)
+				info.zoomRatio = Coding::TextEditor::Limits::ZoomMax / 100.0f;
+
+			//theme
+			{
+				using enum FD::Coding::DisplayInfo::Theme;
+				const std::string theme = elm.at("Theme").get_string().c_str();
+				if (theme == "Default")
+					info.theme = Default;
+				else if (theme == "Dark")
+					info.theme = Dark;
+				else if (theme == "Light")
+					info.theme = Light;
+				else if (theme == "Blue")
+					info.theme = Blue;
+				else {
+					FluidumData_Log_Internal_InternalWarning();
+					info.theme = Default;
+				}
+			}
+
+			//Not exists. The file has been deleted or moved.
+			if (!std::filesystem::exists(info.path))
+				continue;
 
 			Coding::Internal::Data::displayInfo.emplace_back(std::move(info));
-
-			counter++;
-			if (counter > 1000)
-				throw Exception::BrokenFile;
 		}
 	}
 
-	//TabFilePathes
+	//tab files
 	{
-		UIF16 counter = 0;
-		while (true) {
-			std::getline(ifs, data);
-			if (data == Name::Delimiter)
-				break;
-			Coding::Internal::Data::filePaths.emplace_back(data);
-
-			counter++;
-			if (counter > 1000)
-				throw Exception::BrokenFile;
+		const json::value files = val.at("TabFiles");
+		if (!files.is_object())
+			throw Exception::BrokenFile;
+		const json::object& obj = files.get_object();
+		for (auto itr = obj.cbegin(), end = obj.cend(); itr != end; itr++) {
+			const json::object& elm = itr->value().get_object();
+			std::string path = elm.at("FilePath").get_string().c_str();
+			Coding::Internal::Data::filePaths.emplace_back(std::move(path));
 		}
 	}
+
+	//set internal data.
+	Coding::Internal::Data::ProjectWrite::initializeInternalData();
+	
 }
 
 void FD::ProjectWrite::read_scene() const {

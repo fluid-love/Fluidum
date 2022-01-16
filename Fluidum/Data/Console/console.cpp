@@ -1,7 +1,14 @@
 #include "console.h"
 
-void FD::ConsoleWrite::busy(const bool val) const {
-	std::lock_guard<std::mutex> lock(Console::Internal::Data::mtx);
+void FD::ConsoleWrite::clear() noexcept {
+	std::lock_guard<std::mutex> lock(Console::Internal::Data::mtx);//std::system_error
+	using namespace Console::Internal;
+
+	Data::texts.clear();
+}
+
+void FD::ConsoleWrite::busy(const bool val) noexcept {
+	std::lock_guard<std::mutex> lock(Console::Internal::Data::mtx);//std::system_error
 	using namespace Console::Internal;
 
 	Data::busy = true;
@@ -33,7 +40,7 @@ bool FD::ConsoleRead::busy() const {
 	return Data::busy;
 }
 
-std::size_t FD::ConsoleRead::size() const {
+FD::Size FD::ConsoleRead::size() const {
 	std::lock_guard<std::mutex> lock(Console::Internal::Data::mtx);
 	using namespace Console::Internal;
 

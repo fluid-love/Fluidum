@@ -9,12 +9,14 @@ namespace FS {
 		explicit Console(
 			FD::ConsoleWrite* const consoleWrite,
 			const FD::ConsoleRead* const consoleRead,
+			const FD::Style::ColorRead* const colorRead,
 			const FD::Style::VarRead* const varRead,
 			FD::ToolBarWrite* const toolBarWrite
 		);
 		void Constructor(
 			FD::ConsoleWrite,
 			FD::ConsoleRead,
+			FD::Style::ColorRead,
 			FD::Style::VarRead,
 			FD::ToolBarWrite
 		);
@@ -29,10 +31,14 @@ namespace FS {
 	private:
 		FD::ConsoleWrite* const consoleWrite;
 		const FD::ConsoleRead* const consoleRead;
+		const FD::Style::ColorRead* const colorRead;
 		const FD::Style::VarRead* const varRead;
 		FD::ToolBarWrite* const toolBarWrite;
 
 		const FD::Text::Console text{};
+		struct {
+			FD::Text::Common collapseWindow{ FD::Text::CommonText::CollapseWindow };
+		}text_;
 
 	private:
 		std::string inputText{};
@@ -52,6 +58,8 @@ namespace FS {
 
 		struct {
 			bool windowFlag = true;
+			bool collapseWindow = false;
+			bool isWindowCollpsed = false;
 			bool popupTitle = false;
 			bool popupRight = false;
 		}flag;
@@ -64,6 +72,7 @@ namespace FS {
 
 	private:
 		void console();
+		[[nodiscard]] ImVec4 messageColor(const FU::Log::Type type) const;
 
 	private:
 		void input();

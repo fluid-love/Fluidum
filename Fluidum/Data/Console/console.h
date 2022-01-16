@@ -2,32 +2,41 @@
 
 #include "../Common/common.h"
 
-//forward
+//forward declaration
 namespace FD {
+
 	class ConsoleWrite;
 	class ConsoleRead;
+
 }
 
 namespace FD::Console {
+
 	struct Info final {
 		std::string message{};
+		FU::Log::Type type{};
 	};
+
 }
 
 namespace FD::Console::Internal {
+
 	class Data final {
 	private:
 		FluidumUtils_Class_Delete_ConDestructor(Data);
-			FluidumUtils_Class_Delete_CopyMove(Data);
+		FluidumUtils_Class_Delete_CopyMove(Data);
 
 	private:
 		static inline std::vector<::FD::Console::Info> texts{};
 		static inline bool busy = false;
 		static inline std::mutex mtx{};
+
 	private:
 		friend ::FD::ConsoleWrite;
 		friend ::FD::ConsoleRead;
+
 	};
+
 }
 
 namespace FD {
@@ -37,16 +46,15 @@ namespace FD {
 		explicit ConsoleWrite(Internal::PassKey) {
 			Console::Internal::Data::texts.reserve(2000);
 		};
-		~ConsoleWrite() = default;
+		~ConsoleWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ConsoleWrite);
 
-
 	public:
-
-		template<typename String>
-		requires(FU::Concept::IsStdString<String>) void push(String&& message) const{
+		template<FU::Log::Type Type = FU::Log::Type::None, typename String>
+		requires(FU::Concept::IsStdString<String>) void push(String&& message) const {
 			Console::Info info{
-				std::forward<String>(message)
+				.message = std::forward<String>(message),
+				.type = Type
 			};
 			std::lock_guard<std::mutex> lock(Console::Internal::Data::mtx);
 
@@ -56,15 +64,15 @@ namespace FD {
 			Data::texts.emplace_back(std::move(info));
 		}
 
-		template<typename String, typename... T>
+		template<FU::Log::Type Type = FU::Log::Type::None, typename String, typename... T>
 		requires((sizeof...(T) > 0) && FU::Concept::IsStdString<String>)
 			void push(String&& message, T&&... values) const {
 
-			//formatÇÃà¯êîÇÕ&ÇÃÇ›
 			std::string result = std::format(message, std::forward<T>(values)...);
 
 			Console::Info info{
-				std::move(result)
+				.message = std::move(result),
+				.type = Type
 			};
 			std::lock_guard<std::mutex> lock(Console::Internal::Data::mtx);
 
@@ -91,14 +99,21 @@ namespace FD {
 		}
 
 	public:
-		void busy(const bool val) const;
+		void clear() noexcept;
+
+	public:
+		void busy(const bool val) noexcept;
 
 	};
 
+}
+
+namespace FD {
+
 	class ConsoleRead final {
 	public:
-		explicit ConsoleRead(Internal::PassKey) {};
-		~ConsoleRead() = default;
+		explicit ConsoleRead(Internal::PassKey) noexcept {};
+		~ConsoleRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ConsoleRead);
 
 	public:
@@ -107,7 +122,8 @@ namespace FD {
 
 	public:
 		[[nodiscard]] bool busy() const;
-		[[nodiscard]] std::size_t size() const;
+		[[nodiscard]] Size size() const;
+
 	};
 
 }

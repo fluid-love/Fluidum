@@ -1,4 +1,5 @@
 #include "var.h"
+#include <imgui_internal.h>
 
 namespace FD::Style {
 	struct {

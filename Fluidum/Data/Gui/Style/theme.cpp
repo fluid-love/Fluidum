@@ -90,8 +90,7 @@ void FD::Style::ThemeWrite::setDefault() noexcept {
 	colors[ImGuiCol_TabActive] = ImVec4(0.135f, 0.135f, 0.135f, 1.000f);
 	colors[ImGuiCol_TabUnfocused] = ImVec4(0.098f, 0.098f, 0.098f, 1.000f);
 	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.195f, 0.195f, 0.195f, 1.000f);
-	colors[ImGuiCol_DockingPreview] = ImVec4(1.000f, 0.391f, 0.000f, 0.781f);
-	colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.180f, 0.180f, 0.180f, 1.000f);
+	colors[ImGuiCol_DockingPreview] = ImVec4(0.150f, 0.791f, 0.800f, 0.700f);
 	colors[ImGuiCol_PlotLines] = ImVec4(0.469f, 0.469f, 0.469f, 1.000f);
 	colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.000f, 0.391f, 0.000f, 1.000f);
 	colors[ImGuiCol_PlotHistogram] = ImVec4(0.586f, 0.586f, 0.586f, 1.000f);
@@ -104,7 +103,7 @@ void FD::Style::ThemeWrite::setDefault() noexcept {
 	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.000f, 0.000f, 0.000f, 0.586f);
 	colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.000f, 0.000f, 0.000f, 0.586f);
 
-	style.WindowBorderSize = 1.0f;
+	style.WindowBorderSize = 1.0f;	
 	style.ChildRounding = 4.0f;
 	style.FrameBorderSize = 1.0f;
 	style.FrameRounding = 2.0f;

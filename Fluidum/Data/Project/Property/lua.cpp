@@ -15,7 +15,7 @@ std::string FD::Project::PropertyLuaRead::entryFilePath() const {
 bool FD::Project::PropertyLuaRead::entryFileExists() const noexcept{
 	using namespace Property::Internal;
 	std::lock_guard<std::mutex> lock(Data::mtx);//system_error
-	return LuaData::entryFilePath.empty();
+	return !LuaData::entryFilePath.empty();
 }
 
 

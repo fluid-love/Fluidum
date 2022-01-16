@@ -165,6 +165,7 @@ void FS::Coding::Tab::display() {
 			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
 		}
+		tabWrite->save();
 		return;
 	}
 
@@ -211,6 +212,7 @@ void FS::Coding::Tab::display() {
 				FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 				Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
 			}
+			tabWrite->save();
 			return;
 		}
 		else {
@@ -235,6 +237,7 @@ void FS::Coding::Tab::display() {
 					Scene::addScene<Utils::Message>(text.error_unexpected, pos.clicked);
 					return;
 				}
+				tabWrite->save();
 			}
 		}
 	}
@@ -250,7 +253,7 @@ void FS::Coding::Tab::display() {
 
 		//remove focused editor
 		{
-			const bool success = this->removeDisplayPath(path);
+			const bool success = this->removeDisplayPath(current);
 			if (!success) {
 				try { displayWrite->remove(path); }
 				catch (...) {
@@ -262,6 +265,7 @@ void FS::Coding::Tab::display() {
 				return;
 			}
 		}
+		tabWrite->save();
 	}
 
 }

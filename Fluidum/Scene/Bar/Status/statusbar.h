@@ -9,13 +9,17 @@ namespace FS {
 		explicit StatusBar(
 			FD::GuiWrite* const guiWrite,
 			const FD::GuiRead* const guiRead,
-			const FD::TaskRead* const taskRead
+			const FD::Style::ColorRead* const colorRead,
+			const FD::TaskRead* const taskRead,
+			const FD::SceneRead* const sceneRead
 		);
 
 		void Constructor(
 			FD::GuiWrite,
-			FD::GuiRead, 
-			FD::TaskRead
+			FD::GuiRead,
+			FD::Style::ColorRead,
+			FD::TaskRead,
+			FD::SceneRead
 		);
 
 		~StatusBar() noexcept;
@@ -27,7 +31,9 @@ namespace FS {
 
 	private://data
 		const FD::GuiRead* const guiRead;
+		const FD::Style::ColorRead* const colorRead;
 		const FD::TaskRead* const taskRead;
+		const FD::SceneRead* const sceneRead;
 
 		FD::Text::StatusBar text{};
 
@@ -46,9 +52,14 @@ namespace FS {
 			ImVec2 versionWindowSize{};
 		}style;
 
+		struct {
+			ImCounter<ImAnimeTime> running{ ImCounterCond::REPEAT };
+		}anime;
+
 	private:
 		void taskGui();
 		void taskPopup();
+		void taskIcons();
 
 	private:
 		void infoGui();

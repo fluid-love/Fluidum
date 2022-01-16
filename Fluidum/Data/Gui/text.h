@@ -22,7 +22,8 @@ namespace FD::Text {
 
 	enum class CommonText : UT {
 		InternalError,
-		UnexceptedError
+		UnexceptedError,
+		CollapseWindow
 	};
 
 	namespace Internal {
@@ -33,12 +34,16 @@ namespace FD::Text {
 			FluidumUtils_Class_Delete_CopyMove(Common);
 
 		public:
-			[[nodiscard]] inline operator const GuiText& () const noexcept {
+			[[nodiscard]] inline operator const GuiText& () const & noexcept {
 				return this->text;
 			}
 
-			[[nodiscard]] inline const char* c_str() const noexcept {
+			[[nodiscard]] inline const char* c_str() const & noexcept {
 				return this->text.operator const char* ();
+			}
+
+			[[nodiscard]] inline const std::string& string_cr() const & noexcept {
+				return this->text.operator const std::string & ();
 			}
 
 		private:

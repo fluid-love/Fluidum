@@ -15,13 +15,13 @@ void FD::Style::ColorRead::popButtonDisabled() const noexcept {
 void FD::Style::ColorRead::pushSelectableDisabled() const noexcept {
 	ImVec4 colDisabled = ImGui::GetStyle().Colors[ImGuiCol_Button];
 	ImGui::PushStyleColor(ImGuiCol_Header, colDisabled);
-	//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colDisabled);
-	//ImGui::PushStyleColor(ImGuiCol_ButtonActive, colDisabled);
-	//ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,0.3f });
+	ImGui::PushStyleColor(ImGuiCol_HeaderActive, colDisabled);
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, colDisabled);
+	ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,0.3f });
 }
 
 void FD::Style::ColorRead::popSelectableDisabled() const noexcept {
-	ImGui::PopStyleColor();
+	ImGui::PopStyleColor(4);
 }
 
 ImVec4 FD::Style::ColorRead::createButton() const noexcept {
@@ -49,7 +49,17 @@ ImVec4 FD::Style::ColorRead::noerror() const noexcept {
 	return { 0.05f, 0.65f, 0.65f, 1.0f };
 }
 
+ImVec4 FD::Style::ColorRead::error() const noexcept {
+	return { 1.00f, 0.30f, 0.30f, 1.0f };
+}
 
+ImVec4 FD::Style::ColorRead::warning() const noexcept{
+	return { 0.95f, 0.95f, 0.25f, 1.0f };
+}
+
+ImVec4 FD::Style::ColorRead::info() const noexcept{
+	return { 0.20f, 0.70f, 1.00f, 1.0f };
+}
 
 
 

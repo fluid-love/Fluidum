@@ -1,12 +1,18 @@
 #include "statusbar.h"
 
+#include "../../Calc/Lua/lua.h"
+
 FS::StatusBar::StatusBar(
 	FD::GuiWrite* const guiWrite,
 	const FD::GuiRead* const guiRead,
-	const FD::TaskRead* const taskRead
+	const FD::Style::ColorRead* const colorRead,
+	const FD::TaskRead* const taskRead,
+	const FD::SceneRead* const sceneRead
 ) :
-	guiRead(guiRead), 
-	taskRead(taskRead)
+	guiRead(guiRead),
+	colorRead(colorRead),
+	taskRead(taskRead),
+	sceneRead(sceneRead)
 {
 	FluidumScene_Log_Constructor(::FS::StatusBar);
 
@@ -72,8 +78,9 @@ void FS::StatusBar::call() {
 }
 
 void FS::StatusBar::taskGui() {
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+	ImGui::BeginChild("##StatusBarTask", { ImGui::GetWindowWidth() * 0.2f,0.0f });
 
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
 	bool clicked = ImGui::Button(text.task); ImGui::SameLine();
 	ImGui::PopStyleVar();
 
@@ -88,6 +95,11 @@ void FS::StatusBar::taskGui() {
 
 	if (!called)
 		ImGui::TextColored(ImVec4(0.85f, 0.85f, 0.85f, 0.9f), text.taskInfo);
+
+	ImGui::EndChild();
+	ImGui::SameLine();
+
+	this->taskIcons();
 
 	//if clicked
 	this->taskPopup();
@@ -105,6 +117,21 @@ void FS::StatusBar::taskPopup() {
 	);
 
 	ImGui::EndPopup();
+}
+
+void FS::StatusBar::taskIcons() {
+	const bool running = sceneRead->exist<Calc::Lua::Run>();
+	if (running) {
+		ImAnime::PushStyleVar(anime.running, 1.6f, 0.8f, 0.2f, ImAnimeType::SQUARE, ImGuiStyleVar_Alpha);
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextColored(colorRead->info(), ICON_FA_RUNNING);
+		ImAnime::PopStyleVar();
+	}
+	else {
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextDisabled(ICON_FA_RUNNING);
+	}
+
 }
 
 void FS::StatusBar::infoGui() {

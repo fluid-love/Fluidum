@@ -38,7 +38,7 @@ FS::TitleBar::TitleBar(
 	style.projectNameWindowPos = { guiRead->windowSize().x * 0.6f, 0.0f };
 	style.projectNameWindowSize = { guiRead->windowSize().x * 0.3f ,windowHeight };
 
-	style.iconSize = ImVec2{ windowHeight ,windowHeight } * 0.86f;
+	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.86f;
 
 	style.buttonSize = { style.windowSize.x / 3.0f, style.windowSize.y };
 }
@@ -60,7 +60,9 @@ void FS::TitleBar::icon() {
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoBackground;
+		ImGuiWindowFlags_NoBackground |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoCollapse;
 
 	ImGui::SetNextWindowPos(style.iconWindowPos);
 	ImGui::SetNextWindowSize(style.iconWindowSize);
@@ -90,7 +92,8 @@ void FS::TitleBar::bar() {
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoBackground;
+		ImGuiWindowFlags_NoBackground |
+		ImGuiWindowFlags_NoSavedSettings;
 
 
 	ImGui::Begin("TitleBar", nullptr, flag);

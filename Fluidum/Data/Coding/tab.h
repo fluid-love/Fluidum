@@ -20,8 +20,19 @@ namespace FD {
 namespace FD::Coding {
 
 	struct DisplayInfo final {
+	public:
+		enum class Theme : UT {
+			Default,
+			Dark,
+			Light,
+			Blue
+		};
+
+	public:
 		std::string path{};
 		float zoomRatio = 1.0f;
+		Theme theme{};
+
 	};
 
 }
@@ -39,6 +50,18 @@ namespace FD::Coding::Internal {
 	private:
 		static inline std::mutex mtx{};
 		static inline std::atomic_bool save = false;
+
+	private:
+		//To load project file.
+		struct ProjectWrite final {
+		private:
+			static void initializeInternalData();
+			static void clearInternalData();
+
+		private:
+			friend ::FD::ProjectWrite;
+
+		};
 
 	private:
 		friend ::FD::Coding::TabWrite;
@@ -89,7 +112,7 @@ namespace FD::Coding {
 		/*
 		Exception:
 			std::exception
-			NotFound			
+			NotFound
 		*/
 		//strong
 		//Be careful with multi-threading.
@@ -150,10 +173,13 @@ namespace FD::Coding {
 
 	public:
 		//NotFound
-		void add(const std::string& path) const;
-		void remove(const std::string& path) const;
+		void add(const std::string& path);
+		void remove(const std::string& path);
 
-		bool tryRemove(const std::string& path) const;
+		bool tryRemove(const std::string& path);
+
+		void theme(const std::string& path, const DisplayInfo::Theme theme);
+		void zoomRatio(const std::string& path, const float ratio);
 
 	public:
 		/*
@@ -163,6 +189,9 @@ namespace FD::Coding {
 		*/
 		//strong
 		void focusedEditor(const std::string& path);
+
+	private:
+		std::vector<DisplayInfo>::iterator find(const std::string& path) const;
 
 	};
 

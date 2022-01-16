@@ -62,10 +62,11 @@ void FS::TextEditor::call() {
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(0.07f, 0.07f, 0.07f, 0.65f));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
 
 	for (Size i = 0; auto & x : this->info) {
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
+
 		ImGui::SetNextWindowSizeConstraints(varRead->viewWindowSizeConstraints(), FU::ImGui::vec2Max());
 
 		zoom.input = std::to_string(static_cast<UIF32>(std::round(x.info.zoomRatio * 100.0f)));
@@ -75,6 +76,8 @@ void FS::TextEditor::call() {
 		std::string label = text.editor.operator const char* ();
 		(label += "##") += std::to_string(i++);
 		ImGui::Begin(label.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar);
+
+		ImGui::PopStyleVar();
 
 		this->isWindowFocused();
 
@@ -89,7 +92,7 @@ void FS::TextEditor::call() {
 		ImGui::End();
 	}
 
-	ImGui::PopStyleVar(2);
+	ImGui::PopStyleVar();
 	ImGui::PopStyleColor();
 
 	this->textChange();
@@ -133,7 +136,7 @@ void FS::TextEditor::tool_separator() {
 }
 
 void FS::TextEditor::isWindowFocused() {
-	if (!ImGui::IsWindowFocused())
+	if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
 		return;
 
 	this->selected = current;
@@ -154,16 +157,28 @@ void FS::TextEditor::windowEmpty() {
 
 void FS::TextEditor::setInfo() {
 	auto displayInfo = displayRead->info();
+	this->info.clear();
 
 	for (auto& x : displayInfo) {
 		std::ifstream ifs(x.path);
 		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
-		auto info_ = this->info.emplace_back(Info{ tabWrite->getEditor(x.path) ,x , FD::Project::File::getSupportedFileType(x.path) });
+		auto& info_ = this->info.emplace_back(Info{ tabWrite->getEditor(x.path) ,x , FD::Project::File::getSupportedFileType(x.path) });
 		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 		info_.editor->SetText(str);
-		info_.editor->SetPalette(FTE::getDarkPalette());
 
+		//theme
+		{
+			using enum FD::Coding::DisplayInfo::Theme;
+			if (x.theme == Default)
+				info_.editor->SetPalette(FTE::TextEditor::GetDarkPalette());
+			else if (x.theme == Dark)
+				info_.editor->SetPalette(FTE::getDarkPalette());
+			else if (x.theme == Light)
+				info_.editor->SetPalette(FTE::TextEditor::GetLightPalette());
+			else
+				info_.editor->SetPalette(FTE::TextEditor::GetRetroBluePalette());
+		}
 	}
 }
 
@@ -172,11 +187,14 @@ void FS::TextEditor::textEditorMenu() {
 	if (!ImGui::BeginMenuBar())
 		return;
 
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().ItemSpacing.y * 1.85f });
 	this->fileMenu();
 	this->editMenu();
 	this->themeMenu();
+	ImGui::PopStyleVar();
 
 	ImGui::EndMenuBar();
+
 }
 
 void FS::TextEditor::fileMenu() {
@@ -186,7 +204,6 @@ void FS::TextEditor::fileMenu() {
 	if (ImGui::MenuItem(text.save_icon))
 		this->saveText(current);
 
-	varRead->iconDummy();
 	if (ImGui::MenuItem(text.saveAs))
 		this->saveAs(current);
 
@@ -235,14 +252,20 @@ void FS::TextEditor::themeMenu() {
 	//TextEditor::GetDarkPalette == defaut , FTE::getDarkPalette == dark
 	if (ImGui::MenuItem(text.default_)) {
 		current->editor->SetPalette(FTE::TextEditor::GetDarkPalette());
+		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Default);
 	}
 	if (ImGui::MenuItem(text.dark)) {
 		current->editor->SetPalette(FTE::getDarkPalette());
+		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Dark);
 	}
-	if (ImGui::MenuItem(text.light))
+	if (ImGui::MenuItem(text.light)) {
 		current->editor->SetPalette(FTE::TextEditor::GetLightPalette());
-	if (ImGui::MenuItem(text.blue))
+		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Light);
+	}
+	if (ImGui::MenuItem(text.blue)) {
 		current->editor->SetPalette(FTE::TextEditor::GetRetroBluePalette());
+		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Light);
+	}
 	ImGui::EndMenu();
 }
 
@@ -485,6 +508,9 @@ void FS::TextEditor::checkAngelScript() {
 }
 
 void FS::TextEditor::shortcut() {
+	if (!selected)
+		return;
+
 	this->shortcut_zoom();
 }
 

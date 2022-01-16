@@ -3,11 +3,13 @@
 FS::Console::Console(
 	FD::ConsoleWrite* const consoleWrite,
 	const FD::ConsoleRead* const consoleRead,
+	const FD::Style::ColorRead* const colorRead,
 	const FD::Style::VarRead* const varRead,
 	FD::ToolBarWrite* const toolBarWrite
 ) :
 	consoleWrite(consoleWrite),
 	consoleRead(consoleRead),
+	colorRead(colorRead),
 	varRead(varRead),
 	toolBarWrite(toolBarWrite)
 {
@@ -20,7 +22,7 @@ FS::Console::Console(
 
 	style.inputTextWindowHeight = varRead->inputTextHeight();
 
-	toolBarWrite->add(&Console::toolBar, this, text.console.operator const std::string &());
+	toolBarWrite->add(&Console::toolBar, this, text.console.operator const std::string & ());
 
 }
 
@@ -32,7 +34,19 @@ FS::Console::~Console() noexcept {
 void FS::Console::call() {
 	ImGui::SetNextWindowContentSize(varRead->viewWindowSizeConstraints());
 
+	//collapse
+	if (flag.collapseWindow) {
+		ImGui::SetNextWindowCollapsed(true);
+		flag.collapseWindow = false;
+	}
+
 	ImGui::Begin(text.console, &flag.windowFlag);
+
+	flag.isWindowCollpsed = ImGui::IsWindowCollapsed();
+
+	//popup: title bar
+	if (FU::ImGui::isTitleBarClicked(ImGuiMouseButton_Right))
+		flag.popupTitle = true;
 
 	//main
 	this->console();
@@ -64,7 +78,7 @@ void FS::Console::console() {
 	ImGui::BeginChild("ConsoleText", { size.x - ImGui::GetStyle().ScrollbarSize, size.y - style.inputTextWindowHeight }, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 	ImGui::SetWindowFontScale(style.fontSizeScale);
 
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows))
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !flag.popupTitle && ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows))
 		flag.popupRight = true;
 
 	ImGuiListClipper clipper;
@@ -74,8 +88,10 @@ void FS::Console::console() {
 		for (IF32 i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
 
 			auto [valid, message] = consoleRead->get(i);
-			if (valid)//read_only
-				ImGui::Text(message.message.c_str());
+			if (valid) {//read_only
+				const ImVec4 color = this->messageColor(message.type);
+				ImGui::TextColored(color, message.message.c_str());
+			}
 			else {
 				ImGui::Spacing();
 			}
@@ -93,6 +109,18 @@ void FS::Console::console() {
 
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
+}
+
+ImVec4 FS::Console::messageColor(const FU::Log::Type type) const {
+	using enum FU::Log::Type;
+	if (type == None)
+		return ImGui::GetStyleColorVec4(ImGuiCol_Text);
+	else if (type == Error)
+		return colorRead->error();
+	else if (type == Warning)
+		return colorRead->warning();
+	else
+		return colorRead->info();
 }
 
 void FS::Console::input() {
@@ -143,6 +171,13 @@ void FS::Console::popupTitle() {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x,ImGui::GetStyle().ItemSpacing.y * 2.2f });
 
+	if (flag.isWindowCollpsed) { //already collapsed
+		ImGui::TextDisabled(text_.collapseWindow.c_str());
+	}
+	else {
+		if (ImGui::Selectable(text_.collapseWindow.c_str()))
+			flag.collapseWindow = true;
+	}
 
 	ImGui::PopStyleVar();
 
@@ -174,7 +209,7 @@ void FS::Console::popupRight() {
 }
 
 void FS::Console::popup_clear() {
-	//consoleWrite->
+	consoleWrite->clear();
 }
 
 void FS::Console::popup_backcolor() {
@@ -187,7 +222,7 @@ void FS::Console::changeFontSize() {
 	if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows))
 		return;
 
-	float wheel = ImGui::GetIO().MouseWheel;
+	const float wheel = ImGui::GetIO().MouseWheel;
 
 	if (static_cast<IF32>(wheel) == 0)
 		return;

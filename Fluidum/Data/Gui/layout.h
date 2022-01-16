@@ -121,6 +121,9 @@ namespace FD {
 	public:
 		//construct main layout window from LayoutData
 		static void reset();
+		
+		//Remake(rebuild) the layout from history.
+		void remake();
 
 		static bool splitVertical(const Layout::DockSpaceWindow& window, const float posX);
 		static bool splitHorizonal(const Layout::DockSpaceWindow& window, const float posY);

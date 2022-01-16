@@ -145,3 +145,24 @@ void FU::ImGui::cursor_busy() {
 
 	::ImGui::GetForegroundDrawList()->AddCircle(::ImGui::GetMousePos(), 8.0f, col, 0, 3.0f);
 }
+
+bool FU::ImGui::isTitleBarClicked(const ImGuiMouseButton mouse) noexcept {
+	const auto rect = ::ImGui::GetCurrentWindow()->TitleBarRect();
+	const bool hovered = ::FU::ImGui::isMouseHoveringRect(rect.Min, rect.Max);
+
+	if (!hovered)
+		return false;
+
+	if (!::ImGui::IsMouseClicked(mouse))
+		return false;
+
+	return true;
+}
+
+bool FU::ImGui::isMouseHoveringRect(const ImVec2& min, const ImVec2& max) noexcept {
+	const auto pos = ::ImGui::GetMousePos();
+	const bool hovered =
+		(pos.x > min.x && pos.y > min.y) &&
+		(pos.x < max.x&& pos.y < max.y);
+	return hovered;
+}
