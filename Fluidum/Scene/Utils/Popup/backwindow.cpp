@@ -19,7 +19,7 @@ void FS::Utils::PopupBackWindow::call() {
 	ImGui::SetNextWindowSize(style.windowSize);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.05f, 0.05f, 0.05f, 0.07f));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.07f, 0.07f, 0.07f, 0.08f));
 
 	constexpr ImGuiWindowFlags windowFlags = FD::Style::VarRead::PopupWindowFlags();
 

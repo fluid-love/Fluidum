@@ -30,6 +30,13 @@ namespace FD::Coding::Tab::Limits {
 
 }
 
+namespace FD::Coding::TextEditor::Limits {
+
+	constexpr inline UIF16 ZoomMax = 300;
+	constexpr inline UIF16 ZoomMin = 30;
+
+}
+
 namespace FD::Plot::Limits {
 
 	//ImPlot
@@ -71,3 +78,7 @@ namespace FD::History::Limits {
 	constexpr inline UIF8 FileLogMax = 50;
 
 }
+
+
+
+

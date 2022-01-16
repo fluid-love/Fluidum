@@ -24,11 +24,30 @@ void FD::Style::ColorRead::popSelectableDisabled() const noexcept {
 	ImGui::PopStyleColor();
 }
 
+ImVec4 FD::Style::ColorRead::createButton() const noexcept {
+	return { 0.02f, 0.35f, 0.02f, 1.0f };
+}
+
+ImVec4 FD::Style::ColorRead::cancelButton() const noexcept {
+	return { 0.7f, 0.05f, 0.05f, 0.5f };
+}
+
+ImVec4 FD::Style::ColorRead::backButton() const noexcept {
+	return ImGui::GetStyleColorVec4(ImGuiCol_Button);
+}
+
+ImVec4 FD::Style::ColorRead::saveButton() const noexcept {
+	return { 0.05f, 0.05f, 0.65f, 0.5f };
+}
+
 ImU32 FD::Style::ColorRead::toolBarVerticalSeparator() const noexcept {
 	constexpr ImU32 color = FU::ImGui::ConvertImVec4ToImU32(0.01f, 0.01f, 0.01f, 1.0f);
 	return color;
 }
 
+ImVec4 FD::Style::ColorRead::noerror() const noexcept {
+	return { 0.05f, 0.65f, 0.65f, 1.0f };
+}
 
 
 

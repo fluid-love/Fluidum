@@ -1,5 +1,6 @@
 #include "texteditor.h"
 #include "../../Calc/Lua/lua.h"
+#include "../../Utils/Popup/message.h"
 #include <nfd.h>
 
 FS::TextEditor::TextEditor(
@@ -65,6 +66,10 @@ void FS::TextEditor::call() {
 
 
 	for (Size i = 0; auto & x : this->info) {
+		ImGui::SetNextWindowSizeConstraints(varRead->viewWindowSizeConstraints(), FU::ImGui::vec2Max());
+
+		zoom.input = std::to_string(static_cast<UIF32>(std::round(x.info.zoomRatio * 100.0f)));
+
 		current = &info[i];
 
 		std::string label = text.editor.operator const char* ();
@@ -90,6 +95,7 @@ void FS::TextEditor::call() {
 	this->textChange();
 	this->update();
 	this->shortcut();
+	this->catchZoom();
 }
 
 void FS::TextEditor::toolBar() {
@@ -157,6 +163,7 @@ void FS::TextEditor::setInfo() {
 		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 		info_.editor->SetText(str);
 		info_.editor->SetPalette(FTE::getDarkPalette());
+
 	}
 }
 
@@ -249,13 +256,17 @@ void FS::TextEditor::textEditor() {
 }
 
 void FS::TextEditor::textEditorInfo() {
+
 	ImGui::BeginChild("TextEditorInfo");
 	auto cpos = current->editor->GetCursorPosition();
+
+	ImGui::Spacing(); ImGui::SameLine();
 
 	//zoom percentage
 	this->editorInfo_zoom();
 
-	ImGui::SameLine(); ImGui::Separator(); ImGui::SameLine();
+	ImGui::SameLine(); ImGui::Spacing();
+	ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
 
 	//line
 	ImGui::Text(text.line); ImGui::SameLine();
@@ -303,15 +314,18 @@ void FS::TextEditor::textEditorInfo() {
 }
 
 void FS::TextEditor::editorInfo_zoom() {
-	constexpr const char* percent[] = {
-		" 30 % ", " 50 % ", " 70 % ", " 100 % ", " 120 % ", " 150 % ", " 200 % ", " 300 % "
+	constexpr UI16 percent[] = {
+		30, 50, 70, 100, 120, 150, 200, 300
 	};
 
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2());
-	ImGui::PopStyleVar();
-	const std::string preview = std::to_string(std::roundf(current->info.zoomRatio * 100.0f)) + " %";
+	ImGui::SetNextItemWidth(ImGui::GetFontSize() * 3.2f);
 
-	ImGui::InputText("##ZoomInput", zoom.input.data(), zoom.input.capacity(), ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsDecimal);
+	const bool focus = ImGui::InputText("##ZoomInput", zoom.input.data(), zoom.input.capacity(), ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsDecimal);
+	if (focus) {
+		pos.zoom = ImGui::GetItemRectMin();
+		flag.inputZoom = true;
+	}
+	flag.zoomFocused = focus;
 
 	ImGui::SameLine();
 
@@ -320,7 +334,10 @@ void FS::TextEditor::editorInfo_zoom() {
 		return;
 
 	for (auto x : percent) {
-		ImGui::Selectable(x);
+		const std::string label = std::to_string(x) + '%';
+		if (ImGui::Selectable(label.c_str())) {
+			current->info.zoomRatio = x / 100.0f;
+		}
 	}
 
 	ImGui::EndCombo();
@@ -477,12 +494,50 @@ void FS::TextEditor::shortcut_zoom() {
 	if (!io.KeyCtrl || (io.MouseWheel == 0.0f))
 		return;
 
+	const float val = current->info.zoomRatio * 100.0f;
+
 	if (io.MouseWheel > 0.0f) {
+		//limit
+		if ((val + 0.1f) >= FD::Coding::TextEditor::Limits::ZoomMax)
+			return;
 		selected->info.zoomRatio += 0.1f;
 	}
 	else {
+		//limit
+		if ((val - 0.1f) <= FD::Coding::TextEditor::Limits::ZoomMin)
+			return;
 		selected->info.zoomRatio -= 0.1f;
 	}
+
+}
+
+void FS::TextEditor::catchZoom() {
+	if (!flag.inputZoom)
+		return;
+
+	if (flag.zoomFocused)
+		return;
+
+	flag.inputZoom = false;
+
+	const float val = std::stof(std::string(zoom.input.c_str()));
+	const UIF16 roundedVal = static_cast<UIF16>(std::round(val));
+
+	//check
+	//is number
+	const bool isNumber = std::all_of(zoom.input.cbegin(), zoom.input.cend(), [](char c) { return std::isdigit(c) != 0; });
+	if (!isNumber) {
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, pos.zoom);
+	}
+
+	//limits
+	if (roundedVal >= FD::Coding::TextEditor::Limits::ZoomMax)
+		return;
+	if (roundedVal <= FD::Coding::TextEditor::Limits::ZoomMin)
+		return;
+
+	selected->info.zoomRatio = val;
 
 }
 

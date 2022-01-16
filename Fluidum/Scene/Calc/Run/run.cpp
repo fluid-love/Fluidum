@@ -3,9 +3,14 @@
 #include "../../Utils/Data/reset.h"
 
 FS::Calc::Run::Run(
-	const FD::FluidumFilesRead* const fluidumFilesRead
+	const FD::Project::PropertyRead* const propertyRead,
+	const FD::Project::PropertyLuaRead* const propertyLuaRead,
+	Info& info
 ) :
-	fluidumFilesRead(fluidumFilesRead)
+	propertyRead(propertyRead),
+	propertyLuaRead(propertyLuaRead),
+
+	info(info)
 {
 	FluidumScene_Log_Constructor(::FS::Calc::Run);
 
@@ -21,20 +26,26 @@ void FS::Calc::Run::call() {
 }
 
 void FS::Calc::Run::run() {
-	const FD::Project::File::SupportedFileType type = fluidumFilesRead->getCurrentMainCodeType();
-	using enum FD::Project::File::SupportedFileType;
+	const FD::Project::Property::ProjectType type = propertyRead->currentProjectType();
+	using enum FD::Project::Property::ProjectType;
 
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
 	if (type == None) {
+		info.errorType = InfoErrorType::NotSetProjectType;
 		return;
 	}
 
-	Scene::addScene<Utils::ResetData<FD::ImPlotWrite, FD::Calc::ArrayWrite>>();
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Call constructor Utils::ResetData<FD::ImPlotWrite, FD::Calc::ArrayWrite>.");
+	Scene::callConstructor<Utils::ResetData<FD::ImPlotWrite, FD::Calc::ArrayWrite>>();
 
 	if (type == Lua) {
+		if (!propertyLuaRead->entryFileExists()) {
+			info.errorType = InfoErrorType::NotExistsEntryFile;
+			return;
+		}
 		FluidumScene_Log_RequestAddScene(::FS::Calc::Lua::Run);
-		Scene::addAsyncScene<Calc::Lua::Run>();
+		Scene::addAsyncScene<Calc::Lua::Run>(propertyLuaRead->entryFilePath());
 	}
 	else if (type == Python) {
 		;
@@ -44,5 +55,9 @@ void FS::Calc::Run::run() {
 	}
 	else {
 		FluidumScene_Log_InternalWarning();
+		info.errorType = InfoErrorType::InternalError;
+		return;
 	}
+
+	info.errorType = InfoErrorType::NoError;
 }

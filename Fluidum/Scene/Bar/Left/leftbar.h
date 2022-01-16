@@ -8,7 +8,6 @@ namespace FS {
 	public:
 		explicit LeftBar(
 			const FD::ProjectRead* const projectRead,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
@@ -18,7 +17,6 @@ namespace FS {
 		);
 		void Constructor(
 			FD::ProjectRead,
-			FD::FluidumFilesRead,
 			FD::GuiRead,
 			FD::GuiWrite,
 			FD::SceneRead,
@@ -38,9 +36,8 @@ namespace FS {
 
 	private://data
 		const FD::ProjectRead* const projectRead;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
-		const FD::GuiRead* const  guiRead;
-		const FD::SceneRead* const  sceneRead;
+		const FD::GuiRead* const guiRead;
+		const FD::SceneRead* const sceneRead;
 		const FD::Coding::TabRead* const tabRead;
 		FD::Coding::TabWrite* const tabWrite;
 

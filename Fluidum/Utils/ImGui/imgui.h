@@ -8,7 +8,13 @@ namespace FU::ImGui {
 	template<typename ImCounter>//ImGuiAnimation ImCounter<ImAnime>
 	void tooltip(ImCounter& counter, const char* desc);
 
-	ImVec2 messagePos();
+	[[nodiscard]] ImVec2 messagePos();
+
+	[[nodiscard]] inline ImVec2 vec2Max() noexcept {
+		constexpr auto max = std::numeric_limits<decltype(ImVec2::x)>::max();
+		return { max, max };
+	}
+
 }
 
 namespace FU::ImGui {

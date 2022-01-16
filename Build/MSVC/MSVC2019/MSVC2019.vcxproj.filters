@@ -637,6 +637,15 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Property\lua.h">
       <Filter>Fluidum\Data\Project\Property</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Property\property.h">
+      <Filter>Fluidum\Scene\Project\Property</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\passkey.h">
+      <Filter>Fluidum\Data\Project\Project</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Data\Common\passkey.h">
+      <Filter>Fluidum\Data\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fluidum">
@@ -1046,6 +1055,12 @@
     </Filter>
     <Filter Include="Fluidum\Data\Project\Property">
       <UniqueIdentifier>{5592229b-f373-4cba-bc63-d4d6375e7c88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Scene\Project\Property">
+      <UniqueIdentifier>{8c07a17f-835c-4ce1-a936-22d309d29d25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\json">
+      <UniqueIdentifier>{610d86b3-99ee-45a3-8cd8-c7c7461d202a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1487,6 +1502,12 @@
     <ClCompile Include="..\..\..\Fluidum\Data\Project\Property\lua.cpp">
       <Filter>Fluidum\Data\Project\Property</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Property\property.cpp">
+      <Filter>Fluidum\Scene\Project\Property</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\json\src\src.cpp">
+      <Filter>External\json</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Test\test.lua">
@@ -1568,6 +1589,12 @@
       <Filter>Resources\GuiText</Filter>
     </None>
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectCheckPath">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Common">
+      <Filter>Resources\GuiText</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectProperty">
       <Filter>Resources\GuiText</Filter>
     </None>
   </ItemGroup>

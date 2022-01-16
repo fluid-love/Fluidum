@@ -9,9 +9,10 @@ FS::Project::Explorer::Explorer(
 	const FD::Style::ColorRead* const colorRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
-	FD::LuaFilesWrite_Lock* const luaFilesWrite,
-	FD::FluidumFilesWrite* const fluidumFilesWrite,
-	const FD::FluidumFilesRead* const fluidumFilesRead,
+	FD::Project::PropertyWrite* const propertyWrite,
+	const FD::Project::PropertyRead* const propertyRead,
+	FD::Project::PropertyLuaWrite* const propertyLuaWrite,
+	const FD::Project::PropertyLuaRead* const propertyLuaRead,
 	FD::ProjectFilesWrite_Lock* const projectFilesWrite,
 	const FD::ProjectFilesRead_Lock* const projectFilesRead,
 	FD::UserFilesWrite_Lock* const userFilesWrite,
@@ -27,9 +28,10 @@ FS::Project::Explorer::Explorer(
 	colorRead(colorRead),
 	projectWrite(projectWrite),
 	projectRead(projectRead),
-	luaFilesWrite(luaFilesWrite),
-	fluidumFilesWrite(fluidumFilesWrite),
-	fluidumFilesRead(fluidumFilesRead),
+	propertyWrite(propertyWrite),
+	propertyRead(propertyRead),
+	propertyLuaWrite(propertyLuaWrite),
+	propertyLuaRead(propertyLuaRead),
 	projectFilesWrite(projectFilesWrite),
 	projectFilesRead(projectFilesRead),
 	userFilesWrite(userFilesWrite),
@@ -66,7 +68,6 @@ void FS::Project::Explorer::call() {
 	//lock
 	auto userFilesLock = userFilesWrite->getLock();
 	auto projectFilesLock = projectFilesWrite->getLock();
-	auto luaLock = luaFilesWrite->getLock();
 
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.27f, 0.67f, 0.87f, 0.34f));
 
@@ -100,7 +101,6 @@ void FS::Project::Explorer::toolBar() {
 	//lock
 	auto userFilesLock = userFilesWrite->getLock();
 	auto projectFilesLock = projectFilesWrite->getLock();
-	auto luaLock = luaFilesWrite->getLock();
 
 	//sync
 	if (select.tab == TabType::Fluidum) {//dummy
@@ -239,26 +239,26 @@ void FS::Project::Explorer::fluidumFiles() {
 }
 
 void FS::Project::Explorer::mainCodeFile() {
-	const std::string path = fluidumFilesRead->mainCodeFilePath();
+	//const std::string path = fluidumFilesRead->mainCodeFilePath();
 
-	if (path.empty()) {
-		ImGui::BulletText(text.mainFileDoesNotExist);
-		return;
-	}
+	//if (path.empty()) {
+	//	ImGui::BulletText(text.mainFileDoesNotExist);
+	//	return;
+	//}
 
-	if (!ImGui::BeginTable("##MainFileInfo", 2, ImGuiTableFlags_Borders))
-		return;
-
-
-	ImGui::Text(text.path); ImGui::NextColumn();
-	ImGui::Text(path.c_str()); ImGui::NextColumn();
-
-	const std::string name = FU::File::fileName(path);
-	ImGui::Text(text.name); ImGui::NextColumn();
-	ImGui::Text(name.c_str()); ImGui::NextColumn();
+	//if (!ImGui::BeginTable("##MainFileInfo", 2, ImGuiTableFlags_Borders))
+	//	return;
 
 
-	ImGui::EndTable();
+	//ImGui::Text(text.path); ImGui::NextColumn();
+	//ImGui::Text(path.c_str()); ImGui::NextColumn();
+
+	//const std::string name = FU::File::fileName(path);
+	//ImGui::Text(text.name); ImGui::NextColumn();
+	//ImGui::Text(name.c_str()); ImGui::NextColumn();
+
+
+	//ImGui::EndTable();
 }
 
 void FS::Project::Explorer::standardFluidumLibrary() {
@@ -274,7 +274,7 @@ void FS::Project::Explorer::standardFluidumLibrary() {
 	ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2());
 	const float buttonWidth = ImGui::GetWindowSize().x;
 
-	constexpr ImGuiDockNodeFlags nodeFlag =
+	constexpr ImGuiTreeNodeFlags nodeFlag =
 		ImGuiTreeNodeFlags_FramePadding |
 		ImGuiTreeNodeFlags_OpenOnDoubleClick |
 		ImGuiTreeNodeFlags_SpanAvailWidth
@@ -313,6 +313,7 @@ namespace FS {
 std::pair<ImVec2, ImVec2> FS::Project::Explorer::projectFilesTree(std::vector<FD::Project::FileList::FileInfo>* node, FD::Project::FileList::FileInfo* info) {
 
 	constexpr ImGuiDockNodeFlags nodeFlag =
+		ImGuiTreeNodeFlags_FramePadding |
 		ImGuiTreeNodeFlags_OpenOnArrow |
 		ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -332,15 +333,14 @@ std::pair<ImVec2, ImVec2> FS::Project::Explorer::projectFilesTree(std::vector<FD
 		constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.27f, 0.67f, 0.87f, 0.14f);
 		ImGui::GetWindowDrawList()->AddRectFilled({ nRect.Min.x ,nRect.Min.y - 2.0f }, { nRect.Max.x,nRect.Max.y + 2.0f }, col);
 
-		if (changeName.popup) {
-			using namespace FU::ImGui::Operators;
-			changeName.pos = { nRect.Min.x + 48.0f ,nRect.Min.y - 1.0f };
-			changeName.size = { nRect.Max.x - changeName.pos.x - 1.0f,nRect.Max.y - changeName.pos.y + 1.0f };
+		if (popup.ChangeName) {
+			changeName.pos = { nRect.Min.x + 48.0f, nRect.Min.y + ImGui::GetStyle().FramePadding.y - 1.0f };
+			changeName.size = { nRect.Max.x - changeName.pos.x - 1.0f, nRect.Max.y - changeName.pos.y - ImGui::GetStyle().FramePadding.y + 1.0f };
 		}
 	}
 
 	//select
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect({ nRect.Min.x + 18.0f,nRect.Min.y }, nRect.Max)) {
+	if (!popup.ChangeName && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect({ nRect.Min.x + 18.0f,nRect.Min.y }, nRect.Max)) {
 		select.projectFiles = info;
 		pos.selectedTree = ImGui::GetItemRectMax();
 	}
@@ -355,6 +355,9 @@ std::pair<ImVec2, ImVec2> FS::Project::Explorer::projectFilesTree(std::vector<FD
 			popup.supported = true;
 		else if (info->type == FD::Project::FileList::Type::Unsupported)
 			popup.unsupported = true;
+
+		changeName.pos = { nRect.Min.x + 47.0f ,nRect.Min.y - 1.0f };
+		changeName.size = { nRect.Max.x - changeName.pos.x - 1.0f,nRect.Max.y - changeName.pos.y + 1.0f };
 	}
 
 	//double click
@@ -408,11 +411,17 @@ void FS::Project::Explorer::projectFiles() {
 		select.projectFiles = nullptr;
 	}
 
+	using namespace ::FU::ImGui::Operators;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImGui::GetStyle().FramePadding * 0.7f);
+
 	auto* data = projectFilesWrite->fileList();
 	for (auto& x : *data) {
 		if (x.name != ".fluidum")
 			this->projectFilesTree(&x.dir_internal, &x);
 	}
+
+	ImGui::PopStyleVar();
 }
 
 void FS::Project::Explorer::userFiles() {
@@ -422,10 +431,16 @@ void FS::Project::Explorer::userFiles() {
 		select.userFiles = nullptr;
 	}
 
+	using namespace ::FU::ImGui::Operators;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImGui::GetStyle().FramePadding * 0.7f);
+
 	auto* data = userFilesWrite->fileList();
 	for (auto& x : *data) {
 		this->userFilesTree(&x.dir_internal, &x);
 	}
+
+	ImGui::PopStyleVar();
 }
 
 std::pair<ImVec2, ImVec2> FS::Project::Explorer::userFilesTree(std::vector<FD::Project::FileList::FileInfo>* node, FD::Project::FileList::FileInfo* info) {
@@ -1010,8 +1025,7 @@ void FS::Project::Explorer::collapseAll() {
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
 	if (select.tab == TabType::Fluidum) {
-		luaFilesWrite->collapseAll();
-		//..
+		;
 	}
 	else if (select.tab == TabType::Project) {
 		projectFilesWrite->collapseAll();
@@ -1028,14 +1042,19 @@ void FS::Project::Explorer::rename() {
 	const bool project = (select.tab == TabType::Project);
 
 	changeName.tempName = select.current()->name;
-
 	changeName.name = changeName.tempName;
 	changeName.popup = true;
 }
 
 void FS::Project::Explorer::setMainFile() {
 
-	fluidumFilesWrite->setMainCodePath(select.current()->path);
+	if (propertyRead->isLua()) {
+		propertyLuaWrite->entryFilePath(select.current()->path);
+	}
+	else {
+		FluidumScene_Log_InternalWarning();
+		assert(false);
+	}
 
 }
 
@@ -1155,7 +1174,7 @@ void FS::Project::Explorer::supportedPopup() {
 	ImGui::Separator();
 
 	//Lua
-	if (supportedPopupInfo.fileType == FD::Project::File::SupportedFileType::Lua) {
+	if (propertyRead->isLua() && supportedPopupInfo.fileType == FD::Project::File::SupportedFileType::Lua) {
 		if (ImGui::Selectable(text.setAsMainFile)) {
 			this->setMainFile();
 		}
@@ -1267,7 +1286,7 @@ void FS::Project::Explorer::tryChangeName() {
 
 		//reset
 		changeName.name = std::string();
-		changeName.name.reserve(100);
+		changeName.name.reserve(FU::File::maxPathSize());
 
 		changeName.once = false;
 		return;
@@ -1275,12 +1294,12 @@ void FS::Project::Explorer::tryChangeName() {
 
 	//reset
 	changeName.name = std::string();
-	changeName.name.reserve(100);
+	changeName.name.reserve(FU::File::maxPathSize());
 
 	changeName.once = false;
 
 	//exist same name file -> false
-	bool result;
+	bool result = true;
 	const std::string path = select.current()->path;
 
 	std::string path_ = path;
@@ -1308,8 +1327,15 @@ void FS::Project::Explorer::tryChangeName() {
 	const std::string newPath = FU::File::directory(path_) + name;
 
 	if (project) {
-		if (std::filesystem::exists(newPath)) {
-			FU::MB::error(text.error_sameName);
+		try {
+			if (std::filesystem::exists(newPath)) {
+				FU::MB::error(text.error_sameName);
+				return;
+			}
+		}
+		catch (const std::exception& e) {
+			FluidumScene_Log_StdExceptionWarning(e);
+			FU::MB::error(text.error_unexpected);
 			return;
 		}
 	}
@@ -1322,13 +1348,21 @@ void FS::Project::Explorer::tryChangeName() {
 
 	std::pair<bool, Size> child{};
 	if (project && type == FD::Project::FileList::Type::Directory) {
-		child = projectFilesRead->childExists(path, fluidumFilesRead->mainCodeFilePath());
+		using enum FD::Project::Property::ProjectType;
+		const auto currentType = propertyRead->currentProjectType();
+		if (currentType == Lua) {
+			child = projectFilesRead->childExists(path, propertyLuaRead->entryFilePath());
+		}
+		else if (currentType == Python) {
+
+		}
 	}
 
 	if (project) {
 		try {
 			std::filesystem::rename(path, newPath);
-			this->syncProjectFiles();
+			projectFilesWrite->tryChangeName(path, name);
+			//this->syncProjectFiles();
 		}
 		catch (const std::filesystem::filesystem_error&) {
 			FU::MB::error(text.error_changeName);
@@ -1353,28 +1387,47 @@ void FS::Project::Explorer::tryChangeName() {
 		userFilesWrite->save();
 
 
-	//main file
+	//entry file
 	if (!project)
 		return;
 
-	auto* data = projectFilesWrite->fileList();
+	{
+		using enum FD::Project::Property::ProjectType;
+		const auto currentType = propertyRead->currentProjectType();
 
-	if (type == FD::Project::FileList::Type::Supported) {
-		const bool same = (fluidumFilesRead->mainCodeFilePath() == newPath);
-		if (!same)
-			return;
+		//one file
+		if (type == FD::Project::FileList::Type::Supported) {
+			if (currentType == Lua) {
+				const bool same = (propertyLuaRead->entryFilePath() == newPath);
+				if (!same)
+					return;
 
-		fluidumFilesWrite->setMainCodePath(newPath);
+				propertyLuaWrite->entryFilePath(newPath);
+			}
+			else if (currentType == Python) {
+				//same = (propertyLuaRead->entryFilePath() == newPath);
+			}
+
+		}
+		//several files
+		else if (type == FD::Project::FileList::Type::Directory) {
+			if (!child.first)
+				return;
+
+			std::string old{};
+			if (currentType == Lua) {
+				old = propertyLuaRead->entryFilePath();
+				const std::string newEntryPath = FU::File::changeName(old, name, child.second);
+				propertyLuaWrite->entryFilePath(newEntryPath);
+			}
+			else if (currentType == Python) {
+
+			}
+
+		}
+
+		propertyWrite->save();
 	}
-	else if (type == FD::Project::FileList::Type::Directory) {
-		if (!child.first)
-			return;
-
-		const std::string old = fluidumFilesRead->mainCodeFilePath();
-		const std::string newMainPath = FU::File::changeName(old, name, child.second);
-
-	}
-	fluidumFilesWrite->save();
 }
 
 std::pair<bool, std::string> FS::Project::Explorer::checkChangeName() {

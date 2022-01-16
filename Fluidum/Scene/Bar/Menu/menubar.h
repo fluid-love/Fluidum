@@ -14,7 +14,6 @@ namespace FS {
 			FD::GuiWrite* const guiWrite,
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
 			const FD::CalcRead* const calcRead,
 			FD::CalcWrite* const calcWrite,
 			const FD::SceneRead* const sceneRead
@@ -27,7 +26,6 @@ namespace FS {
 			FD::GuiWrite,
 			FD::Coding::TabWrite,
 			FD::Coding::TabRead,
-			FD::FluidumFilesRead,
 			FD::CalcRead,
 			FD::CalcWrite,
 			FD::SceneRead
@@ -48,7 +46,6 @@ namespace FS {
 		FD::GuiWrite* const guiWrite;
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::CalcRead* const calcRead;
 		FD::CalcWrite* const calcWrite;
 		const FD::SceneRead* const sceneRead;
@@ -116,6 +113,7 @@ namespace FS {
 
 	private://project
 		void projectGui();
+		void project_property();
 
 	private://extention
 		void extensionGui();

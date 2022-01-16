@@ -14,17 +14,17 @@ namespace FS::Calc::Lua {
 	public:
 		explicit Run(
 			const FD::ProjectRead* const projectRead,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
 			FD::ConsoleWrite* const consoleWrite,
 			FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite,
 			FD::ImPlotWrite* const implotWrite,
 			const FD::ImPlotRead* const implotRead,
 			FD::Calc::ArrayWrite* const arrayWrite,
-			const FD::Calc::ArrayRead* const arrayRead
+			const FD::Calc::ArrayRead* const arrayRead,
+
+			const std::string& entryFilePath
 		);
 		void Constructor(
 			FD::ProjectRead,
-			FD::FluidumFilesRead,
 			FD::ConsoleWrite,
 			FD::FunctionWrite<FD::Calc::Language::Lua>,
 			FD::ImPlotWrite,
@@ -45,13 +45,14 @@ namespace FS::Calc::Lua {
 		
 	private:
 		const FD::ProjectRead* const projectRead;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
 		FD::ConsoleWrite* const consoleWrite;
 		FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite;
 		FD::ImPlotWrite* const implotWrite;
 		const FD::ImPlotRead* const implotRead;
 		FD::Calc::ArrayWrite* const arrayWrite;
 		const FD::Calc::ArrayRead* const arrayRead;
+
+		const std::string entryFilePath;
 
 		Internal::Check check{ consoleWrite };
 

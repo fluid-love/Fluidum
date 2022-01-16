@@ -2,22 +2,24 @@
 
 FS::Calc::Lua::Run::Run(
 	const FD::ProjectRead* const projectRead,
-	const FD::FluidumFilesRead* const fluidumFilesRead,
 	FD::ConsoleWrite* const consoleWrite,
 	FD::FunctionWrite<FD::Calc::Language::Lua>* const functionWrite,
 	FD::ImPlotWrite* const implotWrite,
 	const FD::ImPlotRead* const implotRead,
 	FD::Calc::ArrayWrite* const arrayWrite,
-	const FD::Calc::ArrayRead* const arrayRead
+	const FD::Calc::ArrayRead* const arrayRead,
+	const std::string& entryFilePath
 ) :
 	projectRead(projectRead),
-	fluidumFilesRead(fluidumFilesRead),
 	consoleWrite(consoleWrite),
 	functionWrite(functionWrite),
 	implotWrite(implotWrite),
 	implotRead(implotRead),
 	arrayWrite(arrayWrite),
 	arrayRead(arrayRead),
+
+	entryFilePath(entryFilePath),
+
 	state(luaL_newstate())
 {
 	assert(this->state);
@@ -43,11 +45,12 @@ void FS::Calc::Lua::Run::call() {
 	}
 
 	//load main file
-	if (!fluidumFilesRead->isMainCodeFileExist()) {
+	if (!entryFilePath.empty()) {
 		this->terminate();
 		return;
 	}
-	auto error = luaL_loadfile(state, fluidumFilesRead->mainCodeFilePath().c_str());
+
+	auto error = luaL_loadfile(state, this->entryFilePath.c_str());
 
 	if (error != LUA_OK) {//syntax error ,...
 		assert(lua_isstring(state, -1));

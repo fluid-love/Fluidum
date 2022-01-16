@@ -28,6 +28,7 @@ namespace FD {
 			FailedToOpenProjectFile,
 			IllegalFile,
 			BrokenFile,
+			FileEmpty,
 			Unexpected//e.g. when std::basic_string<char>::operator=() throw exception. 
 		};
 
@@ -86,12 +87,13 @@ namespace FD {
 		void save_tab();
 		void save_scene();
 
-		void save_files_recursive(std::ofstream& ofs, const Project::FileList::FileInfo* info);
-		void save_fluidumFiles();
+		void save_files_recursive(boost::json::object& obj, const Project::FileList::FileInfo* info);
 		void save_projectFiles();
 		void save_userFiles();
 
 		void save_layout();
+
+		void save_projectProperty();
 
 	private:
 		void writeProjectInfo(const std::string& path);
@@ -140,9 +142,9 @@ namespace FD {
 	private://read
 		void readProjectInfo(std::ifstream& ifs) const;
 
-		Project::FileList::FileInfo readFiles_element(std::ifstream& ifs) const;
+		Project::FileList::FileInfo readFiles_element(const boost::json::value& val) const;
 
-		void read_files_recursive(std::ifstream& ifs, Project::FileList::FileInfo* parent) const;
+		void read_files_recursive(const bool top, std::vector< FD::Project::Internal::FileList::Ref>* data, const boost::json::value& val, Project::FileList::FileInfo* parent) const;
 		void read_fluidumFiles() const;
 		void read_projectFiles() const;
 		void read_userFiles() const;
@@ -151,6 +153,11 @@ namespace FD {
 
 		void read_tab() const;
 		void read_scene() const;
+
+		void read_projectProperty();
+
+	private://read helper
+		[[nodiscard]] boost::json::value makeJsonValue(const std::string& filePath) const;
 
 	public://thread
 		void requestStop() noexcept;

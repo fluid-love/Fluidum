@@ -6,6 +6,7 @@
 
 #include "../../Project/File/new.h"
 #include "../../Project/File/saveas.h"
+#include "../../Project/Property/property.h"
 
 #include "../../Utils/Popup/backwindow.h"
 #include "../../Utils/Popup/message.h"
@@ -26,7 +27,6 @@ FS::MenuBar::MenuBar(
 	FD::GuiWrite* const guiWrite,
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::Coding::TabRead* const tabRead,
-	const FD::FluidumFilesRead* const fluidumFilesRead,
 	const FD::CalcRead* const calcRead,
 	FD::CalcWrite* const calcWrite,
 	const FD::SceneRead* const sceneRead
@@ -38,7 +38,6 @@ FS::MenuBar::MenuBar(
 	guiWrite(guiWrite),
 	tabWrite(tabWrite),
 	tabRead(tabRead),
-	fluidumFilesRead(fluidumFilesRead),
 	calcRead(calcRead),
 	calcWrite(calcWrite),
 	sceneRead(sceneRead)
@@ -253,16 +252,16 @@ void FS::MenuBar::calcGui() {
 	if (!ImGui::BeginMenu(text.calc))
 		return;
 
-	bool exist = fluidumFilesRead->isMainCodeFileExist();
+	bool exist = false;
 
 	this->pushItemSpacing();
 
 	if (ImGui::MenuItem(text.run_debug, nullptr, false, exist)) {
-		this->itemRunDebugMode();
+		//this->itemRunDebugMode();
 	}
 
 	if (ImGui::MenuItem(text.run_nomal, nullptr, false, exist)) {
-		this->itemRunNormalMode();
+		//this->itemRunNormalMode();
 	}
 
 	ImGui::Separator();
@@ -282,8 +281,8 @@ void FS::MenuBar::itemRunDebugMode() {
 		calcWrite->save();
 	}
 
-	FluidumScene_Log_RequestAddScene(::FS::Calc::Run);
-	Scene::addScene<Calc::Run>();
+	//FluidumScene_Log_RequestAddScene(::FS::Calc::Run);
+	//Scene::addScene<Calc::Run>();
 }
 
 void FS::MenuBar::itemRunNormalMode() {
@@ -292,8 +291,8 @@ void FS::MenuBar::itemRunNormalMode() {
 		calcWrite->save();
 	}
 
-	FluidumScene_Log_RequestAddScene(::FS::Calc::Run);
-	Scene::addScene<Calc::Run>();
+	//FluidumScene_Log_RequestAddScene(::FS::Calc::Run);
+	//Scene::addScene<Calc::Run>();
 }
 
 void FS::MenuBar::viewGui() {
@@ -564,7 +563,16 @@ void FS::MenuBar::projectGui() {
 	if (!ImGui::BeginMenu(text.project_))
 		return;
 
+	if (ImGui::MenuItem(text.property_icon)) {
+		this->project_property();
+	}
+
 	ImGui::EndMenu();
+}
+
+void FS::MenuBar::project_property() {
+	FluidumScene_Log_RequestAddScene(::FS::Project::Property);
+	Scene::addScene<Project::Property>();
 }
 
 void FS::MenuBar::helpGui() {

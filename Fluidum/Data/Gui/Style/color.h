@@ -29,7 +29,16 @@ namespace FD::Style {
 		void popSelectableDisabled() const noexcept;
 
 	public:
+		[[nodiscard]] ImVec4 createButton() const noexcept;
+		[[nodiscard]] ImVec4 cancelButton() const noexcept;
+		[[nodiscard]] ImVec4 backButton() const noexcept;
+		[[nodiscard]] ImVec4 saveButton() const noexcept;
+
+	public:
 		[[nodiscard]] ImU32 toolBarVerticalSeparator() const noexcept;
+
+	public:
+		[[nodiscard]] ImVec4 noerror() const noexcept;
 
 	};
 

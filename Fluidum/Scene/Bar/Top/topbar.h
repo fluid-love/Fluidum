@@ -4,29 +4,29 @@
 
 namespace FS {
 
-	class TopBar final :public Scene {
+	class TopBar final : public Scene {
 	public:
 		explicit TopBar(
 			const FD::ProjectRead* const projectRead,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
 			const FD::ToolBarRead* const toolBarRead,
 			FD::ToolBarWrite* const toolBarWrite,
 			const FD::ImGuiWindowRead* const imguiWindowRead,
-			const FD::LayoutRead* const layoutRead
+			const FD::LayoutRead* const layoutRead,
+			FD::ConsoleWrite* const conoleWrite
 		);
 		void Constructor(
 			FD::ProjectRead,
-			FD::FluidumFilesRead,
 			FD::GuiRead,
 			FD::GuiWrite,
 			FD::SceneRead,
 			FD::ToolBarRead,
 			FD::ToolBarWrite,
 			FD::ImGuiWindowRead,
-			FD::LayoutRead
+			FD::LayoutRead,
+			FD::ConsoleWrite
 		);
 
 		~TopBar() noexcept;
@@ -38,7 +38,6 @@ namespace FS {
 
 	private:
 		const FD::ProjectRead* const projectRead;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
 		const FD::SceneRead* const sceneRead;
@@ -46,6 +45,7 @@ namespace FS {
 		FD::ToolBarWrite* const toolBarWrite;
 		const FD::ImGuiWindowRead* const imguiWindowRead;
 		const FD::LayoutRead* const layoutRead;
+		FD::ConsoleWrite* const consoleWrite;
 
 		FD::Text::TopBar text{};
 

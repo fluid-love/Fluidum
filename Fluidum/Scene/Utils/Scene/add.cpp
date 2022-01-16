@@ -35,6 +35,10 @@ void FS::Utils::AddScenes::call() {
 			FluidumScene_Log_RequestAddScene(::FS::Coding::Tab);
 			Scene::addScene<::FS::Coding::Tab>();
 		}
+		else if (x == ClassCode::GetClassCode<::FS::Project::Explorer>()) {
+			FluidumScene_Log_RequestAddScene(::FS::Project::Explorer);
+			Scene::addScene<::FS::Project::Explorer>();
+		}
 		else {
 			FluidumScene_Log_InternalWarning();
 		}

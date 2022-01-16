@@ -27,10 +27,6 @@ namespace FS {
 		FD::LayoutRead,
 		FD::ProjectWrite,
 		FD::ProjectRead,
-		FD::LuaFilesWrite_Lock,
-		FD::LuaFilesRead,
-		FD::FluidumFilesWrite,
-		FD::FluidumFilesRead,
 		FD::ProjectFilesWrite_Lock,
 		FD::ProjectFilesRead_Lock,
 		FD::ProjectFilesRead,
@@ -61,7 +57,11 @@ namespace FS {
 		FD::History::FileWrite,
 		FD::History::FileRead,
 		FD::History::ProjectWrite,
-		FD::History::ProjectRead
+		FD::History::ProjectRead,
+		FD::Project::PropertyWrite,
+		FD::Project::PropertyRead,
+		FD::Project::PropertyLuaWrite,
+		FD::Project::PropertyLuaRead
 	> ;
 
 	//public inheritance in each scene.

@@ -30,6 +30,7 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Coding\tab.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Common\common.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Common\log.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Common\passkey.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Common\resource.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Console\console.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Gui\gui.h" />
@@ -50,6 +51,7 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\files.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Files\supported.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\name.h" />
+    <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\passkey.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Project\project.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Property\lua.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Project\Property\property.h" />
@@ -193,6 +195,7 @@
     <ClInclude Include="..\..\..\Fluidum\Scene\Project\File\new.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Project\File\saveas.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Project\project.h" />
+    <ClInclude Include="..\..\..\Fluidum\Scene\Project\Property\property.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Title\title.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Data\reset.h" />
     <ClInclude Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.h" />
@@ -244,6 +247,7 @@
     <ClCompile Include="..\..\..\External\implot\implot.cpp" />
     <ClCompile Include="..\..\..\External\implot\implot_demo.cpp" />
     <ClCompile Include="..\..\..\External\implot\implot_items.cpp" />
+    <ClCompile Include="..\..\..\External\json\src\src.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Array\array.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Calc\calc.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Data\Calc\Plot\ImPlot\plot.cpp" />
@@ -361,6 +365,7 @@
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\File\new.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\File\saveas.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Project\project.cpp" />
+    <ClCompile Include="..\..\..\Fluidum\Scene\Project\Property\property.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Title\title.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Data\reset.cpp" />
     <ClCompile Include="..\..\..\Fluidum\Scene\Utils\Popup\backwindow.cpp" />
@@ -388,6 +393,7 @@
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Analysis" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\BarExit" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\CodingTab" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\Common" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Console" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\Layout" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\LeftBar" />
@@ -399,6 +405,7 @@
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectDirectory" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectForm" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectNewFile" />
+    <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectProperty" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectSaveAs" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\ProjectSelect" />
     <None Include="..\..\..\Resources\Gui\Text\Japanese\StatusBar" />
@@ -481,10 +488,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;BOOST_JSON_STANDALONE;BOOST_JSON_STANDALONE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;../../../External/json/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -502,10 +509,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;BOOST_JSON_STANDALONE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;../../../External/json/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -523,10 +530,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;BOOST_JSON_STANDALONE;BOOST_JSON_STANDALONE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;../../../External/json/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -543,10 +550,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;BOOST_JSON_STANDALONE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.3/src;../../../Internal;../../../External/json/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>

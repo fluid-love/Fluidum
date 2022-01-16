@@ -12,12 +12,12 @@ namespace FD::Project::Internal::Name {
 
 	constexpr inline const char* ProjectDirectory = ".fluidum/Project/";
 
-	constexpr inline const char* Project_FluidumFiles = ".fluidum/Project/.fluidumfiles";
 	constexpr inline const char* Project_ProjectFiles = ".fluidum/Project/.projectfiles";
 	constexpr inline const char* Project_UserFiles = ".fluidum/Project/.userfiles";
 	constexpr inline const char* Project_Tab = ".fluidum/Project/.tab";
 	constexpr inline const char* Project_Scene = ".fluidum/Project/.scene";
 	constexpr inline const char* Project_Layout = ".fluidum/Project/.layout";
+	constexpr inline const char* Project_ProjectProperty = ".fluidum/Project/.projectproperty";
 
 	constexpr inline const char* Project_Temp_FluidumFiles = ".fluidum/Temp/.fluidumfiles";
 	constexpr inline const char* Project_Temp_ProjectFiles = ".fluidum/Temp/.projectfiles";
@@ -25,6 +25,7 @@ namespace FD::Project::Internal::Name {
 	constexpr inline const char* Project_Temp_Tab = ".fluidum/Temp/.tab";
 	constexpr inline const char* Project_Temp_Scene = ".fluidum/Temp/.scene";
 	constexpr inline const char* Project_Temp_Layout = ".fluidum/Temp/.layout";
+	constexpr inline const char* Project_Temp_ProjectProperty = ".fluidum/Temp/.projectproperty";
 
 }
 

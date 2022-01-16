@@ -16,6 +16,45 @@ namespace FD::Text::Internal {
 
 	using GuiText = ::FU::GuiText::Text;
 
+}
+
+namespace FD::Text {
+
+	enum class CommonText : UT {
+		InternalError,
+		UnexceptedError
+	};
+
+	namespace Internal {
+
+		struct Common final {
+			explicit Common(const CommonText index);
+			~Common() noexcept = default;
+			FluidumUtils_Class_Delete_CopyMove(Common);
+
+		public:
+			[[nodiscard]] inline operator const GuiText& () const noexcept {
+				return this->text;
+			}
+
+			[[nodiscard]] inline const char* c_str() const noexcept {
+				return this->text.operator const char* ();
+			}
+
+		private:
+			const GuiText text;
+
+		private:
+			[[nodiscard]] GuiText init(const CommonText index) const;
+
+		};
+
+	}
+
+}
+
+namespace FD::Text::Internal {
+
 	struct Title final {
 		Title();
 		~Title() noexcept = default;
@@ -117,6 +156,7 @@ namespace FD::Text::Internal {
 		GuiText console;
 
 		GuiText project_;
+		GuiText property_icon;
 
 		GuiText extension;
 		GuiText manage;
@@ -161,7 +201,7 @@ namespace FD::Text::Internal {
 		GuiText run;
 
 		GuiText error_mainfile;
-
+		GuiText error_notSetProperty;
 	};
 
 	struct LeftBar final {
@@ -356,7 +396,7 @@ namespace FD::Text::Internal {
 
 	struct TextEditor final {
 		TextEditor();
-		~TextEditor() = default;
+		~TextEditor() noexcept = default;
 
 		GuiText editor;
 
@@ -389,6 +429,7 @@ namespace FD::Text::Internal {
 		GuiText line;
 		GuiText column;
 
+		GuiText error_forbiddenCharactor;
 
 	};
 
@@ -480,7 +521,7 @@ namespace FD::Text::Internal {
 
 	struct AnalysisOverview final {
 		AnalysisOverview();
-		~AnalysisOverview() = default;
+		~AnalysisOverview() noexcept = default;
 
 		GuiText function;
 
@@ -491,17 +532,51 @@ namespace FD::Text::Internal {
 
 	struct Console final {
 		Console();
-		~Console() = default;
+		~Console() noexcept = default;
 
 		GuiText console;
 		GuiText clear;
 		GuiText backcolor;
 	};
 
+	struct ProjectProperty final {
+		ProjectProperty();
+		~ProjectProperty() noexcept = default;
+
+		GuiText projectProperty;
+
+		GuiText tab_main;
+
+		GuiText currentType;
+		GuiText change;
+
+		GuiText entryFilePath;
+
+		GuiText luaVersion;
+		GuiText currentVersion;
+
+		GuiText confirm_changeProjectType;
+		GuiText confirm_notSaved;
+
+		GuiText confirm_save;
+		GuiText confirm_ignore;
+
+		GuiText info_currentType;
+		GuiText info_entryFilePath;
+		GuiText info_luaVersion;
+
+		GuiText bottom_close;
+		GuiText bottom_cancel;
+		GuiText bottom_save;
+
+
+	};
+
 }
 
 namespace FD::Text {
 
+	using ::FD::Text::Internal::Common;
 	using ::FD::Text::Internal::Title;
 	using ::FD::Text::Internal::Layout;
 	using ::FD::Text::Internal::TitleBar;
@@ -523,6 +598,7 @@ namespace FD::Text {
 	using ::FD::Text::Internal::AnalysisOverview;
 	using ::FD::Text::Internal::BarExit;
 	using ::FD::Text::Internal::Console;
+	using ::FD::Text::Internal::ProjectProperty;
 
 }
 
@@ -538,7 +614,7 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(GuiTextRead);
 
 	public:
-		_NODISCARD Text::Language getType() const noexcept;
+		[[nodiscard]] Text::Language getType() const noexcept;
 
 	};
 

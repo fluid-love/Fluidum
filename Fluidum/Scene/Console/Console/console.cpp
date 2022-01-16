@@ -24,7 +24,7 @@ FS::Console::Console(
 
 }
 
-FS::Console::~Console() {
+FS::Console::~Console() noexcept {
 	toolBarWrite->remove<Console>();
 	FluidumScene_Log_Destructor(::FS::Console);
 }
@@ -163,10 +163,10 @@ void FS::Console::popupRight() {
 	if (ImGui::Selectable(text.clear))
 		this->popup_clear();
 
-	ImGui::Separator();
+	//ImGui::Separator();
 
-	if (ImGui::MenuItem(text.backcolor))
-		this->popup_backcolor();
+	//if (ImGui::MenuItem(text.backcolor))
+	//	this->popup_backcolor();
 
 	ImGui::PopStyleVar();
 
@@ -174,7 +174,7 @@ void FS::Console::popupRight() {
 }
 
 void FS::Console::popup_clear() {
-
+	//consoleWrite->
 }
 
 void FS::Console::popup_backcolor() {
@@ -189,7 +189,7 @@ void FS::Console::changeFontSize() {
 
 	float wheel = ImGui::GetIO().MouseWheel;
 
-	if (static_cast<int32_t>(wheel) == 0)
+	if (static_cast<IF32>(wheel) == 0)
 		return;
 
 	if (style.fontSize < limit.maxFontSize) {

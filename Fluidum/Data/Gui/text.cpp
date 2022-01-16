@@ -3,6 +3,8 @@
 #include "../../../External/IconFontCppHeaders/IconsMaterialDesign.h"
 #include "../../../External/IconFontCppHeaders/IconsFontAwesome5.h"
 
+#include "../../../External/magic_enum/include/magic_enum.hpp"
+
 namespace FD::Text::Internal {
 
 	using Language = ::FD::Text::Language;
@@ -15,12 +17,14 @@ namespace FD::Text::Internal {
 	}
 
 	enum class Type : UT {
+		Common,
 		Analysis,
 		BarExit,
 		ProjectNewFile,
 		ProjectDirectory,
 		ProjectCheckPath,
 		ProjectSelect,
+		ProjectProperty,
 		CodingTab,
 		Console,
 		Layout,
@@ -35,11 +39,11 @@ namespace FD::Text::Internal {
 		TextEditor,
 		Title,
 		TitleBar,
-		TopBar
+		TopBar,
 	};
 
 	template<Type T>
-	std::string makePath(const Language lang) {
+	[[nodiscard]] std::string makePath(const Language lang) {
 		using namespace ::FD::Internal::Resource;
 		using enum Type;
 
@@ -50,10 +54,15 @@ namespace FD::Text::Internal {
 			path += EnglishGuiTextFolderPath;
 		else if (lang == Language::Chinese)
 			path += ChineseGuiTextFolderPath;
-		else
-			abort();
+		else {
+			::FD::Internal::GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Internal Error.");;
+			std::terminate();
+		}
 
-		if constexpr (T == Analysis) {
+		if constexpr (T == Common) {
+			path += "Common";
+		}
+		else if constexpr (T == Analysis) {
 			path += "Analysis";
 		}
 		else if constexpr (T == BarExit) {
@@ -70,6 +79,9 @@ namespace FD::Text::Internal {
 		}
 		else if constexpr (T == ProjectSelect) {
 			path += "ProjectSelect";
+		}
+		else if constexpr (T == ProjectProperty) {
+			path += "ProjectProperty";
 		}
 		else if constexpr (T == CodingTab) {
 			path += "CodingTab";
@@ -160,6 +172,36 @@ FD::GuiTextRead::GuiTextRead(Internal::PassKey) {
 	else
 		throw std::runtime_error("Failed to read GuiTextType.");
 
+}
+
+FD::Text::Internal::Common::Common(const CommonText index)
+	: text(init(index))
+{}
+
+FD::Text::Internal::GuiText FD::Text::Internal::Common::init(const CommonText index) const {
+	using T = std::underlying_type_t<CommonText>;
+
+	const T i = static_cast<T>(index);
+
+	assert(std::numeric_limits<T>::max() != i);
+	assert(i < magic_enum::enum_count<CommonText>());
+
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::Common>(Getter::get()), std::ios::in);
+
+	if (!ifs) {
+		::FD::Internal::GMessenger.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Failed to open Common file.");;
+		return GuiText{ "Error" };
+	}
+
+	std::string buf{};
+
+	for (T j = 0; j < i + 1; j++) {
+		std::getline(ifs, buf);
+	}
+
+	return GuiText{ buf };
 }
 
 FD::Text::Internal::Title::Title() {
@@ -384,6 +426,9 @@ FD::Text::Internal::MenuBar::MenuBar() {
 	this->project_ = data;
 
 	std::getline(ifs, data);
+	this->property_icon = ICON_FA_WRENCH "   " + data;
+
+	std::getline(ifs, data);
 	this->extension = data;
 
 	std::getline(ifs, data);
@@ -472,6 +517,9 @@ FD::Text::Internal::TopBar::TopBar() {
 
 	std::getline(ifs, data);
 	this->error_mainfile = data;
+
+	std::getline(ifs, data);
+	this->error_notSetProperty = data;
 
 }
 
@@ -991,6 +1039,9 @@ FD::Text::Internal::TextEditor::TextEditor() {
 	std::getline(ifs, data);
 	this->column = data;
 
+	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
 }
 
 
@@ -1223,9 +1274,72 @@ FD::Text::Internal::Console::Console() {
 
 	std::getline(ifs, data);
 	this->backcolor = data;
+
 }
 
+FD::Text::Internal::ProjectProperty::ProjectProperty() {
+	std::ifstream ifs{};
 
+	ifs = std::ifstream(makePath<Type::ProjectProperty>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open ProjectProperty.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->projectProperty = data;
+
+	std::getline(ifs, data);
+	this->tab_main = data;
+
+	std::getline(ifs, data);
+	this->currentType = data;
+
+	std::getline(ifs, data);
+	this->change = data;
+
+	std::getline(ifs, data);
+	this->entryFilePath = data;
+
+	std::getline(ifs, data);
+	this->luaVersion = data;
+
+	std::getline(ifs, data);
+	this->currentVersion = data;
+
+	std::getline(ifs, data);
+	this->confirm_changeProjectType = data;
+
+	std::getline(ifs, data);
+	this->confirm_notSaved = data;
+
+	std::getline(ifs, data);
+	this->confirm_save = data;
+
+	std::getline(ifs, data);
+	this->confirm_ignore = data;
+
+	std::getline(ifs, data);
+	this->info_currentType = data;
+
+	std::getline(ifs, data);
+	this->info_entryFilePath = Internal::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->info_luaVersion = Internal::newLine(ifs, data);;
+
+	std::getline(ifs, data);
+	this->bottom_close = data;
+
+	std::getline(ifs, data);
+	this->bottom_cancel = data;
+
+	std::getline(ifs, data);
+	this->bottom_save = data;
+
+
+}
 
 
 

@@ -813,7 +813,7 @@ namespace FDR::Internal::Initialization {
 		iconConfig2.PixelSnapH = true;
 		iconConfig2.GlyphOffset = { 0.0f, 1.0f };
 		//iconConfig2.GlyphExtraSpacing = { 0.60f, -0.60f };
-
+		
 		iconConfig2.OversampleH = 3;//FreeType -> ignore
 		iconConfig2.OversampleV = 3;//FreeType -> ignore
 
@@ -833,7 +833,7 @@ namespace FDR::Internal::Initialization {
 		param.pInfo = &info;
 		param.pFontInfos = fonts;
 		param.fontInfoCount = std::extent_v<decltype(fonts), 0>;
-
+		
 		FVK::createImGui(BaseImGuiKey, param);
 		ImGui::GetIO().FontGlobalScale = 0.525f;
 

@@ -36,7 +36,12 @@ namespace FD::Style {
 		[[nodiscard]] ImVec2 viewWindowSizeConstraints() const noexcept;
 
 	public://popup window
+		[[nodiscard]] ImVec2 popupWindowPos(const ImVec2& centerPos, const ImVec2& screenSize) const noexcept;
+		[[nodiscard]] ImVec2 popupWindowSize(const ImVec2& windowPos, const ImVec2& screenSize) const noexcept;
+
 		[[nodiscard]] float popupWindowBorderSize() const noexcept;
+
+		[[nodiscard]] float popupWindowBottomButtonWidth(const float windowWidth) const noexcept;
 
 		[[nodiscard]] static consteval ImGuiWindowFlags PopupWindowFlags() {
 			return
@@ -46,6 +51,9 @@ namespace FD::Style {
 				ImGuiWindowFlags_NoDocking |
 				ImGuiWindowFlags_NoTitleBar;
 		}
+
+	public:
+		void bulletDummy() const noexcept;
 
 	};
 

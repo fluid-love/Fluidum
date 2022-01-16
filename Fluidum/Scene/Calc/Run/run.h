@@ -6,11 +6,26 @@ namespace FS::Calc {
 
 	class Run final : public Scene {
 	public:
+		enum class InfoErrorType : UIF8 {
+			NoError,
+			NotSetProjectType,
+			NotExistsEntryFile,
+			InternalError
+		};
+
+		struct Info final {
+			InfoErrorType errorType = InfoErrorType::NoError;
+		};
+
+	public:
 		explicit Run(
-			const FD::FluidumFilesRead* const fluidumFilesRead
+			const FD::Project::PropertyRead* const propertyRead,
+			const FD::Project::PropertyLuaRead* const propertyLuaRead,
+			Info& info
 		);
 		void Constructor(
-			FD::FluidumFilesRead
+			FD::Project::PropertyRead,
+			FD::Project::PropertyLuaRead
 		);
 
 		~Run() noexcept;
@@ -21,7 +36,10 @@ namespace FS::Calc {
 		virtual void call() override;
 
 	private:
-		const FD::FluidumFilesRead* const fluidumFilesRead;
+		const FD::Project::PropertyRead* const propertyRead;
+		const FD::Project::PropertyLuaRead* const propertyLuaRead;
+
+		Info& info;
 
 	private:
 		void run();

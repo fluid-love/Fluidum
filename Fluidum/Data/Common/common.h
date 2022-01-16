@@ -2,8 +2,11 @@
 
 #include "resource.h"
 #include "log.h"
+#include "passkey.h"
+
 #include "../Limits/limits.h"
 #include <boost/predef.h>
+#include <boost/json.hpp>
 #include <lua.hpp>
 
 #include <filesystem>

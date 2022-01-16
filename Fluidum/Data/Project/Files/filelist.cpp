@@ -50,7 +50,7 @@ FD::Project::Internal::FileList::Ref* FD::Project::Internal::FileList::add(const
 		if (res)
 			return f.value().operator->();
 		else
-			throw std::runtime_error("Failed to add directory. \"path\" already exists.");
+			throw std::runtime_error("Failed to add unsupported file. \"path\" already exists.");
 	}
 
 	return this->addRef(parent, ref);
@@ -378,10 +378,10 @@ FD::Project::Internal::FileList::Ref FD::Project::Internal::FileList::makeRef(co
 
 FD::Project::Internal::FileList::Ref FD::Project::Internal::FileList::makeRef(const std::string& path, const Unsupported& info) const {
 	return {
-	.type = Type::Unsupported,
-	.path = path,
-	.name = FU::File::fileName(path),
-	.ptr = unsupported.back().get(),
+		.type = Type::Unsupported,
+		.path = path,
+		.name = FU::File::fileName(path),
+		.ptr = unsupported.back().get(),
 	};
 }
 

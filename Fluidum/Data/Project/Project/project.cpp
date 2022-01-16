@@ -50,11 +50,11 @@ void FD::ProjectWrite::save_thread() {
 			std::lock_guard<std::mutex> lockScene(::FD::Scene::Internal::Data::mtx);
 			this->save_scene();
 		}
-		if (Project::Internal::FluidumFilesData::save) {
-			Project::Internal::FluidumFilesData::save.store(false);
+		if (Project::Property::Internal::Data::save) {
+			Project::Property::Internal::Data::save.store(false);
 			std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
-			std::lock_guard<std::mutex> lockFiles(Project::Internal::FluidumFilesData::mtx);
-			this->save_fluidumFiles();
+			std::lock_guard<std::mutex> lockProperty(Project::Property::Internal::Data::mtx);
+			this->save_projectProperty();
 		}
 		if (Project::Internal::ProjectFilesData::save) {
 			Project::Internal::ProjectFilesData::save.store(false);
@@ -74,6 +74,7 @@ void FD::ProjectWrite::save_thread() {
 			std::lock_guard<std::mutex> lockLayout(Layout::Internal::LayoutData::mtx);
 			this->save_layout();
 		}
+
 	}
 
 }
@@ -249,8 +250,11 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 
 	Data temp{};
 
+	//project property
+	const auto temp_projectProperty_currentProjectType = Project::Property::Internal::Data::currentProjectType;
+	std::string temp_projectPropertyLua_entryFilePath{};
+
 	//files
-	std::string temp_files_mainCodeFilePath{};
 	Project::Internal::FileList temp_files_projectFiles{};
 	Project::Internal::FileList temp_files_userFiles{};
 
@@ -264,16 +268,16 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 	//layout
 	std::vector<Layout::Internal::History> temp_layout_history{};
 
-	std::lock_guard<std::mutex> lock1(FluidumFilesData::mtx);
-	std::lock_guard<std::mutex> lock2(ProjectFilesData::mtx);
-	std::lock_guard<std::mutex> lock3(UserFilesData::mtx);
-	std::unique_lock<std::mutex> lock4(Layout::Internal::LayoutData::mtx);
-	std::lock_guard<std::mutex> lock5(Coding::Internal::Data::mtx);
-	std::lock_guard<std::mutex> lock6(Scene::Internal::Data::mtx);
+	std::lock_guard<std::mutex> lock1(Project::Property::Internal::Data::mtx);
+	std::lock_guard<std::mutex> lock3(ProjectFilesData::mtx);
+	std::lock_guard<std::mutex> lock4(UserFilesData::mtx);
+	std::unique_lock<std::mutex> lock5(Layout::Internal::LayoutData::mtx);
+	std::lock_guard<std::mutex> lock6(Coding::Internal::Data::mtx);
+	std::lock_guard<std::mutex> lock7(Scene::Internal::Data::mtx);
 
 	try {//copy
 		temp = GCurrentData;
-		temp_files_mainCodeFilePath = Project::Internal::FluidumFilesData::mainCodeFilePath;
+		temp_projectPropertyLua_entryFilePath = Project::Property::Internal::LuaData::entryFilePath;
 		temp_files_projectFiles = Project::Internal::ProjectFilesData::projectFiles;
 		temp_files_userFiles = Project::Internal::UserFilesData::userFiles;
 		temp_layout_history = Layout::Internal::LayoutData::history;
@@ -310,29 +314,17 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		this->read_tab();
 		this->read_scene();
 
+		this->read_projectProperty();
+
 		this->updateHistory();
 
-	}
-	catch (const Exception) {
-		//no-throw
-
-		GCurrentData = std::move(temp);
-
-		Project::Internal::FluidumFilesData::mainCodeFilePath = std::move(temp_files_mainCodeFilePath);
-		Project::Internal::ProjectFilesData::projectFiles = std::move(temp_files_userFiles);
-		Project::Internal::UserFilesData::userFiles = std::move(temp_files_projectFiles);
-		Coding::Internal::Data::displayInfo = std::move(temp_tab_displayInfo);
-		Coding::Internal::Data::filePaths = std::move(temp_tab_filePaths);
-		Scene::Internal::Data::codes = std::move(temp_scene_codes);
-
-		Layout::Internal::LayoutData::history = std::move(temp_layout_history);
-
-		std::rethrow_exception(std::current_exception());
 	}
 	catch (...) {
 		GCurrentData = std::move(temp);
 
-		Project::Internal::FluidumFilesData::mainCodeFilePath = std::move(temp_files_mainCodeFilePath);
+		Project::Property::Internal::Data::currentProjectType = temp_projectProperty_currentProjectType;
+		Project::Property::Internal::LuaData::entryFilePath = temp_projectPropertyLua_entryFilePath;
+
 		Project::Internal::ProjectFilesData::projectFiles = std::move(temp_files_userFiles);
 		Project::Internal::UserFilesData::userFiles = std::move(temp_files_projectFiles);
 		Coding::Internal::Data::displayInfo = std::move(temp_tab_displayInfo);
@@ -340,7 +332,7 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		Scene::Internal::Data::codes = std::move(temp_scene_codes);
 		Layout::Internal::LayoutData::history = std::move(temp_layout_history);
 
-		throw Exception::Unexpected;
+		FU::Exception::rethrow();
 	}
 
 
@@ -478,51 +470,31 @@ void FD::ProjectWrite::save_scene() {
 	}
 }
 
-void FD::ProjectWrite::save_files_recursive(std::ofstream& ofs, const Project::FileList::FileInfo* info) {
-	ofs << info->path << std::endl;
-	ofs << info->name << std::endl;
-	ofs << info->open << std::endl;
+void FD::ProjectWrite::save_files_recursive(boost::json::object& obj, const Project::FileList::FileInfo* info) {
+	namespace json = boost::json;
 
-	if (info->type == FD::Project::FileList::Type::Directory)
-		ofs << "D" << std::endl;
-	else if (info->type == FD::Project::FileList::Type::Supported)
-		ofs << "S" << std::endl;
-	else {
-		assert(info->type == FD::Project::FileList::Type::Unsupported);
-		ofs << "U" << std::endl;
+	json::object& item = obj[info->path].emplace_object();
+	{
+		item["Name"] = info->name;
+		item["Open"] = info->open;
+
+		//type
+		const char* type;
+		if (info->type == FD::Project::FileList::Type::Directory)
+			type = "Dir";
+		else if (info->type == FD::Project::FileList::Type::Supported)
+			type = "Sup";
+		else if (info->type == FD::Project::FileList::Type::Unsupported)
+			type = "Unsup";
+		else {
+			FluidumData_Log_Internal_InternalError();
+			throw Exception::Unexpected;
+		}
+		item["Type"] = type;
 	}
-
-	ofs << info->dir_internal.size() << std::endl;
 
 	for (Size i = 0, size = info->dir_internal.size(); i < size; i++) {
-		save_files_recursive(ofs, &info->dir_internal[i]);
-	}
-}
-
-void FD::ProjectWrite::save_fluidumFiles() {
-	using namespace Project::Internal;
-
-	//already locked
-
-	{
-		std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::Project_Temp_FluidumFiles, std::ios::trunc);
-
-		if (!ofs)
-			throw std::runtime_error("Failed to open .fluidumfiles file.");
-
-		ofs << FluidumFilesData::mainCodeFilePath << std::endl;
-
-		ofs << Name::Delimiter << std::endl;
-	}
-
-	//success
-	{
-		//std::filesystem::filesystem_error
-		std::filesystem::copy_file(
-			GCurrentData.projectDirectoryPath + Name::Project_Temp_FluidumFiles, //from
-			GCurrentData.projectDirectoryPath + Name::Project_FluidumFiles,      //to
-			std::filesystem::copy_options::overwrite_existing
-		);
+		save_files_recursive(item, &info->dir_internal[i]);
 	}
 }
 
@@ -538,11 +510,16 @@ void FD::ProjectWrite::save_projectFiles() {
 			throw std::runtime_error("Failed to open .projectfiles file.");
 
 		auto data = Project::Internal::ProjectFilesData::projectFiles.get();
+
+		boost::json::object obj{};
+
 		for (auto& x : *data) {
-			this->save_files_recursive(ofs, &x);
+			this->save_files_recursive(obj, &x);
 		}
 
-		ofs << Name::Delimiter << std::endl;
+		const std::string text = boost::json::serialize(obj);
+
+		ofs << text;
 	}
 
 	//success
@@ -568,11 +545,16 @@ void FD::ProjectWrite::save_userFiles() {
 			throw std::runtime_error("Failed to open .userfiles file.");
 
 		auto data = Project::Internal::UserFilesData::userFiles.get();
+
+		boost::json::object obj{};
+
 		for (auto& x : *data) {
-			this->save_files_recursive(ofs, &x);
+			this->save_files_recursive(obj, &x);
 		}
 
-		ofs << Name::Delimiter << std::endl;
+		const std::string text = boost::json::serialize(obj);
+
+		ofs << text;
 	}
 
 	//success
@@ -635,6 +617,69 @@ void FD::ProjectWrite::save_layout() {
 		std::filesystem::copy_file(
 			GCurrentData.projectDirectoryPath + Name::Project_Temp_Layout, //from
 			GCurrentData.projectDirectoryPath + Name::Project_Layout,      //to
+			std::filesystem::copy_options::overwrite_existing
+		);
+	}
+}
+
+void FD::ProjectWrite::save_projectProperty() {
+	using namespace Project::Internal;
+
+	//already locked
+
+	std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::Project_Temp_ProjectProperty, std::ios::trunc);
+
+	if (!ofs)
+		throw std::runtime_error("Failed to open .projectproperty file.");
+
+	namespace json = boost::json;
+
+	json::object obj{};
+
+	//common
+	{
+		json::object& common = obj["Common"].emplace_object();
+		{
+			using enum FD::Project::Property::ProjectType;
+			const char* type;
+			if (FD::Project::Property::Internal::Data::currentProjectType == None)
+				type = "None";
+			else if (FD::Project::Property::Internal::Data::currentProjectType == Lua)
+				type = "Lua";
+			else if (FD::Project::Property::Internal::Data::currentProjectType == Python)
+				type = "Python";
+			else if (FD::Project::Property::Internal::Data::currentProjectType == Cpp)
+				type = "C++";
+			else {
+				FluidumData_Log_Internal_InternalWarning();
+				type = "None";
+			}
+			common["ProjectType"] = type;
+		}
+	}
+
+	//Lua
+	{
+		json::object& lua = obj["Lua"].emplace_object();
+		{
+			lua["EntryFilePath"] = FD::Project::Property::Internal::LuaData::entryFilePath;
+		}
+	}
+
+	//write
+	{
+		const std::string text = json::serialize(obj);
+		ofs << text;
+	}
+
+	ofs.close();
+
+	//success
+	{
+		//std::filesystem::filesystem_error
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::Project_Temp_ProjectProperty, //from
+			GCurrentData.projectDirectoryPath + Name::Project_ProjectProperty,      //to
 			std::filesystem::copy_options::overwrite_existing
 		);
 	}
@@ -779,12 +824,12 @@ void FD::ProjectWrite::tryCreateFluidumFiles() {
 		throw Exception::NotFoundProjectFiles;
 
 	constexpr const char* paths[] = {
-		Name::Project_FluidumFiles,
 		Name::Project_ProjectFiles,
 		Name::Project_UserFiles,
 		Name::Project_Tab,
 		Name::Project_Scene,
 		Name::Project_Layout,
+		Name::Project_ProjectProperty,
 		Name::Genome_Function
 	};
 
@@ -944,122 +989,123 @@ void FD::ProjectWrite::readProjectInfo(std::ifstream& ifs) const {
 
 }
 
-FD::Project::FileList::FileInfo FD::ProjectWrite::readFiles_element(std::ifstream& ifs) const {
-	std::string data{};
+FD::Project::FileList::FileInfo FD::ProjectWrite::readFiles_element(const boost::json::value& val) const {
+	FD::Project::FileList::FileInfo info{};
 
-	Project::FileList::FileInfo info;
+	info.name = val.at("Name").get_string();
+	info.open = val.at("Open").get_bool();
 
-	std::getline(ifs, data);
-	info.path = data;
+	const std::string type = val.at("Type").get_string().c_str();
 
-	std::getline(ifs, data);
-	info.name = data;
-
-	std::getline(ifs, data);
-	if (static_cast<bool>(std::stoi(data)) == true)
-		info.open = true;
+	using enum Project::Internal::FileList::Type;
+	if (type == "Dir")
+		info.type = Directory;
+	else if (type == "Sup")
+		info.type = Supported;
+	else if (type == "Unsup")
+		info.type = Unsupported;
 	else
-		info.open = false;
-
-	std::getline(ifs, data);
-	using Type = Project::Internal::FileList::Type;
-	if (data == "D")
-		info.type = Type::Directory;
-	else if (data == "S")
-		info.type = Type::Supported;
-	else if (data == "U")
-		info.type = Type::Unsupported;
+		throw Exception::BrokenFile;
 
 	return info;
 }
 
-void FD::ProjectWrite::read_files_recursive(std::ifstream& ifs, Project::FileList::FileInfo* parent) const {
-	std::string data{};
+void FD::ProjectWrite::read_files_recursive(const bool top, std::vector< FD::Project::Internal::FileList::Ref>* data, const boost::json::value& val, Project::FileList::FileInfo* parent) const {
+	namespace json = boost::json;
 
-	parent->dir_internal.emplace_back(this->readFiles_element(ifs));
-
-	//size
-	std::getline(ifs, data);
-	Size size = std::stoull(data);
-	for (Size i = 0; i < size; i++) {
-		this->read_files_recursive(ifs, &parent->dir_internal.back());
+	if (val.kind() != json::kind::object) {
+		return;
 	}
+
+	const json::object& obj = val.get_object();
+
+	if (top) {
+		for (auto itr = obj.cbegin(), end = obj.cend(); itr != end; itr++) {
+			if (!itr->value().is_object())
+				continue;
+
+			FD::Project::FileList::FileInfo info = this->readFiles_element(itr->value());
+			info.path = itr->key();
+			data->emplace_back(std::move(info));
+			this->read_files_recursive(false, nullptr, itr->value(), &data->back());
+		}
+	}
+	else {
+		for (auto itr = obj.cbegin(), end = obj.cend(); itr != end; itr++) {
+			if (!itr->value().is_object())
+				continue;
+
+			FD::Project::FileList::FileInfo info = this->readFiles_element(itr->value());
+			info.path = itr->key();
+			parent->dir_internal.emplace_back(std::move(info));
+			this->read_files_recursive(false, nullptr, itr->value(), &parent->dir_internal.back());
+		}
+	}
+
+
 }
 
 void FD::ProjectWrite::read_fluidumFiles() const {
-	using namespace Project::Internal;
+	//using namespace Project::Internal;
 
-	std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_FluidumFiles);
-	if (!ifs)
-		throw Exception::NotFoundProjectFiles;
+	//std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_FluidumFiles);
+	//if (!ifs)
+	//	throw Exception::NotFoundProjectFiles;
 
-	if (FU::File::empty(ifs))
-		return;
+	//if (FU::File::empty(ifs))
+	//	return;
 
-	std::string buf{};
+	//std::string buf{};
 
-	//MainCodeFilePath
-	std::getline(ifs, buf);
+	////MainCodeFilePath
+	//std::getline(ifs, buf);
 
-	FluidumFilesData::mainCodeFilePath = buf;
+	//FluidumFilesData::mainCodeFilePath = buf;
 }
 
 void FD::ProjectWrite::read_projectFiles() const {
 	using namespace Project::Internal;
+	namespace json = boost::json;
 
-	std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_ProjectFiles);
-	if (!ifs)
-		throw Exception::NotFoundProjectFiles;
-
-	if (FU::File::empty(ifs))
-		return;
-
-	std::string buf{};
-
-	std::size_t counter = 0;
-	while (true) {
-		std::getline(ifs, buf);
-		if (buf == Name::Delimiter)
-			break;
-
-		auto data = UserFilesData::userFiles.get();
-		auto info = this->readFiles_element(ifs);
-		data->emplace_back(std::move(info));
-		this->read_files_recursive(ifs, &info);
-
-		counter++;
-		if (counter > 1000)
-			throw Exception::BrokenFile;
+	json::value val{};
+	try {
+		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_ProjectFiles);
 	}
+	catch (const Exception v) {
+		if (v == Exception::FileEmpty)
+			return;
+		FU::Exception::rethrow();
+	}
+
+	auto data = ProjectFilesData::projectFiles.get();
+	data->clear();
+
+	if (!val.is_object())
+		throw Exception::Unexpected;
+
+	this->read_files_recursive(true, data, val, nullptr);
 }
 
 void FD::ProjectWrite::read_userFiles() const {
 	using namespace Project::Internal;
+	namespace json = boost::json;
 
-	std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_UserFiles);
-	if (!ifs)
-		throw Exception::NotFoundProjectFiles;
-
-	if (FU::File::empty(ifs))
-		return;
-
-	std::string buf{};
-
-	std::size_t counter = 0;
-	while (true) {
-		std::getline(ifs, buf);
-		if (buf == Name::Delimiter)
-			break;
-
-		auto data = UserFilesData::userFiles.get();
-		auto info = this->readFiles_element(ifs);
-		data->emplace_back(std::move(info));
-		this->read_files_recursive(ifs, &info);
-
-		counter++;
-		if (counter > 5000)
-			throw Exception::BrokenFile;
+	json::value val{};
+	try {
+		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_UserFiles);
 	}
+	catch (const Exception v) {
+		if (v == Exception::FileEmpty)
+			return;
+		FU::Exception::rethrow();
+	}
+
+	auto data = UserFilesData::userFiles.get();
+	data->clear();
+
+	const json::object& obj = val.get_object();
+
+	this->read_files_recursive(true, data, val, nullptr);
 }
 
 void FD::ProjectWrite::read_layout() const {
@@ -1213,6 +1259,92 @@ void FD::ProjectWrite::read_scene() const {
 
 }
 
+void FD::ProjectWrite::read_projectProperty() {
+	using namespace Project::Internal;
+	namespace json = boost::json;
+
+	//already locked
+
+	json::value val{};
+	try {
+		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_ProjectProperty);
+	}
+	catch (const Exception val) {
+		if (val == Exception::FileEmpty)
+			return;
+		FU::Exception::rethrow();
+	}
+
+	std::string data{};
+
+	//common
+	{
+		const json::value common = val.at("Common");
+		{
+			const json::value projectType = common.at("ProjectType");
+			if (!projectType.is_string())
+				Exception::BrokenFile;
+
+			using enum FD::Project::Property::ProjectType;
+
+			const std::string type = projectType.get_string().c_str();
+			if (type == "None")
+				FD::Project::Property::Internal::Data::currentProjectType = None;
+			else if (type == "Lua")
+				FD::Project::Property::Internal::Data::currentProjectType = Lua;
+			else if (type == "Python")
+				FD::Project::Property::Internal::Data::currentProjectType = Python;
+			else if (type == "C++")
+				FD::Project::Property::Internal::Data::currentProjectType = Cpp;
+			else {
+				Internal::GMessenger.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Invalid pattern string({}).", type);
+				throw Exception::BrokenFile;
+			}
+		}
+	}
+
+	//Lua
+	{
+		const json::value common = val.at("Lua");
+		{
+			const json::value entryFilePath = common.at("EntryFilePath");
+			if (!entryFilePath.is_string())
+				Exception::BrokenFile;
+
+			using enum FD::Project::Property::ProjectType;
+
+			std::string path = json::serialize(entryFilePath.get_string());
+			FD::Project::Property::Internal::LuaData::entryFilePath = std::move(path);
+		}
+	}
+
+}
+
+boost::json::value FD::ProjectWrite::makeJsonValue(const std::string& filePath) const {
+	namespace json = boost::json;
+
+	std::ifstream ifs(filePath);
+	if (!ifs)
+		throw Exception::NotFoundProjectFiles;
+	if (FU::File::empty(ifs))
+		throw Exception::FileEmpty;
+
+	json::stream_parser p;
+	json::error_code ec;
+
+	std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
+	p.write(str.c_str(), str.size(), ec);
+
+	if (ec)
+		throw Exception::BrokenFile;
+	p.finish(ec);
+	if (ec)
+		throw Exception::BrokenFile;
+
+	return p.release();
+}
+
 std::array<FD::ProjectRead::HistoryInfo, 50> FD::ProjectRead::loadProjectHistory() const {
 	using namespace Project::Internal;
 
@@ -1237,9 +1369,13 @@ std::array<FD::ProjectRead::HistoryInfo, 50> FD::ProjectRead::loadProjectHistory
 }
 
 std::vector<FU::Class::ClassCode::CodeType> FD::ProjectRead::loadSceneFile() const {
+	using namespace Project::Internal;
+
 	std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 
-	std::ifstream ifs(Project::Internal::GCurrentData.projectDirectoryPath + Project::Internal::Name::Project_Scene);
+	std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_Scene);
+	if (!ifs)
+		throw Exception::NotFoundProjectFiles;
 
 	if (FU::File::empty(ifs))
 		return {};
@@ -1248,12 +1384,30 @@ std::vector<FU::Class::ClassCode::CodeType> FD::ProjectRead::loadSceneFile() con
 
 	std::vector<FU::Class::ClassCode::CodeType> result{};
 
-	while (true) {
-		std::getline(ifs, data);
-		if (data == Project::Internal::Name::Delimiter)
-			break;
-		result.emplace_back(static_cast<FU::Class::ClassCode::CodeType>(std::stoll(data)));
-	};
+	//SceneCodes
+	{
+		Size counter = 0;
+		while (true) {
+			std::getline(ifs, data);
+			if (data == Name::Delimiter)
+				break;
+
+			const auto find = std::find_if(
+				std::begin(::FS::Utils::Class::ClassCodesViewNames),
+				std::end(::FS::Utils::Class::ClassCodesViewNames),
+				[&](auto& x) {return x == data; }
+			);
+			if (find != std::end(::FS::Utils::Class::ClassCodesViewNames)) {
+				const Size distance = static_cast<Size>(std::distance(std::begin(::FS::Utils::Class::ClassCodesViewNames), find));
+				const auto code = ::FS::Utils::Class::ClassCodesView[distance];
+				result.emplace_back(code);
+			}
+
+			counter++;
+			if (counter > 1000)
+				throw Exception::BrokenFile;
+		}
+	}
 
 	return result;
 }

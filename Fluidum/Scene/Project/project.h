@@ -11,9 +11,10 @@ namespace FS::Project {
 			const FD::Style::ColorRead* const colorRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
-			FD::LuaFilesWrite_Lock* const luaFilesWrite,
-			FD::FluidumFilesWrite* const fluidumFilesWrite,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
+			FD::Project::PropertyWrite* const propertyWrite,
+			const FD::Project::PropertyRead* const propertyRead,
+			FD::Project::PropertyLuaWrite* const propertyLuaWrite,
+			const FD::Project::PropertyLuaRead* const propertyLuaRead,
 			FD::ProjectFilesWrite_Lock* const projectFilesWrite,
 			const FD::ProjectFilesRead_Lock* const projectFilesRead,
 			FD::UserFilesWrite_Lock* const userFilesWrite,
@@ -30,9 +31,10 @@ namespace FS::Project {
 			FD::Style::ColorRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
-			FD::LuaFilesWrite_Lock,
-			FD::FluidumFilesWrite,
-			FD::FluidumFilesRead,
+			FD::Project::PropertyWrite,
+			FD::Project::PropertyRead,
+			FD::Project::PropertyLuaWrite,
+			FD::Project::PropertyLuaRead,
 			FD::ProjectFilesWrite_Lock,
 			FD::ProjectFilesRead_Lock,
 			FD::UserFilesWrite_Lock,
@@ -56,10 +58,11 @@ namespace FS::Project {
 	private:
 		const FD::Style::ColorRead* const colorRead;
 		FD::ProjectWrite* const projectWrite;
-		FD::LuaFilesWrite_Lock* const luaFilesWrite;
-		FD::FluidumFilesWrite* const fluidumFilesWrite;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::ProjectRead* const projectRead;
+		FD::Project::PropertyWrite* const propertyWrite;
+		const FD::Project::PropertyRead* const propertyRead;
+		FD::Project::PropertyLuaWrite* const propertyLuaWrite;
+		const FD::Project::PropertyLuaRead* const propertyLuaRead;
 		FD::ProjectFilesWrite_Lock* const projectFilesWrite;
 		const FD::ProjectFilesRead_Lock* const projectFilesRead;
 		FD::UserFilesWrite_Lock* const userFilesWrite;
@@ -85,7 +88,7 @@ namespace FS::Project {
 			ImVec2 selectedTree{};
 		}pos;
 
-		enum class TabType : uint8_t {
+		enum class TabType : UIF8 {
 			Fluidum,
 			Project,
 			User
@@ -93,7 +96,6 @@ namespace FS::Project {
 
 		struct {
 			TabType tab = TabType::Fluidum;
-			FD::Project::FileList::FileInfo* fluidumFiles = nullptr;
 			FD::Project::FileList::FileInfo* projectFiles = nullptr;
 			FD::Project::FileList::FileInfo* userFiles = nullptr;
 
@@ -103,7 +105,7 @@ namespace FS::Project {
 				else if (tab == TabType::User)
 					return this->userFiles;
 				else
-					return this->fluidumFiles;
+					return nullptr;
 			}
 		}select;
 
@@ -156,6 +158,7 @@ namespace FS::Project {
 
 		struct {
 			FD::Project::File::SupportedFileType fileType{};
+
 		}supportedPopupInfo;
 
 		bool windowFlag = true;

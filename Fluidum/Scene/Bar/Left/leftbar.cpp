@@ -17,7 +17,6 @@ using namespace FU::ImGui::Operators;
 
 FS::LeftBar::LeftBar(
 	const FD::ProjectRead* const projectRead,
-	const FD::FluidumFilesRead* const fluidumFilesRead,
 	const FD::GuiRead* const  guiRead,
 	FD::GuiWrite* const  guiWrite,
 	const FD::SceneRead* const  sceneRead,
@@ -26,7 +25,6 @@ FS::LeftBar::LeftBar(
 	std::vector<FDR::ImGuiImage>&& images
 ) :
 	projectRead(projectRead),
-	fluidumFilesRead(fluidumFilesRead),
 	guiRead(guiRead),
 	sceneRead(sceneRead),
 	tabWrite(tabWrite),

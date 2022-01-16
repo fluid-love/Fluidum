@@ -18,7 +18,7 @@ namespace FS::File::Add::Internal {
 			"cpp.png"
 		};
 		std::vector<FDR::ImGuiImage> result;
-		for (uint16_t i = 0; i < std::extent_v<decltype(names), 0>; i++) {
+		for (UIF16 i = 0; i < std::extent_v<decltype(names), 0>; i++) {
 			std::string path = Resource::ProjectNewIconsFolderPath;
 			path += names[i];
 			result.emplace_back(FDR::createImGuiImage(path.c_str()));

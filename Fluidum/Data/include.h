@@ -18,7 +18,7 @@
 
 #include "Project/Project/project.h"
 #include "Project/Files/files.h"
-#include "Project/Property/property.h"
+#include "Project/Property/lua.h"
 
 #include "Task/task.h"
 

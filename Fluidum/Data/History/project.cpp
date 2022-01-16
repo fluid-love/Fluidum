@@ -138,6 +138,10 @@ std::vector<FD::History::Project::Type> FD::History::ProjectWrite::load() {
 	if (!ifs)
 		throw std::runtime_error("Failed to open RecentTemplateProject.history");
 
+	if (FU::File::empty(ifs)) {
+		return {};
+	}
+
 	std::string buf{};
 
 	UIF16 size{};

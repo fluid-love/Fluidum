@@ -15,24 +15,24 @@ using namespace FU::ImGui::Operators;
 
 FS::TopBar::TopBar(
 	const FD::ProjectRead* const projectRead,
-	const FD::FluidumFilesRead* const fluidumFilesRead,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::SceneRead* const sceneRead,
 	const FD::ToolBarRead* const toolBarRead,
 	FD::ToolBarWrite* const toolBarWrite,
 	const FD::ImGuiWindowRead* const imguiWindowRead,
-	const FD::LayoutRead* const layoutRead
+	const FD::LayoutRead* const layoutRead,
+	FD::ConsoleWrite* const conoleWrite
 ) :
 	projectRead(projectRead),
-	fluidumFilesRead(fluidumFilesRead),
 	guiRead(guiRead),
 	guiWrite(guiWrite),
 	sceneRead(sceneRead),
 	toolBarRead(toolBarRead),
 	toolBarWrite(toolBarWrite),
 	imguiWindowRead(imguiWindowRead),
-	layoutRead(layoutRead)
+	layoutRead(layoutRead),
+	consoleWrite(consoleWrite)
 {
 	FluidumScene_Log_Constructor(::FS::TopBar);
 
@@ -138,8 +138,9 @@ void FS::TopBar::calc() {
 	}
 	else {
 		bool run = ImGui::Button(ICON_MD_PLAY_ARROW);
-		//FU::ImGui::tooltip(text.);
+		FU::ImGui::tooltip(anime.run, text.run);
 		if (run) {
+			consoleWrite->push_input("flu run");
 			pos.run = FU::ImGui::messagePos();
 			this->run();
 		}
@@ -183,13 +184,31 @@ void FS::TopBar::mode() {
 }
 
 void FS::TopBar::run() {
-	if (!fluidumFilesRead->isMainCodeFileExist()) {
-		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
-		Scene::addScene<Utils::Message>(text.error_mainfile, pos.run);
-	}
+
+	Calc::Run::Info info{};
 
 	FluidumScene_Log_CallSceneConstructor(::FS::Calc::Run);
-	Scene::callConstructor<Calc::Run>();
+	Scene::callConstructor<Calc::Run>(info);
+
+	using enum Calc::Run::InfoErrorType;
+	if (info.errorType == NoError) {
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Successfully run.");
+		return;
+	}
+
+	FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+	if (info.errorType == NotSetProjectType) {
+		Scene::addScene<Utils::Message>(text.error_notSetProperty, pos.run);
+	}
+	else if (info.errorType == NotExistsEntryFile) {
+		Scene::addScene<Utils::Message>(text.error_mainfile, pos.run);
+	}
+	else if (info.errorType == InternalError) {
+		FluidumScene_Log_InternalWarning();
+		FD::Text::Common errorText(FD::Text::CommonText::InternalError);
+		Scene::addScene<Utils::Message>(errorText, pos.run);
+	}
+
 }
 
 void FS::TopBar::playCheck() {

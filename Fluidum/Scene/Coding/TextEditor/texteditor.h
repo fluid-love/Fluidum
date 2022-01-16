@@ -71,8 +71,13 @@ namespace FS {
 		}anime;
 
 		struct {
-
+			ImVec2 zoom{};
 		}pos;
+
+		struct {
+			bool inputZoom = false;
+			bool zoomFocused = false;
+		}flag;
 
 		struct Info final {
 			FTE::TextEditor* editor = nullptr;
@@ -127,6 +132,9 @@ namespace FS {
 	private://shortcut
 		void shortcut();
 		void shortcut_zoom();
+
+	private://catch
+		void catchZoom();
 
 	};
 

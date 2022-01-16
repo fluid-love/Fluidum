@@ -3,13 +3,8 @@
 #include "supported.h"
 
 namespace FD {
+
 	class ProjectWrite;
-
-	class LuaFilesWrite_Lock;
-	class LuaFilesRead;
-
-	class FluidumFilesWrite;
-	class FluidumFilesRead;
 
 	class ProjectFilesWrite_Lock;
 	class ProjectFilesRead_Lock;
@@ -22,119 +17,40 @@ namespace FD {
 
 namespace FD::Project::Internal {
 
-	struct LibraryFilesData final {
-	private:
-		static inline FileList luaLibraries{};
-
-		static inline std::mutex mtx{};
-		static inline std::atomic_bool save = false;
-	private:
-		friend class ProjectWrite;
-		friend class LuaFilesWrite_Lock;
-		friend class LuaFilesRead;
-	};
-
-	struct FluidumFilesData final {
-	private:
-		static inline std::string mainCodeFilePath{};
-
-		static inline FileList luaLibraries{};
-
-		static inline std::mutex mtx{};
-		static inline std::atomic_bool save = false;
-	private:
-		friend class ProjectWrite;
-		friend class FluidumFilesWrite;
-		friend class FluidumFilesRead;
-	};
-
 	struct ProjectFilesData final {
+	private:
+		FluidumUtils_Class_Delete_ConDestructor(ProjectFilesData);
+
 	private:
 		static inline FileList projectFiles{};
 
+	private:
 		static inline std::mutex mtx{};
 		static inline std::atomic_bool save = false;
+
 	private:
 		friend class ProjectWrite;
 		friend class ProjectFilesWrite_Lock;
 		friend class ProjectFilesRead_Lock;
+
 	};
 
 	struct UserFilesData final {
 	private:
+		FluidumUtils_Class_Delete_ConDestructor(UserFilesData);
+
+	private:
 		static inline FileList userFiles{};
 
+	private:
 		static inline std::mutex mtx{};
 		static inline std::atomic_bool save = false;
+
 	private:
 		friend class ProjectWrite;
 		friend class UserFilesWrite_Lock;
 		friend class UserFilesRead_Lock;
 		friend class UserFilesRead;
-	};
-}
-
-namespace FD {
-
-	class LuaFilesWrite_Lock final {
-	public:
-		explicit LuaFilesWrite_Lock(Internal::PassKey) {}
-		~LuaFilesWrite_Lock() = default;
-		FluidumUtils_Class_Delete_CopyMove(LuaFilesWrite_Lock);
-
-	public:
-		void collapseAll();
-
-	public:
-		[[nodiscard]] std::vector<Project::FileList::FileInfo>* fileList();
-
-	public:
-		[[nodiscard]] std::unique_lock<std::mutex> getLock();
-
-	public:
-		void save() const;
-	};
-
-
-	class LuaFilesRead final {
-	public:
-		explicit LuaFilesRead(Internal::PassKey) {}
-		~LuaFilesRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(LuaFilesRead);
-
-
-	};
-}
-
-namespace FD {
-
-	class FluidumFilesWrite final {
-	public:
-		explicit FluidumFilesWrite(Internal::PassKey) {}
-		~FluidumFilesWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(FluidumFilesWrite);
-
-	public:
-		void setMainCodePath(const std::string& path) const;
-		void unsetMainCodePath() const;
-
-	public:
-		void save() const;
-
-	};
-
-	class FluidumFilesRead final {
-	public:
-		explicit FluidumFilesRead(Internal::PassKey) noexcept {}
-		~FluidumFilesRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(FluidumFilesRead);
-
-	public:
-
-		[[nodiscard]] std::string mainCodeFilePath() const;
-		[[nodiscard]] bool isMainCodeFileExist() const;
-
-		[[nodiscard]] Project::File::SupportedFileType getCurrentMainCodeType() const;
 
 	};
 
@@ -183,7 +99,7 @@ namespace FD {
 	class ProjectFilesRead_Lock final {
 	public:
 		explicit ProjectFilesRead_Lock(Internal::PassKey) noexcept {}
-		~ProjectFilesRead_Lock() = default;
+		~ProjectFilesRead_Lock() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ProjectFilesRead_Lock);
 
 	public:
@@ -220,6 +136,12 @@ namespace FD {
 			second : depth
 		*/
 		[[nodiscard]] std::pair<bool, Size> childExists(const std::string& parent, const std::string& child) const;
+
+		/*
+		return:
+			not exists -> nullptr
+		*/
+		[[nodiscard]] static Project::FileList::FileInfo* exists(const std::string& path);
 
 	};
 

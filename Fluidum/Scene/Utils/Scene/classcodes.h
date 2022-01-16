@@ -8,11 +8,14 @@ namespace FS::Utils::Class {
 		::FU::Class::ClassCode::GetClassCode<::FS::Analysis::Overview>(),
 		::FU::Class::ClassCode::GetClassCode<::FS::TextEditor>(),
 		::FU::Class::ClassCode::GetClassCode<::FS::Coding::Tab>(),
+		::FU::Class::ClassCode::GetClassCode<::FS::Project::Explorer>(),
 	};
+
 	constexpr inline const char* ClassCodesViewNames[] = {
 		"::FS::Analysis::Overview",
 		"::FS::TextEditor",
-		"::FS::Coding::Tab"
+		"::FS::Coding::Tab",
+		"::FS::Project::Explorer",
 	};
 
 }
