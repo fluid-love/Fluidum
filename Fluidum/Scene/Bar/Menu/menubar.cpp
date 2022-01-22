@@ -53,7 +53,7 @@ FS::MenuBar::MenuBar(
 
 }
 
-FS::MenuBar::~MenuBar() {
+FS::MenuBar::~MenuBar() noexcept {
 	FluidumScene_Log_Destructor(::FS::MenuBar);
 }
 
@@ -215,7 +215,8 @@ void FS::MenuBar::itemSave() {
 }
 
 void FS::MenuBar::itemSaveAs() {
-	if (!ImGui::MenuItem(text.saveFileAs))
+	const bool running = sceneRead->running();
+	if (!ImGui::MenuItem(text.saveFileAs, nullptr, false, !running))
 		return;
 
 	FluidumScene_Log_RequestAddScene(::FS::Project::File::SaveAs);

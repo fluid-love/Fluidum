@@ -138,12 +138,11 @@ void FS::StatusBar::infoGui() {
 	ImGui::SetNextWindowPos(style.infoWindowPos);
 	ImGui::SetNextWindowSize(style.infoWindowSize);
 
-	ImGui::Begin("Info", nullptr, Internal::Bar::CommonWindowFlag);
+	ImGui::Begin("StatusBarInfo", nullptr, Internal::Bar::CommonWindowFlag);
 
 	//fps
 	ImGui::Text(text.fps); ImGui::SameLine();
-	ImGui::Text("%.1f", ImGui::GetIO().Framerate);
-
+	ImGui::Text("%d", static_cast<I32>(ImGui::GetIO().Framerate));
 	ImGui::End();
 }
 

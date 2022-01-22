@@ -23,7 +23,6 @@ namespace FD {
 			NotFoundProjectFile,
 			NotFoundProjectDirectory,
 			NotFoundProjectFiles,
-			AlreadyProjectDirctoryExist,
 			AlreadyExist,
 			FailedToOpenProjectFile,
 			IllegalFile,
@@ -77,6 +76,14 @@ namespace FD {
 		*/
 		//strong
 		void removeHistory(const std::string& fprojPath);
+
+	public:
+		/*
+		Exception: strong
+			std::exception
+			Unexpected
+		*/
+		void saveImGuiIniFile();
 
 	private:
 		/*
@@ -156,8 +163,7 @@ namespace FD {
 
 		void read_projectProperty();
 
-	private://read helper
-		[[nodiscard]] boost::json::value makeJsonValue(const std::string& filePath) const;
+		void read_imguiini();
 
 	public://thread
 		void requestStop() noexcept;
@@ -166,7 +172,7 @@ namespace FD {
 	private:
 		void save_thread();
 		std::jthread saveThread{ &ProjectWrite::save_thread,this };
-
+		void resetThread();
 	};
 
 }
@@ -190,7 +196,7 @@ namespace FD {
 			Unexpected
 		*/
 		//strong
-		[[nodiscard]] std::array<HistoryInfo, 50> loadProjectHistory() const;
+		[[nodiscard]] std::array<HistoryInfo, Project::Limits::HistoryLogMax> loadProjectHistory() const;
 		[[nodiscard]] std::vector<FU::Class::ClassCode::CodeType> loadSceneFile() const;
 
 	public:

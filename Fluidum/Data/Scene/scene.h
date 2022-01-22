@@ -36,14 +36,13 @@ namespace FD {
 	class SceneRead final {
 	public:
 		explicit SceneRead(Internal::PassKey) noexcept {};
-		~SceneRead() = default;
+		~SceneRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(SceneRead);
 
 	private:
 		using CodeType = FU::Class::ClassCode::CodeType;
 
 	public:
-
 		template<typename Scene>
 		[[nodiscard]] bool exist() const noexcept {
 			using namespace ::FD::Scene::Internal;
@@ -53,9 +52,12 @@ namespace FD {
 			return itr != Data::codes.cend();
 		}
 
-		//[scene1 exists] [scene2 exists]   -> true
-		//[scene1 exists] [!scene2 exists]  -> true
-		//[!scene1 exists] [!scene2 exists] -> false
+		/*
+		Note:
+			[scene1 exists] [scene2 exists]   -> true
+			[scene1 exists] [!scene2 exists]  -> true
+			[!scene1 exists] [!scene2 exists] -> false
+		*/
 		template<typename... Scene>
 		[[nodiscard]] bool exist_or() const noexcept {
 			using namespace ::FD::Scene::Internal;
@@ -70,9 +72,12 @@ namespace FD {
 			return false;
 		}
 
-		//[scene1 exists] [scene2 exists]   -> true
-		//[scene1 exists] [!scene2 exists]  -> false
-		//[!scene1 exists] [!scene2 exists] -> false
+		/*
+		Note:
+			[scene1 exists] [scene2 exists]   -> true
+			[scene1 exists] [!scene2 exists]  -> false
+			[!scene1 exists] [!scene2 exists] -> false
+		*/
 		template<typename... Scene>
 		[[nodiscard]] bool exist_and() const noexcept {
 			using namespace ::FD::Scene::Internal;
@@ -97,6 +102,14 @@ namespace FD {
 
 		[[nodiscard]] bool exist(const FU::Class::ClassCode::CodeType Code) const noexcept;
 
+	public:
+		/*
+		Return:
+			running   : true
+			otherwise : false
+		Exception: no-throw
+		*/
+		[[nodiscard]] bool running() const noexcept;
 
 	};
 

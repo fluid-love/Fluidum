@@ -7,6 +7,8 @@ namespace FS::Project::File {
 	class SaveAs final : public Scene {
 	public:
 		explicit SaveAs(
+			const FD::Style::ColorRead* const colorRead,
+			const FD::Style::VarRead* const varRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			const FD::GuiRead* const guiRead,
@@ -14,6 +16,8 @@ namespace FS::Project::File {
 			FD::WindowWrite* const windowWrite
 		);
 		void Constructor(
+			FD::Style::ColorRead,
+			FD::Style::VarRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
 			FD::GuiRead,
@@ -29,12 +33,18 @@ namespace FS::Project::File {
 		virtual void call() override;
 
 	private:
+		const FD::Style::ColorRead* const colorRead;
+		const FD::Style::VarRead* const varRead;
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
 		const FD::GuiRead* const guiRead;
 		FD::WindowWrite* const windowWrite;
 
 		FD::Text::ProjectSaveAs text{};
+
+		struct {
+			FD::Text::Common unexpected{ FD::Text::CommonText::UnexceptedError };
+		}text_;
 
 	private:
 		struct {
@@ -50,10 +60,14 @@ namespace FS::Project::File {
 		}str;
 
 		struct {
-			ImVec2 projectFolder{};
+			ImVec2 projectDirectory{};
 			ImVec2 projectName{};
 			ImVec2 save{};
 		}pos;
+
+		struct {
+			ImCounter<ImAnimeTime> counter{};
+		}anime;
 
 		const bool exit;
 

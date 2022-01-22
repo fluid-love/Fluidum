@@ -11,6 +11,7 @@ namespace FS::Bar {
 			FD::WindowWrite* const windowWrite,
 			const FD::SceneRead* const sceneRead,
 			const FD::ProjectRead* const projectRead,
+			FD::ProjectWrite* const projectWrite,
 			FD::ExitWrite* const exitWrite,
 			const FD::Coding::TabRead* const tabRead,
 			FD::Coding::TabWrite* const tabWrite
@@ -20,6 +21,7 @@ namespace FS::Bar {
 			FD::WindowWrite,
 			FD::SceneRead,
 			FD::ProjectRead,
+			FD::ProjectWrite,
 			FD::ExitWrite,
 			FD::Coding::TabRead,
 			FD::Coding::TabWrite
@@ -37,6 +39,7 @@ namespace FS::Bar {
 		FD::WindowWrite* const windowWrite;
 		const FD::SceneRead* const sceneRead;
 		const FD::ProjectRead* const projectRead;
+		FD::ProjectWrite* const projectWrite;
 		FD::ExitWrite* const exitWrite;
 		const FD::Coding::TabRead* const tabRead;
 		FD::Coding::TabWrite* const tabWrite;

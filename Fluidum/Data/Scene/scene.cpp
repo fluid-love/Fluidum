@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "../../Scene/Utils/Scene/include.h"
 
 void FD::Scene::Internal::Data::addSceneCallback(bool async, FU::Class::ClassCode::CodeType code) {
 	std::lock_guard<std::mutex> lock(mtx);
@@ -25,4 +26,10 @@ bool FD::SceneRead::exist(const FU::Class::ClassCode::CodeType code) const noexc
 	std::lock_guard<std::mutex> lock(Data::mtx);
 	const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), code);
 	return itr != Data::codes.cend();
+}
+
+bool FD::SceneRead::running() const noexcept {
+	constexpr auto code = FU::Class::ClassCode::GetClassCode<FS::Calc::Lua::Run>();
+	const bool exist = this->exist<code>();
+	return exist;
 }

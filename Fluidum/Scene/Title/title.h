@@ -44,7 +44,7 @@ namespace FS {
 		FD::Text::Title text{};
 
 	private:
-		std::array<FD::ProjectRead::HistoryInfo, 50> recentProjectInfo;
+		std::array<FD::ProjectRead::HistoryInfo, FD::Project::Limits::HistoryLogMax> recentProjectInfo;
 
 		struct {
 			ImVec2 recentWindow{};
@@ -68,7 +68,14 @@ namespace FS {
 			std::once_flag once{};
 			bool projectHistoryError = false;
 			bool isSelectProjectHovered = false;
+			bool recentProjectPopup = false;
+			bool recentProjectButtonPopup = false;
+			bool recentProjectButtonHovered = false;
 		}flag;
+
+		struct {
+			const FD::ProjectRead::HistoryInfo* info = nullptr;
+		}buttonPopup;
 
 		struct {
 			const ImVec2 imageHalfSize = ImVec2(960, 540);
@@ -82,7 +89,7 @@ namespace FS {
 
 	private:
 		//no-throw
-		[[nodiscard]] std::array<FD::ProjectRead::HistoryInfo, 50> getProjectHistory() noexcept;
+		[[nodiscard]] std::array<FD::ProjectRead::HistoryInfo, FD::Project::Limits::HistoryLogMax> getProjectHistory() noexcept;
 
 	private:
 		//The constructor hasn't finished initializing FluidumDraw yet. Therefore, call it only once in the loop.
@@ -94,11 +101,17 @@ namespace FS {
 		//title image
 		void drawTitleImage();
 
+	private:
 		//select recent project
 		void selectProject();
 
 		void recentProject();
+		
+		void recentProjectPopup();
+		void recentProjectButtonPopup();
+		void recentPopupItem_clearAll();
 
+	private:
 		void newProject();
 
 	public:

@@ -59,7 +59,8 @@ void FS::Title::call() {
 
 	this->drawTitleImage();
 	this->selectProject();
-
+	this->recentProjectPopup();
+	this->recentProjectButtonPopup();
 }
 
 FS::Title::Title(
@@ -88,7 +89,7 @@ FS::Title::~Title() noexcept {
 	FluidumScene_Log_Destructor(::FS::Title);
 }
 
-std::array<FD::ProjectRead::HistoryInfo, 50> FS::Title::getProjectHistory() noexcept {
+std::array<FD::ProjectRead::HistoryInfo, FD::Project::Limits::HistoryLogMax> FS::Title::getProjectHistory() noexcept {
 	try {
 		return projectRead->loadProjectHistory();
 	}
@@ -203,8 +204,17 @@ void FS::Title::selectProject() {
 	ImGui::BeginChild("HistoryTitle", { 0.0f ,style.selectWindowSize.y * 0.15f });
 	ImGui::Text(ICON_MD_HISTORY); ImGui::SameLine();
 	ImGui::Text(text.recentProject);
+
+	//popup
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		flag.recentProjectButtonPopup = true;
+
 	ImGui::EndChild();
 	ImGui::BeginChild("History", ImVec2(), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+	//popup
+	if (!flag.recentProjectButtonHovered && ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+		flag.recentProjectPopup = true;
 
 	this->recentProject();
 
@@ -252,6 +262,9 @@ void FS::Title::recentProject() {
 		return;
 	}
 
+	//popup
+	bool once = false;
+
 	for (auto& x : recentProjectInfo) {
 		if (x.projectName.empty())
 			break;
@@ -259,6 +272,17 @@ void FS::Title::recentProject() {
 		std::string buttonText = ICON_MD_FOLDER_OPEN + x.projectName + '\n' + x.projectFilePath + '\n' + x.ymd_h;
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2());
 		bool clicked = ImGui::Button(buttonText.c_str(), { ImGui::GetWindowWidth() * 0.97f,0.0f });
+		
+		//popup
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+			flag.recentProjectButtonPopup = true;
+			buttonPopup.info = &x;
+		}
+		if (!once && ImGui::IsItemHovered()) {
+			flag.recentProjectButtonHovered = true;
+			once = true;
+		}
+
 		pos.recentButton = ImGui::GetItemRectMin();
 		ImGui::PopStyleVar();
 		ImGui::Spacing();
@@ -268,6 +292,61 @@ void FS::Title::recentProject() {
 			this->openProject(x.projectFilePath.c_str(), pos.recentButton);
 		}
 	}
+}
+
+void FS::Title::recentProjectPopup() {
+
+	if (flag.recentProjectPopup) {
+		ImGui::OpenPopup("RecentProject");
+		flag.recentProjectPopup = false;
+	}
+
+	if (!ImGui::BeginPopup("RecentProject"))
+		return;
+
+	//dummy
+	ImGui::TextDisabled("Erase");
+
+	if (ImGui::Selectable("clear")) {
+		this->recentPopupItem_clearAll();
+	}
+
+	ImGui::EndPopup();
+}
+
+void FS::Title::recentProjectButtonPopup() {
+
+	if (flag.recentProjectButtonPopup) {
+		ImGui::OpenPopup("RecentProject");
+		flag.recentProjectButtonPopup = false;
+	}
+
+	if (!ImGui::BeginPopup("RecentProject"))
+		return;
+
+	if (ImGui::Selectable("Erase")) {
+		this->recentPopupItem_clearAll();
+	}
+
+
+	//dummy
+	ImGui::Text("clear");
+
+	ImGui::EndPopup();
+}
+
+void FS::Title::recentPopupItem_clearAll() {
+
+	const auto index = FU::MB::ok_cancel("Readry");
+	if (index == 0) {//ok
+	}
+	else if (index == 1) { //cancel
+		return;
+	}
+	else {
+	}
+
+
 }
 
 void FS::Title::newProject() {
@@ -328,6 +407,8 @@ void FS::Title::openProject(const char* filePath, const ImVec2& pos) {
 		}
 		else {
 			FluidumScene_Log_InternalWarning();
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text.error_noexpected, pos);
 		}
 		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Failed to open .fproj file.");
 		return;
@@ -363,7 +444,7 @@ void FS::Title::documentLink() {
 #else
 #error Not Supported
 #endif 
-	}
+}
 
 bool FS::Title::checkIsShellAvailable() const {
 	int ret;

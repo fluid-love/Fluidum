@@ -68,7 +68,8 @@ void FS::LeftBar::call() {
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoSavedSettings;
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoFocusOnAppearing;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -84,6 +85,7 @@ void FS::LeftBar::call() {
 	ImGui::PopStyleColor(2);
 	ImGui::PopStyleVar(3);
 
+	this->drawRightBorder();
 	ImGui::End();
 
 
@@ -453,3 +455,32 @@ void FS::LeftBar::subWindowHelpSetting() {
 	ImGui::PopStyleVar();
 
 }
+
+void FS::LeftBar::drawRightBorder() {
+
+	const ImVec2 windowPos = ImGui::GetWindowPos();
+	const ImVec2 windowSize = ImGui::GetWindowSize();
+
+	const ImVec2 pos1 = { windowPos.x + windowSize.x, windowPos.y };
+	const ImVec2 pos2 = { windowPos.x + windowSize.x, windowSize.y + windowPos.y };
+
+	const ImU32 col = ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_Border));
+	ImGui::GetBackgroundDrawList()->AddLine(pos1, pos2, col, ImGui::GetStyle().WindowBorderSize);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

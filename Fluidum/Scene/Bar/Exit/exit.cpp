@@ -6,6 +6,7 @@ FS::Bar::Exit::Exit(
 	FD::WindowWrite* const windowWrite,
 	const FD::SceneRead* const sceneRead,
 	const FD::ProjectRead* const projectRead,
+	FD::ProjectWrite* const projectWrite,
 	FD::ExitWrite* const exitWrite,
 	const FD::Coding::TabRead* const tabRead,
 	FD::Coding::TabWrite* const tabWrite
@@ -14,6 +15,7 @@ FS::Bar::Exit::Exit(
 	windowRead(windowRead),
 	sceneRead(sceneRead),
 	projectRead(projectRead),
+	projectWrite(projectWrite),
 	exitWrite(exitWrite),
 	tabRead(tabRead),
 	tabWrite(tabWrite)
@@ -39,6 +41,9 @@ void FS::Bar::Exit::exit() {
 	bool project = this->confirmDefaultProject();
 	if (!project)
 		return;
+
+	//Before destroying ImGui, save the imgui.ini file.
+	projectWrite->saveImGuiIniFile();
 
 	*windowWrite->getCloseFlag() = true;
 }

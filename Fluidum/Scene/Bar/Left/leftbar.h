@@ -99,7 +99,6 @@ namespace FS {
 		void deleteCodingScene();
 
 	private:
-		//ImageButton‚ÌHoveredŽž
 		void subWindow();
 
 		void subWindowCoding();
@@ -113,6 +112,9 @@ namespace FS {
 
 	private:
 		void subWindowHelpSetting();
+
+	private:
+		void drawRightBorder();
 
 	};
 

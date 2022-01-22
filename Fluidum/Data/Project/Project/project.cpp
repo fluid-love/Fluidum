@@ -32,6 +32,36 @@ namespace FD::Project::Internal {
 
 }
 
+namespace FD::Project::Internal {
+
+	//helper
+	[[nodiscard]] boost::json::value makeJsonValue(const std::string& filePath) {
+		namespace json = boost::json;
+
+		std::ifstream ifs(filePath);
+		if (!ifs)
+			throw ProjectWrite::Exception::NotFoundProjectFiles;
+		if (FU::File::empty(ifs))
+			throw ProjectWrite::Exception::FileEmpty;
+
+		json::stream_parser p;
+		json::error_code ec;
+
+		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
+		p.write(str.c_str(), str.size(), ec);
+
+		if (ec)
+			throw ProjectWrite::Exception::BrokenFile;
+		p.finish(ec);
+		if (ec)
+			throw ProjectWrite::Exception::BrokenFile;
+
+		return p.release();
+	}
+
+}
+
 void FD::ProjectWrite::save_thread() {
 
 	bool request = this->saveThread.get_stop_token().stop_requested();
@@ -77,6 +107,11 @@ void FD::ProjectWrite::save_thread() {
 
 	}
 
+}
+
+void FD::ProjectWrite::resetThread() {
+	assert(this->joinable());
+	this->saveThread = std::jthread{ &ProjectWrite::save_thread, this };
 }
 
 void FD::ProjectWrite::requestStop() noexcept {
@@ -186,9 +221,17 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 			GCurrentData.projectDirectoryPath.push_back('/');
 		GCurrentData.projectDirectoryPath += (GCurrentData.projectName + '/');
 
-		//create ProjectDirectory
-		if (std::filesystem::is_directory(GCurrentData.projectDirectoryPath))
-			throw Exception::AlreadyProjectDirctoryExist;
+		{
+			//directory
+			if (std::filesystem::is_directory(GCurrentData.projectDirectoryPath))
+				throw Exception::AlreadyExist;
+
+			//file
+			std::string file = GCurrentData.projectDirectoryPath;
+			file.pop_back();
+			if (std::filesystem::exists(file))
+				throw Exception::AlreadyExist;
+		}
 	}
 	catch (const Exception) {
 		GCurrentData = std::move(temp);
@@ -221,9 +264,20 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 		this->writeProjectInfo(path);
 		this->updateHistory();
 	}
-	catch (const Exception) {
+	catch (Exception) {
+		//remove project directory
+		try {
+			std::filesystem::remove_all(GCurrentData.projectDirectoryPath);
+		}
+		catch (...) {
+			GCurrentData = std::move(temp);
+			try { lock.unlock(); }
+			catch (...) { FU::Exception::terminate(FU::Exception::TerminateExceptionType::Project); }
+			std::terminate();
+		}
+
 		GCurrentData = std::move(temp);
-		std::rethrow_exception(std::current_exception());
+		FU::Exception::rethrow();
 	}
 	catch (...) {
 		//remove project directory
@@ -236,10 +290,11 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 			catch (...) { FU::Exception::terminate(FU::Exception::TerminateExceptionType::Project); }
 			std::terminate();
 		}
+
 		GCurrentData = std::move(temp);
 		throw Exception::Unexpected;
 	}
-	
+
 	GCurrentData.isTempProject = false;
 }
 
@@ -294,6 +349,10 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		throw Exception::FailedToOpenProjectFile;
 	}
 
+	//thread
+	this->requestStop(); //save old data.
+	while (!this->joinable()) { ; }
+
 	try {
 		UI64 identifier = 0;
 		ifs.read(reinterpret_cast<char*>(&identifier), 8);//identifier
@@ -315,6 +374,7 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		this->read_scene();
 
 		this->read_projectProperty();
+		this->read_imguiini();
 
 		this->updateHistory();
 
@@ -327,7 +387,7 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 
 		Project::Internal::ProjectFilesData::projectFiles = std::move(temp_files_userFiles);
 		Project::Internal::UserFilesData::userFiles = std::move(temp_files_projectFiles);
-		
+
 		Coding::Internal::Data::displayInfo = std::move(temp_tab_displayInfo);
 		Coding::Internal::Data::filePaths = std::move(temp_tab_filePaths);
 		Coding::Internal::Data::ProjectWrite::clearInternalData();
@@ -335,9 +395,11 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		Scene::Internal::Data::codes = std::move(temp_scene_codes);
 		Layout::Internal::LayoutData::history = std::move(temp_layout_history);
 
+		this->resetThread();
 		FU::Exception::rethrow();
 	}
 
+	this->resetThread();
 
 	GCurrentData.isTempProject = false;
 }
@@ -345,13 +407,15 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 void FD::ProjectWrite::saveAs(const std::string& newName, const std::string& dstProjectDirectoryPath) {
 	std::lock_guard<std::mutex> lock(Project::Internal::GMtx);
 
-	const std::string projectDirectoryPath = FU::File::consistentDirectory(dstProjectDirectoryPath);
+	std::string projectDirectoryPath = FU::File::consistentDirectory(dstProjectDirectoryPath);
+	FU::File::tryPushSlash(projectDirectoryPath);
 	const std::string fullPath = projectDirectoryPath + newName;
 
 	//First, check if there is a folder with the same name in the destination folder.
+
 	if (!std::filesystem::is_directory(projectDirectoryPath))
 		throw Exception::NotFoundDirectory;
-	if (std::filesystem::is_directory(projectDirectoryPath))
+	if (std::filesystem::exists(fullPath))
 		throw Exception::AlreadyExist;
 
 	//Check that the current folder has not been moved or deleted.
@@ -370,17 +434,27 @@ void FD::ProjectWrite::saveAs(const std::string& newName, const std::string& dst
 	try { temp = GCurrentData; }
 	catch (...) { throw Exception::Unexpected; }
 
+	//thread
+	this->requestStop(); //save old data.
+	while (!this->joinable()) { ; }
+
 	//copy
 	try {
 		const std::string srcPath = GCurrentData.projectDirectoryPath + Name::FluidumHiddenDirectory;
 
-		//set new folder path
+		//set new directory path
 		GCurrentData.projectDirectoryPath = fullPath + '/';
 
-		std::filesystem::copy(srcPath, GCurrentData.projectDirectoryPath + Name::FluidumHiddenDirectory, std::filesystem::copy_options::recursive);
+		std::filesystem::copy(
+			srcPath, //from
+			GCurrentData.projectDirectoryPath, //to
+			std::filesystem::copy_options::recursive
+		);
 
 		GCurrentData.projectName = newName;
 		GCurrentData.projectFilePath = GCurrentData.projectDirectoryPath + newName + ".fproj";
+
+		this->writeProjectInfo(GCurrentData.projectFilePath);
 
 		this->updateHistory();
 	}
@@ -390,6 +464,7 @@ void FD::ProjectWrite::saveAs(const std::string& newName, const std::string& dst
 		std::rethrow_exception(std::current_exception());
 	}
 
+	GCurrentData.isTempProject = false;
 }
 
 void FD::ProjectWrite::save_tab() {
@@ -785,6 +860,29 @@ void FD::ProjectWrite::removeHistory(const std::string& fprojPath) {
 
 }
 
+void FD::ProjectWrite::saveImGuiIniFile() {
+	using namespace Project::Internal;
+	try {
+		const char* const text = ImGui::SaveIniSettingsToMemory();
+		std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::Project_Temp_ImGuiIni);
+		if (!ofs)
+			throw Exception::Unexpected;
+		ofs << text;
+		ofs.close();
+
+		std::filesystem::copy_file(
+			GCurrentData.projectDirectoryPath + Name::Project_Temp_ImGuiIni, //from
+			GCurrentData.projectDirectoryPath + Name::Project_ImGuiIni,      //to
+			std::filesystem::copy_options::overwrite_existing
+		);
+	}
+	catch (...) {
+		Internal::GMessenger.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Failed to copy imgui init file.");
+		FU::Exception::rethrow();
+	}
+
+}
+
 void FD::ProjectWrite::writeProjectInfo(const std::string& path) {
 	using namespace Project::Internal;
 
@@ -861,6 +959,7 @@ void FD::ProjectWrite::tryCreateFluidumFiles() {
 		Name::Project_Scene,
 		Name::Project_Layout,
 		Name::Project_ProjectProperty,
+		Name::Project_ImGuiIni,
 		Name::Genome_Function
 	};
 
@@ -917,55 +1016,99 @@ namespace FD::Project::Internal {
 
 void FD::ProjectWrite::updateHistory() {
 	using namespace Project::Internal;
+	namespace json = boost::json;
 
-	std::ifstream ifs(Internal::Resource::RecentProjectHistoryFilePath);
+	//already locked
 
-	std::deque<HistoryInfo> temp(50);
+	const std::string currentProjectFilePath = GCurrentData.projectFilePath + GCurrentData.projectName + ".fproj";
 
-	const std::string currentPath = GCurrentData.projectDirectoryPath + GCurrentData.projectName + ".fproj";
-	UIF16 index = std::numeric_limits<UIF16>::max();
-	bool isNewFile = true;//is new file
+	bool empty = false;
 
-	//till 100
-	for (UIF16 i = 0; i < 50; i++) {
-		//projectname path time
-		std::getline(ifs, temp[i].projectName);
-		std::getline(ifs, temp[i].projectFilePath);
-		std::getline(ifs, temp[i].ymd_h);
+	json::value val{};
+	try {
+		val = makeJsonValue(Internal::Resource::RecentProjectHistoryFilePath);
+	}
+	catch (const Exception v) {
+		if (v == Exception::FileEmpty)
+			empty = true;
+		else
+			FU::Exception::rethrow();
+	}
 
-		if (temp[i].projectFilePath == currentPath) {
-			index = i;
-			isNewFile = false;
+	std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::HistoryTempPath, std::ios::trunc);
+
+	if (!ofs)
+		throw Exception::Unexpected;
+
+	if (!empty && !val.is_object())
+		throw Exception::BrokenFile;
+
+	bool newProject = true;
+	std::vector<HistoryInfo>::const_iterator oldProjectItr{};
+
+	std::vector<HistoryInfo> temp(Project::Limits::HistoryLogMax);
+
+	if (!empty) {
+		json::object& obj = val.get_object();
+		Size index = 0;
+		for (auto itr = obj.cbegin(), end = obj.cend(); itr != end; itr++, index++) {
+			if (index == Project::Limits::HistoryLogMax)
+				break;
+
+			HistoryInfo info{};
+			const json::value val = itr->value();
+			info.projectFilePath = val.at("Path").get_string();
+			info.projectName = val.at("Name").get_string();
+			info.projectFilePath = val.at("Date").get_string();
+
+			if (!newProject && info.projectFilePath == currentProjectFilePath) {
+				newProject = false;
+				oldProjectItr = temp.begin() + index;
+			}
+
+			temp[index] = std::move(info);
 		}
 	}
 
-	//If there is a current file, bring it to the top.
-	if (!isNewFile) {
-		temp.emplace_front(temp.at(index));
-		temp.erase(temp.begin() + index + 1);
-	}
-	//new
-	else {
-		HistoryInfo info;
-		info.projectFilePath = currentPath;
-		info.projectName = GCurrentData.projectName;
-		info.ymd_h = getYMDH();
-		temp.emplace_front(std::move(info));
-	}
+	json::object obj{};
 
+	if (newProject) {
+		json::object item{};
+		item["Path"] = currentProjectFilePath;
+		item["Name"] = GCurrentData.projectName;
+		item["Date"] = getYMDH();
+
+		obj["1"].emplace_object() = std::move(item);
+	}
+	else { //to top
+		HistoryInfo info = *oldProjectItr;
+		info.ymd_h = getYMDH();//update
+		temp.erase(oldProjectItr);
+		temp.insert(temp.begin(), std::move(info));
+	}
 
 	//rewrite
 	{
-		std::ofstream ofs(GCurrentData.projectDirectoryPath + Name::HistoryTempPath, std::ios::trunc);
+		Size index = newProject ? 2 : 1;
+		for (Size i = 0, size = temp.size(); i < size; i++, index++) {
+			if (i == Project::Limits::HistoryLogMax)
+				break;
+			if (temp[i].projectFilePath.empty())
+				break;
 
-		if (!ofs)
-			throw Exception::Unexpected;
+			json::object item{};
+			item["Path"] = temp[i].projectFilePath;
+			item["Name"] = temp[i].projectName;
+			item["Date"] = temp[i].ymd_h;
 
-		for (const auto& x : temp) {
-			ofs << x.projectName << std::endl;
-			ofs << x.projectFilePath << std::endl;
-			ofs << x.ymd_h << std::endl;
+			obj[std::to_string(index)].emplace_object() = std::move(item);
 		}
+	}
+
+	{
+		const std::string text = json::serialize(obj);
+		ofs << text;
+		ofs.close();
 	}
 
 	//success
@@ -1100,7 +1243,7 @@ void FD::ProjectWrite::read_projectFiles() const {
 
 	json::value val{};
 	try {
-		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_ProjectFiles);
+		val = makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_ProjectFiles);
 	}
 	catch (const Exception v) {
 		if (v == Exception::FileEmpty)
@@ -1123,7 +1266,7 @@ void FD::ProjectWrite::read_userFiles() const {
 
 	json::value val{};
 	try {
-		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_UserFiles);
+		val = makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_UserFiles);
 	}
 	catch (const Exception v) {
 		if (v == Exception::FileEmpty)
@@ -1146,7 +1289,7 @@ void FD::ProjectWrite::read_layout() const {
 
 	json::value val{};
 	try {
-		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_Layout);
+		val = makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_Layout);
 	}
 	catch (const Exception v) {
 		if (v == Exception::FileEmpty)
@@ -1188,7 +1331,7 @@ void FD::ProjectWrite::read_tab() const {
 
 	json::value val{};
 	try {
-		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_Tab);
+		val = makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_Tab);
 	}
 	catch (const Exception v) {
 		if (v == Exception::FileEmpty)
@@ -1257,7 +1400,7 @@ void FD::ProjectWrite::read_tab() const {
 
 	//set internal data.
 	Coding::Internal::Data::ProjectWrite::initializeInternalData();
-	
+
 }
 
 void FD::ProjectWrite::read_scene() const {
@@ -1309,7 +1452,7 @@ void FD::ProjectWrite::read_projectProperty() {
 
 	json::value val{};
 	try {
-		val = this->makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_ProjectProperty);
+		val = makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_ProjectProperty);
 	}
 	catch (const Exception val) {
 		if (val == Exception::FileEmpty)
@@ -1362,49 +1505,58 @@ void FD::ProjectWrite::read_projectProperty() {
 
 }
 
-boost::json::value FD::ProjectWrite::makeJsonValue(const std::string& filePath) const {
-	namespace json = boost::json;
+void FD::ProjectWrite::read_imguiini() {
+	using namespace Project::Internal;
 
-	std::ifstream ifs(filePath);
+	std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_ImGuiIni);
 	if (!ifs)
 		throw Exception::NotFoundProjectFiles;
-	if (FU::File::empty(ifs))
-		throw Exception::FileEmpty;
-
-	json::stream_parser p;
-	json::error_code ec;
+	if (FU::File::empty(ifs)) {
+		ImGui::LoadIniSettingsFromMemory("");
+		return;
+	}
 
 	std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
-	p.write(str.c_str(), str.size(), ec);
-
-	if (ec)
-		throw Exception::BrokenFile;
-	p.finish(ec);
-	if (ec)
-		throw Exception::BrokenFile;
-
-	return p.release();
+	ImGui::LoadIniSettingsFromMemory(str.c_str());
 }
 
-std::array<FD::ProjectRead::HistoryInfo, 50> FD::ProjectRead::loadProjectHistory() const {
+std::array<FD::ProjectRead::HistoryInfo, FD::Project::Limits::HistoryLogMax> FD::ProjectRead::loadProjectHistory() const {
 	using namespace Project::Internal;
+	namespace json = boost::json;
 
 	std::lock_guard<std::mutex> lock(GMtx);
 
-	std::ifstream ifs(Internal::Resource::RecentProjectHistoryFilePath);
+	std::array<FD::ProjectRead::HistoryInfo, FD::Project::Limits::HistoryLogMax> result{};
 
-	if (!ifs)
-		throw Exception::Unexpected;
+	json::value val{};
+	try {
+		val = makeJsonValue(Internal::Resource::RecentProjectHistoryFilePath);
+	}
+	catch (const Exception v) {
+		if (v == Exception::FileEmpty)
+			return{};
+		else
+			FU::Exception::rethrow();
+	}
 
-	std::array<HistoryInfo, 50> result{};
+	if (!val.is_object())
+		throw Exception::BrokenFile;
 
-	//till 50
-	for (Size i = 0; i < std::tuple_size_v<decltype(result)>; i++) {
-		//projectname path time
-		std::getline(ifs, result[i].projectName);
-		std::getline(ifs, result[i].projectFilePath);
-		std::getline(ifs, result[i].ymd_h);
+	const json::object& obj = val.get_object();
+
+	Size index = 0;
+	for (auto itr = obj.cbegin(), end = obj.cend(); itr != end; itr++, index++) {
+		if (index == Project::Limits::HistoryLogMax)
+			break;
+
+		HistoryInfo info{};
+		const json::value val = itr->value();
+		info.projectFilePath = val.at("Path").get_string();
+		info.projectName = val.at("Name").get_string();
+		info.ymd_h = val.at("Date").get_string();
+
+		result[index] = std::move(info);
 	}
 
 	return result;

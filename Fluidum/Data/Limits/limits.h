@@ -15,6 +15,8 @@ namespace FD::Project::Limits {
 		constexpr inline UIF16 FileSizeMax = 500;
 	}
 
+	constexpr inline UIF16 HistoryLogMax = 100;
+
 }
 
 namespace FD::Coding::Limits {

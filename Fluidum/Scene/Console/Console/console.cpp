@@ -32,6 +32,7 @@ FS::Console::~Console() noexcept {
 }
 
 void FS::Console::call() {
+
 	ImGui::SetNextWindowContentSize(varRead->viewWindowSizeConstraints());
 
 	//collapse

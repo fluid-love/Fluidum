@@ -104,7 +104,6 @@ void FD::Style::ThemeWrite::setDefault() noexcept {
 	colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.000f, 0.000f, 0.000f, 0.586f);
 
 	style.WindowBorderSize = 1.0f;	
-	style.ChildRounding = 4.0f;
 	style.FrameBorderSize = 1.0f;
 	style.FrameRounding = 2.0f;
 	style.GrabMinSize = 7.0f;
@@ -114,5 +113,7 @@ void FD::Style::ThemeWrite::setDefault() noexcept {
 	style.TabBorderSize = 1.0f;
 	style.TabRounding = 0.0f;
 	style.WindowRounding = 0.0f;
+	style.ChildRounding = 0.0f;
+	style.GrabRounding = 0.0f;
 
 }

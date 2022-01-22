@@ -301,7 +301,7 @@ namespace FD::Text::Internal {
 
 	struct ProjectCheckPath final {
 		ProjectCheckPath();
-		~ProjectCheckPath() = default;
+		~ProjectCheckPath() noexcept = default;
 
 		GuiText error_fill;
 		GuiText error_parentDoesNotExist;
@@ -314,7 +314,7 @@ namespace FD::Text::Internal {
 
 	struct NewProject final {
 		NewProject();
-		~NewProject() = default;
+		~NewProject() noexcept = default;
 
 		GuiText newProject;
 		GuiText search;
@@ -342,7 +342,7 @@ namespace FD::Text::Internal {
 
 	struct ProjectForm final {
 		ProjectForm();
-		~ProjectForm() = default;
+		~ProjectForm() noexcept = default;
 
 		GuiText fillPlease;
 		GuiText folderPath;
@@ -362,6 +362,7 @@ namespace FD::Text::Internal {
 		GuiText error_absolute;
 		GuiText error_notFoundDirectory;
 		GuiText error_alreadyExist;
+		GuiText error_forbiddenCharactor;
 		GuiText error_failedToCreate;
 
 
@@ -370,7 +371,7 @@ namespace FD::Text::Internal {
 
 	struct ProjectSaveAs final {
 		ProjectSaveAs();
-		~ProjectSaveAs() = default;
+		~ProjectSaveAs() noexcept = default;
 
 		GuiText title;
 
@@ -386,13 +387,15 @@ namespace FD::Text::Internal {
 
 		GuiText error_empty;
 		GuiText error_alreadyExist;
+		GuiText error_notFoundProject;
 		GuiText error_notFound;
-		GuiText error_unexpected;
+		GuiText error_forbiddenCharactor;
+
 	};
 
 	struct PopupSelect final {
 		PopupSelect();
-		~PopupSelect() = default;
+		~PopupSelect() noexcept = default;
 
 		GuiText yes;
 		GuiText no;
@@ -615,7 +618,7 @@ namespace FD {
 	class GuiTextRead final {
 	public:
 		GuiTextRead(Internal::PassKey);
-		~GuiTextRead() = default;
+		~GuiTextRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(GuiTextRead);
 
 	public:

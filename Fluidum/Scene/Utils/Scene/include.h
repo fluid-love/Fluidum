@@ -17,3 +17,5 @@
 #include "../../Project/project.h"
 
 #include "../../Console/Console/console.h"
+
+#include "../../Calc/Lua/lua.h"

@@ -882,7 +882,11 @@ FD::Text::Internal::ProjectForm::ProjectForm() {
 	this->error_alreadyExist = data;
 
 	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
+	std::getline(ifs, data);
 	this->error_failedToCreate = data;
+
 }
 
 FD::Text::Internal::ProjectSaveAs::ProjectSaveAs() {
@@ -927,10 +931,14 @@ FD::Text::Internal::ProjectSaveAs::ProjectSaveAs() {
 	this->error_alreadyExist = data;
 
 	std::getline(ifs, data);
+	this->error_notFoundProject = data;
+
+	std::getline(ifs, data);
 	this->error_notFound = data;
 
 	std::getline(ifs, data);
-	this->error_unexpected = data;
+	this->error_forbiddenCharactor = data;
+
 }
 
 FD::Text::Internal::PopupSelect::PopupSelect() {

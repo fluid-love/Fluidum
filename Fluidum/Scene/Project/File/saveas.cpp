@@ -6,12 +6,16 @@
 using namespace FU::ImGui::Operators;
 
 FS::Project::File::SaveAs::SaveAs(
+	const FD::Style::ColorRead* const colorRead,
+	const FD::Style::VarRead* const varRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
 	const FD::GuiRead* const guiRead,
 	const FD::ExitRead* const exitRead,
 	FD::WindowWrite* const windowWrite
 ) :
+	colorRead(colorRead),
+	varRead(varRead),
 	projectWrite(projectWrite),
 	projectRead(projectRead),
 	guiRead(guiRead),
@@ -31,6 +35,7 @@ FS::Project::File::SaveAs::SaveAs(
 
 	FluidumScene_Log_RequestAddScene(::FS::Utils::PopupBackWindow);
 	Scene::addScene<Utils::PopupBackWindow>();
+
 }
 
 FS::Project::File::SaveAs::~SaveAs() noexcept {
@@ -47,10 +52,13 @@ void FS::Project::File::SaveAs::call() {
 	ImGui::SetNextWindowSize(style.windowSize);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, varRead->popupWindowBorderSize());
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
 
 	constexpr auto windowFlags = FD::Style::VarRead::PopupWindowFlags();
+
+	//animation
+	ImAnime::PushStyleVar(anime.counter, 0.5f, 0.0f, 1.0f, ImAnimeType::LINEAR, ImGuiStyleVar_Alpha);
 
 	ImGui::Begin("SaveAs", nullptr, windowFlags);
 
@@ -70,6 +78,7 @@ void FS::Project::File::SaveAs::call() {
 
 	ImGui::End();
 
+	ImAnime::PopStyleVar();
 	ImGui::PopStyleVar(3);
 }
 
@@ -85,7 +94,7 @@ void FS::Project::File::SaveAs::title() {
 void FS::Project::File::SaveAs::folderPath() {
 	ImGui::Text(text.directoryPath);
 	bool input = ImGui::InputText("##ppath", str.directoryPath.data(), str.directoryPath.capacity());
-	pos.projectFolder = ImGui::GetItemRectMin();
+	pos.projectDirectory = ImGui::GetItemRectMin();
 
 	ImGui::SameLine();
 	if (!ImGui::Button(ICON_MD_FOLDER_OPEN))
@@ -121,15 +130,17 @@ void FS::Project::File::SaveAs::bottom() {
 
 	const ImVec2 buttonSize = ImVec2(ImGui::GetWindowSize().x * 0.2f, 0.0f);
 
-	//cancel
+	//cancel	
+	ImGui::PushStyleColor(ImGuiCol_Button, colorRead->cancelButton());
 	if (ImGui::Button(text.cancel, buttonSize)) {
 		FluidumScene_Log_RequestDeleteScene(::FS::Project::File::SaveAs);
 		Scene::deleteScene<SaveAs>();
 	}
+	ImGui::PopStyleColor();
 
 	ImGui::SameLine();
 
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.35f, 0.02f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_Button, colorRead->createButton());
 	if (ImGui::Button(text.save, buttonSize)) {//save
 		pos.save = ImGui::GetItemRectMin();
 
@@ -145,19 +156,6 @@ void FS::Project::File::SaveAs::bottom() {
 }
 
 bool FS::Project::File::SaveAs::save() {
-
-	//if (projectRead->isDataChanged()) {
-	//	//Current project is not saved.
-
-	//	//save ignore cancel
-	//	const auto ret = FU::MB::button_button_cancel(
-	//		FU::MB::Icon::Warning,
-	//		text.confirm_notSaved,
-	//		text.confirm_save,
-	//		text.confirm_ignore
-	//	);
-	//	return false;
-	//}
 
 	const std::string directoryPath = str.directoryPath.c_str();
 	const std::string projectName = str.projectName.c_str();
@@ -175,36 +173,59 @@ bool FS::Project::File::SaveAs::save() {
 		return false;
 	}
 
+	//forbidden charactor
+	if (FU::File::containForbiddenCharactor(projectName)) {
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Project name({}) contains forbidden characters.", projectName);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, pos.projectName);
+		return false;
+	}
+
 	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Save project({Path:{}, Name:{}}).", directoryPath, projectName);
 	try {
-		projectWrite->saveAs(directoryPath, projectName);
+		projectWrite->saveAs(projectName, directoryPath);
 	}
 	catch (const FD::ProjectWrite::Exception type) {
-		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Failed to create new project.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Failed to save project.");
 
-		if (type == FD::ProjectWrite::Exception::AlreadyProjectDirctoryExist) {
+		if (type == FD::ProjectWrite::Exception::NotFoundProjectDirectory) {
 			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
-			Scene::addScene<Utils::Message>(text.error_alreadyExist, pos.projectFolder);
+			Scene::addScene<Utils::Message>(text.error_notFoundProject, pos.projectDirectory);
 			return false;
 		}
-		else if (type == FD::ProjectWrite::Exception::NotFoundProjectDirectory) {
+		else if (type == FD::ProjectWrite::Exception::NotFoundDirectory) {
 			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
-			Scene::addScene<Utils::Message>(text.error_notFound, pos.projectFolder);
+			Scene::addScene<Utils::Message>(text.error_notFound, pos.projectDirectory);
+			return false;
+		}
+		else if (type == FD::ProjectWrite::Exception::AlreadyExist) {
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text.error_alreadyExist, pos.save);
 			return false;
 		}
 		else {
-			FluidumScene_Log_InternalError();
+			FluidumScene_Log_InternalWarning();
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text_.unexpected, pos.projectDirectory);
 			return false;
 		}
 	}
 	catch (const std::exception& e) {
-		GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Catch std::exception({}).", e.what());
+		FluidumScene_Log_StdExceptionWarning(e);
 
 		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
-		Scene::addScene<Utils::Message>(text.error_unexpected, pos.save);
+		Scene::addScene<Utils::Message>(text_.unexpected, pos.save);
+
+		return false;
+	}
+	catch (...) {
+		FluidumScene_Log_InternalWarning();
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text_.unexpected, pos.projectDirectory);
+		return false;
 	}
 
-	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__,"The project has been saved successfully.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "The project has been saved successfully.");
 
 	this->checkExit();
 

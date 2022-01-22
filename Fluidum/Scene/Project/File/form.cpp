@@ -185,7 +185,7 @@ bool FS::Project::File::Form::createProject() {
 	//save / ignore / cancelÅ@
 //FU::MB
 
-	//forbiden
+	//empty
 	if (directoryPath.empty()) {
 		FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.projectDirectory);
@@ -194,6 +194,14 @@ bool FS::Project::File::Form::createProject() {
 	if (name.empty()) {
 		FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_emptyForm, pos.projectName);
+		return false;
+	}
+
+	//forbidden charactors
+	if (FU::File::containForbiddenCharactor(name)) {
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Project name({}) contains forbidden characters.", name);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, pos.projectName);
 		return false;
 	}
 
@@ -229,10 +237,10 @@ bool FS::Project::File::Form::createProject() {
 	}
 	catch (const FD::ProjectWrite::Exception type) {
 
-		//already exist.
-		if (type == FD::ProjectWrite::Exception::AlreadyProjectDirctoryExist) {
-			FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
-			Scene::addScene<Utils::Message>(text.error_emptyForm, pos.create);
+		//already exists.
+		if (type == FD::ProjectWrite::Exception::AlreadyExist) {
+			FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text.error_alreadyExist, pos.create);
 		}
 		else {
 			FluidumScene_Log_InternalWarning();
@@ -241,13 +249,16 @@ bool FS::Project::File::Form::createProject() {
 	}
 	catch (const std::exception& e) {
 		FluidumScene_Log_StdExceptionError(e);
-		FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(text.error_failedToCreate, pos.create);
 
 		return false;
 	}
 	catch (...) {//unexpected
 		FluidumScene_Log_InternalWarning();
+		FD::Text::Common unexpected(FD::Text::CommonText::UnexceptedError);
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(unexpected, pos.create);
 		return false;
 	}
 
