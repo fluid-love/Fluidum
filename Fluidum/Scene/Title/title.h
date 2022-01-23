@@ -42,6 +42,9 @@ namespace FS {
 		FD::Style::ThemeWrite* const themeWrite;
 
 		FD::Text::Title text{};
+		struct {
+			FD::Text::Common unexpected{FD::Text::CommonText::UnexpectedError};
+		}text_;
 
 	private:
 		std::array<FD::ProjectRead::HistoryInfo, FD::Project::Limits::HistoryLogMax> recentProjectInfo;
@@ -109,7 +112,8 @@ namespace FS {
 		
 		void recentProjectPopup();
 		void recentProjectButtonPopup();
-		void recentPopupItem_clearAll();
+		void recentPopupItem_clear();
+		void recentPopupItem_erase();
 
 	private:
 		void newProject();

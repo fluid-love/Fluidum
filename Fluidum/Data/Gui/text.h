@@ -22,7 +22,7 @@ namespace FD::Text {
 
 	enum class CommonText : UT {
 		InternalError,
-		UnexceptedError,
+		UnexpectedError,
 		CollapseWindow
 	};
 
@@ -69,12 +69,17 @@ namespace FD::Text::Internal {
 		GuiText openProject;
 		GuiText document;
 
+		GuiText erase_icon;
+		GuiText clear_icon;
+
+		GuiText confirm_clearHistory;
+
 		GuiText error_notSupported;
 		GuiText error_loadProjectHistory;
 		GuiText error_openProjectFile;
 		GuiText error_illegalFile;
 		GuiText error_brokenFile;
-		GuiText error_noexpected;
+		GuiText error_unexpected;
 
 	};
 

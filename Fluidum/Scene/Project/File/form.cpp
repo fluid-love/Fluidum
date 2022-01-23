@@ -256,7 +256,7 @@ bool FS::Project::File::Form::createProject() {
 	}
 	catch (...) {//unexpected
 		FluidumScene_Log_InternalWarning();
-		FD::Text::Common unexpected(FD::Text::CommonText::UnexceptedError);
+		FD::Text::Common unexpected(FD::Text::CommonText::UnexpectedError);
 		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
 		Scene::addScene<Utils::Message>(unexpected, pos.create);
 		return false;

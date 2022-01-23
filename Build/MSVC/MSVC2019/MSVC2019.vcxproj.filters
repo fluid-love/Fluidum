@@ -646,6 +646,9 @@
     <ClInclude Include="..\..\..\Fluidum\Data\Common\passkey.h">
       <Filter>Fluidum\Data\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Fluidum\Common\define.h">
+      <Filter>Fluidum\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fluidum">
@@ -1061,6 +1064,9 @@
     </Filter>
     <Filter Include="External\json">
       <UniqueIdentifier>{610d86b3-99ee-45a3-8cd8-c7c7461d202a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fluidum\Common">
+      <UniqueIdentifier>{4d7487bf-e311-461f-8280-b9bef8067b46}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

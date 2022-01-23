@@ -227,6 +227,15 @@ FD::Text::Internal::Title::Title() {
 	this->document = data;
 
 	std::getline(ifs, data);
+	this->erase_icon = ICON_FA_ERASER "  " + data;
+
+	std::getline(ifs, data);
+	this->clear_icon = ICON_FA_ERASER "  " + data;
+
+	std::getline(ifs, data);
+	this->confirm_clearHistory = Internal::newLine(ifs, data);
+
+	std::getline(ifs, data);
 	this->error_notSupported = data;
 
 	std::getline(ifs, data);
@@ -242,7 +251,7 @@ FD::Text::Internal::Title::Title() {
 	this->error_brokenFile = data;
 
 	std::getline(ifs, data);
-	this->error_noexpected = data;
+	this->error_unexpected = data;
 }
 
 FD::Text::Internal::TitleBar::TitleBar() {

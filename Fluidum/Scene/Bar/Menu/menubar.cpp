@@ -66,11 +66,10 @@ void FS::MenuBar::call() {
 	ImGui::SetNextWindowPos(ImVec2(), ImGuiCond_Once);
 	ImGui::SetNextWindowSize(ImVec2(guiRead->windowSize().x, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2), ImGuiCond_Once);
 
-	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(0.017f, 0.017f, 0.017f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImGui::GetStyleColorVec4(ImGuiCol_PopupBg));
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.087f, 0.087f, 0.087f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.087f, 0.087f, 0.087f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.16f, 0.16f, 0.24f, 0.9f));
-	ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.017f, 0.017f, 0.017f, 1.0f));
 
 	constexpr ImGuiWindowFlags flag =
 		ImGuiWindowFlags_NoBringToFrontOnFocus |
@@ -100,7 +99,7 @@ void FS::MenuBar::call() {
 	}
 	ImGui::End();
 
-	ImGui::PopStyleColor(5);
+	ImGui::PopStyleColor(4);
 	ImGui::PopStyleVar();
 
 }

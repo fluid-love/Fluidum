@@ -77,6 +77,12 @@ namespace FD {
 		//strong
 		void removeHistory(const std::string& fprojPath);
 
+		/*
+		Exception: strong
+			Unexpected
+		*/
+		void clearHistory();
+
 	public:
 		/*
 		Exception: strong

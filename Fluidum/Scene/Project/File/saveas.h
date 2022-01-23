@@ -43,7 +43,7 @@ namespace FS::Project::File {
 		FD::Text::ProjectSaveAs text{};
 
 		struct {
-			FD::Text::Common unexpected{ FD::Text::CommonText::UnexceptedError };
+			FD::Text::Common unexpected{ FD::Text::CommonText::UnexpectedError };
 		}text_;
 
 	private:

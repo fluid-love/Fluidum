@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Fluidum\Common\define.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Array\array.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Array\type.h" />
     <ClInclude Include="..\..\..\Fluidum\Data\Calc\Calc\calc.h" />

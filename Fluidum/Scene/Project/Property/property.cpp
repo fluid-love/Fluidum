@@ -375,7 +375,7 @@ bool FS::Project::Property::changeProjectType(const FD::Project::Property::Proje
 	}
 	else {
 		FluidumScene_Log_InternalWarning();
-		FD::Text::Common errText(FD::Text::CommonText::UnexceptedError);
+		FD::Text::Common errText(FD::Text::CommonText::UnexpectedError);
 		FU::MB::error(errText.c_str());
 		return false;
 	}
@@ -485,7 +485,7 @@ bool FS::Project::Property::confirmNotSaved() {
 			return false;
 		else {
 			FluidumScene_Log_InternalWarning();
-			FD::Text::Common errText(FD::Text::CommonText::UnexceptedError);
+			FD::Text::Common errText(FD::Text::CommonText::UnexpectedError);
 			FU::MB::error(errText.c_str());
 			return false;
 		}
