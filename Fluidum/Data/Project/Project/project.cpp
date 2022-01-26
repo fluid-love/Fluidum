@@ -437,10 +437,13 @@ void FD::ProjectWrite::saveAs(const std::string& newName, const std::string& dst
 
 	//copy
 	try {
-		const std::string srcPath = GCurrentData.projectDirectoryPath + Name::FluidumHiddenDirectory;
+		const std::string srcPath = GCurrentData.projectDirectoryPath;
+		const std::string oldProjPath = GCurrentData.projectFilePath;
 
 		//set new directory path
 		GCurrentData.projectDirectoryPath = fullPath + '/';
+		GCurrentData.projectFilePath = GCurrentData.projectDirectoryPath + newName + ".fproj";
+		GCurrentData.projectName = newName;
 
 		std::filesystem::copy(
 			srcPath, //from
@@ -448,11 +451,16 @@ void FD::ProjectWrite::saveAs(const std::string& newName, const std::string& dst
 			std::filesystem::copy_options::recursive
 		);
 
-		const std::string fprojPath = GCurrentData.projectDirectoryPath + newName + ".fproj";
+		//remove
+		{
+			const std::filesystem::path old = oldProjPath;
+			const std::filesystem::path new_ = GCurrentData.projectFilePath;
+			if (old.filename() != new_.filename())
+				std::filesystem::remove(old);
+		}
+
 		this->writeProjectInfo(GCurrentData.projectFilePath);
 
-		GCurrentData.projectName = newName;
-		GCurrentData.projectFilePath = fprojPath;
 
 		this->updateHistory();
 	}
