@@ -67,6 +67,10 @@ namespace FS {
 		}flag;
 
 	private:
+		void updateLayout();
+		void updateWindowMinSize();
+
+	private:
 		void dockGui();
 		void dockSpace(const char* label);
 
@@ -98,6 +102,7 @@ namespace FS {
 	private:
 		void focusedWindowBackground();
 		void drawSeparators();
+		void hoveredSeparator();
 
 	};
 }

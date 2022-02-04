@@ -73,7 +73,7 @@ vk::Extent2D FVK::Internal::Swapchain::getCorrectSwapchainExtent(GLFWwindow* win
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-
+	
 	vk::Extent2D actualExtent = {
 		static_cast<UI32>(width),
 		static_cast<UI32>(height)

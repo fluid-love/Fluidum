@@ -159,6 +159,7 @@ bool FU::ImGui::isTitleBarClicked(const ImGuiMouseButton mouse) noexcept {
 	return true;
 }
 
+//ImGui::IsMouseHoveringRect bug?
 bool FU::ImGui::isMouseHoveringRect(const ImVec2& min, const ImVec2& max) noexcept {
 	const auto pos = ::ImGui::GetMousePos();
 	const bool hovered =

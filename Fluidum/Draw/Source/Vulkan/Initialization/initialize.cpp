@@ -96,7 +96,9 @@ namespace FDR::Internal::Initialization {
 
 		vk::PresentModeKHR presentMode = vk::PresentModeKHR::eMailbox;
 		if (!FVK::isPresentModeSupport(BasePhysicalDeviceKey, presentMode)) {
-			presentMode = vk::PresentModeKHR::eFifo;
+			presentMode = vk::PresentModeKHR::eImmediate;
+			if (!FVK::isPresentModeSupport(BasePhysicalDeviceKey, presentMode))
+				presentMode = vk::PresentModeKHR::eFifo;
 		}
 
 		const vk::Extent2D extent = FVK::getCorrectSwapchainExtent(BaseWindowKey, BasePhysicalDeviceKey);
@@ -443,7 +445,10 @@ namespace FDR::Internal::Initialization {
 			.blendConstants = vk::ArrayWrapper1D<float,4>({0.0f,0.0f,0.0f,0.0f}),
 		};
 
-		std::vector<vk::DynamicState> dynamics = { vk::DynamicState::eViewport, vk::DynamicState::eScissor };
+		std::vector<vk::DynamicState> dynamics{
+			vk::DynamicState::eViewport,
+			vk::DynamicState::eScissor
+		};
 		vk::PipelineDynamicStateCreateInfo dynamicsStates = {
 			.dynamicStateCount = static_cast<UI32>(dynamics.size()),
 			.pDynamicStates = dynamics.data(),
@@ -813,7 +818,7 @@ namespace FDR::Internal::Initialization {
 		iconConfig2.PixelSnapH = true;
 		iconConfig2.GlyphOffset = { 0.0f, 1.0f };
 		//iconConfig2.GlyphExtraSpacing = { 0.60f, -0.60f };
-		
+
 		iconConfig2.OversampleH = 3;//FreeType -> ignore
 		iconConfig2.OversampleV = 3;//FreeType -> ignore
 
@@ -833,7 +838,7 @@ namespace FDR::Internal::Initialization {
 		param.pInfo = &info;
 		param.pFontInfos = fonts;
 		param.fontInfoCount = std::extent_v<decltype(fonts), 0>;
-		
+
 		FVK::createImGui(BaseImGuiKey, param);
 		ImGui::GetIO().FontGlobalScale = 0.525f;
 
@@ -845,7 +850,7 @@ namespace FDR::Internal::Initialization {
 		glm::vec3 up = { 0.0f,1.0f,0.0f };
 		float aspect = 16.0f / 9.0f;
 	};
-	//
+
 	//void updateUniformBuffer(auto data, void* cam) {
 	//	Camera* camera = static_cast<Camera*>(cam);
 	//
@@ -889,6 +894,7 @@ namespace FDR::Internal::Initialization {
 			scissor.extent = extent;
 			setScissor->setScissor(scissor);
 			MainCommands.push(setScissor);
+			Commands::MainScissor.emplace_back(setScissor);
 
 			FVK::SetViewportCommand setViewport = FVK::makeSetViewportCommand(BaseCommandBuffersKey, i);
 			vk::Viewport viewport;
@@ -896,6 +902,7 @@ namespace FDR::Internal::Initialization {
 			viewport.height = static_cast<float>(extent.height);
 			setViewport->setViewport(viewport);
 			MainCommands.push(setViewport);
+			Commands::MainViewport.emplace_back(setViewport);
 
 			FVK::ImGuiRenderDrawDataCommand imguiRender
 				= FVK::makeImGuiRenderDrawDataCommand(BaseCommandBuffersKey, i);

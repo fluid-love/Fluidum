@@ -29,7 +29,8 @@ namespace FS {
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		FD::GuiWrite* const guiWrite;
 		const FD::GuiRead* const guiRead;
 		const FD::Style::ColorRead* const colorRead;
 		const FD::TaskRead* const taskRead;
@@ -55,6 +56,9 @@ namespace FS {
 		struct {
 			ImCounter<ImAnimeTime> running{ ImCounterCond::REPEAT };
 		}anime;
+
+	private:
+		void updateStyle();
 
 	private:
 		void taskGui();

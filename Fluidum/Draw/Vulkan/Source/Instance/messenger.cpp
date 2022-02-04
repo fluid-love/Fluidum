@@ -6,8 +6,8 @@ FVK::Internal::Messenger::Messenger(ManagerPassKey, const Data::MessengerData& d
 
 void FVK::Internal::Messenger::create(const Data::MessengerData& data, const Parameter& parameter) {
 	if (!checkValidationLayerSupport(parameter)) {
-		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "ValidationLayer is not supported.");
-		Exception::throwFailedToCreate();
+		GMessenger.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "ValidationLayer is not supported.");
+		return;
 	}
 
 	const VkDebugUtilsMessengerCreateInfoEXT debugInfo = {

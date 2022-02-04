@@ -9,6 +9,7 @@ FS::StatusBar::StatusBar(
 	const FD::TaskRead* const taskRead,
 	const FD::SceneRead* const sceneRead
 ) :
+	guiWrite(guiWrite),
 	guiRead(guiRead),
 	colorRead(colorRead),
 	taskRead(taskRead),
@@ -26,7 +27,7 @@ FS::StatusBar::StatusBar(
 
 	//center
 	style.infoWindowPos = { guiRead->windowSize().x / 2.0f, style.windowPos.y };
-	style.infoWindowSize = { guiRead->windowSize().x / 3.0f,style.barHeight };
+	style.infoWindowSize = { ImGui::CalcTextSize("FPS:0000000").x,style.barHeight };
 
 	//lower right
 	style.versionWindowPos = { guiRead->windowSize().x - (1.5f * style.version), style.windowPos.y };
@@ -52,17 +53,18 @@ namespace FS::Internal::Bar {
 }
 
 void FS::StatusBar::call() {
+	this->updateStyle();
+
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.007f, 0.007f, 0.007f, 1.0f));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { ImGui::GetStyle().WindowPadding.x,ImGui::GetStyle().WindowPadding.y / 2.0f });
 
-	ImGui::SetNextWindowPos(style.windowPos);
-	ImGui::SetNextWindowSize({ guiRead->windowSize().x, style.barHeight });
+	ImGui::SetNextWindowPos(style.windowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize({ guiRead->windowSize().x, style.barHeight }, ImGuiCond_Always);
 
-
-	ImGui::Begin("StatusBar", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBringToFrontOnFocus);//アンダーバーの背景
+	ImGui::Begin("StatusBar", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
 	this->taskGui();
 
@@ -75,6 +77,21 @@ void FS::StatusBar::call() {
 
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);//rounding bordersize
+}
+
+void FS::StatusBar::updateStyle() {
+
+	const auto& size = guiRead->windowSize();
+	style.versionWindowPos.x = size.x - (1.5f * style.version);
+	style.windowPos.y = size.y - style.barHeight;
+	style.infoWindowPos.y = style.windowPos.y;
+	style.versionWindowPos.y = style.windowPos.y;
+
+	{
+		const float minWidth = style.versionWindowSize.x + style.taskIcon;
+		if (guiRead->windowLimitMinWidth() < minWidth)
+			guiWrite->windowLimitMinWidth(minWidth);
+	}
 }
 
 void FS::StatusBar::taskGui() {
@@ -135,10 +152,13 @@ void FS::StatusBar::taskIcons() {
 }
 
 void FS::StatusBar::infoGui() {
-	ImGui::SetNextWindowPos(style.infoWindowPos);
-	ImGui::SetNextWindowSize(style.infoWindowSize);
+	if (style.versionWindowPos.x < (style.infoWindowPos.x + style.infoWindowSize.x))
+		return;
 
-	ImGui::Begin("StatusBarInfo", nullptr, Internal::Bar::CommonWindowFlag);
+	ImGui::SetNextWindowPos(style.infoWindowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(style.infoWindowSize, ImGuiCond_Always);
+
+	ImGui::Begin("StatusBarInfo", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBackground);
 
 	//fps
 	ImGui::Text(text.fps); ImGui::SameLine();
@@ -147,8 +167,8 @@ void FS::StatusBar::infoGui() {
 }
 
 void FS::StatusBar::versionGui() {
-	ImGui::SetNextWindowPos(style.versionWindowPos);
-	ImGui::SetNextWindowSize(style.versionWindowSize);
+	ImGui::SetNextWindowPos(style.versionWindowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(style.versionWindowSize, ImGuiCond_Always);
 
 	ImGui::Begin("Version", nullptr, Internal::Bar::CommonWindowFlag);
 

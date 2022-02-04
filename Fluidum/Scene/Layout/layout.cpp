@@ -30,6 +30,16 @@ FS::Layout::Layout(
 	layoutWrite->heightLimit(guiRead->windowSize().y * 0.13f);
 
 	this->updateWindows();
+
+	{
+		const float minHeight = (
+			guiRead->menuBarHeight() +
+			guiRead->statusBarHeight() +
+			guiRead->topBarHeight() +
+			layoutRead->heightLimit())
+			* 1.1f;
+		guiWrite->windowLimitMinHeight(minHeight);
+	}
 }
 
 FS::Layout::~Layout() noexcept {
@@ -57,6 +67,26 @@ void FS::Layout::call() {
 	this->popup();
 	this->save_resize();
 	this->drawSeparators();
+
+	this->updateLayout();
+}
+
+void FS::Layout::updateLayout() {
+	if (static_cast<I32>(guiRead->windowSize().x) == static_cast<I32>(layoutRead->mainFrameRight()))
+		return;
+
+	layoutWrite->resizeMainFrameRight(guiRead->windowSize().x);
+	this->updateWindows();
+}
+
+void FS::Layout::updateWindowMinSize() {
+	const float minWidth =
+		layoutRead->widthLimitSum() +
+		guiRead->leftBarWidth();
+
+	if (minWidth >= guiRead->windowLimitMinWidth()) {
+		guiWrite->windowLimitMinWidth(minWidth);
+	}
 }
 
 void FS::Layout::dockGui() {
@@ -76,6 +106,7 @@ void FS::Layout::dockSpace(const char* label) {
 	constexpr auto windowFlags =
 		ImGuiWindowFlags_NoBringToFrontOnFocus |
 		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
@@ -251,6 +282,7 @@ void FS::Layout::splitVerticalCurrentPos() {
 	}
 
 	layoutWrite->save();
+	this->updateWindowMinSize();
 	this->updateWindows();
 }
 
@@ -263,6 +295,7 @@ void FS::Layout::splitHorizonalCurrentPos() {
 	}
 
 	layoutWrite->save();
+	this->updateWindowMinSize();
 	this->updateWindows();
 }
 
@@ -275,6 +308,7 @@ void FS::Layout::splitVerticalCenterLine() {
 	}
 
 	layoutWrite->save();
+	this->updateWindowMinSize();
 	this->updateWindows();
 }
 
@@ -287,6 +321,7 @@ void FS::Layout::splitHorizonalCenterLine() {
 	}
 
 	layoutWrite->save();
+	this->updateWindowMinSize();
 	this->updateWindows();
 }
 
@@ -301,12 +336,14 @@ void FS::Layout::reset() {
 	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Reset layout.");
 	layoutWrite->reset();
 	layoutWrite->save();
+	this->updateWindowMinSize();
 	this->updateWindows();
 }
 
 void FS::Layout::merge() {
 	layoutWrite->merge(*select.right, select.pos);
 	layoutWrite->save();
+	this->updateWindowMinSize();
 	this->updateWindows();
 }
 
@@ -399,5 +436,36 @@ void FS::Layout::drawSeparators() {
 		else {
 			list->AddLine(x.pos1, x.pos2, col);
 		}
+	}
+
+	this->hoveredSeparator();
+}
+
+void FS::Layout::hoveredSeparator() {
+	constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.9020f, 0.5647f, 0.2157f, 1.000f);
+	const float width = layoutRead->widthLimit() * 0.07f;
+
+	for (auto& x : separators) {
+		const bool hovered = x.horizonal ?
+			FU::ImGui::isMouseHoveringRect({ x.pos1.x, x.pos1.y - width }, { x.pos2.x, x.pos2.y + width }) :
+			FU::ImGui::isMouseHoveringRect({ x.pos1.x - width, x.pos1.y }, { x.pos2.x + width, x.pos2.y });
+
+		if (!hovered)
+			continue;
+
+		if (x.horizonal) {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+			FU::Cursor::setCursorType(FU::Cursor::Type::SizeNS);
+			break;
+		}
+		else {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+			FU::Cursor::setCursorType(FU::Cursor::Type::SizeWE);
+			break;
+		}
+		/*if (hovered && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+
+			break;
+		}*/
 	}
 }

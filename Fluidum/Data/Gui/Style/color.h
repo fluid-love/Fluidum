@@ -8,7 +8,7 @@ namespace FD::Style {
 	class ColorWrite final {
 	public:
 		explicit ColorWrite(Internal::PassKey) noexcept {};
-		~ColorWrite() = default;
+		~ColorWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ColorWrite);
 
 	};
@@ -17,7 +17,7 @@ namespace FD::Style {
 	class ColorRead final {
 	public:
 		explicit ColorRead(Internal::PassKey) noexcept {};
-		~ColorRead() = default;
+		~ColorRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ColorRead);
 
 	public:
@@ -42,6 +42,9 @@ namespace FD::Style {
 		[[nodiscard]] ImVec4 error() const noexcept;
 		[[nodiscard]] ImVec4 warning() const noexcept;
 		[[nodiscard]] ImVec4 info() const noexcept;
+
+	public:
+		[[nodiscard]] ImU32 windowBorder() const noexcept;
 
 	};
 

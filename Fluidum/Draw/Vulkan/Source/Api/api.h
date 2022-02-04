@@ -90,7 +90,6 @@ namespace FVK {
 			window = info.window;
 		}
 		while (!glfwWindowShouldClose(window)) {
-			glfwPollEvents();
 			func(std::forward<Args>(args)...);
 		}
 	}
@@ -137,6 +136,12 @@ namespace FVK {
 		return { static_cast<IF32>(x), static_cast<IF32>(y) };
 	}
 
+	FluidumVK_API [[nodiscard]] inline std::pair<IF32, IF32> getFulscreenWindowSize() {
+		using namespace Internal;
+		Api::checkManagerEmpty();
+		return Internal::Window::fullscreenSize();
+	}
+
 	template<Internal::Key::IsKeyType T>
 	FluidumVK_API void setWindowSize(const WindowKey<T>& key, const IF32 width, const IF32 height) {
 		using namespace Internal;
@@ -156,21 +161,55 @@ namespace FVK {
 	}
 
 	template<Internal::Key::IsKeyType T>
-	FluidumVK_API void setWindowSizeLimitsMin(const WindowKey<T>& key, const IF32 width, const IF32 height) {
+	FluidumVK_API void setWindowSizeLimitsMin(const WindowKey<T>& key, const std::optional<IF32> width, const std::optional<IF32> height) {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
 		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		glfwSetWindowSizeLimits(info.window, static_cast<int>(width), static_cast<int>(height), GLFW_DONT_CARE, GLFW_DONT_CARE);
+		assert(width.has_value() || height.has_value());
+		if (width && height)
+			glfwSetWindowSizeLimits_(info.window, static_cast<int>(*width), static_cast<int>(*height), GLFW_DONT_CARE, GLFW_DONT_CARE);
+		else {//width || height
+			if (width)
+				glfwSetWindowSizeLimits_(info.window, static_cast<int>(*width), static_cast<int>(info.sizeMinlimits.second), GLFW_DONT_CARE, GLFW_DONT_CARE);
+			else //height
+				glfwSetWindowSizeLimits_(info.window, static_cast<int>(info.sizeMinlimits.first), static_cast<int>(*height), GLFW_DONT_CARE, GLFW_DONT_CARE);
+		}
 	}
 
 	template<Internal::Key::IsKeyType T>
-	FluidumVK_API void setWindowSizeLimitsMax(const WindowKey<T>& key, const IF32 width, const IF32 height) {
+	FluidumVK_API void setWindowSizeLimitsMax(const WindowKey<T>& key, const std::optional<IF32> width, const std::optional<IF32> height) {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
 		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		glfwSetWindowSizeLimits(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(width), static_cast<int>(height));
+		assert(width.has_value() || height.has_value());
+		if (width && height)
+			glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(*width), static_cast<int>(*height));
+		else {//width || height
+			if (width)
+				glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(*width), static_cast<int>(info.sizeMinLimits.second));
+			else //height
+				glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(info.sizeMinLimits.first), static_cast<int>(*height));
+		}
+	}
+
+	template<Internal::Key::IsKeyType T>
+	FluidumVK_API [[nodiscard]] std::pair<IF32, IF32> getWindowSizeLimitsMin(const WindowKey<T>& key) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
+		return { static_cast<IF32>(info.sizeMaxLimits.first), static_cast<IF32>(info.sizeMaxLimits.second) };
+	}
+	
+	template<Internal::Key::IsKeyType T>
+	FluidumVK_API [[nodiscard]] std::pair<IF32, IF32> getWindowSizeLimitsMax(const WindowKey<T>& key) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
+		return { static_cast<IF32>(info.sizeMinLimits.first), static_cast<IF32>(info.sizeMinLimits.second) };
 	}
 
 	//minimize maximize
@@ -196,6 +235,33 @@ namespace FVK {
 		Api::checkManagerEmpty();
 		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
 		glfwMaximizeWindow(info.window);
+	}
+
+	template<Internal::Key::IsKeyType T>
+	FluidumVK_API void fullscreenWindow(const WindowKey<T>& key) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		item.fullscreen();
+	}
+
+	template<Internal::Key::IsKeyType T>
+	FluidumVK_API [[nodiscard]] bool isWindowMaximized(const WindowKey<T>& key) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
+		return info.maximized;
+	}
+
+	template<Internal::Key::IsKeyType T>
+	FluidumVK_API [[nodiscard]] bool isWindowFocused(const WindowKey<T>& key) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
+		return info.focused;
 	}
 
 }
@@ -1057,7 +1123,7 @@ namespace FVK {
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
 		std::array<std::vector<IndexKey>, sizeof...(T)> indices
-			{ Key::Converter::toIndexKeyVector(keys)... };
+		{ Key::Converter::toIndexKeyVector(keys)... };
 
 		return GManager->makeAnyCommand<T...>(indices);
 	}

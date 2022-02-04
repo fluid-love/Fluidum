@@ -46,10 +46,10 @@ namespace FD::Layout {
 		return *itr;
 	}
 
-	uint16_t separatorSize() {
-		uint16_t count = 0;
+	UIF16 separatorSize() {
+		UIF16 count = 0;
 		for (auto& x : GAdjacent) {
-			count += static_cast<uint16_t>(x->separators.size());
+			count += static_cast<UIF16>(x->separators.size());
 		}
 		return count;
 	}
@@ -365,6 +365,26 @@ void FD::LayoutWrite::mainFrameBottom(const float val) const {
 		*LayoutData::mainFrameBottom.get() = val;
 	else
 		LayoutData::mainFrameBottom = std::make_shared<Layout::Separator>(val);
+}
+
+void FD::LayoutWrite::resizeMainFrameRight(const float val) {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+
+	*LayoutData::mainFrameRight = val;
+
+	for (auto& x : Layout::GAdjacent) {
+		for (auto& y : x->separators) {
+			if ((*y->right - *y->separator) <= Layout::GData.widthLimit) {
+				*y->separator = (*y->right - Layout::GData.widthLimit);
+			}
+		}
+
+		//if(x->right->separator == LayoutData::mainFrameRight)
+
+	}
+
+	this->remakeAllWindows();
 }
 
 void FD::LayoutWrite::widthLimit(const float val) const {
@@ -1046,7 +1066,7 @@ void FD::LayoutWrite::remakeWindow_horizonal(std::vector<std::shared_ptr<Layout:
 void FD::LayoutWrite::remakeWindow_vertical(std::vector<std::shared_ptr<Layout::DockSpaceWindow>>& result, auto& x, const Layout::Internal::ResizedBorder border) {
 	constexpr float floatMax = std::numeric_limits<float>::max();
 
-	const uint16_t size = static_cast<uint16_t>(x->separators.size());
+	const UIF16 size = static_cast<UIF16>(x->separators.size());
 
 	Layout::DockSpaceWindow window{};
 	window.identifier = x.get();
@@ -1126,7 +1146,7 @@ void FD::LayoutWrite::remakeWindow_vertical(std::vector<std::shared_ptr<Layout::
 		}
 	}
 
-	for (uint16_t i = 1, size = static_cast<uint16_t>(x->separators.size()); i < size; i++) {
+	for (UIF16 i = 1, size = static_cast<UIF16>(x->separators.size()); i < size; i++) {
 		const bool haveChildren = Layout::haveChildren(x, x->separators[i]);
 		if (!haveChildren) {
 			window.pos = { *x->separators[i - 1]->separator ,*x->top->separator };
@@ -1216,6 +1236,77 @@ float FD::LayoutRead::heightLimit() const {
 	return Layout::GData.heightLimit;
 }
 
+float FD::LayoutRead::widthLimitSum() const {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);
+
+	const std::function<Size(const Layout::AdjacentInfo* const, Size&)> calc = [&](const Layout::AdjacentInfo* const child, Size& count) -> Size {
+		count += child->separators.size();
+
+		if (!child->parent)
+			return count;
+
+		return calc(child->parent.get(), count);
+	};
+
+	std::vector<Size> data{};
+
+	for (auto& x : Layout::GAdjacent) {
+		for (auto& y : x->separators) {
+			Size count = 1;
+			if (x->haveChildren.empty())
+				calc(x.get(), count);
+
+			data.emplace_back(count);
+		}
+	}
+	assert(!data.empty());
+	const auto max = std::max_element(data.begin(), data.end());
+
+	return ((*max) * Layout::GData.widthLimit) * 1.1f;
+}
+
+float FD::LayoutRead::heightLimitSum() const {
+
+	return 0.0f;
+}
+
+bool FD::LayoutRead::isLeftMost(const Layout::DockSpaceWindow& window) const noexcept {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);//std::exception
+
+	Layout::AdjacentInfo* layout = static_cast<Layout::AdjacentInfo*>(window.identifier);
+
+	return layout->left->separator == LayoutData::mainFrameLeft;
+}
+
+bool FD::LayoutRead::isRightMost(const Layout::DockSpaceWindow& window) const noexcept {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);//std::exception
+
+	Layout::AdjacentInfo* layout = static_cast<Layout::AdjacentInfo*>(window.identifier);
+
+	return layout->right->separator == LayoutData::mainFrameRight;
+}
+
+bool FD::LayoutRead::isTopMost(const Layout::DockSpaceWindow& window) const noexcept {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);//std::exception
+
+	Layout::AdjacentInfo* layout = static_cast<Layout::AdjacentInfo*>(window.identifier);
+
+	return layout->top->separator == LayoutData::mainFrameTop;
+}
+
+bool FD::LayoutRead::isBottomMost(const Layout::DockSpaceWindow& window) const noexcept {
+	using namespace Layout::Internal;
+	std::lock_guard<std::mutex> lock(LayoutData::mtx);//std::exception
+
+	Layout::AdjacentInfo* layout = static_cast<Layout::AdjacentInfo*>(window.identifier);
+
+	return layout->bottom->separator == LayoutData::mainFrameBottom;
+}
+
 std::vector<FD::Layout::DockSpaceWindow> FD::LayoutRead::get() const {
 	using namespace Layout::Internal;
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);
@@ -1234,21 +1325,25 @@ std::vector<FD::Layout::SeparatorPos> FD::LayoutRead::getSeparators() const {
 	for (auto& x : Layout::GAdjacent) {
 		if (x->horizonal) {
 			for (auto& y : x->separators) {
-				Layout::SeparatorPos pos{
-					.pos1 = {*x->left->separator ,*y->separator},
-					.pos2 = {*x->right->separator ,*y->separator},
-					.resize = (Layout::GUpdateSeparator == y)
-				};
+				Layout::SeparatorPos pos{};
+				pos.pos1 = { *x->left->separator ,*y->separator };
+				pos.pos2 = { *x->right->separator ,*y->separator };
+				pos.resize = (Layout::GUpdateSeparator == y);
+				pos.horizonal = true;
+				pos.identifier = x.get();
+
 				result.emplace_back(pos);
 			}
 		}
 		else { //vertical
 			for (auto& y : x->separators) {
-				Layout::SeparatorPos pos{
-					.pos1 = {*y->separator, *x->top->separator},
-					.pos2 = {*y->separator, *x->bottom->separator},
-					.resize = (Layout::GUpdateSeparator == y)
-				};
+				Layout::SeparatorPos pos{};
+				pos.pos1 = { *y->separator, *x->top->separator };
+				pos.pos2 = { *y->separator, *x->bottom->separator };
+				pos.resize = (Layout::GUpdateSeparator == y);
+				pos.horizonal = false;
+				pos.identifier = x.get();
+
 				result.emplace_back(pos);
 			}
 		}

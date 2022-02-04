@@ -91,10 +91,13 @@ int main() {
 		FD::Internal::GMessenger.setCallback(FluidumMain::messengerCallback);
 		FS::GLog.setCallback(FluidumMain::messengerCallback);
 		FS::Calc::setMessengerCallback(FluidumMain::messengerCallback);
+		
+		FluidumMain::GScene->addScene<FS::Misc::ResizeWindow>();
+		
 		FDR::mainLoop("Fluidum", FluidumMain::loop, window->getCloseFlag());
 	}
 	catch (const std::exception& e) {
-		std::cerr << e.what();
+		std::cerr << e.what() << std::endl;
 	}
 	catch (...) {
 		std::cerr << "Error" << std::endl;

@@ -57,7 +57,7 @@ namespace FVK::Internal::Manager {
 				//Class of each item
 				using ElmType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type::element_type;
 
-				auto unique = std::make_unique<ElmType>(ElmType(ManagerPassKey{}, requiredData, parameter));
+				std::unique_ptr<ElmType> unique(new ElmType(ManagerPassKey{}, requiredData, parameter));
 
 				try {
 					//https://eel.is/c++draft/vector.modifiers
@@ -132,7 +132,7 @@ namespace FVK::Internal::Manager {
 				//Class of each item
 				using ElmType = std::tuple_element_t<CorrespondenceAt<Type>(), DataTuple>::value_type::element_type;
 
-				auto unique = std::make_unique<ElmType>(ElmType(ManagerPassKey{}, requiredData, parameter));
+				std::unique_ptr<ElmType> unique(new ElmType(ManagerPassKey{}, requiredData, parameter));
 
 				try {
 					//https://eel.is/c++draft/vector.modifiers

@@ -62,6 +62,17 @@ namespace FS {
 		}style;
 
 		struct {
+			float file = 0.0f;
+			float edit = 0.0f;
+			float calc = 0.0f;
+			float view = 0.0f;
+			float project = 0.0f;
+			float extension = 0.0f;
+			float window = 0.0f;
+			float help = 0.0f;
+		}menuBarItemWidth;
+
+		struct {
 			ImVec2 open{};
 		}pos;
 

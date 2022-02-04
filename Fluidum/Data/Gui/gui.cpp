@@ -2,41 +2,65 @@
 
 namespace FD {
 	struct Gui final {
+		ImVec2 windowPos{};
 		ImVec2 centerPos{};
 		ImVec2 windowSize{};
 		float leftBarWidth = 0.0f;
 		float menuBarHeight = 0.0f;
 		float topBarHeight = 0.0f;
 		float statusBarHeight = 0.0f;
+		float titleBarLeft{};
+		float windowLimitMinWidth = 0.0f;
+		float windowLimitMinHeight = 0.0f;
 	};
 	Gui GGui = {};
 }
 
-void FD::GuiWrite::centerPos(const ImVec2& vec2) const noexcept {
+void FD::GuiWrite::windowPos(const ImVec2& vec2) noexcept {
+	GGui.windowPos = vec2;
+}
+
+void FD::GuiWrite::centerPos(const ImVec2& vec2) noexcept {
 	GGui.centerPos = vec2;
 }
 
-void FD::GuiWrite::windowSize(const ImVec2& vec2) const noexcept {
+void FD::GuiWrite::windowSize(const ImVec2& vec2) noexcept {
 	GGui.windowSize = vec2;
 }
 
-void FD::GuiWrite::leftBarWidth(const float width) const noexcept {
+void FD::GuiWrite::leftBarWidth(const float width) noexcept {
 	GGui.leftBarWidth = width;
 }
 
-void FD::GuiWrite::menuBarHeight(const float height) const noexcept {
+void FD::GuiWrite::menuBarHeight(const float height) noexcept {
 	GGui.menuBarHeight = height;
 }
 
-void FD::GuiWrite::topBarHeight(const float height) const noexcept {
+void FD::GuiWrite::topBarHeight(const float height) noexcept {
 	GGui.topBarHeight = height;
 }
 
-void FD::GuiWrite::statusBarHeight(const float height) const noexcept {
+void FD::GuiWrite::statusBarHeight(const float height) noexcept {
 	GGui.statusBarHeight = height;
 }
 
+void FD::GuiWrite::titleBarLeft(const float left) noexcept {
+	GGui.titleBarLeft = left;
+}
+
+void FD::GuiWrite::windowLimitMinWidth(const float width) noexcept {
+	GGui.windowLimitMinWidth = width;
+}
+
+void FD::GuiWrite::windowLimitMinHeight(const float height) noexcept {
+	GGui.windowLimitMinHeight = height;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const ImVec2& FD::GuiRead::windowPos() const noexcept {
+	return GGui.windowPos;
+}
 
 const ImVec2& FD::GuiRead::centerPos() const noexcept {
 	return GGui.centerPos;
@@ -60,6 +84,18 @@ float FD::GuiRead::topBarHeight() const noexcept {
 
 float FD::GuiRead::statusBarHeight() const noexcept {
 	return GGui.statusBarHeight;
+}
+
+float FD::GuiRead::titleBarLeft() const noexcept {
+	return GGui.titleBarLeft;
+}
+
+float FD::GuiRead::windowLimitMinWidth() const noexcept {
+	return GGui.windowLimitMinWidth;
+}
+
+float FD::GuiRead::windowLimitMinHeight() const noexcept {
+	return GGui.windowLimitMinHeight;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -5,6 +5,7 @@
 using namespace FU::ImGui::Operators;
 
 FS::TitleBar::TitleBar(
+	const FD::Style::ColorRead* const colorRead,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::WindowRead* const windowRead,
@@ -15,6 +16,7 @@ FS::TitleBar::TitleBar(
 	const FD::Coding::TabRead* const tabRead,
 	FD::Coding::TabWrite* const tabWrite
 ) :
+	colorRead(colorRead),
 	guiRead(guiRead),
 	guiWrite(guiWrite),
 	windowWrite(windowWrite),
@@ -36,7 +38,7 @@ FS::TitleBar::TitleBar(
 	style.iconWindowSize = { (ImGui::GetStyle().WindowPadding.x * 2.0f + (ImGui::GetStyle().FramePadding.x * 2.0f)) + ImGui::CalcTextSize("   ").x ,windowHeight };
 
 	style.projectNameWindowPos = { guiRead->windowSize().x * 0.6f, 0.0f };
-	style.projectNameWindowSize = { guiRead->windowSize().x * 0.3f ,windowHeight };
+	style.projectNameWindowSize = { ImGui::CalcTextSize(text.tempProject).x * 1.2f ,windowHeight };
 
 	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.86f;
 
@@ -48,9 +50,23 @@ FS::TitleBar::~TitleBar() noexcept {
 }
 
 void FS::TitleBar::call() {
+	this->update();
+
 	this->icon();
 	this->bar();
 	this->project();
+}
+
+void FS::TitleBar::update() {
+	style.windowPos.x = guiRead->windowSize().x - (style.buttonSize.x * 3.0f);
+
+	style.projectNameWindowPos.x = style.windowPos.x - style.projectNameWindowSize.x;
+
+	{
+		const float minWidth = (style.iconWindowSize.x + style.projectNameWindowSize.x + style.windowSize.x) * 1.1f;
+		if (guiRead->windowLimitMinWidth() < minWidth)
+			guiWrite->windowLimitMinWidth(minWidth);
+	}
 }
 
 void FS::TitleBar::icon() {
@@ -64,8 +80,8 @@ void FS::TitleBar::icon() {
 		ImGuiWindowFlags_NoSavedSettings |
 		ImGuiWindowFlags_NoCollapse;
 
-	ImGui::SetNextWindowPos(style.iconWindowPos);
-	ImGui::SetNextWindowSize(style.iconWindowSize);
+	ImGui::SetNextWindowPos(style.iconWindowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(style.iconWindowSize, ImGuiCond_Always);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(ImGui::GetStyle().WindowPadding.x, 0.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2());
@@ -83,8 +99,8 @@ void FS::TitleBar::bar() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2());
 
-	ImGui::SetNextWindowPos(style.windowPos);
-	ImGui::SetNextWindowSize(style.windowSize);
+	ImGui::SetNextWindowPos(style.windowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(style.windowSize, ImGuiCond_Always);
 
 	constexpr auto flag =
 		ImGuiWindowFlags_NoMove |
@@ -104,16 +120,20 @@ void FS::TitleBar::bar() {
 
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4());
 
-	bool minimize = ImGui::Button(ICON_MD_REMOVE, style.buttonSize); ImGui::SameLine();
-	ImGui::Button(ICON_MD_LAYERS, style.buttonSize); ImGui::SameLine();
+	const bool minimize = ImGui::Button(ICON_MD_REMOVE, style.buttonSize); ImGui::SameLine();
+	const bool restore = ImGui::Button(ICON_MD_LAYERS, style.buttonSize); ImGui::SameLine();
 
 	//color: red
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.7f, 0.05f, 0.05f, 0.5f));
-	bool close = ImGui::Button(ICON_MD_CLOSE, style.buttonSize);
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colorRead->cancelButton());
+	const bool close = ImGui::Button(ICON_MD_CLOSE, style.buttonSize);
 
 	if (minimize) {
 		GLog.add_str<FU::Log::Type::None>("[Request] MinimizeWindow.");
 		FDR::minimizeWindow();
+	}
+	else if (restore) {
+		GLog.add_str<FU::Log::Type::None>("[Request] RestoreWindow.");
+		FDR::restoreWindow();
 	}
 	else if (close) {
 		GLog.add_str<FU::Log::Type::None>("[Request] Terminate.");
@@ -133,8 +153,10 @@ void FS::TitleBar::exit() {
 }
 
 void FS::TitleBar::project() {
-	ImGui::SetNextWindowPos(style.projectNameWindowPos);
-	ImGui::SetNextWindowSize(style.projectNameWindowSize);
+	ImGui::SetNextWindowPos(style.projectNameWindowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(style.projectNameWindowSize, ImGuiCond_Always);
+
+	guiWrite->titleBarLeft(style.projectNameWindowPos.x);
 
 	constexpr ImGuiWindowFlags flag =
 		ImGuiWindowFlags_NoMove |
@@ -142,7 +164,8 @@ void FS::TitleBar::project() {
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoBackground;
+		ImGuiWindowFlags_NoBackground |
+		ImGuiWindowFlags_NoSavedSettings;
 
 	ImGui::Begin("##ProjectName", nullptr, flag);
 
@@ -154,8 +177,9 @@ void FS::TitleBar::project() {
 
 	if (projectRead->isDefaultProject())
 		ImGui::Button(text.tempProject);
-	else
+	else {
 		ImGui::Button(projectRead->projectName().c_str());
+	}
 
 	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar(2);

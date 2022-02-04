@@ -5,7 +5,6 @@ namespace FDR::Internal {
 		using namespace FDR::Internal;
 
 		ImGui_ImplGlfw_NewFrame();
-		glfwPollEvents();
 
 		ImGui::NewFrame();
 
@@ -16,11 +15,12 @@ namespace FDR::Internal {
 
 		ImGui::Render();
 		commands->call();
+		glfwPollEvents();
 	};
 
 	void drawFrame(auto& data, void* null) {
 		static std::vector<vk::Fence> imagesInFlight{};
-		static int32_t currentFrame = 0;
+		static I32 currentFrame = 0;
 
 		vk::Device device = std::get<0>(data);
 		vk::SwapchainKHR swapchain = std::get<1>(data);

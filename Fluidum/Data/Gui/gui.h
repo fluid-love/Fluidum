@@ -8,36 +8,60 @@ namespace FD {
 	class GuiWrite final {
 	public:
 		GuiWrite(Internal::PassKey) {};
-		~GuiWrite() = default;
+		~GuiWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(GuiWrite);
 
 	public:
-		void centerPos(const ImVec2& vec2) const noexcept;
-		void windowSize(const ImVec2& vec2) const noexcept;
-		void leftBarWidth(const float width) const noexcept;
-		void menuBarHeight(const float height) const noexcept;
-		void topBarHeight(const float height) const noexcept;
-		void statusBarHeight(const float height) const noexcept;
+		void windowPos(const ImVec2& vec2) noexcept;
+		void centerPos(const ImVec2& vec2) noexcept;
+		void windowSize(const ImVec2& vec2) noexcept;
+
+	public:
+		void leftBarWidth(const float width) noexcept;
+		void menuBarHeight(const float height) noexcept;
+		void topBarHeight(const float height) noexcept;
+		void statusBarHeight(const float height) noexcept;
+
+	public:
+		void titleBarLeft(const float left) noexcept;
+
+	public:
+		void windowLimitMinWidth(const float width) noexcept;
+		void windowLimitMinHeight(const float height) noexcept;
 
 	};
 
+}
+
+namespace FD {
+
+	//single thread
 	class GuiRead final {
 	public:
 		GuiRead(Internal::PassKey) {};
-		~GuiRead() = default;
+		~GuiRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(GuiRead);
 
 	public:
-		const ImVec2& centerPos() const noexcept;
-		const ImVec2& windowSize() const noexcept;
-		float leftBarWidth() const noexcept;
-		float menuBarHeight() const noexcept;
-		float topBarHeight() const noexcept;
-		float statusBarHeight() const noexcept;
+		[[nodiscard]] const ImVec2& windowPos() const noexcept;
+		[[nodiscard]] const ImVec2& centerPos() const noexcept;
+		[[nodiscard]] const ImVec2& windowSize() const noexcept;
 
+	public:
+		[[nodiscard]] float leftBarWidth() const noexcept;
+		[[nodiscard]] float menuBarHeight() const noexcept;
+		[[nodiscard]] float topBarHeight() const noexcept;
+		[[nodiscard]] float statusBarHeight() const noexcept;
 
+	public:
+		[[nodiscard]] float titleBarLeft() const noexcept;
+
+	public:
+		[[nodiscard]] float windowLimitMinWidth() const noexcept;
+		[[nodiscard]] float windowLimitMinHeight() const noexcept;
 
 	};
+
 }
 
 namespace FD {
@@ -45,7 +69,7 @@ namespace FD {
 	class ImGuiWindowWrite final {
 	public:
 		ImGuiWindowWrite(Internal::PassKey) {};
-		~ImGuiWindowWrite() = default;
+		~ImGuiWindowWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowWrite);
 
 	public:
@@ -56,10 +80,14 @@ namespace FD {
 
 	};
 
+}
+
+namespace FD {
+
 	class ImGuiWindowRead final {
 	public:
 		ImGuiWindowRead(Internal::PassKey) {};
-		~ImGuiWindowRead() = default;
+		~ImGuiWindowRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowRead);
 
 	public:

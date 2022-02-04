@@ -6,7 +6,13 @@ namespace FU::Cursor {
 
 	enum class Type : UIF8 {
 		Wait,
-		Arrow
+		Arrow,
+		Hand,
+		SizeWE,
+		SizeNS,
+		SizeNESW,
+		SizeNWSE,
+		SizeAll,
 	};
 
 	void setCursorType(const Type type);

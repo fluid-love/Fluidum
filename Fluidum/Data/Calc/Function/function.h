@@ -1,7 +1,7 @@
 #pragma once
 
 #include "lua.h"
-#include "../../External/lua-5.4.3/src/lua.hpp"
+#include "../../External/lua-5.4.4/src/lua.hpp"
 
 namespace FD::Calc {
 	enum class Language : uint8_t {

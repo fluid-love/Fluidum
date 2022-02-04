@@ -54,6 +54,8 @@ namespace FDR {
 	*/
 	FluidumDrawAPI [[nodiscard]] std::pair<IF32, IF32> getWindowSize();
 
+	FluidumDrawAPI [[nodiscard]] std::pair<IF32, IF32> getFullscreenWindowSize();
+
 	//get main window pos
 	/*
 	return:
@@ -104,11 +106,33 @@ namespace FDR {
 	*/
 	FluidumDrawAPI void setWindowSizePos(const ImVec2& size, const ImVec2& pos);
 
-	//miximize window
-	FluidumDrawAPI void miximizeWindow();
-
 	//minimize window
 	FluidumDrawAPI void minimizeWindow();
+
+	//fullcreen window
+	FluidumDrawAPI void fullscreenWindow();
+
+	//restore window
+	FluidumDrawAPI void restoreWindow();
+
+	FluidumDrawAPI [[nodiscard]] bool isWindowFocused();
+
+	FluidumDrawAPI [[nodiscard]] bool isWindowFullscreen();
+
+	FluidumDrawAPI void setWindowWidthMaxLimit(const IF32 width);
+	
+	FluidumDrawAPI void setWindowHeightMaxLimit(const IF32 height);
+
+}
+
+//viewport scissor
+namespace FDR {
+
+	FluidumDrawAPI void setViewportWidthHeight(const float width, const float height);
+
+	FluidumDrawAPI void setScissorExtent(const UI32 width, const UI32 height);
+
+	FluidumDrawAPI void setScissorOffset(const I32 x, const I32 y);
 
 }
 

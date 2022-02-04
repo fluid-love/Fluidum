@@ -68,5 +68,14 @@ namespace FDR::Internal {
 
 //Main Commands
 namespace FDR::Internal {
+
 	inline FVK::Commands MainCommands{};
+
+	namespace Commands {
+
+		inline std::vector<FVK::SetScissorCommand> MainScissor{};
+		inline std::vector<FVK::SetViewportCommand> MainViewport{};
+	
+	}
+
 }

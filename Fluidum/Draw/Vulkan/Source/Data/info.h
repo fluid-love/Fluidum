@@ -13,6 +13,10 @@ namespace FVK::Internal::Data {
 	struct Info<FvkType::Window> final {
 		GLFWwindow* window = nullptr;
 		bool framebufferResized = false;
+		bool maximized{};
+		bool focused{};
+		std::pair<I32, I32> sizeMinLimits{};//width, height
+		std::pair<I32, I32> sizeMaxLimits{};//width, height
 	};
 
 	template<>

@@ -7,6 +7,7 @@ namespace FS {
 	class TitleBar final : public Scene {
 	public:
 		explicit TitleBar(
+			const FD::Style::ColorRead* const colorRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::WindowRead* const windowRead,
@@ -18,6 +19,7 @@ namespace FS {
 			FD::Coding::TabWrite* const tabWrite
 		);
 		void Constructor(
+			FD::Style::ColorRead,
 			FD::GuiRead,
 			FD::GuiWrite,
 			FD::WindowRead,
@@ -36,7 +38,8 @@ namespace FS {
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		const FD::Style::ColorRead* const colorRead;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
 		const FD::WindowRead* const windowRead;
@@ -67,6 +70,9 @@ namespace FS {
 
 			ImVec2 buttonSize{};
 		}style;
+
+	private:
+		void update();
 
 	private:
 		void icon();

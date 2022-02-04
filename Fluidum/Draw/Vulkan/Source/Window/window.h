@@ -21,10 +21,10 @@ namespace FVK::Internal {
 		template<>
 		struct Parameter<WindowMode::Normal> {
 			const char* title = "";
-			int32_t width = 0;
-			int32_t height = 0;
-			int32_t posX = 0;
-			int32_t posY = 0;
+			I32 width = 0;
+			I32 height = 0;
+			I32 posX = 0;
+			I32 posY = 0;
 		};
 
 		template<>
@@ -65,12 +65,38 @@ namespace FVK::Internal {
 	public:
 		[[nodiscard]] std::pair<I32, I32> windowSize() const noexcept;
 
+		/*
+		Returns the height of the window minus the height of the taskbar.
+
+		Exception: strong
+			Unexpected : Native error
+
+		Return:
+			{ width, height }
+		*/
+		static [[nodiscard]] std::pair<IF32, IF32> fullscreenSize();
+
+		/*
+		Exception: strong
+			Unexpected : Native error
+
+		Return:
+			{ posX, posY }
+		*/
+		static [[nodiscard]] std::pair<IF32, IF32> fullscreenPos();
+
+		/*
+		Exception: strong
+			Unexpected : Native error
+		*/
+		void fullscreen() const;
+
 	private:
 
 		//Create window by specifying the position and size.
 		void create(const Data::WindowData& data, const NormalParameter& parameter);
 
-		//Fullscreen									
+		//Fullscreen(taskbar)								
 		void create(const Data::WindowData& data, const FullScreenParameter& parameter);
 
 		//GLFW_MAXIMIZED									
@@ -89,9 +115,19 @@ namespace FVK::Internal {
 			FailedToCreate
 		*/
 		//basic
-		void setResizedCallback() noexcept;
+		void setCallbacks() noexcept;
 
 		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+		static void setPosCallback(GLFWwindow* window, int posX, int posY);
+		static void focusedCallback(GLFWwindow* window, int focus);
+
+		static void sizeLimitsCallback(
+			GLFWwindow* window,
+			std::optional<int> minwidth,
+			std::optional<int> minheight,
+			std::optional<int> maxwidth,
+			std::optional<int> maxheight
+		);
 
 		/*
 		Exception:
@@ -102,6 +138,10 @@ namespace FVK::Internal {
 
 	private:
 		Data::WindowInfo info{};
+
 	};
 
 }
+
+//with callback
+void glfwSetWindowSizeLimits_(GLFWwindow* window, int minwidth, int minheight, int maxwidth, int maxheight);

@@ -12,7 +12,7 @@ void FVK::Internal::Surface::create(const Data::SurfaceData& data, const Paramet
 		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to create Surface.({}).", vk::to_string(vk::Result(result)));
 		Exception::throwFailedToCreate();
 	}
-
+	
 	//recast
 	info.surface = castSurface;
 

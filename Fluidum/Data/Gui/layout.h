@@ -29,6 +29,14 @@ namespace FD::Layout {
 		ImVec2 pos1{};
 		ImVec2 pos2{};
 		bool resize = false;
+		bool horizonal{};
+
+	private:
+		void* identifier = nullptr; //::FD::Layout::AdjacentInfo
+
+	private:
+		friend class LayoutWrite;
+		friend class LayoutRead;
 	};
 
 	struct UnRedoInfo final {
@@ -105,7 +113,7 @@ namespace FD {
 	class LayoutWrite final {
 	public:
 		LayoutWrite(Internal::PassKey) {};
-		~LayoutWrite() = default;
+		~LayoutWrite() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(LayoutWrite);
 
 	public:
@@ -114,6 +122,8 @@ namespace FD {
 		void mainFrameTop(const float val) const;
 		void mainFrameBottom(const float val) const;
 
+		void resizeMainFrameRight(const float val);
+
 	public:
 		void widthLimit(const float val) const;
 		void heightLimit(const float val) const;
@@ -121,7 +131,7 @@ namespace FD {
 	public:
 		//construct main layout window from LayoutData
 		static void reset();
-		
+
 		//Remake(rebuild) the layout from history.
 		void remake();
 
@@ -154,7 +164,7 @@ namespace FD {
 	class LayoutRead final {
 	public:
 		LayoutRead(Internal::PassKey) {};
-		~LayoutRead() = default;
+		~LayoutRead() noexcept = default;
 		FluidumUtils_Class_Delete_CopyMove(LayoutRead);
 
 	public:
@@ -165,6 +175,16 @@ namespace FD {
 
 		[[nodiscard]] float widthLimit() const;
 		[[nodiscard]] float heightLimit() const;
+
+	public:
+		[[nodiscard]] float widthLimitSum() const;
+		[[nodiscard]] float heightLimitSum() const;
+
+	public:
+		[[nodiscard]] bool isLeftMost(const Layout::DockSpaceWindow& window) const noexcept;
+		[[nodiscard]] bool isRightMost(const Layout::DockSpaceWindow& window) const noexcept;
+		[[nodiscard]] bool isTopMost(const Layout::DockSpaceWindow& window) const noexcept;
+		[[nodiscard]] bool isBottomMost(const Layout::DockSpaceWindow& window) const noexcept;
 
 	public:
 		[[nodiscard]] std::vector<Layout::DockSpaceWindow> get() const;

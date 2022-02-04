@@ -65,8 +65,8 @@ namespace FD {
 			constexpr std::array<CodeType, sizeof...(Scene)> codes = { FU::Class::ClassCode::GetClassCode<Scene>()... };
 
 			for (auto x : codes) {
-				const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), x);
-				if (itr != Data::codes.cend())
+				const auto itr = std::find(Data::codes.crbegin(), Data::codes.crend(), x);
+				if (itr != Data::codes.crend())
 					return true;
 			}
 			return false;
@@ -85,8 +85,8 @@ namespace FD {
 			constexpr std::array<CodeType, sizeof...(Scene)> codes = { FU::Class::ClassCode::GetClassCode<Scene>()... };
 
 			for (auto x : codes) {
-				const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), x);
-				if (itr == Data::codes.cend())
+				const auto itr = std::find(Data::codes.crbegin(), Data::codes.crend(), x);
+				if (itr == Data::codes.crend())
 					return false;
 			}
 			return true;
@@ -96,8 +96,8 @@ namespace FD {
 		[[nodiscard]] bool exist() const noexcept {
 			using namespace ::FD::Scene::Internal;
 			std::lock_guard<std::mutex> lock(Data::mtx);
-			const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), Code);
-			return itr != Data::codes.cend();
+			const auto itr = std::find(Data::codes.crbegin(), Data::codes.crend(), Code);
+			return itr != Data::codes.crend();
 		}
 
 		[[nodiscard]] bool exist(const FU::Class::ClassCode::CodeType Code) const noexcept;

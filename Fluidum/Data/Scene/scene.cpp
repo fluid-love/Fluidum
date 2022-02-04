@@ -4,8 +4,8 @@
 void FD::Scene::Internal::Data::addSceneCallback(bool async, FU::Class::ClassCode::CodeType code) {
 	std::lock_guard<std::mutex> lock(mtx);
 
-	const auto itr = std::find(codes.cbegin(), codes.cend(), code);
-	if (itr != codes.cend())
+	const auto itr = std::find(codes.crbegin(), codes.crend(), code);
+	if (itr != codes.crend())
 		return;
 
 	codes.emplace_back(code);
@@ -14,18 +14,18 @@ void FD::Scene::Internal::Data::addSceneCallback(bool async, FU::Class::ClassCod
 
 void FD::Scene::Internal::Data::deleteSceneCallback(bool async, FU::Class::ClassCode::CodeType code) {
 	std::lock_guard<std::mutex> lock(mtx);
-	const auto itr = std::find(codes.cbegin(), codes.cend(), code);
-	assert((itr != codes.cend()) && "FluidumSceneの設計に問題があります．");
+	const auto itr = std::find(codes.crbegin(), codes.crend(), code);
+	assert((itr != codes.crend()) && "FluidumSceneの設計に問題があります．");
 
-	codes.erase(itr);
+	codes.erase(std::next(itr).base());
 	save.store(true);
 }
 
 bool FD::SceneRead::exist(const FU::Class::ClassCode::CodeType code) const noexcept {
 	using namespace ::FD::Scene::Internal;
 	std::lock_guard<std::mutex> lock(Data::mtx);
-	const auto itr = std::find(Data::codes.cbegin(), Data::codes.cend(), code);
-	return itr != Data::codes.cend();
+	const auto itr = std::find(Data::codes.crbegin(), Data::codes.crend(), code);
+	return itr != Data::codes.crend();
 }
 
 bool FD::SceneRead::running() const noexcept {

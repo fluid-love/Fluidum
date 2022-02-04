@@ -105,9 +105,13 @@ void FS::MenuBar::call() {
 }
 
 void FS::MenuBar::fileGui() {
-
-	if (!ImGui::BeginMenu(text.file))
+	if (guiRead->titleBarLeft() <= this->menuBarItemWidth.file)
 		return;
+
+	if (!ImGui::BeginMenu(text.file)) {
+		this->menuBarItemWidth.file = ImGui::GetItemRectMax().x;
+		return;
+	}
 
 	this->pushItemSpacing();
 
@@ -240,8 +244,13 @@ void FS::MenuBar::itemExit() {
 }
 
 void FS::MenuBar::editGui() {
-	if (!ImGui::BeginMenu(text.edit))
+	if (guiRead->titleBarLeft() <= this->menuBarItemWidth.edit)
 		return;
+
+	if (!ImGui::BeginMenu(text.edit)) {
+		this->menuBarItemWidth.edit = ImGui::GetItemRectMax().x;
+		return;
+	}
 
 	this->pushItemSpacing();
 
@@ -251,8 +260,14 @@ void FS::MenuBar::editGui() {
 }
 
 void FS::MenuBar::calcGui() {
-	if (!ImGui::BeginMenu(text.calc))
+	if (guiRead->titleBarLeft() <= this->menuBarItemWidth.calc)
 		return;
+
+	if (!ImGui::BeginMenu(text.calc)) {
+		this->menuBarItemWidth.calc = ImGui::GetItemRectMax().x;
+		return;
+	}
+	
 
 	bool exist = false;
 
@@ -298,8 +313,13 @@ void FS::MenuBar::itemRunNormalMode() {
 }
 
 void FS::MenuBar::viewGui() {
-	if (!ImGui::BeginMenu(text.view))
+	if (guiRead->titleBarLeft() <= this->menuBarItemWidth.view)
 		return;
+
+	if (!ImGui::BeginMenu(text.view)) {
+		this->menuBarItemWidth.view = ImGui::GetItemRectMax().x;
+		return;
+	}
 
 	//once
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsWindowHovered()) {
@@ -369,8 +389,13 @@ void FS::MenuBar::updateView() {
 }
 
 void FS::MenuBar::windowGui() {
-	if (!ImGui::BeginMenu(text.window))
+	if (guiRead->titleBarLeft() <= this->menuBarItemWidth.window)
 		return;
+
+	if (!ImGui::BeginMenu(text.window)) {
+		this->menuBarItemWidth.window = ImGui::GetItemRectMax().x;
+		return;
+	}
 
 	if (ImGui::BeginMenu(text.layoutTemplates)) {
 		this->itemLayoutTemplates();
@@ -420,8 +445,13 @@ void FS::MenuBar::setLayoutCoding() {
 }
 
 void FS::MenuBar::extensionGui() {
-	if (!ImGui::BeginMenu(text.extension))
+	if (guiRead->titleBarLeft() <= this->menuBarItemWidth.extension)
 		return;
+
+	if (!ImGui::BeginMenu(text.extension)) {
+		this->menuBarItemWidth.extension = ImGui::GetItemRectMax().x;
+		return;
+	}
 
 	if (ImGui::MenuItem(text.manage, nullptr, false, false)) {
 
@@ -562,8 +592,13 @@ void FS::MenuBar::itemConsole() {
 }
 
 void FS::MenuBar::projectGui() {
-	if (!ImGui::BeginMenu(text.project_))
+	if (guiRead->titleBarLeft() <= this->menuBarItemWidth.project)
 		return;
+
+	if (!ImGui::BeginMenu(text.project_)) {
+		this->menuBarItemWidth.project = ImGui::GetItemRectMax().x;
+		return;
+	}
 
 	if (ImGui::MenuItem(text.property_icon)) {
 		this->project_property();
@@ -578,8 +613,14 @@ void FS::MenuBar::project_property() {
 }
 
 void FS::MenuBar::helpGui() {
-	if (!ImGui::BeginMenu(text.help))
+	if (guiRead->titleBarLeft() <= this->menuBarItemWidth.help)
 		return;
+
+	if (!ImGui::BeginMenu(text.help)) {
+		this->menuBarItemWidth.help = ImGui::GetItemRectMax().x;
+		return;
+	}
+
 
 	this->pushItemSpacing();
 

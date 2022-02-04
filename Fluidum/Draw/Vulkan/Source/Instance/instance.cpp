@@ -36,6 +36,35 @@ void FVK::Internal::Instance::create(const Data::InstanceData& data, const Param
 	this->createInstance(instanceCreateInfo);
 }
 
+namespace FVK::Internal {
+
+	bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers) {
+		auto result = vk::enumerateInstanceLayerProperties();
+		if (result.result != vk::Result::eSuccess)
+			return false;
+
+		std::vector<vk::LayerProperties> availableLayers = std::move(result.value);
+
+		for (const char* layerName : validationLayers) {
+			bool layerFound = false;
+
+			for (const auto& layerProperties : availableLayers) {
+				if (strcmp(layerName, layerProperties.layerName) == 0) {
+					layerFound = true;
+					break;
+				}
+			}
+
+			if (!layerFound) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+}
+
 void FVK::Internal::Instance::create(const Data::InstanceData& data, const MessengerParameter& parameter) {
 	//no-throw
 	const auto applicationVersion = VK_MAKE_VERSION(parameter.appInfo.appVersion.major, parameter.appInfo.appVersion.minor, parameter.appInfo.appVersion.patch);
@@ -54,10 +83,12 @@ void FVK::Internal::Instance::create(const Data::InstanceData& data, const Messe
 
 	const auto layerNames = makeValidationLayerNames(parameter.messengerParameter.validationLayer);
 
+	const bool layerSupported = checkValidationLayerSupport(layerNames);
+
 	const vk::InstanceCreateInfo instanceCreateInfo = {
 		.pApplicationInfo = &appInfo,
-		.enabledLayerCount = static_cast<UI32>(layerNames.size()),
-		.ppEnabledLayerNames = layerNames.data(),
+		.enabledLayerCount = layerSupported ? static_cast<UI32>(layerNames.size()) : 0,
+		.ppEnabledLayerNames = layerSupported ? layerNames.data() : nullptr,
 		.enabledExtensionCount = static_cast<UI32>(extensions.size()),
 		.ppEnabledExtensionNames = extensions.data()
 	};
@@ -97,10 +128,10 @@ std::vector<const char*> FVK::Internal::Instance::Instance::getRequiredExtension
 	UI32 glfwExtensionCount = 0;
 	const char** glfwExtensions{};
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
+	
 	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 	extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-
+	
 	return extensions;
 }
 

@@ -53,12 +53,16 @@ ImVec4 FD::Style::ColorRead::error() const noexcept {
 	return { 1.00f, 0.30f, 0.30f, 1.0f };
 }
 
-ImVec4 FD::Style::ColorRead::warning() const noexcept{
+ImVec4 FD::Style::ColorRead::warning() const noexcept {
 	return { 0.95f, 0.95f, 0.25f, 1.0f };
 }
 
-ImVec4 FD::Style::ColorRead::info() const noexcept{
+ImVec4 FD::Style::ColorRead::info() const noexcept {
 	return { 0.20f, 0.70f, 1.00f, 1.0f };
+}
+
+ImU32 FD::Style::ColorRead::windowBorder() const noexcept {
+	return ImGui::ColorConvertFloat4ToU32({ 0.2980 ,0.5333 ,1.000 ,1.0f });
 }
 
 
