@@ -1,14 +1,18 @@
 #include "layout.h"
 #include "../Utils/Popup/message.h"
+#include "../Utils/Scene/classcodes.h"
+#include <imgui_internal.h>
 
 using namespace FU::ImGui::Operators;
 
 FS::Layout::Layout(
+	const FD::ImGuiWindowRead* const imguiWindowRead,
 	const FD::LayoutRead* const layoutRead,
 	FD::LayoutWrite* const layoutWrite,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite
 ) :
+	imguiWindowRead(imguiWindowRead),
 	layoutRead(layoutRead),
 	layoutWrite(layoutWrite),
 	guiRead(guiRead),
@@ -47,7 +51,13 @@ FS::Layout::~Layout() noexcept {
 }
 
 void FS::Layout::call() {
-	this->noresize();
+	{
+		flag.mouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+		const auto mPos = ImGui::GetMousePos();
+		static ImVec2 old = mPos;
+		mouse.delta = mPos - old;
+		old = mPos;
+	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding / 6.5f);
@@ -72,10 +82,22 @@ void FS::Layout::call() {
 }
 
 void FS::Layout::updateLayout() {
-	if (static_cast<I32>(guiRead->windowSize().x) == static_cast<I32>(layoutRead->mainFrameRight()))
+	//Changes the layout when the size of the main window is changed.	
+
+	const std::pair<bool, bool> resized =
+	{
+		static_cast<I32>(guiRead->windowSize().x) == static_cast<I32>(layoutRead->mainFrameRight()) ,
+		static_cast<I32>(guiRead->windowSize().y) == static_cast<I32>(layoutRead->mainFrameBottom())
+	};
+
+	if (!resized.first && !resized.second)
 		return;
 
-	layoutWrite->resizeMainFrameRight(guiRead->windowSize().x);
+	if (resized.first) //width
+		layoutWrite->resizeMainFrameRight(guiRead->windowSize().x);
+	else               //height
+		layoutWrite->resizeMainFrameBottom(guiRead->windowSize().y);
+
 	this->updateWindows();
 }
 
@@ -84,8 +106,17 @@ void FS::Layout::updateWindowMinSize() {
 		layoutRead->widthLimitSum() +
 		guiRead->leftBarWidth();
 
-	if (minWidth >= guiRead->windowLimitMinWidth()) {
+	const float minHeight =
+		layoutRead->heightLimitSum() +
+		guiRead->menuBarHeight() +
+		guiRead->statusBarHeight() +
+		guiRead->topBarHeight();
+
+	if (minWidth > guiRead->windowLimitMinWidth()) {
 		guiWrite->windowLimitMinWidth(minWidth);
+	}
+	if (minHeight > guiRead->windowLimitMinHeight()) {
+		guiWrite->windowLimitMinHeight(minHeight);
 	}
 }
 
@@ -94,16 +125,15 @@ void FS::Layout::dockGui() {
 	for (UIF16 i = 0, size = static_cast<UIF16>(windows.size()); i < size; i++) {
 		select.resizedWindowIndex = i;
 		select.current = &windows[i];
-		std::string label = "##Lay" + std::to_string(i);
+		const std::string label = "##Lyt" + std::to_string(i);
 
 		this->dockSpace(label.c_str());
-
 	}
 
 }
 
 void FS::Layout::dockSpace(const char* label) {
-	constexpr auto windowFlags =
+	constexpr ImGuiWindowFlags windowFlags =
 		ImGuiWindowFlags_NoBringToFrontOnFocus |
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoResize |
@@ -118,8 +148,7 @@ void FS::Layout::dockSpace(const char* label) {
 	ImGui::SetNextWindowPos(select.current->pos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(select.current->size, ImGuiCond_Always);
 
-
-	ImGui::Begin(label, nullptr, windowFlags | (flag.noresize ? ImGuiWindowFlags_NoResize : ImGuiWindowFlags_None));
+	ImGui::Begin(label, nullptr, windowFlags);
 
 	select.current->pos = ImGui::GetWindowPos();
 	select.current->size = ImGui::GetWindowSize();
@@ -129,13 +158,8 @@ void FS::Layout::dockSpace(const char* label) {
 
 	ImGuiID dockingID = ImGui::DockSpace(id, ImVec2{}, ImGuiDockNodeFlags_PassthruCentralNode);
 
-	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowFocused()) {
-		flag.mouseDown = true;
-		const auto border = layoutWrite->update(*select.current, ImGui::GetMousePos(), select.resizeBorder);
-		if (select.resizeBorder == FD::Layout::ResizedBorder::None)
-			select.resizeBorder = border;
-		this->updateWindows();
-	}
+	if (this->windows.size() != this->dockSpaceIDs.size())
+		this->dockSpaceIDs.emplace_back(ImGui::GetCurrentWindow()->ID);
 
 	this->focusedWindowBackground();
 
@@ -161,8 +185,6 @@ void FS::Layout::ifRightMouseButtonCliked() {
 	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 		return;
 
-
-
 	flag.popup = true;
 	select.pos = ImGui::GetMousePos();
 	select.right = select.current;
@@ -174,7 +196,6 @@ void FS::Layout::ifRightMouseButtonCliked() {
 	flag.centerVerticalConstraintArea = this->centerVerticalConstraintArea();
 
 	flag.canMerge = layoutRead->canMerge(*select.right, select.pos);
-
 }
 
 void FS::Layout::popup() {
@@ -347,65 +368,29 @@ void FS::Layout::merge() {
 	this->updateWindows();
 }
 
-void FS::Layout::noresize() {
-	const ImVec2 mousePos = ImGui::GetMousePos();
-	const float left = layoutRead->mainFrameLeft();
-	const float right = layoutRead->mainFrameRight();
-	const float top = layoutRead->mainFrameTop();
-	const float bottom = layoutRead->mainFrameBottom();
-
-	if (
-		(left - 8.0f < mousePos.x && left + 8.0f > mousePos.x) ||
-		(right - 8.0f < mousePos.x && right + 8.0f > mousePos.x) ||
-		(top - 8.0f < mousePos.y && top + 8.0f > mousePos.y) ||
-		(bottom - 8.0f < mousePos.y && bottom + 8.0f > mousePos.y)
-		)
-	{
-		this->flag.noresize = true;
-	}
-	else
-		this->flag.noresize = false;
-
-	if (!select.hovered)
-		return;
-
-	const float rectMaxX = select.hovered->pos.x + select.hovered->size.x;
-	const float rectMaxY = select.hovered->pos.y + select.hovered->size.y;
-
-	if (!(mousePos.y > rectMaxY - 17.0f && mousePos.y < rectMaxY))
-		return;
-
-	if (
-		(mousePos.x > select.hovered->pos.x && mousePos.x < select.hovered->pos.x + 17.0f) ||
-		(mousePos.x > rectMaxX - 17.0f && mousePos.x < rectMaxX)
-		)
-	{
-		this->flag.noresize = true;
-	}
-
-}
-
 void FS::Layout::save_resize() {
-	if (!flag.mouseDown)
-		return;
+	//if (!flag.mouseDown)
+	//	return;
 
-	if (select.resizeBorder == FD::Layout::ResizedBorder::None)
-		return;
+	//if (select.resizeBorder == FD::Layout::ResizedBorder::None)
+	//	return;
 
-	if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
-		return;
+	//if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+	//	return;
 
-	layoutWrite->resize(windows[select.resizedWindowIndex], select.resizeBorder);
-	layoutWrite->save();
+	//layoutWrite->resize(windows[select.resizedWindowIndex], select.resizeBorder);
+	//layoutWrite->save();
 
-	select.resizeBorder = FD::Layout::ResizedBorder::None;
-	flag.mouseDown = false;
+	//select.resizeBorder = FD::Layout::ResizedBorder::None;
+	//flag.mouseDown = false;
 }
 
 void FS::Layout::updateWindows() {
 	select.current = nullptr;
 	select.hovered = nullptr;
 	select.right = nullptr;
+	select.down = nullptr;
+	this->dockSpaceIDs.clear();
 	this->windows = layoutRead->get();
 	this->separators = layoutRead->getSeparators();
 }
@@ -426,46 +411,85 @@ void FS::Layout::focusedWindowBackground() {
 }
 
 void FS::Layout::drawSeparators() {
-	ImDrawList* list = ImGui::GetBackgroundDrawList();
+	ImDrawList* list = select.down ? ImGui::GetForegroundDrawList() : ImGui::GetBackgroundDrawList();
 	constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.366f, 0.366f, 0.366f, 1.000f);
 	constexpr ImU32 colResize = FU::ImGui::ConvertImVec4ToImU32(0.3f, 1.0f, 0.4f, 1.0f);
 
+	this->hoveredSeparator();
+
 	for (auto& x : separators) {
-		if (x.resize)
-			list->AddLine(x.pos1, x.pos2, select.resizeBorder != FD::Layout::ResizedBorder::None ? colResize : col);
-		else {
-			list->AddLine(x.pos1, x.pos2, col);
-		}
+		list->AddLine(x.pos1, x.pos2, (flag.mouseDown && select.down == &x) ? colResize : col);
 	}
 
-	this->hoveredSeparator();
 }
 
 void FS::Layout::hoveredSeparator() {
 	constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.9020f, 0.5647f, 0.2157f, 1.000f);
-	const float width = layoutRead->widthLimit() * 0.07f;
+	const float width = ImGui::GetStyle().WindowPadding.x;
+	const float height = ImGui::GetStyle().WindowPadding.y;
 
-	for (auto& x : separators) {
+	for (ISize i = -1; auto & x : separators) {
+		i++;
+
 		const bool hovered = x.horizonal ?
-			FU::ImGui::isMouseHoveringRect({ x.pos1.x, x.pos1.y - width }, { x.pos2.x, x.pos2.y + width }) :
+			FU::ImGui::isMouseHoveringRect({ x.pos1.x, x.pos1.y - height }, { x.pos2.x, x.pos2.y + height }) :
 			FU::ImGui::isMouseHoveringRect({ x.pos1.x - width, x.pos1.y }, { x.pos2.x + width, x.pos2.y });
 
-		if (!hovered)
+		if (!hovered) {
+			if (&x != select.down) {
+				continue;
+			}
+			else {
+				if (!flag.mouseDown)
+					select.down = nullptr;
+			}
+		}
+
+		const bool hoveredUndocked = this->isUndockedWindowHovered();
+
+		if (hoveredUndocked)
 			continue;
 
 		if (x.horizonal) {
 			ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 			FU::Cursor::setCursorType(FU::Cursor::Type::SizeNS);
-			break;
 		}
 		else {
 			ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 			FU::Cursor::setCursorType(FU::Cursor::Type::SizeWE);
+		}
+
+		if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+			select.down = &x;
+			select.downIndex = i;
+		}
+
+		if (flag.mouseDown && select.down && select.downIndex == i) {
+			layoutWrite->update(x, mouse.delta);
+			this->updateWindows();//note: this->separators = new vector
+			select.down = &separators.at(select.downIndex);
 			break;
 		}
-		/*if (hovered && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-
-			break;
-		}*/
 	}
+
+}
+
+bool FS::Layout::isUndockedWindowHovered() {
+	for (auto x : Utils::Class::ClassCodesView) {
+		const ImGuiWindow* window = imguiWindowRead->get<ImGuiWindow*>(x);
+		if (!window)
+			continue;
+
+		if (window->DockNodeIsVisible) {
+			const auto find = std::find(dockSpaceIDs.cbegin(), dockSpaceIDs.cend(), window->RootWindowDockTree->ID);
+			if (find != dockSpaceIDs.cend()) {
+				//docked
+				continue;
+			}
+		}
+
+		if (FU::ImGui::isMouseHoveringRect(window->Pos, window->Pos + window->Size))
+			return true;
+	}
+	return false;
 }

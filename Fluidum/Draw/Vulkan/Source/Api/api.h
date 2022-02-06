@@ -161,6 +161,15 @@ namespace FVK {
 	}
 
 	template<Internal::Key::IsKeyType T>
+	FluidumVK_API void resizeWindow(const WindowKey<T>& key, const IF32 x, const IF32 y, const IF32 width, const IF32 height) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Window& window = GManager->refItem<FvkType::Window>(key);
+		window.resizeWindow(x, y, width, height);
+	}
+
+	template<Internal::Key::IsKeyType T>
 	FluidumVK_API void setWindowSizeLimitsMin(const WindowKey<T>& key, const std::optional<IF32> width, const std::optional<IF32> height) {
 		using namespace Internal;
 		LockGuard lock(GMutex);
@@ -202,7 +211,7 @@ namespace FVK {
 		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
 		return { static_cast<IF32>(info.sizeMaxLimits.first), static_cast<IF32>(info.sizeMaxLimits.second) };
 	}
-	
+
 	template<Internal::Key::IsKeyType T>
 	FluidumVK_API [[nodiscard]] std::pair<IF32, IF32> getWindowSizeLimitsMax(const WindowKey<T>& key) {
 		using namespace Internal;

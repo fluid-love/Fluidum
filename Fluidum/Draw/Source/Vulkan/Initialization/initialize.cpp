@@ -841,6 +841,7 @@ namespace FDR::Internal::Initialization {
 
 		FVK::createImGui(BaseImGuiKey, param);
 		ImGui::GetIO().FontGlobalScale = 0.525f;
+		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
 	}
 

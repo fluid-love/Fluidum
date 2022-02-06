@@ -65,6 +65,9 @@ namespace FVK::Internal {
 	public:
 		[[nodiscard]] std::pair<I32, I32> windowSize() const noexcept;
 
+		void resizeWindow(const IF32 x, const IF32 y, const IF32 width, const IF32 height) const noexcept;
+
+
 		/*
 		Returns the height of the window minus the height of the taskbar.
 

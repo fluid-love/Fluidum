@@ -62,7 +62,7 @@ ImVec4 FD::Style::ColorRead::info() const noexcept {
 }
 
 ImU32 FD::Style::ColorRead::windowBorder() const noexcept {
-	return ImGui::ColorConvertFloat4ToU32({ 0.2980 ,0.5333 ,1.000 ,1.0f });
+	return ImGui::ColorConvertFloat4ToU32({ 0.2980f ,0.5333f ,1.000f ,1.0f });
 }
 
 

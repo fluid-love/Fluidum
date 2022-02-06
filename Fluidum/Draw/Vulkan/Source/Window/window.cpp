@@ -1,5 +1,10 @@
 #include "window.h"
 
+#ifdef BOOST_OS_WINDOWS
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+#include <GLFW/glfw3native.h>
+
 using GlfwSetWindowSizeLimitsCallback = void(*)(GLFWwindow* window, std::optional<int> minwidth, std::optional<int> minheight, std::optional<int> maxwidth, std::optional<int> maxheight);
 GlfwSetWindowSizeLimitsCallback glfwSetWindowSizeLimitsCallback = GlfwSetWindowSizeLimitsCallback{};
 
@@ -87,7 +92,7 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const FullScree
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
 
 	const auto [width, height] = fullscreenSize();
 	this->info.window = glfwCreateWindow(width, height - 1, parameter.title, nullptr, nullptr);
@@ -147,7 +152,7 @@ void FVK::Internal::Window::checkGlfwCreateWindow() const {
 void FVK::Internal::Window::setCallbacks() noexcept {
 
 	glfwSetWindowUserPointer(this->info.window, this);
-	
+
 	glfwSetFramebufferSizeCallback(this->info.window, framebufferResizeCallback);
 	glfwSetWindowFocusCallback(this->info.window, focusedCallback);
 
@@ -192,6 +197,25 @@ std::pair<FVK::I32, FVK::I32> FVK::Internal::Window::windowSize() const noexcept
 	glfwGetWindowSize(this->info.window, &width, &height);
 	assert(width > 0 && height > 0);
 	return { static_cast<I32>(width), static_cast<I32>(height) };
+}
+
+void FVK::Internal::Window::resizeWindow(const IF32 x, const IF32 y, const IF32 width, const IF32 height) const noexcept {
+#ifdef BOOST_OS_WINDOWS
+	HWND hwnd = glfwGetWin32Window(this->info.window);
+
+	MoveWindow(
+		hwnd,
+		static_cast<int>(x),
+		static_cast<int>(y),
+		static_cast<int>(width),
+		static_cast<int>(height),
+		TRUE
+	);
+#else
+#error NotSupported
+#endif 
+	setPosCallback(info.window, x, y);
+	framebufferResizeCallback(info.window, width, height);
 }
 
 std::pair<FVK::IF32, FVK::IF32> FVK::Internal::Window::fullscreenSize() {

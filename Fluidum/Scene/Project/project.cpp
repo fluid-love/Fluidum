@@ -6,6 +6,7 @@
 #include "../File/select.h"
 
 FS::Project::Explorer::Explorer(
+	FD::ImGuiWindowWrite* const imguiWindowWrite,
 	const FD::Style::ColorRead* const colorRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
@@ -25,6 +26,7 @@ FS::Project::Explorer::Explorer(
 	FD::ToolBarWrite* const toolBarWrite,
 	const FD::Style::VarRead* const varRead
 ) :
+	imguiWindowWrite(imguiWindowWrite),
 	colorRead(colorRead),
 	projectWrite(projectWrite),
 	projectRead(projectRead),
@@ -72,6 +74,7 @@ void FS::Project::Explorer::call() {
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.27f, 0.67f, 0.87f, 0.34f));
 
 	ImGui::Begin(text.explorer, &windowFlag);
+	this->setImGuiWindow();
 	ImGui::SetWindowFontScale(0.945f);
 
 	this->topBar();
@@ -132,6 +135,10 @@ void FS::Project::Explorer::toolBar() {
 	this->showCodeButton();
 	FU::ImGui::tooltip(anime.displayCode, text.displayCode);
 
+}
+
+void FS::Project::Explorer::setImGuiWindow() {
+	imguiWindowWrite->set(FU::Class::ClassCode::GetClassCode<Explorer>(), ImGui::GetCurrentWindow());
 }
 
 void FS::Project::Explorer::topBar() {

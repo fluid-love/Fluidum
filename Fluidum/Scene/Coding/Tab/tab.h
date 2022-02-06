@@ -7,6 +7,7 @@ namespace FS::Coding {
 	class Tab final : public Scene {
 	public:
 		explicit Tab(
+			FD::ImGuiWindowWrite* const imguiWindowWrite,
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
 			FD::Coding::DisplayWrite* const displayWrite,
@@ -14,6 +15,7 @@ namespace FS::Coding {
 			const FD::ProjectRead* const projectRead
 		);
 		void Constructor(
+			FD::ImGuiWindowWrite,
 			FD::Coding::TabWrite,
 			FD::Coding::TabRead,
 			FD::Coding::DisplayWrite,
@@ -28,7 +30,8 @@ namespace FS::Coding {
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		FD::ImGuiWindowWrite* const imguiWindowWrite;
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
 		const FD::ProjectRead* const projectRead;
@@ -68,8 +71,9 @@ namespace FS::Coding {
 			UIF32 hovered = -1;
 		}select;
 
-	private:
+	private://misc
 		void checkWindowShouldClose();
+		void setImGuiWindow();
 
 	private:
 		void update();

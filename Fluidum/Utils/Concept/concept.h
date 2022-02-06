@@ -217,6 +217,15 @@ namespace FU::Concept {
 	template<typename T1, typename ...T2>
 	concept IsSame = isSame<T1, T2...>();
 
+	//||...
+	template<typename T1, typename ...T2>
+	[[nodiscard]] constexpr bool isSameOr() {
+		return (std::same_as<T1, T2> || ...);
+	}
+
+	template<typename T1, typename ...T2>
+	concept IsSameOr = isSameOr<T1, T2...>();
+
 }
 
 namespace FU::Concept {

@@ -94,14 +94,28 @@ void FDR::setWindowPos(const ImVec2& pos) {
 	setWindowPos(static_cast<IF32>(pos.x), static_cast<IF32>(pos.y));
 }
 
-void FDR::setWindowSizePos(const IF32 width, const IF32 height, const IF32 x, const IF32 y) {
-	setWindowSize(width, height);
-	setWindowPos(x, y);
+void FDR::setWindowPosSize(const IF32 x, const IF32 y, const IF32 width, const IF32 height) {
+	FVK::resizeWindow(Internal::BaseWindowKey, x, y, width, height);
 }
 
-void FDR::setWindowSizePos(const ImVec2& size, const ImVec2& pos) {
-	setWindowSize(size);
-	setWindowPos(pos);
+void FDR::setWindowPosSize_timing(const IF32 x, const IF32 y, const IF32 width, const IF32 height) {
+	Command::Internal::setSetPosSize(x, y, width, height);
+}
+
+void FDR::setWindowSize_timing(const IF32 width, const IF32 height) {
+	Command::Internal::setSetSize(width, height);
+}
+
+void FDR::setWindowSize_timing(const ImVec2& size) {
+	setWindowSize_timing(static_cast<IF32>(size.x), static_cast<IF32>(size.y));
+}
+
+void FDR::setWindowPos_timing(const IF32 x, const IF32 y) {
+	Command::Internal::setSetPos(x, y);
+}
+
+void FDR::setWindowPos_timing(const ImVec2& pos) {
+	setWindowPos_timing(static_cast<IF32>(pos.x), static_cast<IF32>(pos.y));
 }
 
 void FDR::minimizeWindow() {

@@ -106,8 +106,8 @@ void FS::Misc::ResizeWindow::call() {
 
 	//bottom
 	else if (
-		mousePosY < (windowSizeY + innerY) &&
-		mousePosY >(windowSizeY - outerY) &&
+		mousePosY < (windowSizeY + outerY) &&
+		mousePosY >(windowSizeY - innerY) &&
 		mousePosX > innerX &&
 		mousePosX < (windowSizeX - innerX)
 		)
@@ -163,8 +163,12 @@ void FS::Misc::ResizeWindow::resize_left() {
 	if (dragDeltaX >= 0 && windowSizeX <= guiRead->windowLimitMinWidth())
 		return;
 
-	FDR::setWindowPos(windowPosX + dragDeltaX, windowPosY);
-	FDR::setWindowSize(windowSizeX - dragDeltaX, windowSizeY);
+	FDR::setWindowPosSize_timing(
+		windowPosX + dragDeltaX,
+		windowPosY,
+		windowSizeX - dragDeltaX,
+		windowSizeY
+	);
 }
 
 void FS::Misc::ResizeWindow::resize_right() {
@@ -182,7 +186,7 @@ void FS::Misc::ResizeWindow::resize_right() {
 	if (deltaX <= 0 && windowSizeX <= guiRead->windowLimitMinWidth())
 		return;
 
-	FDR::setWindowSize(windowSizeX + deltaX, windowSizeY);
+	FDR::setWindowSize_timing(windowSizeX + deltaX, windowSizeY);
 }
 
 void FS::Misc::ResizeWindow::resize_top() {
@@ -200,8 +204,12 @@ void FS::Misc::ResizeWindow::resize_top() {
 	if (dragDeltaY >= 0 && windowSizeY <= guiRead->windowLimitMinHeight())
 		return;
 
-	FDR::setWindowPos(windowPosX, windowPosY + dragDeltaY);
-	FDR::setWindowSize(windowSizeX, windowSizeY - dragDeltaY);
+	FDR::setWindowPosSize_timing(
+		windowPosX, 
+		windowPosY + dragDeltaY, 
+		windowSizeX,
+		windowSizeY - dragDeltaY
+	);
 }
 
 void FS::Misc::ResizeWindow::resize_bottom() {
@@ -219,7 +227,7 @@ void FS::Misc::ResizeWindow::resize_bottom() {
 	if (deltaY <= 0 && windowSizeY <= guiRead->windowLimitMinHeight())
 		return;
 
-	FDR::setWindowSize(windowSizeX, windowSizeY + deltaY);
+	FDR::setWindowSize_timing(windowSizeX, windowSizeY + deltaY);
 }
 
 void FS::Misc::ResizeWindow::hold() {
@@ -251,7 +259,7 @@ void FS::Misc::ResizeWindow::hold() {
 	else if (holdBorder == Border::Right) {
 		this->resize_right();
 		if (!hovered)
-			this->resize_right();
+			this->rightCursor();
 	}
 	else if (holdBorder == Border::Top) {
 		this->resize_top();

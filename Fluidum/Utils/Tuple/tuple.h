@@ -30,8 +30,8 @@ namespace FU::Tuple {
 		};
 
 		template<Size N, auto Function>
-		requires(::FU::Concept::IsFunction<Function>)
-			struct FunctionArgType final {
+			requires(::FU::Concept::IsFunction<Function>)
+		struct FunctionArgType final {
 			using Type = decltype(GetFunctionArgType<N>(Function));
 		};
 	}
@@ -77,8 +77,8 @@ namespace FU::Tuple {
 		};
 
 		template<auto Function>
-		requires Concept::IsFunction<Function>
-			struct FunctionArgsToTuple final {
+			requires Concept::IsFunction<Function>
+		struct FunctionArgsToTuple final {
 			using Type = std::conditional_t<Concept::IsMemberFunctionPointer<Function>, ClassFunctionArgsToTuple<Function>, NonClassFunctionArgsToTuple<Function>>::Type;
 		};
 	}
@@ -642,8 +642,8 @@ namespace FU::Tuple {
 
 	//std::array to std::tuple
 	template<auto Array, template<auto>typename Correspondence>
-	requires(Concept::IsStdArray<decltype(Array)>)
-		class ArrayToTuple final {
+		requires(Concept::IsStdArray<decltype(Array)>)
+	class ArrayToTuple final {
 		using ArrayType = decltype(Array);
 
 		template<typename Type>
@@ -654,11 +654,58 @@ namespace FU::Tuple {
 		static auto helper(std::index_sequence<Index...>) {
 			return Ty<std::tuple<Correspondence<Array.at(Index)>...>>();
 		}
-		public:
-			using Type = typename decltype(helper(std::make_index_sequence<std::tuple_size_v<ArrayType>>()))::T;
+	public:
+		using Type = typename decltype(helper(std::make_index_sequence<std::tuple_size_v<ArrayType>>()))::T;
 	};
 
 	template<auto Array, template<auto>typename Correspondence>
 	using ArrayToTupleType = ArrayToTuple<Array, Correspondence>::Type;
 
 }
+
+namespace FU::Tuple {
+
+	namespace Internal {
+
+		template<IsTuple Tuple, typename Func, Size... I>
+		void for_each(Tuple& tuple, Func func, std::index_sequence<I...>) {
+			auto list = { (func(std::get<I>(tuple)),0)... };
+		}
+
+	}
+
+	template<IsTuple Tuple, typename Func>
+	void for_each(Tuple& tuple, Func func) {
+		Internal::for_each(tuple, func, std::make_index_sequence<std::tuple_size_v<Tuple>>());
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

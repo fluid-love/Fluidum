@@ -12,10 +12,12 @@ namespace FDR::Internal {
 			LockGuard lock(GMutex);
 			function();
 		}
+		
 
 		ImGui::Render();
 		commands->call();
 		glfwPollEvents();
+
 	};
 
 	void drawFrame(auto& data, void* null) {
@@ -37,7 +39,7 @@ namespace FDR::Internal {
 		if (result != vk::Result::eSuccess)
 			throw std::runtime_error("Failed to wait for Fence");
 
-		uint32_t imageIndex;
+		UI32 imageIndex;
 
 		result = device.acquireNextImageKHR(swapchain, UINT64_MAX, imageAvailableSemaphores[currentFrame], nullptr, &imageIndex);
 
@@ -83,7 +85,7 @@ namespace FDR::Internal {
 			throw std::runtime_error("Failed to reset Fence");
 
 
-		//fenceが終わったタイミングでコマンドブッファを作り直す
+		//Recreate the command buffers at the end of the fence.
 		result = commandBuffers[imageIndex].reset(vk::CommandBufferResetFlagBits::eReleaseResources);
 		FVK::exeCommands(MainCommands);
 
@@ -114,6 +116,8 @@ namespace FDR::Internal {
 		}
 		else {
 			result = presentQueue.presentKHR(presentInfo);
+			//Stacked commands
+			Command::Internal::call();
 		}
 
 		currentFrame = (currentFrame + 1) % inFlightFences.size();

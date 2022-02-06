@@ -117,6 +117,9 @@ template void FD::ImGuiWindowWrite::set<ImGuiWindow*>(const FU::Class::ClassCode
 
 template<typename T>
 T FD::ImGuiWindowRead::get(const FU::Class::ClassCode::CodeType classCode) const {
-	return GImGuiWindows.at(classCode);
+	auto itr = GImGuiWindows.find(classCode);
+	if (itr == GImGuiWindows.end())
+		return nullptr;
+	return itr->second;
 }
 template ImGuiWindow* FD::ImGuiWindowRead::get<ImGuiWindow*>(const FU::Class::ClassCode::CodeType) const;

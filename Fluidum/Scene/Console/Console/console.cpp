@@ -1,12 +1,14 @@
 ﻿#include "console.h"
+#include <imgui_internal.h>
 
 FS::Console::Console(
-	FD::ConsoleWrite* const consoleWrite,
+	FD::ImGuiWindowWrite* const imguiWindowWrite, FD::ConsoleWrite* const consoleWrite,
 	const FD::ConsoleRead* const consoleRead,
 	const FD::Style::ColorRead* const colorRead,
 	const FD::Style::VarRead* const varRead,
 	FD::ToolBarWrite* const toolBarWrite
 ) :
+	imguiWindowWrite(imguiWindowWrite),
 	consoleWrite(consoleWrite),
 	consoleRead(consoleRead),
 	colorRead(colorRead),
@@ -42,6 +44,7 @@ void FS::Console::call() {
 	}
 
 	ImGui::Begin(text.console, &flag.windowFlag);
+	this->setImGuiWindow();
 
 	flag.isWindowCollpsed = ImGui::IsWindowCollapsed();
 
@@ -61,6 +64,10 @@ void FS::Console::call() {
 	this->popupTitle();
 	this->popupRight();
 	this->closeWindow();
+}
+
+void FS::Console::setImGuiWindow() {
+	imguiWindowWrite->set(FU::Class::ClassCode::GetClassCode<Console>(), ImGui::GetCurrentWindow());
 }
 
 void FS::Console::toolBar() {

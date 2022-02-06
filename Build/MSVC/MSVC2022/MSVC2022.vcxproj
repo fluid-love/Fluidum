@@ -60,6 +60,7 @@
     <ClInclude Include="Fluidum\Fluidum\Draw\include.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Source\Api\api.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Source\Api\using.h" />
+    <ClInclude Include="Fluidum\Fluidum\Draw\Source\Command\stack.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Source\Common\define.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Source\Common\include.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Source\Common\messenger.h" />
@@ -267,6 +268,7 @@
     <ClCompile Include="Fluidum\Fluidum\Data\Scene\window.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Data\Task\task.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Source\Api\api.cpp" />
+    <ClCompile Include="Fluidum\Fluidum\Draw\Source\Command\stack.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Source\Exception\exception.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Source\Vulkan\Base\mainloop.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Source\Vulkan\Image\imgui_image.cpp" />

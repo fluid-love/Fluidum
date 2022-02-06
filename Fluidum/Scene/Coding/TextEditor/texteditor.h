@@ -7,6 +7,7 @@ namespace FS {
 	class TextEditor final : public Scene {
 	public:
 		explicit TextEditor(
+			FD::ImGuiWindowWrite* const imguiWindowWrite,
 			const FD::Style::VarRead* const varRead,
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
@@ -20,6 +21,7 @@ namespace FS {
 			const FD::Style::ColorRead* const colorRead
 		);
 		void Constructor(
+			FD::ImGuiWindowWrite,
 			FD::Style::VarRead,
 			FD::Coding::TabWrite,
 			FD::Coding::TabRead,
@@ -40,7 +42,8 @@ namespace FS {
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		FD::ImGuiWindowWrite* const imguiWindowWrite;
 		const FD::Style::VarRead* const varRead;
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
@@ -88,6 +91,9 @@ namespace FS {
 
 		Info* current = nullptr;
 		Info* selected = nullptr;
+
+	private:
+		void setImGuiWindow();
 
 	private:
 		void toolBar();

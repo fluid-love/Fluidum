@@ -7,6 +7,7 @@ namespace FS {
 	class Console final : public Scene {
 	public:
 		explicit Console(
+			FD::ImGuiWindowWrite* const imguiWindowWrite,
 			FD::ConsoleWrite* const consoleWrite,
 			const FD::ConsoleRead* const consoleRead,
 			const FD::Style::ColorRead* const colorRead,
@@ -14,6 +15,7 @@ namespace FS {
 			FD::ToolBarWrite* const toolBarWrite
 		);
 		void Constructor(
+			FD::ImGuiWindowWrite,
 			FD::ConsoleWrite,
 			FD::ConsoleRead,
 			FD::Style::ColorRead,
@@ -29,6 +31,7 @@ namespace FS {
 		virtual void call() override;
 
 	private:
+		FD::ImGuiWindowWrite* const imguiWindowWrite;
 		FD::ConsoleWrite* const consoleWrite;
 		const FD::ConsoleRead* const consoleRead;
 		const FD::Style::ColorRead* const colorRead;
@@ -63,6 +66,9 @@ namespace FS {
 			bool popupTitle = false;
 			bool popupRight = false;
 		}flag;
+
+	private:
+		void setImGuiWindow();
 
 	private:
 		void toolBar();

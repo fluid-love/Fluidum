@@ -7,12 +7,14 @@ namespace FS {
 	class Layout final : public Scene {
 	public:
 		explicit Layout(
+			const FD::ImGuiWindowRead* const imguiWindowRead,
 			const FD::LayoutRead* const layoutRead,
 			FD::LayoutWrite* const layoutWrite,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite
 		);
 		void Constructor(
+			FD::ImGuiWindowRead,
 			FD::LayoutRead,
 			FD::LayoutWrite,
 			FD::GuiRead,
@@ -26,7 +28,8 @@ namespace FS {
 	public:
 		virtual void call() override;
 
-	private:
+	private:			
+		const FD::ImGuiWindowRead* const imguiWindowRead;
 		const FD::LayoutRead* const layoutRead;
 		FD::LayoutWrite* const layoutWrite;
 		const FD::GuiRead* const guiRead;
@@ -36,6 +39,7 @@ namespace FS {
 	private:
 		std::vector<FD::Layout::DockSpaceWindow> windows{};
 		std::vector<FD::Layout::SeparatorPos> separators{};
+		std::vector<ImGuiID> dockSpaceIDs{};
 
 		struct {
 			FD::Layout::DockSpaceWindow* current{};
@@ -45,8 +49,8 @@ namespace FS {
 			UIF16 resizedWindowIndex = 0;
 
 			FD::Layout::DockSpaceWindow* hovered{};
-
-			FD::Layout::ResizedBorder resizeBorder = FD::Layout::ResizedBorder::None;
+			FD::Layout::SeparatorPos* down = nullptr;
+			ISize downIndex = -1;
 
 			ImVec2 pos{};
 		}select;
@@ -59,12 +63,15 @@ namespace FS {
 			bool centerHorizonalConstraintArea = false;
 			bool centerVerticalConstraintArea = false;
 
-			bool noresize = false;
-
 			bool canMerge = false;
 
 			bool mouseDown = false;
+			bool hold = false;
 		}flag;
+
+		struct {
+			ImVec2 delta{};
+		}mouse;
 
 	private:
 		void updateLayout();
@@ -92,7 +99,6 @@ namespace FS {
 		void merge();
 
 	private:
-		void noresize();
 		void save_resize();
 
 	private:
@@ -103,6 +109,7 @@ namespace FS {
 		void focusedWindowBackground();
 		void drawSeparators();
 		void hoveredSeparator();
+		[[nodiscard]] bool isUndockedWindowHovered();
 
 	};
 }

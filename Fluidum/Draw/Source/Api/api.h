@@ -90,21 +90,76 @@ namespace FDR {
 	FluidumDrawAPI void setWindowPos(const ImVec2& pos);
 
 
-	//set window size and pos
 	/*
-	arg:
+	Set window pos and size.
+	
+	Args:
 		width  : width(size)
-		height : heght(size)
+		height : height(size)
 		x	   : x(pos)
 		y	   : y(pos)
 	*/
-	FluidumDrawAPI void setWindowSizePos(const IF32 width, const IF32 height, const IF32 x, const IF32 y);
+	FluidumDrawAPI void setWindowPosSize(const IF32 x, const IF32 y, const IF32 width, const IF32 height);
+
 	/*
-	arg:
-		size : size
-		pos  : pos
+	Set window pos and size.
+	
+	Args:
+		width  : width(size)
+		height : height(size)
+		x	   : x(pos)
+		y	   : y(pos)
+
+	Note:
+		It will be changed at the appropriate time.
 	*/
-	FluidumDrawAPI void setWindowSizePos(const ImVec2& size, const ImVec2& pos);
+	FluidumDrawAPI void setWindowPosSize_timing(const IF32 x, const IF32 y, const IF32 width, const IF32 height);
+
+	/*
+	Set window size.
+
+	Args:
+		width  : width of window.
+		height : height of window.
+
+	Note:
+		It will be changed at the appropriate time.
+	*/
+	FluidumDrawAPI void setWindowSize_timing(const IF32 width, const IF32 height);
+	
+	/*
+	Set window size.
+
+	Args:
+		size : { width, height }
+
+	Note:
+		It will be changed at the appropriate time.
+	*/
+	FluidumDrawAPI void setWindowSize_timing(const ImVec2& size);
+
+	/*
+	Set window pos.
+
+	Args:
+		width  : posX
+		height : posY
+
+	Note:
+		It will be changed at the appropriate time.
+	*/
+	FluidumDrawAPI void setWindowPos_timing(const IF32 x, const IF32 y);
+	
+	/*
+	Set window pos.
+
+	Args:
+		pos  : { posX, posY }
+
+	Note:
+		It will be changed at the appropriate time.
+	*/
+	FluidumDrawAPI void setWindowPos_timing(const ImVec2& pos);
 
 	//minimize window
 	FluidumDrawAPI void minimizeWindow();

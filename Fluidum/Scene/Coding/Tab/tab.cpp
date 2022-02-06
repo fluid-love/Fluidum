@@ -1,6 +1,7 @@
 #include "tab.h"
 #include <nfd.h>
 #include "../../Utils/Popup/message.h"
+#include <imgui_internal.h>
 
 namespace FS::Coding {
 
@@ -10,12 +11,14 @@ namespace FS::Coding {
 }
 
 FS::Coding::Tab::Tab(
+	FD::ImGuiWindowWrite* const imguiWindowWrite,
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::Coding::TabRead* const tabRead,
 	FD::Coding::DisplayWrite* const displayWrite,
 	const FD::Coding::DisplayRead* const displayRead,
 	const FD::ProjectRead* const projectRead
 ) :
+	imguiWindowWrite(imguiWindowWrite),
 	tabWrite(tabWrite),
 	tabRead(tabRead),
 	displayWrite(displayWrite),
@@ -60,6 +63,10 @@ void FS::Coding::Tab::checkWindowShouldClose() {
 
 	FluidumScene_Log_RequestDeleteScene(::FS::Coding::Tab);
 	Scene::deleteScene<Tab>();
+}
+
+void FS::Coding::Tab::setImGuiWindow() {
+	imguiWindowWrite->set(FU::Class::ClassCode::GetClassCode<Tab>(), ImGui::GetCurrentWindow());
 }
 
 void FS::Coding::Tab::update() {

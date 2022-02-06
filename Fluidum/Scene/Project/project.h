@@ -8,6 +8,7 @@ namespace FS::Project {
 	class Explorer final : public Scene {
 	public:
 		explicit Explorer(
+			FD::ImGuiWindowWrite* const imguiWindowWrite,
 			const FD::Style::ColorRead* const colorRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
@@ -28,6 +29,7 @@ namespace FS::Project {
 			const FD::Style::VarRead* const varRead
 		);
 		void Constructor(
+			FD::ImGuiWindowWrite,
 			FD::Style::ColorRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
@@ -56,6 +58,7 @@ namespace FS::Project {
 		virtual void call() override;
 
 	private:
+		FD::ImGuiWindowWrite* const imguiWindowWrite;
 		const FD::Style::ColorRead* const colorRead;
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
@@ -109,7 +112,7 @@ namespace FS::Project {
 			}
 		}select;
 
-		enum class PopupType : uint8_t {
+		enum class PopupType : UIF8 {
 			Top,
 			Dir,
 			Supported,
@@ -163,9 +166,10 @@ namespace FS::Project {
 
 		bool windowFlag = true;
 
-	private:
+	private://misc
 		void closeWindow();
 		void toolBar();
+		void setImGuiWindow();
 
 	private:
 		void topBar();

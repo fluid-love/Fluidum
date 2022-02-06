@@ -91,7 +91,13 @@ namespace FD {
 		FluidumUtils_Class_Delete_CopyMove(ImGuiWindowRead);
 
 	public:
-		//return ImGuiWindow*
+		/*
+		Get ImGuiWindow*
+
+		Return:
+			ImGuiWindow* : exists    
+			nullptr		 : otherwise 
+		*/
 		template<typename T>
 		[[nodiscard]] T get(const FU::Class::ClassCode::CodeType classCode) const;
 

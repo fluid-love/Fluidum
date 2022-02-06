@@ -32,7 +32,7 @@ namespace FD::Layout {
 		bool horizonal{};
 
 	private:
-		void* identifier = nullptr; //::FD::Layout::AdjacentInfo
+		void* identifier = nullptr; //::FD::Layout::SeparatorInfo
 
 	private:
 		friend class LayoutWrite;
@@ -40,7 +40,7 @@ namespace FD::Layout {
 	};
 
 	struct UnRedoInfo final {
-		enum class Type :uint8_t {
+		enum class Type : UT {
 			Resize,
 			Merge,
 			Split
@@ -123,6 +123,7 @@ namespace FD {
 		void mainFrameBottom(const float val) const;
 
 		void resizeMainFrameRight(const float val);
+		void resizeMainFrameBottom(const float val);
 
 	public:
 		void widthLimit(const float val) const;
@@ -143,6 +144,7 @@ namespace FD {
 
 	public:
 		Layout::ResizedBorder update(const Layout::DockSpaceWindow& window, const ImVec2& mousePos, Layout::ResizedBorder border) const;
+		void update(const Layout::SeparatorPos& separator, const ImVec2& mousePos);
 		void resize(const Layout::DockSpaceWindow& window, const Layout::ResizedBorder border) const;
 
 	public:

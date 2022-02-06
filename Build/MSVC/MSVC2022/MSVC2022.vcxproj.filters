@@ -211,6 +211,7 @@
     <ClInclude Include="Fluidum\Fluidum\Utils\Type\type.h" />
     <ClInclude Include="Fluidum\Fluidum\Utils\include.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Misc\window_resize.h" />
+    <ClInclude Include="Fluidum\Fluidum\Draw\Source\Command\stack.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fluidum\Fluidum\Data\Calc\Array\array.cpp" />
@@ -361,5 +362,6 @@
     <ClCompile Include="Fluidum\Internal\LuAssist\Utils\misc.cpp" />
     <ClCompile Include="Fluidum\Internal\LuAssist\Utils\table.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Misc\window_resize.cpp" />
+    <ClCompile Include="Fluidum\Fluidum\Draw\Source\Command\stack.cpp" />
   </ItemGroup>
 </Project>

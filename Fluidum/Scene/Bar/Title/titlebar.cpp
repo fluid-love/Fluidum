@@ -61,7 +61,6 @@ void FS::TitleBar::update() {
 	style.windowPos.x = guiRead->windowSize().x - (style.buttonSize.x * 3.0f);
 
 	style.projectNameWindowPos.x = style.windowPos.x - style.projectNameWindowSize.x;
-
 	{
 		const float minWidth = (style.iconWindowSize.x + style.projectNameWindowSize.x + style.windowSize.x) * 1.1f;
 		if (guiRead->windowLimitMinWidth() < minWidth)

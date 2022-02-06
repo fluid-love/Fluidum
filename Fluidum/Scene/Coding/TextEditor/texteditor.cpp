@@ -2,8 +2,10 @@
 #include "../../Calc/Lua/lua.h"
 #include "../../Utils/Popup/message.h"
 #include <nfd.h>
+#include <imgui_internal.h>
 
 FS::TextEditor::TextEditor(
+	FD::ImGuiWindowWrite* const imguiWindowWrite,
 	const FD::Style::VarRead* const varRead,
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::Coding::TabRead* const tabRead,
@@ -16,6 +18,7 @@ FS::TextEditor::TextEditor(
 	FD::ToolBarWrite* const toolBarWrite,
 	const FD::Style::ColorRead* const colorRead
 ) :
+	imguiWindowWrite(imguiWindowWrite),
 	varRead(varRead),
 	tabWrite(tabWrite),
 	tabRead(tabRead),
@@ -99,6 +102,10 @@ void FS::TextEditor::call() {
 	this->update();
 	this->shortcut();
 	this->catchZoom();
+}
+
+void FS::TextEditor::setImGuiWindow() {
+	imguiWindowWrite->set(FU::Class::ClassCode::GetClassCode<TextEditor>(), ImGui::GetCurrentWindow());
 }
 
 void FS::TextEditor::toolBar() {
