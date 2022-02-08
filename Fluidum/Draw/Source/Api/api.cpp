@@ -216,6 +216,14 @@ void FDR::setWindowHeightMaxLimit(const IF32 height) {
 	FVK::setWindowSizeLimitsMax(Internal::BaseWindowKey, std::nullopt, height);
 }
 
+void FDR::setTransparentWindow(const I32 r, const I32 g, const I32 b, const I32 alpha) {
+	FVK::setTransparentWindow(Internal::BaseWindowKey, r, g, b, alpha);
+}
+
+void FDR::unsetTransparentWindow() {
+	FVK::unsetTransparentWindow(Internal::BaseWindowKey);
+}
+
 void FDR::setViewportWidthHeight(const float width, const float height) {
 	for (auto& x : Internal::Commands::MainViewport) {
 		x->setViewportWidth(width);
@@ -235,6 +243,11 @@ void FDR::setScissorOffset(const I32 x, const I32 y) {
 	}
 }
 
+void FDR::setClearColor(const float r, const float g, const float b, const float a) {
+	for (auto& x : Internal::Commands::MainBeginRenderPass) {
+		x->setBackColor({ r, g, b, a });
+	}
+}
 
 FDR::ImGuiImage FDR::createImGuiImage(const char* filePath) {
 

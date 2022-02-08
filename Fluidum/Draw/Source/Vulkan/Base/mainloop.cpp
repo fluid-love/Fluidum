@@ -12,7 +12,7 @@ namespace FDR::Internal {
 			LockGuard lock(GMutex);
 			function();
 		}
-		
+
 
 		ImGui::Render();
 		commands->call();
@@ -40,7 +40,6 @@ namespace FDR::Internal {
 			throw std::runtime_error("Failed to wait for Fence");
 
 		UI32 imageIndex;
-
 		result = device.acquireNextImageKHR(swapchain, UINT64_MAX, imageAvailableSemaphores[currentFrame], nullptr, &imageIndex);
 
 		if (result == vk::Result::eErrorOutOfDateKHR) {
@@ -51,8 +50,8 @@ namespace FDR::Internal {
 			throw std::runtime_error("Failed to acquire next image");
 		}
 
-		if (imagesInFlight[imageIndex]) {
-			result = device.waitForFences(1, &imagesInFlight[imageIndex], true, UINT64_MAX);
+		if (imagesInFlight[imageIndex].operator bool()) {
+			result = device.waitForFences(1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
 			if (result != vk::Result::eSuccess) {
 				throw std::runtime_error("Failed to wat fence");
 			}

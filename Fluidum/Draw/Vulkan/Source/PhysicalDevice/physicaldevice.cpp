@@ -172,7 +172,6 @@ void FVK::Internal::PhysicalDevice::pick(const Data::PhysicalDeviceData& data, c
 }
 
 void FVK::Internal::PhysicalDevice::pick(const Data::PhysicalDeviceSwapchainData& data, const SwapchainParameter& parameter) {
-
 	//strong
 	const auto devices = this->enumeratePhysicalDevices(data.get<FvkType::Surface>().instance);
 
@@ -208,6 +207,9 @@ void FVK::Internal::PhysicalDevice::pick(const Data::PhysicalDeviceSwapchainData
 
 	//no-throw
 	this->fillInfo(data);
+
+	const auto sup = info.physicalDevice.getSurfaceCapabilitiesKHR(data.get<FvkType::Surface>().surface);
+
 }
 
 const FVK::Internal::Data::PhysicalDeviceInfo& FVK::Internal::PhysicalDevice::get() const noexcept {

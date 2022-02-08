@@ -69,6 +69,7 @@ void FS::Layout::call() {
 	ImGui::PushStyleColor(ImGuiCol_ResizeGripHovered, ImVec4());
 	ImGui::PushStyleColor(ImGuiCol_SeparatorActive, ImVec4());
 
+	this->updateLayout();
 	this->dockGui();
 
 	ImGui::PopStyleVar(3);
@@ -78,7 +79,6 @@ void FS::Layout::call() {
 	this->save_resize();
 	this->drawSeparators();
 
-	this->updateLayout();
 }
 
 void FS::Layout::updateLayout() {
@@ -86,8 +86,8 @@ void FS::Layout::updateLayout() {
 
 	const std::pair<bool, bool> resized =
 	{
-		static_cast<I32>(guiRead->windowSize().x) == static_cast<I32>(layoutRead->mainFrameRight()) ,
-		static_cast<I32>(guiRead->windowSize().y) == static_cast<I32>(layoutRead->mainFrameBottom())
+		static_cast<I32>(guiRead->windowSize().x) != static_cast<I32>(layoutRead->mainFrameRight()) ,
+		static_cast<I32>(guiRead->windowSize().y) != static_cast<I32>(layoutRead->mainFrameBottom())
 	};
 
 	if (!resized.first && !resized.second)
@@ -97,7 +97,6 @@ void FS::Layout::updateLayout() {
 		layoutWrite->resizeMainFrameRight(guiRead->windowSize().x);
 	else               //height
 		layoutWrite->resizeMainFrameBottom(guiRead->windowSize().y);
-
 	this->updateWindows();
 }
 

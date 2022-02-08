@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include "../../../External/stb/stb_image.h"
+
 #ifdef BOOST_OS_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32
 #endif
@@ -91,12 +93,16 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const FullScree
 	assert(!this->info.window);
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-
+	//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
 	const auto [width, height] = fullscreenSize();
 	this->info.window = glfwCreateWindow(width, height - 1, parameter.title, nullptr, nullptr);
 	checkGlfwCreateWindow();
+
+	GLFWimage images[1];
+	images[0].pixels = stbi_load(parameter.iconFilePath, &images[0].width, &images[0].height, 0, 4);
+	glfwSetWindowIcon(info.window, 1, images);
+	stbi_image_free(images[0].pixels);
 
 	this->setCallbacks();
 
@@ -203,14 +209,16 @@ void FVK::Internal::Window::resizeWindow(const IF32 x, const IF32 y, const IF32 
 #ifdef BOOST_OS_WINDOWS
 	HWND hwnd = glfwGetWin32Window(this->info.window);
 
-	MoveWindow(
+	SetWindowPos(
 		hwnd,
+		NULL,
 		static_cast<int>(x),
 		static_cast<int>(y),
 		static_cast<int>(width),
 		static_cast<int>(height),
-		TRUE
+		NULL
 	);
+
 #else
 #error NotSupported
 #endif 
@@ -237,7 +245,6 @@ void FVK::Internal::Window::fullscreen() const {
 	glfwSetWindowSize(info.window, static_cast<int>(width), static_cast<int>(height - 1));
 }
 
-
 void glfwSetWindowSizeLimits_(GLFWwindow* window, int minwidth, int minheight, int maxwidth, int maxheight) {
 	glfwSetWindowSizeLimits(window, minwidth, minheight, maxwidth, maxheight);
 
@@ -248,3 +255,26 @@ void glfwSetWindowSizeLimits_(GLFWwindow* window, int minwidth, int minheight, i
 
 	glfwSetWindowSizeLimitsCallback(window, minW, minH, maxW, maxH);
 }
+
+void FVK::Internal::Window::setTransparent(const I32 r, const I32 g, const I32 b, const I32 alpha) const {
+	auto hwnd = glfwGetWin32Window(info.window);
+	if ((GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_LAYERED) == WS_EX_LAYERED)
+		return;
+
+	assert(r >= 0 && r <= 255);
+	assert(g >= 0 && g <= 255);
+	assert(b >= 0 && b <= 255);
+	assert(alpha >= 0 && alpha <= 255);
+	SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+	SetLayeredWindowAttributes(hwnd, RGB(r, g, b), alpha, LWA_COLORKEY);
+
+}
+
+void FVK::Internal::Window::unsetTransparent() const {
+	auto hwnd = glfwGetWin32Window(info.window);
+	if ((GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_LAYERED) == WS_EX_LAYERED) {
+		SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) ^ WS_EX_LAYERED);
+	}
+}
+
+

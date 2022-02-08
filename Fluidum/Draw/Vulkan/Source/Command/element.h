@@ -134,7 +134,7 @@ namespace FVK::Internal::Command {
 			this->backColor = color;
 		}
 
-		std::array<float, 4> getBackColor() {
+		[[nodiscard]] std::array<float, 4> getBackColor() {
 			LockGuard lock(GMutex);
 			return this->backColor;
 		}

@@ -17,7 +17,7 @@ namespace FDR {
 	Then call the function in the argument at the appropriate place every frame.
 
 	Three fonts are loaded using freetype.
-	
+
 	ImGui can be used, so they can be written from ImGui::Begin().
 	ImGui::Render and ImGui::NewFrame do not need to be called; they are handled by FluidumDraw.
 	*/
@@ -49,7 +49,7 @@ namespace FDR {
 
 	//get main window size
 	/*
-	return: 
+	return:
 		{width, height}
 	*/
 	FluidumDrawAPI [[nodiscard]] std::pair<IF32, IF32> getWindowSize();
@@ -92,7 +92,7 @@ namespace FDR {
 
 	/*
 	Set window pos and size.
-	
+
 	Args:
 		width  : width(size)
 		height : height(size)
@@ -103,7 +103,7 @@ namespace FDR {
 
 	/*
 	Set window pos and size.
-	
+
 	Args:
 		width  : width(size)
 		height : height(size)
@@ -126,7 +126,7 @@ namespace FDR {
 		It will be changed at the appropriate time.
 	*/
 	FluidumDrawAPI void setWindowSize_timing(const IF32 width, const IF32 height);
-	
+
 	/*
 	Set window size.
 
@@ -149,7 +149,7 @@ namespace FDR {
 		It will be changed at the appropriate time.
 	*/
 	FluidumDrawAPI void setWindowPos_timing(const IF32 x, const IF32 y);
-	
+
 	/*
 	Set window pos.
 
@@ -175,8 +175,18 @@ namespace FDR {
 	FluidumDrawAPI [[nodiscard]] bool isWindowFullscreen();
 
 	FluidumDrawAPI void setWindowWidthMaxLimit(const IF32 width);
-	
+
 	FluidumDrawAPI void setWindowHeightMaxLimit(const IF32 height);
+
+	/*
+	Args:
+		r	  : red   0-255
+		g	  : green 0-255
+		b	  : blue  0-255
+		alpha : alpha 0-255
+	*/
+	FluidumDrawAPI void setTransparentWindow(const I32 r, const I32 g, const I32 b, const I32 alpha);
+	FluidumDrawAPI void unsetTransparentWindow();
 
 }
 
@@ -188,6 +198,13 @@ namespace FDR {
 	FluidumDrawAPI void setScissorExtent(const UI32 width, const UI32 height);
 
 	FluidumDrawAPI void setScissorOffset(const I32 x, const I32 y);
+
+}
+
+//RenderPass
+namespace FDR {
+
+	FluidumDrawAPI void setClearColor(const float r, const float g, const float b, const float a);
 
 }
 
@@ -205,7 +222,7 @@ namespace FDR {
 
 	arg:
 		filePath : Path of the image to load(.png .jpeg .jpg .ppm ...).
-	
+
 	return:
 		image
 	*/

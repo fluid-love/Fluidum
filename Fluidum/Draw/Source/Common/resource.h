@@ -31,6 +31,12 @@ namespace FDR::Internal {
 	constexpr inline const char* WindowInfoFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 5, FU::File::PathArg("/Resources/Gui/Window/.window")>();
 #endif	
 
+#ifdef Fluidum_Path
+	constexpr inline const char* FluidumIconFilePath = Fluidum_Path "Resources/Images/Bar/Icon/Fluidum.png";
+#else
+	constexpr inline const char* FluidumIconFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 5, FU::File::PathArg("/Resources/Images/Bar/Icon/Fluidum.png")>();
+#endif	
+
 }
 
 #endif

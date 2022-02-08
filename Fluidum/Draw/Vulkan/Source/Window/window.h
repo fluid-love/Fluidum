@@ -30,6 +30,7 @@ namespace FVK::Internal {
 		template<>
 		struct Parameter<WindowMode::FullScreen> {
 			const char* title = "";
+			const char* iconFilePath = nullptr;
 		};
 
 		template<>
@@ -94,6 +95,9 @@ namespace FVK::Internal {
 		*/
 		void fullscreen() const;
 
+		void setTransparent(const I32 r, const I32 g, const I32 b, const I32 alpha) const;
+		void unsetTransparent() const;
+
 	private:
 
 		//Create window by specifying the position and size.
@@ -131,6 +135,7 @@ namespace FVK::Internal {
 			std::optional<int> maxwidth,
 			std::optional<int> maxheight
 		);
+
 
 		/*
 		Exception:

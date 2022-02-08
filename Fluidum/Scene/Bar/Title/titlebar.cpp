@@ -40,7 +40,7 @@ FS::TitleBar::TitleBar(
 	style.projectNameWindowPos = { guiRead->windowSize().x * 0.6f, 0.0f };
 	style.projectNameWindowSize = { ImGui::CalcTextSize(text.tempProject).x * 1.2f ,windowHeight };
 
-	style.iconSize = ImVec2{ windowHeight ,windowHeight } *0.86f;
+	style.iconSize = ImVec2{ windowHeight ,windowHeight } * 0.86f;
 
 	style.buttonSize = { style.windowSize.x / 3.0f, style.windowSize.y };
 }

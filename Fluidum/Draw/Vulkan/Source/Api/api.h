@@ -273,6 +273,30 @@ namespace FVK {
 		return info.focused;
 	}
 
+	template<Internal::Key::IsKeyType T>
+	FluidumVK_API [[nodiscard]] void setTransparentWindow(
+		const WindowKey<T>& key,
+		const I32 r,
+		const I32 g,
+		const I32 b,
+		const I32 alpha
+	) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		item.setTransparent(r, g, b, alpha);
+	}
+
+	template<Internal::Key::IsKeyType T>
+	FluidumVK_API [[nodiscard]] void unsetTransparentWindow(const WindowKey<T>& key) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		item.unsetTransparent();
+	}
+
 }
 
 //Instance

@@ -63,9 +63,10 @@ namespace FS::Internal::Bar {
 }
 
 void FS::TopBar::call() {
+	this->updateStyle();
 
-	ImGui::SetNextWindowPos(style.windowPos);
-	ImGui::SetNextWindowSize(style.windowSize);
+	ImGui::SetNextWindowPos(style.windowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(style.windowSize, ImGuiCond_Always);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -82,6 +83,10 @@ void FS::TopBar::call() {
 
 	ImGui::PopStyleVar(2);
 
+}
+
+void FS::TopBar::updateStyle() {
+	style.windowSize.x = guiRead->windowSize().x;
 }
 
 void FS::TopBar::rightGui() {

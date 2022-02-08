@@ -491,8 +491,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../../External/glfw/lib-vc2019;../../../External/Vulkan-Headers/lib;../../../External/freetype-2.10.0/objs;../../../External/lua-5.4.4/lib;../../../External/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;freetype.lib;Lua.lib;nfd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../../External/Vulkan-Headers/lib;../../../External/freetype-2.10.0/objs;../../../External/lua-5.4.4/lib;../../../External/nativefiledialog/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;freetype.lib;Lua.lib;nfd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

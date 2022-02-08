@@ -17,6 +17,8 @@ FS::Misc::ResizeWindow::~ResizeWindow() noexcept {
 }
 
 void FS::Misc::ResizeWindow::call() {
+	this->background();
+
 	using namespace FU::ImGui::Operators;
 
 	if (!FDR::isWindowFocused())
@@ -42,6 +44,8 @@ void FS::Misc::ResizeWindow::call() {
 		dragDeltaX = static_cast<IF32>(dragDelta.x);
 		dragDeltaY = static_cast<IF32>(dragDelta.y);
 		down = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+
+		ImGui::GetMainViewport()->Pos = viewPortPos;
 	}
 
 	this->moveWindow();
@@ -128,6 +132,19 @@ void FS::Misc::ResizeWindow::call() {
 	this->updateGuiData();
 }
 
+void FS::Misc::ResizeWindow::background() {
+	//if (holdBorder == Border::None || holdBorder == Border::Move)
+	//	return;
+
+	auto list = ImGui::GetBackgroundDrawList();
+
+	list->AddRectFilled(
+		{ -50.0f, -50.0f },
+		{ static_cast<float>(windowSizeX), static_cast<float>(windowSizeY) },
+		IM_COL32_BLACK
+	);
+}
+
 void FS::Misc::ResizeWindow::leftCursor() {
 	ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 	FU::Cursor::setCursorType(FU::Cursor::Type::SizeWE);
@@ -163,7 +180,7 @@ void FS::Misc::ResizeWindow::resize_left() {
 	if (dragDeltaX >= 0 && windowSizeX <= guiRead->windowLimitMinWidth())
 		return;
 
-	FDR::setWindowPosSize_timing(
+	FDR::setWindowPosSize(
 		windowPosX + dragDeltaX,
 		windowPosY,
 		windowSizeX - dragDeltaX,
@@ -205,8 +222,8 @@ void FS::Misc::ResizeWindow::resize_top() {
 		return;
 
 	FDR::setWindowPosSize_timing(
-		windowPosX, 
-		windowPosY + dragDeltaY, 
+		windowPosX,
+		windowPosY + dragDeltaY,
 		windowSizeX,
 		windowSizeY - dragDeltaY
 	);
@@ -227,50 +244,51 @@ void FS::Misc::ResizeWindow::resize_bottom() {
 	if (deltaY <= 0 && windowSizeY <= guiRead->windowLimitMinHeight())
 		return;
 
-	FDR::setWindowSize_timing(windowSizeX, windowSizeY + deltaY);
+	FDR::setWindowSize_timing(windowSizeX, windowPosY + deltaY);
 }
 
 void FS::Misc::ResizeWindow::hold() {
-	bool hovered = false;
-
-	//cursor
-	if (currentBorder == Border::Left) {
-		this->leftCursor();
-		hovered = true;
-	}
-	else if (currentBorder == Border::Right) {
-		this->rightCursor();
-		hovered = true;
-	}
-	else if (currentBorder == Border::Top) {
-		this->topCursor();
-		hovered = true;
-	}
-	else if (currentBorder == Border::Bottom) {
-		this->bottomCursor();
-		hovered = true;
-	}
-
-	if (holdBorder == Border::Left) {
-		this->resize_left();
-		if (!hovered)
-			this->leftCursor();
-	}
-	else if (holdBorder == Border::Right) {
-		this->resize_right();
-		if (!hovered)
-			this->rightCursor();
-	}
-	else if (holdBorder == Border::Top) {
-		this->resize_top();
-		if (!hovered)
-			this->topCursor();
-	}
-	else if (holdBorder == Border::Bottom) {
-		this->resize_bottom();
-		if (!hovered)
-			this->bottomCursor();
-	}
+	
+	//bool hovered = false;
+	//
+	////cursor
+	//if (currentBorder == Border::Left) {
+	//	this->leftCursor();
+	//	hovered = true;
+	//}
+	//else if (currentBorder == Border::Right) {
+	//	this->rightCursor();
+	//	hovered = true;
+	//}
+	//else if (currentBorder == Border::Top) {
+	//	this->topCursor();
+	//	hovered = true;
+	//}
+	//else if (currentBorder == Border::Bottom) {
+	//	this->bottomCursor();
+	//	hovered = true;
+	//}
+	//
+	//if (holdBorder == Border::Left) {
+	//	this->resize_left();
+	//	if (!hovered)
+	//		this->leftCursor();
+	//}
+	//else if (holdBorder == Border::Right) {
+	//	this->resize_right();
+	//	if (!hovered)
+	//		this->rightCursor();
+	//}
+	//else if (holdBorder == Border::Top) {
+	//	this->resize_top();
+	//	if (!hovered)
+	//		this->topCursor();
+	//}
+	//else if (holdBorder == Border::Bottom) {
+	//	this->resize_bottom();
+	//	if (!hovered)
+	//		this->bottomCursor();
+	//}
 
 	if (!down) {
 		holdBorder = Border::None;
@@ -308,31 +326,42 @@ void FS::Misc::ResizeWindow::moveWindow() {
 	x += dragDeltaX;
 	y += dragDeltaY;
 
-	FDR::setWindowPos(x, y);
+	FDR::setWindowPos_timing(x, y);
+
 }
 
 void FS::Misc::ResizeWindow::decorateWindow() {
 	this->decorateWindow_frame();
-	this->decorateWindow_border();
+	this->decorateWindow_limitBorder();
 }
 
 void FS::Misc::ResizeWindow::decorateWindow_frame() {
-	if (holdBorder != Border::None && holdBorder != Border::Move)
-		return;
-
 	auto list = ImGui::GetForegroundDrawList();
 
-	list->AddRect(
-		{ 0.0f, 0.0f },
-		{ static_cast<float>(windowSizeX) , static_cast<float>(windowSizeY) },
-		colorRead->windowBorder(),
-		0.0f,
-		0,
-		1.85f
-	);
+	if (holdBorder == Border::Move) {
+		list->AddRect(
+			{ 0.0f, 0.0f },
+			{ static_cast<float>(windowSizeX) , static_cast<float>(windowSizeY) },
+			ImGui::ColorConvertFloat4ToU32(colorRead->noerror()),
+			0.0f,
+			0,
+			1.85f
+		);
+	}
+	else if (holdBorder == Border::None) {
+		list->AddRect(
+			{ 0.0f, 0.0f },
+			{ static_cast<float>(windowSizeX) , static_cast<float>(windowSizeY) },
+			colorRead->windowBorder(),
+			0.0f,
+			0,
+			1.85f
+		);
+	}
+
 }
 
-void FS::Misc::ResizeWindow::decorateWindow_border() {
+void FS::Misc::ResizeWindow::decorateWindow_limitBorder() {
 	if (limit == Border::None)
 		return;
 
@@ -345,32 +374,39 @@ void FS::Misc::ResizeWindow::decorateWindow_border() {
 
 	auto list = ImGui::GetForegroundDrawList();
 
+	const auto [pos1, pos2] = this->borderPos(limit);
+
+	list->AddLine(
+		pos1,
+		pos2,
+		ImGui::ColorConvertFloat4ToU32(colorRead->error()),
+		2.05f
+	);
+
+}
+
+void FS::Misc::ResizeWindow::setLimitNone() {
+	this->limit = Border::None;
+}
+
+std::pair<ImVec2, ImVec2> FS::Misc::ResizeWindow::borderPos(const Border border) {
 	ImVec2 pos1 = { 0.0f, 0.0f };
 	ImVec2 pos2 = { static_cast<float>(windowSizeX), static_cast<float>(windowSizeY) };
 
-	if (limit == Border::Left) {
+	if (holdBorder == Border::Left) {
 		pos2.x = 0.0f;
 	}
-	else if (limit == Border::Right) {
-		pos1.x = pos2.x;
+	else if (holdBorder == Border::Right) {
+		pos1.x = pos2.x - 1.0f;
 	}
-	else if (limit == Border::Top) {
+	else if (holdBorder == Border::Top) {
 		pos2.y = 0.0f;
 	}
 	else {
 		pos1.y = pos2.y;
 	}
 
-	list->AddLine(
-		pos1,
-		pos2,
-		ImGui::ColorConvertFloat4ToU32(colorRead->error()),
-		1.85f
-	);
-}
-
-void FS::Misc::ResizeWindow::setLimitNone() {
-	this->limit = Border::None;
+	return { pos1, pos2 };
 }
 
 void FS::Misc::ResizeWindow::updateGuiData() {

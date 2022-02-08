@@ -63,8 +63,8 @@ void FS::MenuBar::call() {
 
 	//MenuBar size == ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2
 
-	ImGui::SetNextWindowPos(ImVec2(), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(guiRead->windowSize().x, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(guiRead->windowSize().x, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2), ImGuiCond_Always);
 
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImGui::GetStyleColorVec4(ImGuiCol_PopupBg));
 	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.087f, 0.087f, 0.087f, 0.7f));

@@ -493,4 +493,3 @@ void FVK::exeCommands(Commands& commands) {
 	Internal::Api::checkManagerEmpty();
 	commands.call();
 }
-

@@ -15,6 +15,7 @@ namespace FDR::Internal::Initialization {
 		try {
 			FVK::WindowFullScreenParameter param{};
 			param.title = title;
+			param.iconFilePath = FluidumIconFilePath;
 			FVK::createWindow(FDR::Internal::BaseWindowKey, param);
 			return;
 		}
@@ -97,9 +98,11 @@ namespace FDR::Internal::Initialization {
 		vk::PresentModeKHR presentMode = vk::PresentModeKHR::eMailbox;
 		if (!FVK::isPresentModeSupport(BasePhysicalDeviceKey, presentMode)) {
 			presentMode = vk::PresentModeKHR::eImmediate;
-			if (!FVK::isPresentModeSupport(BasePhysicalDeviceKey, presentMode))
+			if (!FVK::isPresentModeSupport(BasePhysicalDeviceKey, presentMode)) {
 				presentMode = vk::PresentModeKHR::eFifo;
+			}
 		}
+
 
 		const vk::Extent2D extent = FVK::getCorrectSwapchainExtent(BaseWindowKey, BasePhysicalDeviceKey);
 
@@ -128,6 +131,7 @@ namespace FDR::Internal::Initialization {
 			createInfo.imageSharingMode = vk::SharingMode::eExclusive;
 		}
 		createInfo.preTransform = capabilities.currentTransform;
+
 		createInfo.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
@@ -884,6 +888,7 @@ namespace FDR::Internal::Initialization {
 			};
 			beginRenderPass->setRenderArea(renderArea);
 			MainCommands.push(beginRenderPass);
+			Commands::MainBeginRenderPass.emplace_back(beginRenderPass);
 
 			FVK::BindGraphicsPipelineCommand bindGPipeline
 				= FVK::makeBindGraphicsPipelineCommand(BaseCommandBuffersKey, BaseGraphicsPipelineKey, i);

@@ -5,7 +5,6 @@ FVK::Internal::Swapchain::Swapchain(const ManagerPassKey, const Data::SwapchainD
 }
 
 void FVK::Internal::Swapchain::create(const Data::SwapchainData& data, Parameter& parameter) {
-
 	parameter.pInfo->surface = data.get<FvkType::LogicalDevice>().surface;
 
 	auto result = data.get<FvkType::LogicalDevice>().device.createSwapchainKHR(*parameter.pInfo, nullptr);
@@ -16,7 +15,7 @@ void FVK::Internal::Swapchain::create(const Data::SwapchainData& data, Parameter
 	}
 
 	this->info.swapchain = result.value;
-	
+
 	//no-throw
 	this->setInfo(parameter);
 
@@ -73,7 +72,7 @@ vk::Extent2D FVK::Internal::Swapchain::getCorrectSwapchainExtent(GLFWwindow* win
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-	
+
 	vk::Extent2D actualExtent = {
 		static_cast<UI32>(width),
 		static_cast<UI32>(height)

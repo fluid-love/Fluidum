@@ -75,6 +75,7 @@ namespace FDR::Internal {
 
 		inline std::vector<FVK::SetScissorCommand> MainScissor{};
 		inline std::vector<FVK::SetViewportCommand> MainViewport{};
+		inline std::vector<FVK::BeginRenderPassCommand> MainBeginRenderPass{};
 	
 	}
 

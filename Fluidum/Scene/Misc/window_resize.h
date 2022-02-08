@@ -54,10 +54,21 @@ namespace FS::Misc {
 		bool down{};
 		bool isItemHoved{};
 
+		ImVec2 viewPortPos{};
+
 		Border limit = Border::None;
+
+
+		struct {
+			const std::array<float, 4> chromaKey{ 0.0f,1.0f,0.0f,1.0f };
+			const std::array<I32, 3> chromaKeyByte{ 0, 255, 0 };
+		}color;
 
 	public:
 		virtual void call() override;
+
+	private:
+		void background();
 
 	private:
 		void leftCursor();
@@ -79,8 +90,10 @@ namespace FS::Misc {
 	private:
 		void decorateWindow();
 		void decorateWindow_frame();
-		void decorateWindow_border();
+		void decorateWindow_limitBorder();
+		void decorateWindow_resizingBorder();
 		void setLimitNone();
+		[[nodiscard]] std::pair<ImVec2, ImVec2> borderPos(const Border border);
 
 	private:
 		void updateGuiData();

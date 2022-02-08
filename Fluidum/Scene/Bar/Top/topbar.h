@@ -72,6 +72,9 @@ namespace FS {
 		}anime;
 
 	private:
+		void updateStyle();
+
+	private:
 		void rightGui();
 
 		void areaGui();
