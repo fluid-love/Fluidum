@@ -11,7 +11,7 @@ namespace FS::Flu {
 
 		~Node() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Node)
+		FluidumUtils_Class_Delete_CopyMove(Node);
 
 	public:
 		virtual void call() override;

@@ -13,7 +13,7 @@ FS::Analysis::Plot::Plot(
 	implotRead(implotRead),
 	implotWrite(implotWrite)
 {
-	GLog.add<FD::Log::Type::None>("Construct Analysis::PlotScene.");
+	FluidumScene_Log_Constructor(::FS::Analysis::Plot);
 
 	//ImPlot
 	ImPlot::CreateContext();
@@ -21,23 +21,9 @@ FS::Analysis::Plot::Plot(
 }
 
 FS::Analysis::Plot::~Plot() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct PlotScene.");
+	FluidumScene_Log_Destructor(::FS::Analysis::Plot);
 
-		ImPlot::DestroyContext();
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	ImPlot::DestroyContext();
 }
 
 void FS::Analysis::Plot::call() {
@@ -74,7 +60,7 @@ void FS::Analysis::Plot::plot() {
 	const auto* data = implotRead->get();
 
 	GWindows.resize(data->size());
-	
+
 	for (FD::Plot::FigureIndex i = 0; const auto & x : *data) {
 		ImGui::Begin(x.figure.title.c_str(), nullptr, ImGuiWindowFlags_NoSavedSettings);
 

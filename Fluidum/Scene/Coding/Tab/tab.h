@@ -7,35 +7,48 @@ namespace FS::Coding {
 	class Tab final : public Scene {
 	public:
 		explicit Tab(
+			FD::ImGuiWindowWrite* const imguiWindowWrite,
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
+			FD::Coding::DisplayWrite* const displayWrite,
+			const FD::Coding::DisplayRead* const displayRead,
 			const FD::ProjectRead* const projectRead
 		);
-		void Constructor(FD::Coding::TabWrite, FD::Coding::TabRead, FD::ProjectRead);
+		void Constructor(
+			FD::ImGuiWindowWrite,
+			FD::Coding::TabWrite,
+			FD::Coding::TabRead,
+			FD::Coding::DisplayWrite,
+			FD::Coding::DisplayRead,
+			FD::ProjectRead
+		);
 
 		~Tab() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Tab)
+		FluidumUtils_Class_Delete_CopyMove(Tab);
 
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		FD::ImGuiWindowWrite* const imguiWindowWrite;
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
 		const FD::ProjectRead* const projectRead;
+		FD::Coding::DisplayWrite* const displayWrite;
+		const FD::Coding::DisplayRead* const displayRead;
 
 		FD::Text::CodingTab text{};
 
 	private:
-		bool windowCloseFlag = false;
+		bool windowCloseFlag = true;
 
 		struct {
-			ImVec2 topBarSize{};
 		}style;
 
 		struct {
 			ImVec2 center{};
+			ImVec2 clicked{};
 		}pos;
 
 		struct File final {
@@ -50,17 +63,17 @@ namespace FS::Coding {
 
 		struct {
 			std::vector<File> files{};
-			std::size_t currentIndex = 0;
+			Size currentIndex = 0;
 		}info;
 
 		struct {
-			uint16_t index = 0;
-			int32_t hovered = -1;
+			UIF16 index = 0;
+			UIF32 hovered = -1;
 		}select;
 
-	private:
+	private://misc
 		void checkWindowShouldClose();
-
+		void setImGuiWindow();
 
 	private:
 		void update();
@@ -69,8 +82,16 @@ namespace FS::Coding {
 
 	private:
 		void fileList();
-		void display();
 
+	private:
+		void display();
+		//no-throw
+		[[nodiscard]] bool addDisplayPath(const std::string& path) noexcept;
+		[[nodiscard]] bool removeDisplayPath(const std::string& path) noexcept;
+		[[nodiscard]] bool checkExistsFile(const std::string& path) noexcept;
+
+
+	private:
 		void closeButton();
 		void close();
 
@@ -79,4 +100,5 @@ namespace FS::Coding {
 		void popup_window();
 
 	};
+
 }

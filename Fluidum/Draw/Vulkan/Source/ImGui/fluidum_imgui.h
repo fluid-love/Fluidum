@@ -7,7 +7,6 @@ namespace FVK::Internal {
 
 	class FvkImGui final {
 	public:
-
 		struct CreateInfo {
 			std::optional<Key::WindowVariantKey> windowKey = std::nullopt;
 			std::optional<Key::InstanceVariantKey> instanceKey = std::nullopt;
@@ -16,8 +15,8 @@ namespace FVK::Internal {
 			std::optional<Key::QueueVariantKey> presentQueueKey = std::nullopt;
 			std::optional<Key::DescriptorPoolVariantKey> descriptorPoolKey = std::nullopt;
 			std::optional<VkSampleCountFlagBits> msaaSamples = std::nullopt;
-			uint32_t minImageCount = 0;
-			uint32_t imageCount = 0;
+			UI32 minImageCount = 0;
+			UI32 imageCount = 0;
 			std::optional<Key::RenderPassVariantKey> renderPassKey = std::nullopt;
 		};
 
@@ -44,24 +43,45 @@ namespace FVK::Internal {
 			std::optional<Key::CommandPoolVariantKey> commandPoolKey = std::nullopt;
 			std::optional<Key::QueueVariantKey> graphicsQueueKey = std::nullopt;
 			FontInfo* pFontInfos = nullptr;
-			uint32_t fontInfoCount = 0;
+			UI32 fontInfoCount = 0;
 		};
 
 	public:
+		/*
+		Exception:
+			std::exception
+		*/
+		//basic
 		explicit FvkImGui(ManagerPassKey, const Data::ImGuiData& data, const Parameter& parameter);
-		~FvkImGui() = default;
-		FluidumUtils_Class_Default_CopyMove(FvkImGui)
+
+		~FvkImGui() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(FvkImGui);
 
 	private:
+		/*
+		Exception:
+			std::exception
+		*/
+		//basic
 		void create(const Data::ImGuiData& data, const Parameter& parameter);
+
 	public:
-		_NODISCARD const Data::ImGuiInfo& get() const noexcept;
+		/*
+		Exception:
+			FailedToDestroy
+		*/
+		//no-exception-safety
+		//It depends on the implementation of imgui.
+		//Probably no-throw.
 		void destroy();
 
-	private://data
-		Data::ImGuiInfo info = {};
+	public:
+		//no-throw
+		[[nodiscard]] const Data::ImGuiInfo& get() const noexcept;
+
+	private:
+		Data::ImGuiInfo info{};
+
 	};
-
-
 
 }

@@ -1,115 +1,113 @@
 #include "tab.h"
 
-namespace FD::Internal::Coding {
-	constexpr inline uint16_t LimitMaxFileSize = 1000;
+namespace FD::Coding::Internal {
 	bool Update = false;
 	bool Update_textSaved = false;
 	bool DisplayFileChanged = false;
 
-	struct FileInfo final {
+	struct EditorInfo final {
 		FTE::TextEditor editor{};
 		bool isTextSaved = true;
 	};
 
-	std::map<std::string, std::unique_ptr<FileInfo>> GData;
+	EditorInfo* FocusedEditor = nullptr;
+
+	std::map<std::string, std::unique_ptr<EditorInfo>> GData;
 }
 
-using namespace ::FD::Internal::Coding;
+void FD::Coding::Internal::Data::ProjectWrite::initializeInternalData() {
+	//already locked
 
-void FD::Coding::TabWrite::addFile(const std::string& path) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+	for (const auto& x : filePaths) {
+		GData.insert({ x, std::make_unique<EditorInfo>() });
+	}
+}
 
-	if (TabData::filePathes.size() >= LimitMaxFileSize)
+void FD::Coding::Internal::Data::ProjectWrite::clearInternalData() {
+	//already locked
+
+	GData.clear();
+}
+
+void FD::Coding::TabWrite::add(const std::string& path) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	if (Data::filePaths.size() >= Tab::Limits::FileSizeMax)
 		throw Exception::LimitFileSizeMax;
 
-	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
-	if (itr != TabData::filePathes.end())
+	auto itr = std::find(Data::filePaths.begin(), Data::filePaths.end(), path);
+	if (itr != Data::filePaths.end())
 		throw Exception::AlreadyExist;
 
-	std::ifstream ifs(path);
-	if (!ifs)
+	if (!std::filesystem::exists(path))
 		throw Exception::NotFound;
 
-	TabData::filePathes.emplace_back(path);
+	Data::filePaths.emplace_back(path);
 
 	this->update();
 }
 
-void FD::Coding::TabWrite::eraseFile(const std::string& path) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+void FD::Coding::TabWrite::remove(const std::string& path) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
 	{
-		auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
-		if (itr == TabData::filePathes.end())
+		auto itr = std::find(Data::filePaths.begin(), Data::filePaths.end(), path);
+		if (itr == Data::filePaths.end())
 			throw Exception::NotFound;
-		TabData::filePathes.erase(itr);
+		Data::filePaths.erase(itr);
 	}
 	{
 		auto itr = GData.find(path);
 		if (itr != GData.end())
 			GData.erase(itr);
 	}
-
-	this->update();
-}
-
-void FD::Coding::TabWrite::clear() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-
-	TabData::displayFiles.clear();
-	TabData::filePathes.clear();
-	GData.clear();
-
-	this->update();
-}
-
-void FD::Coding::TabWrite::addDisplayFile(const std::string& path) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
-	if (itr == TabData::filePathes.end())
-		throw Exception::NotFound;
-
-	if (!GData.contains(path)) {
-		GData.insert({ path,std::make_unique<FileInfo>() });
+	{
+		auto itr = std::find_if(Data::displayInfo.begin(), Data::displayInfo.end(),
+			[&](auto& x) {return path == x.path; }
+		);
+		if (itr != Data::displayInfo.end())
+			Data::displayInfo.erase(itr);
 	}
 
-	TabData::displayFiles.emplace_back(*itr);
-
-	DisplayFileChanged = true;
 	this->update();
 }
 
-void FD::Coding::TabWrite::eraseDisplayFile(const std::string& path) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	auto itr = std::find(TabData::filePathes.begin(), TabData::filePathes.end(), path);
-	if (itr == TabData::filePathes.end())
-		throw Exception::NotFound;
+void FD::Coding::TabWrite::clear() {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
 
-	TabData::displayFiles.erase(itr);
-
-	DisplayFileChanged = true;
-	this->update();
-}
-
-void FD::Coding::TabWrite::releaseAllEditorData() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+	Data::displayInfo.clear();
+	Data::filePaths.clear();
 	GData.clear();
+
+	this->update();
 }
 
 FTE::TextEditor* FD::Coding::TabWrite::getEditor(const std::string& path) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	return &GData.at(path).get()->editor;
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	auto itr = GData.find(path);
+	if (itr == GData.end())
+		throw Exception::NotFound;
+
+	return &itr->second.get()->editor;
 }
 
-void FD::Coding::TabWrite::update() const {
+void FD::Coding::TabWrite::update() {
+	using namespace Internal;
 	Update = true;
 }
 
-void FD::Coding::TabWrite::save() const {
-	TabData::save.store(true);
+void FD::Coding::TabWrite::save() {
+	using namespace Internal;
+	Data::save.store(true);
 }
 
-void FD::Coding::TabWrite::setIsTextSaved(const std::string& path, const bool val) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+void FD::Coding::TabWrite::setIsTextSaved(const std::string& path, const bool val) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
 	auto* elm = GData.at(path).get();
 	if (elm->isTextSaved == val)
 		return;
@@ -118,8 +116,9 @@ void FD::Coding::TabWrite::setIsTextSaved(const std::string& path, const bool va
 	Update_textSaved = true;
 }
 
-void FD::Coding::TabWrite::setAllIsTextSaved(const bool val) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+void FD::Coding::TabWrite::setAllIsTextSaved(const bool val) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
 
 	for (auto& x : GData) {
 		if (x.second.get()->isTextSaved != val) {
@@ -129,26 +128,33 @@ void FD::Coding::TabWrite::setAllIsTextSaved(const bool val) const {
 	}
 }
 
-void FD::Coding::TabWrite::saveText(const std::string& path) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	FileInfo* info = GData.at(path).get();
+void FD::Coding::TabWrite::saveText(const std::string& path) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	if (!GData.contains(path))
+		throw Exception::NotFound;
+
+	EditorInfo* info = GData.at(path).get();
 
 	//already saved
 	if (info->isTextSaved)
 		return;
 
 	const std::string text = info->editor.GetText();
-	std::ofstream ofs(path);
+	std::ofstream ofs(path, std::ios::trunc);
 	ofs << text;
 
 	info->isTextSaved = true;
+	Update_textSaved = true;
 }
 
-void FD::Coding::TabWrite::saveAllTexts() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+void FD::Coding::TabWrite::saveAllTexts() {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
 
 	for (auto& x : GData) {
-		FileInfo* info = x.second.get();
+		EditorInfo* info = x.second.get();
 
 		//already saved
 		if (info->isTextSaved)
@@ -160,48 +166,52 @@ void FD::Coding::TabWrite::saveAllTexts() const {
 
 		info->isTextSaved = true;
 	}
+
+	Update_textSaved = true;
 }
 
 bool FD::Coding::TabRead::update() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	bool result = Internal::Coding::Update;
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	bool result = Update;
 	if (result) {
-		Internal::Coding::Update = false;
+		Update = false;
 	}
 	return result;
 }
 
-std::vector<std::string> FD::Coding::TabRead::getFilePathes() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	return TabData::filePathes;
-}
-
-std::vector<std::string> FD::Coding::TabRead::getDisplayFilePaths() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	return TabData::displayFiles;
-}
-
-bool FD::Coding::TabRead::isDisplayFileChanged() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	const bool result = DisplayFileChanged;
-	if (result)
-		DisplayFileChanged = false;
-	return result;
+std::vector<std::string> FD::Coding::TabRead::paths() const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	return Data::filePaths;
 }
 
 bool FD::Coding::TabRead::isTextSaved(const std::string& path) const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
 	return GData.at(path).get()->isTextSaved;
 }
 
-bool FD::Coding::TabRead::isAllTextSaved() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
-	auto itr = std::find_if(GData.begin(), GData.end(), [](auto& x) { return x.second.get()->isTextSaved; });
-	return itr == GData.end();
+bool FD::Coding::TabRead::isAllTextSaved() const noexcept {
+	using namespace Internal;
+	try {
+		std::lock_guard<std::mutex> lock(Data::mtx);//system_error
+		auto itr = std::find_if(GData.begin(), GData.end(), [](auto& x) { return !x.second.get()->isTextSaved; });
+		return itr == GData.end();
+	}
+	catch (const std::exception& e) {
+		FluidumData_Log_Internal_StdExceptionError(e);
+		std::terminate();
+	}
+	catch (...) {
+		FluidumData_Log_Internal_InternalError();
+		std::terminate();
+	}
 }
 
 bool FD::Coding::TabRead::update_isTextSaved() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
 	const bool result = Update_textSaved;
 	if (result)
 		Update_textSaved = false;
@@ -209,7 +219,8 @@ bool FD::Coding::TabRead::update_isTextSaved() const {
 }
 
 std::vector<std::string> FD::Coding::TabRead::notSavedTexts() const {
-	std::lock_guard<std::mutex> lock(TabData::mtx);
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
 
 	std::vector<std::string> ret{};
 
@@ -218,4 +229,189 @@ std::vector<std::string> FD::Coding::TabRead::notSavedTexts() const {
 			ret.emplace_back(x.first);
 	}
 	return ret;
+}
+
+bool FD::Coding::TabRead::exist(const std::string& path) const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	const auto itr = std::find(Data::filePaths.begin(), Data::filePaths.end(), path);
+	return itr != Data::filePaths.end();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void FD::Coding::DisplayWrite::add(const std::string& path) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	auto itr = std::find(Data::filePaths.begin(), Data::filePaths.end(), path);
+	if (itr == Data::filePaths.end())
+		throw Exception::NotFound;
+
+	if (!GData.contains(path)) {
+		GData.insert({ path,std::make_unique<EditorInfo>() });
+	}
+
+	DisplayInfo info{
+		.path = *itr,
+		.zoomRatio = Data::firstEditorZoomRatio
+	};
+	Data::displayInfo.emplace_back(std::move(info));
+
+	DisplayFileChanged = true;
+}
+
+void FD::Coding::DisplayWrite::remove(const std::string& path) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	auto itr = this->find(path);
+	if (itr == Data::displayInfo.end())
+		throw Exception::NotFound;
+
+	Data::displayInfo.erase(itr);
+
+	DisplayFileChanged = true;
+}
+
+bool FD::Coding::DisplayWrite::tryRemove(const std::string& path) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	auto itr = this->find(path);
+	if (itr == Data::displayInfo.end())
+		return false;
+
+	Data::displayInfo.erase(itr);
+
+	DisplayFileChanged = true;
+
+	return true;
+}
+
+void FD::Coding::DisplayWrite::theme(const std::string& path, const DisplayInfo::Theme theme) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	auto itr = this->find(path);
+	if (itr == Data::displayInfo.end())
+		throw Exception::NotFound;
+
+	itr->theme = theme;
+}
+
+void FD::Coding::DisplayWrite::zoomRatio(const std::string& path, const float ratio) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	auto itr = this->find(path);
+	if (itr == Data::displayInfo.end())
+		throw Exception::NotFound;
+
+	itr->zoomRatio = ratio;
+}
+
+std::vector<FD::Coding::DisplayInfo>::iterator FD::Coding::DisplayWrite::find(const std::string& path) const {
+	using namespace Internal;
+
+	auto itr = std::find_if(Data::displayInfo.begin(), Data::displayInfo.end(),
+		[&](auto& x)
+		{
+			return path == x.path;
+		}
+	);
+	return itr;
+}
+
+void FD::Coding::DisplayWrite::focusedEditor(const std::string& path) {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+
+	auto itr = GData.find(path);
+	if (itr == GData.end())
+		throw Exception::NotFound;
+
+	FocusedEditor = GData.at(path).get();
+}
+
+std::vector<std::string> FD::Coding::DisplayRead::paths() const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	std::vector<std::string> ret(Data::displayInfo.size());
+	for (Size i = 0, size = ret.size(); i < size; i++) {
+		ret[i] = Data::displayInfo[i].path;
+	}
+	return ret;
+}
+
+std::vector<FD::Coding::DisplayInfo> FD::Coding::DisplayRead::info() const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	return Data::displayInfo;
+}
+
+bool FD::Coding::DisplayRead::empty() const noexcept {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx); //system_error
+	return Data::displayInfo.empty();
+}
+
+bool FD::Coding::DisplayRead::changed() const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	const bool result = DisplayFileChanged;
+	if (result)
+		DisplayFileChanged = false;
+	return result;
+}
+
+bool FD::Coding::DisplayRead::isEditorFocused(const std::string& path) const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);//system_error
+
+	if (!FocusedEditor)//nullptr
+		return false;;
+
+	const auto find = std::find_if(
+		Data::displayInfo.begin(),
+		Data::displayInfo.end(),
+		[&](auto& x) {return x.path == path; }
+	);
+
+	if (find == Data::displayInfo.end())
+		return false;//not found
+
+	const auto itr = std::find_if(
+		GData.begin(),
+		GData.end(),
+		[&](auto& x) {return x.first == find->path; }
+	);
+
+	return (*itr).second.get() == FocusedEditor;
+}
+
+bool FD::Coding::DisplayRead::isEditorFocused(const FTE::TextEditor* editor) const noexcept {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);//system_error
+
+	return &FocusedEditor->editor == editor;
+}
+
+std::string FD::Coding::DisplayRead::focusedFilePath() const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);//system_error
+
+	if (!FocusedEditor)//nullptr
+		return {};
+
+	const auto itr = std::find_if(
+		GData.begin(),
+		GData.end(),
+		[&](auto& x) {return x.second.get() == FocusedEditor; }
+	);
+
+	assert(itr != GData.end());
+	if (itr == GData.end())
+		return {};
+
+	return itr->first;
 }

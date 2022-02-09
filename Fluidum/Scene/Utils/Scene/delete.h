@@ -29,17 +29,17 @@ namespace FS::Utils {
 		explicit DeleteScenes(const FD::SceneRead* const sceneRead) :
 			sceneRead(sceneRead)
 		{
-			FluidumScene_Log_Constructor("Utils::DeleteScenes");
+			FluidumScene_Log_Constructor(::FS::Utils::DeleteScenes<T...>);
 			this->deleteScenes<0>();
 		}
 
 		void Constructor(FD::SceneRead);
 
 		~DeleteScenes() noexcept {
-			FluidumScene_Log_Destructor_("Utils::DeleteScenes")
+			FluidumScene_Log_Destructor(::FS::Utils::DeleteScenes<T...>);
 		}
 
-		FluidumUtils_Class_Delete_CopyMove(DeleteScenes)
+		FluidumUtils_Class_Delete_CopyMove(DeleteScenes);
 
 	public:
 		virtual void call() override {
@@ -83,7 +83,7 @@ namespace FS::Utils {
 				this->genome();
 			else if constexpr (code == ClassCode::GetClassCode<Animation>())
 				this->animation();
-			else if constexpr (code == ClassCode::GetClassCode<Project>())
+			else if constexpr (code == ClassCode::GetClassCode<Project::Explorer>())
 				this->project();
 			else if constexpr (code == ClassCode::GetClassCode<Console>())
 				this->console();
@@ -94,77 +94,77 @@ namespace FS::Utils {
 
 	private:
 		void coding() {
-			if (sceneRead->isExist<Coding::Tab>()) {
+			if (sceneRead->exist<Coding::Tab>()) {
 				this->tab();
 			}
-			if (sceneRead->isExist<Coding::Debug>()) {
+			if (sceneRead->exist<Coding::Debug>()) {
 				this->debug();
 			}
 
-			FluidumScene_Log_RequestTryDeleteScene("Genome::Overview");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Genome::Overview);
 			Scene::tryDeleteScene<TextEditor>();
 		}
 
 		void tab() {
-			FluidumScene_Log_RequestTryDeleteScene("Coding::Tab");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Coding::Tab);
 			Scene::tryDeleteScene<Coding::Tab>();
 		}
 
 		void debug() {
-			FluidumScene_Log_RequestTryDeleteScene("Coding::Debug");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Coding::Debug);
 			Scene::tryDeleteScene<Coding::Debug>();
 		}
 
 	private:
 		void flu() {
-			FluidumScene_Log_RequestTryDeleteScene("Flu::Node");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Flu::Node);
 			Scene::tryDeleteScene<Flu::Node>();
 		}
 
 	private:
 		void analysis() {
-			if (sceneRead->isExist<Analysis::Plot>()) {
+			if (sceneRead->exist<Analysis::Plot>()) {
 				this->plot();
 			}
-			if (sceneRead->isExist<Analysis::Function>()) {
+			if (sceneRead->exist<Analysis::Function>()) {
 				this->function();
 			}
 
-			FluidumScene_Log_RequestTryDeleteScene("Analysis::Overview");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Analysis::Overview);
 			Scene::tryDeleteScene<Analysis::Overview>();
 		}
 
 		void plot() {
-			FluidumScene_Log_RequestTryDeleteScene("Analysis::Plot");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Analysis::Plot);
 			Scene::tryDeleteScene<Analysis::Plot>();
 		}
 
 		void function() {
-			FluidumScene_Log_RequestTryDeleteScene("Analysis::Function");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Analysis::Function);
 			Scene::tryDeleteScene<Analysis::Function>();
 		}
 
 	private:
 		void genome() {
-			FluidumScene_Log_RequestTryDeleteScene("Genome::Overview");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Genome::Overview);
 			Scene::tryDeleteScene<Genome::Overview>();
 		}
 
 	private:
 		void animation() {
-			FluidumScene_Log_RequestTryDeleteScene("Animation");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Animation);
 			Scene::tryDeleteScene<Animation>();
 		}
 
 	private:
 		void project() {
-			FluidumScene_Log_RequestTryDeleteScene("Project");
-			Scene::tryDeleteScene<Project>();
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Project::Explorer);
+			Scene::tryDeleteScene<Project::Explorer>();
 		}
 
 	private:
 		void console() {
-			FluidumScene_Log_RequestTryDeleteScene("Console");
+			FluidumScene_Log_RequestTryDeleteScene(::FS::Console);
 			Scene::tryDeleteScene<Console>();
 		}
 

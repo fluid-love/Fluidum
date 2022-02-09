@@ -1,0 +1,13 @@
+# CMake generation dependency list for this directory.
+C:/Fluidum/Libraries/Vulkan-Headers/CMakeLists.txt
+C:/Fluidum/Libraries/Vulkan-Headers/build/CMakeFiles/3.19.1/CMakeSystem.cmake
+C:/Fluidum/Libraries/Vulkan-Headers/cmake/cmake_uninstall.cmake.in
+C:/cmake/share/cmake-3.19/Modules/CMakeDetermineSystem.cmake
+C:/cmake/share/cmake-3.19/Modules/CMakeGenericSystem.cmake
+C:/cmake/share/cmake-3.19/Modules/CMakeInitializeConfigs.cmake
+C:/cmake/share/cmake-3.19/Modules/CMakeSystem.cmake.in
+C:/cmake/share/cmake-3.19/Modules/CMakeSystemSpecificInformation.cmake
+C:/cmake/share/cmake-3.19/Modules/CMakeSystemSpecificInitialize.cmake
+C:/cmake/share/cmake-3.19/Modules/GNUInstallDirs.cmake
+C:/cmake/share/cmake-3.19/Modules/Platform/Windows.cmake
+C:/cmake/share/cmake-3.19/Modules/Platform/WindowsPaths.cmake

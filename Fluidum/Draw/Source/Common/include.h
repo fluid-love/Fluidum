@@ -14,4 +14,5 @@
 #include "messenger.h"
 #include "mutex.h"
 #include "resource.h"
+#include "../Command/stack.h"
 #include "../Exception/exception.h"

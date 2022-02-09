@@ -13,8 +13,7 @@ namespace FS::Utils {
 
 		~AddScenes() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(AddScenes)
-
+		FluidumUtils_Class_Delete_CopyMove(AddScenes);
 
 	public:
 		virtual void call() override;

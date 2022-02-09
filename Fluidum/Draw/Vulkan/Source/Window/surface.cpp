@@ -5,13 +5,24 @@ FVK::Internal::Surface::Surface(ManagerPassKey, const Data::SurfaceData& data, c
 }
 
 void FVK::Internal::Surface::create(const Data::SurfaceData& data, const Parameter& parameter) {
-	VkSurfaceKHR castSurface;
+	vk::SurfaceKHR castSurface{};
 
-	if (glfwCreateWindowSurface(data.get<FvkType::Instance>().instance, data.get<FvkType::Window>().window, nullptr, &castSurface) != VK_SUCCESS)
-		Exception::throwFailedToCreate("Failed to create Surface.");
+#ifdef FluidumUtils_Type_OS_Windows
 
-	//recast
-	info.surface = castSurface;
+	vk::Win32SurfaceCreateInfoKHR createInfo{
+		.hinstance = GetModuleHandle(NULL),
+		.hwnd = data.get<FvkType::Window>().window,
+	};
+
+	const auto result = data.get<FvkType::Instance>().instance.createWin32SurfaceKHR(createInfo);
+
+	if (result.result != vk::Result::eSuccess) {
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to create Surface.({}).", vk::to_string(result.result));
+		Exception::throwFailedToCreate();
+	}
+	info.surface = result.value;
+
+#endif 
 
 	this->fillInfo(data);
 }
@@ -21,7 +32,7 @@ const FVK::Internal::Data::SurfaceInfo& FVK::Internal::Surface::get() const noex
 	return this->info;
 }
 
-void FVK::Internal::Surface::destroy() {
+void FVK::Internal::Surface::destroy() noexcept {
 	assert(this->info.surface);
 	vkDestroySurfaceKHR(this->info.instance, info.surface, nullptr);
 }

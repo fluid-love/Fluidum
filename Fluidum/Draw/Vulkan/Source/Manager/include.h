@@ -1,8 +1,9 @@
 #pragma once
 
+//common
 #include "../Common/include.h"
 
-#include "../Window/glfw.h"
+//items
 #include "../Window/window.h"
 #include "../Instance/instance.h"
 #include "../Instance/messenger.h"
@@ -31,8 +32,8 @@
 #include "../Sync/fence.h"
 #include "../Image/sampler.h"
 #include "../Image/texture.h"
-#include "../Draw/draw.h"
 #include "../ImGui/fluidum_imgui.h"
 #include "../ImGui/image.h"
 
+//commands
 #include "../Command/commands.h"

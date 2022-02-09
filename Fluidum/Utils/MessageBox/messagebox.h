@@ -1,7 +1,10 @@
 ﻿#pragma once
 
 #include <boost/predef.h>
+
 #include "../Concept/concept.h"
+#include "../Type/type.h"
+
 #include <string>
 #include <array>
 
@@ -14,11 +17,14 @@
 #endif
 
 namespace FU::MB {
-	enum class Icon : uint8_t {
+	enum class Icon : UIF8 {
 		Warning,
-		Error
+		Error,
+		Information
 	};
 }
+
+#ifdef BOOST_OS_WINDOWS
 
 namespace FU::MB::Internal {
 	inline HHOOK MsgBoxHook{};
@@ -54,6 +60,8 @@ namespace FU::MB::Internal {
 		return CallNextHookEx(MsgBoxHook, code, wParam, lParam);
 	}
 
+#endif
+
 	int MsgBox3(const wchar_t* caption, UINT uType);
 
 	long iconToVal(const Icon type);
@@ -64,7 +72,7 @@ namespace FU::MB::Internal {
 
 namespace FU::MB {
 
-	int32_t button_button_cancel(
+	I32 button_button_cancel(
 		const Icon iconType,
 		const char* message,
 		const char* button1,
@@ -75,16 +83,25 @@ namespace FU::MB {
 	//Icon::Error message [IDOK]
 	void error(const char* message);
 
+	//Icon::Information message [IDOK]
+	void information(const char* message);
+
+
 	//Icon::Warning message [IDOK] [IDCANCEL]
 	//ok     -> return 0
 	//cancel -> return 1
-	int32_t ok_cancel(const char* message);
+	I32 ok_cancel(const char* message);
+
+	//Icon::Warning message [IDYES] [IDNO]
+	//ok     -> return 0
+	//cancel -> return 1
+	I32 yes_no(const char* message);
 
 }
 
 namespace FU::MB {
 
-	int32_t child_button_button_cancel(
+	I32 child_button_button_cancel(
 		const Icon iconType,
 		const char* message,
 		const char* childMessage,

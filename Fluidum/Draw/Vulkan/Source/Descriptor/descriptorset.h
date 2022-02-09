@@ -6,7 +6,6 @@ namespace FVK::Internal {
 
 	class DescriptorSet final {
 	public:
-
 		struct AllocateInfo : public vk::DescriptorSetAllocateInfo {
 		public:
 			std::optional<Key::DescriptorPoolVariantKey> descriptorPoolKey = std::nullopt;
@@ -27,18 +26,46 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//basic
+		/*
+		If an exception is thrown, 
+		the contents of the private variable in parameter may change.
+		However, it is safe.
+		*/
 		DescriptorSet(ManagerPassKey, const Data::DescriptorSetData& data, Parameter& parameter);
+
 		~DescriptorSet() = default;
-		FluidumUtils_Class_Default_CopyMove(DescriptorSet)
+		FluidumUtils_Class_Default_CopyMove(DescriptorSet);
 
 	private:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//basic
 		void allocate(const Data::DescriptorSetData& data, Parameter& parameter);
-	public:
-		const Data::DescriptorSetInfo& get() const noexcept;
-		void destroy();
 
+	public:
+		/*
+		Exception:
+			FailedToDestroy
+		*/		
+		//strong
+		void destroy() noexcept;
+
+	public:
+		//no-throw
+		[[nodiscard]] const Data::DescriptorSetInfo& get() const noexcept;
 
 	private:
-		Data::DescriptorSetInfo info = {};
+		Data::DescriptorSetInfo info{};
+
 	};
+
 }

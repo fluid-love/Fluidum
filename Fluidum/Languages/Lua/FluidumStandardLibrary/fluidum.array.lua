@@ -1,5 +1,0 @@
-function {
-	make = function()
-
-	end
-}

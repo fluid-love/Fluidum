@@ -1,80 +1,140 @@
 ﻿#include "console.h"
+#include <imgui_internal.h>
 
 FS::Console::Console(
-	FD::ConsoleWrite* const consoleWrite,
-	const FD::ConsoleRead* const consoleRead
+	FD::ImGuiWindowWrite* const imguiWindowWrite, FD::ConsoleWrite* const consoleWrite,
+	const FD::ConsoleRead* const consoleRead,
+	const FD::Style::ColorRead* const colorRead,
+	const FD::Style::VarRead* const varRead,
+	FD::ToolBarWrite* const toolBarWrite
 ) :
+	imguiWindowWrite(imguiWindowWrite),
 	consoleWrite(consoleWrite),
-	consoleRead(consoleRead)
+	consoleRead(consoleRead),
+	colorRead(colorRead),
+	varRead(varRead),
+	toolBarWrite(toolBarWrite)
 {
-	GLog.add<FD::Log::Type::None>("Construct ConsoleScene.");
+	FluidumScene_Log_Constructor(::FS::Console);
 
-	if (inputText.max_size() >= 2000)
-		inputText.reserve(2000);
-	else
+	if (inputText.max_size() <= FD::Console::Limits::Characters)
 		inputText.reserve(inputText.max_size());
+	else
+		inputText.reserve(FD::Console::Limits::Characters);
+
+	style.inputTextWindowHeight = varRead->inputTextHeight();
+
+	toolBarWrite->add(&Console::toolBar, this, text.console.operator const std::string & ());
 
 }
 
-FS::Console::~Console() {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct ConsoleScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+FS::Console::~Console() noexcept {
+	toolBarWrite->remove<Console>();
+	FluidumScene_Log_Destructor(::FS::Console);
 }
 
 void FS::Console::call() {
-	ImGui::Begin("Console", &this->windowFlag);
 
+	ImGui::SetNextWindowContentSize(varRead->viewWindowSizeConstraints());
+
+	//collapse
+	if (flag.collapseWindow) {
+		ImGui::SetNextWindowCollapsed(true);
+		flag.collapseWindow = false;
+	}
+
+	ImGui::Begin(text.console, &flag.windowFlag);
+	this->setImGuiWindow();
+
+	flag.isWindowCollpsed = ImGui::IsWindowCollapsed();
+
+	//popup: title bar
+	if (FU::ImGui::isTitleBarClicked(ImGuiMouseButton_Right))
+		flag.popupTitle = true;
+
+	//main
 	this->console();
 	this->input();
 
 
 	this->changeFontSize();
+
 	ImGui::End();
 
+	this->popupTitle();
+	this->popupRight();
 	this->closeWindow();
 }
 
+void FS::Console::setImGuiWindow() {
+	imguiWindowWrite->set(FU::Class::ClassCode::GetClassCode<Console>(), ImGui::GetCurrentWindow());
+}
+
+void FS::Console::toolBar() {
+	ImGui::Button("test");
+}
+
 void FS::Console::console() {
+	using namespace FU::ImGui::Operators;
+
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, { 0.005f,0.005f,0.005f,1.0f });
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.1f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding * 2.0f);
 
 	const auto size = ImGui::GetWindowSize();
-	ImGui::BeginChild("ConsoleText", { size.x * 0.98f,size.y * 0.8f }, false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+	ImGui::BeginChild("ConsoleText", { size.x - ImGui::GetStyle().ScrollbarSize, size.y - style.inputTextWindowHeight }, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 	ImGui::SetWindowFontScale(style.fontSizeScale);
 
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !flag.popupTitle && ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows))
+		flag.popupRight = true;
+
 	ImGuiListClipper clipper;
-	clipper.Begin(100);
+	const IF32 clipperSize = static_cast<IF32>(consoleRead->size() < 100 ? consoleRead->size() : 100);
+	clipper.Begin(clipperSize);
 	while (clipper.Step()) {
+		for (IF32 i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
 
-		for (int32_t i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-
-			const auto info = consoleRead->get(i);
-			if (info.first)
-				ImGui::Text(info.second.message.c_str());
-			else
+			auto [valid, message] = consoleRead->get(i);
+			if (valid) {//read_only
+				const ImVec4 color = this->messageColor(message.type);
+				ImGui::TextColored(color, message.message.c_str());
+			}
+			else {
 				ImGui::Spacing();
+			}
 		}
+	}
+
+	if (!consoleRead->busy()) {
+		const float alpha = std::fabs(std::sinf(static_cast<float>(2.0 * ImGui::GetTime())));
+		ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,alpha });
+		ImGui::Text(">");
+		ImGui::PopStyleColor();
 	}
 
 	ImGui::EndChild();
 
 	ImGui::PopStyleColor();
+	ImGui::PopStyleVar(2);
+}
+
+ImVec4 FS::Console::messageColor(const FU::Log::Type type) const {
+	using enum FU::Log::Type;
+	if (type == None)
+		return ImGui::GetStyleColorVec4(ImGuiCol_Text);
+	else if (type == Error)
+		return colorRead->error();
+	else if (type == Warning)
+		return colorRead->warning();
+	else
+		return colorRead->info();
 }
 
 void FS::Console::input() {
+
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.8f);
+
 	ImGui::InputText("##InputText", inputText.data(), inputText.capacity());
 
 	if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) && ImGui::IsItemFocused()) {
@@ -89,17 +149,79 @@ void FS::Console::input() {
 }
 
 void FS::Console::closeWindow() {
-	if (windowFlag)
+	if (flag.windowFlag)
 		return;
 
 	//close
-	FluidumScene_Log_RequestDeleteScene("Console");
+	FluidumScene_Log_RequestDeleteScene(::FS::Console);
 	Scene::deleteScene<Console>();
 }
 
 void FS::Console::push() {
-	consoleWrite->add(std::string(inputText.data()));
+	std::string text = ">" + std::string(inputText.data());
+	consoleWrite->push(std::move(text));
 	inputText = std::string();
+
+	if (inputText.max_size() <= FD::Console::Limits::Characters)
+		inputText.reserve(inputText.max_size());
+	else
+		inputText.reserve(FD::Console::Limits::Characters);
+}
+
+void FS::Console::popupTitle() {
+	if (flag.popupTitle) {
+		flag.popupTitle = false;
+		ImGui::OpenPopup("TitlePopup");
+	}
+
+	if (!ImGui::BeginPopup("TitlePopup"))
+		return;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x,ImGui::GetStyle().ItemSpacing.y * 2.2f });
+
+	if (flag.isWindowCollpsed) { //already collapsed
+		ImGui::TextDisabled(text_.collapseWindow.c_str());
+	}
+	else {
+		if (ImGui::Selectable(text_.collapseWindow.c_str()))
+			flag.collapseWindow = true;
+	}
+
+	ImGui::PopStyleVar();
+
+	ImGui::EndPopup();
+}
+
+void FS::Console::popupRight() {
+	if (flag.popupRight) {
+		flag.popupRight = false;
+		ImGui::OpenPopup("ConsolePopup");
+	}
+
+	if (!ImGui::BeginPopup("ConsolePopup"))
+		return;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x,ImGui::GetStyle().ItemSpacing.y * 2.2f });
+
+	if (ImGui::Selectable(text.clear))
+		this->popup_clear();
+
+	//ImGui::Separator();
+
+	//if (ImGui::MenuItem(text.backcolor))
+	//	this->popup_backcolor();
+
+	ImGui::PopStyleVar();
+
+	ImGui::EndPopup();
+}
+
+void FS::Console::popup_clear() {
+	consoleWrite->clear();
+}
+
+void FS::Console::popup_backcolor() {
+	//ImGui::ColorPicker4();
 }
 
 void FS::Console::changeFontSize() {
@@ -108,9 +230,9 @@ void FS::Console::changeFontSize() {
 	if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows))
 		return;
 
-	float wheel = ImGui::GetIO().MouseWheel;
+	const float wheel = ImGui::GetIO().MouseWheel;
 
-	if (static_cast<int32_t>(wheel) == 0)
+	if (static_cast<IF32>(wheel) == 0)
 		return;
 
 	if (style.fontSize < limit.maxFontSize) {
@@ -124,11 +246,4 @@ void FS::Console::changeFontSize() {
 
 	style.fontSizeScale = style.fontSize / ImGui::GetFontSize();
 }
-
-
-
-
-
-
-
 

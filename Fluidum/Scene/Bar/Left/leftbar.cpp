@@ -1,6 +1,5 @@
 ﻿#include "leftbar.h"
 
-#include "../../Coding/Select/select.h"
 #include "../../Coding/TextEditor/texteditor.h"
 #include "../../Coding/Tab/tab.h"
 #include "../../Coding/Debug/debug.h"
@@ -18,7 +17,6 @@ using namespace FU::ImGui::Operators;
 
 FS::LeftBar::LeftBar(
 	const FD::ProjectRead* const projectRead,
-	const FD::FluidumFilesRead* const fluidumFilesRead,
 	const FD::GuiRead* const  guiRead,
 	FD::GuiWrite* const  guiWrite,
 	const FD::SceneRead* const  sceneRead,
@@ -27,21 +25,19 @@ FS::LeftBar::LeftBar(
 	std::vector<FDR::ImGuiImage>&& images
 ) :
 	projectRead(projectRead),
-	fluidumFilesRead(fluidumFilesRead),
 	guiRead(guiRead),
 	sceneRead(sceneRead),
 	tabWrite(tabWrite),
 	tabRead(tabRead),
 	images(images)
 {
-	GLog.add<FD::Log::Type::None>("Construct MenuBarScene.");
-
+	FluidumScene_Log_Constructor(::FS::LeftBar);
 
 	const auto windowSizeX = guiRead->windowSize().x * 0.03f;
 	style.windowPos = { 0.0f,guiRead->menuBarHeight() + guiRead->topBarHeight() };
 	style.windowSize = { windowSizeX,guiRead->windowSize().y + 1.0f };
 
-	//画像の幅 windowpaddingと内部のスペースを考慮する必要がある
+	//width of image. windowpaddingと内部のスペースを考慮する必要がある
 	//windowpaddingを1/2にして調整する
 	auto imageWidth = windowSizeX - (ImGui::GetStyle().WindowPadding.x) - (ImGui::GetStyle().FramePadding.x * 2.0f);
 
@@ -50,28 +46,14 @@ FS::LeftBar::LeftBar(
 	guiWrite->leftBarWidth(style.windowSize.x);
 
 	//set analysis icons
-	for (uint16_t i = 0; i < 2; i++) {
+	for (UIF16 i = 0; i < 2; i++) {
 		sub.analysisImages.emplace_back(images.at(images.size() - 2 + i));
 	}
 
 }
 
 FS::LeftBar::~LeftBar() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct MenuBarScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::LeftBar);
 }
 
 void FS::LeftBar::call() {
@@ -85,9 +67,10 @@ void FS::LeftBar::call() {
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoScrollbar;
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoFocusOnAppearing;
 
-	//角とボーダーを消す
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding / 2.0f);
@@ -102,6 +85,7 @@ void FS::LeftBar::call() {
 	ImGui::PopStyleColor(2);
 	ImGui::PopStyleVar(3);
 
+	this->drawRightBorder();
 	ImGui::End();
 
 
@@ -119,7 +103,7 @@ namespace FS::Internal {
 		FU::Class::ClassCode::GetClassCode<::FS::Analysis::Overview>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Genome::Overview>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Animation>(),
-		FU::Class::ClassCode::GetClassCode<::FS::Project>(),
+		FU::Class::ClassCode::GetClassCode<::FS::Project::Explorer>(),
 		FU::Class::ClassCode::GetClassCode<::FS::Console>()
 	};
 }
@@ -129,14 +113,14 @@ void FS::LeftBar::imageGui() {
 
 	for (std::size_t i = 0; i < std::tuple_size_v<decltype(Internal::MainScenes)>; i++) {
 		//シーンが存在するなら降ろす
-		if (sceneRead->isExist(Internal::MainScenes[i])) {
-			//シーンの削除
+		if (sceneRead->exist(Internal::MainScenes[i])) {
+
 			ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.main);
+			this->hoveredIcon(i);
 
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
 				this->deleteScene(Internal::MainScenes[i]);
 
-			this->hoveredIcon(i);
 		}
 		else {
 			//ボタンが押されたら == シーンの追加を要請
@@ -144,23 +128,32 @@ void FS::LeftBar::imageGui() {
 
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
 				this->addScene(Internal::MainScenes[i]);
+
 		}
 
-		//つめつめなので少し空ける
 		ImGui::Spacing(); ImGui::Spacing();
 	}
 
 }
 
-void FS::LeftBar::hoveredIcon(const std::size_t index) {
-	if (ImGui::IsMouseHoveringRect(ImGui::GetItemRectMin(), { ImGui::GetItemRectMax().x + 20.0f,ImGui::GetItemRectMax().y })) {
+void FS::LeftBar::hoveredIcon(const Size index) {
+	const ImVec2 rectMin = ImGui::GetItemRectMin();
+	const ImVec2 rectMax = { ImGui::GetItemRectMax().x + 20.0f,ImGui::GetItemRectMax().y };
+
+	if (ImGui::IsMouseHoveringRect(rectMin, rectMax)) {
+		sub.hoveringImageRect = { rectMin, rectMax };
 		sub.current = static_cast<SceneIndex>(index + 1);
 		sub.selectWindowPos = ImVec2(ImGui::GetItemRectMax().x + 1.0f, ImGui::GetItemRectMin().y);
 		sub.isIconHovered = true;
 	}
 	else {
-		if (!sub.isSubWindowHovered)
+		if (
+			!sub.isSubWindowHovered &&
+			!ImGui::IsMouseHoveringRect(sub.hoveringImageRect.first, sub.hoveringImageRect.second)
+			)
+		{
 			sub.isIconHovered = false;
+		}
 	}
 }
 
@@ -175,67 +168,60 @@ void FS::LeftBar::addScene(const ClassCode::CodeType code) {
 		this->addAnalysisScene();
 	}
 	else if (code == Internal::MainScenes[3]) {
-		this->addProjectScene();
+		this->addGenomeScene();
 	}
 	else if (code == Internal::MainScenes[4]) {
 		this->addAnimationScene();
 	}
 	else if (code == Internal::MainScenes[5]) {
-		this->addGenomeScene();
+		this->addProjectScene();
 	}
 	else if (code == Internal::MainScenes[6]) {
 		this->addConsoleScene();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 }
 
 void FS::LeftBar::addCodingScene() {
 	//set image
 	std::string path = Resource::LeftBarIconsFilePath;
-	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "tab.png").c_str()));	
+	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "tab.png").c_str()));
 	sub.codingImages.emplace_back(FDR::createImGuiImage((path + "debug.png").c_str()));
 
-	if (!fluidumFilesRead->isMainCodeFileExist()) {
-		GLog.add<FD::Log::Type::None>("Main file does not exist.");
-		GLog.add<FD::Log::Type::None>("Request add CodingSelectScene.");
-		Scene::addScene<CodingSelect>();
-	}
-	else {
-		GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");
-		Scene::addScene<TextEditor>();
-	}
+	FluidumScene_Log_RequestAddScene(::FS::TextEditor);
+	Scene::addScene<TextEditor>();
 }
 
 void FS::LeftBar::addFluScene() {
-	GLog.add<FD::Log::Type::None>("Request add Flu::NodeScene.");
+	FluidumScene_Log_RequestAddScene(::FS::Flu::Node);
 	Scene::addScene<::FS::Flu::Node>();
 }
 
 void FS::LeftBar::addAnalysisScene() {
-	GLog.add<FD::Log::Type::None>("Request add AnalysisScene.");
+	FluidumScene_Log_RequestAddScene(::FS::Analysis::Overview);
 	Scene::addScene<::FS::Analysis::Overview>();
 }
 
 void FS::LeftBar::addProjectScene() {
-	GLog.add<FD::Log::Type::None>("Request add ProjectScene.");
-	Scene::addScene<::FS::Project>();
+	FluidumScene_Log_RequestAddScene(::FS::Project::Explorer);
+	Scene::addScene<::FS::Project::Explorer>();
 }
 
 void FS::LeftBar::addAnimationScene() {
-	GLog.add<FD::Log::Type::None>("Request add AnimationScene.");
+	FluidumScene_Log_RequestAddScene(::FS::Animation);
 	Scene::addScene<::FS::Animation>();
 }
 
 void FS::LeftBar::addGenomeScene() {
-	GLog.add<FD::Log::Type::None>("Request add Genome::OverviewScene.");
+	FluidumScene_Log_RequestAddScene(::FS::Genome::Overview);
 	Scene::addScene<::FS::Genome::Overview>();
 }
 
 void FS::LeftBar::addConsoleScene() {
-	GLog.add<FD::Log::Type::None>("Request add ConsoleScene.");
+	FluidumScene_Log_RequestAddScene(::FS::Console);
 	Scene::addScene<::FS::Console>();
 }
 
@@ -244,62 +230,61 @@ void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 		this->deleteCodingScene();
 	}
 	else if (code == Internal::MainScenes[1]) {
-		GLog.add<FD::Log::Type::None>("Request delete Flu::NodeScene.");
+		FluidumScene_Log_RequestDeleteScene(::FS::Flu::Node);
 		Scene::deleteScene<Flu::Node>();
 	}
 	else if (code == Internal::MainScenes[2]) {
-		GLog.add<FD::Log::Type::None>("Request delete AnalysisScene.");
+		FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Overview);
 		Scene::deleteScene<Analysis::Overview>();
 	}
 	else if (code == Internal::MainScenes[3]) {
-		GLog.add<FD::Log::Type::None>("Request delete ProjectScene.");
-		Scene::deleteScene<Project>();
+		FluidumScene_Log_RequestDeleteScene(::FS::Genome::Overview);
+		Scene::deleteScene<Genome::Overview>();
 	}
 	else if (code == Internal::MainScenes[4]) {
-		GLog.add<FD::Log::Type::None>("Request delete AnimationScene.");
+		FluidumScene_Log_RequestDeleteScene(::FS::Animation);
 		Scene::deleteScene<Animation>();
 	}
 	else if (code == Internal::MainScenes[5]) {
-		GLog.add<FD::Log::Type::None>("Request delete Genome::OverviewScene.");
-		Scene::deleteScene<Genome::Overview>();
+		FluidumScene_Log_RequestDeleteScene(::FS::Project::Explorer);
+		Scene::deleteScene<Project::Explorer>();
 	}
 	else if (code == Internal::MainScenes[6]) {
-		GLog.add<FD::Log::Type::None>("Request delete ConsoleScene.");
+		FluidumScene_Log_RequestDeleteScene(::FS::Console);
 		Scene::deleteScene<Console>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-		abort();
+		FluidumScene_Log_InternalError();
+		std::terminate();
 	}
 	sub.codingImages.clear();
 }
 
 void FS::LeftBar::deleteCodingScene() {
 	if (!tabRead->isAllTextSaved()) {
-		GLog.add<FD::Log::Type::None>("Popup MessageBox.");
-		int32_t button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
+		const auto button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
 		if (button == 0) {//save close
-			GLog.add<FD::Log::Type::None>("Save all tab texts.");
+			GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save all tab texts.");
 			tabWrite->saveAllTexts();
 			tabWrite->clear();
 			tabWrite->save();
 		}
 		else if (button == 1) {//without saving
-			GLog.add<FD::Log::Type::None>("Clear tab texts.");
+			GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Clear tab texts.");
 			tabWrite->clear();
 			tabWrite->save();
 		}
 		else if (button == 2)//cancel
 			return;
 		else {//unexpected
-			GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-			abort();
+			FluidumScene_Log_InternalWarning();
+			return;
 		}
 	}
 
-	GLog.add<FD::Log::Type::None>("Request tryDelete Coding::TabScene.");
+	FluidumScene_Log_RequestTryDeleteScene(::FS::Coding::Tab);
 	Scene::tryDeleteScene<Coding::Tab>();
-	GLog.add<FD::Log::Type::None>("Request delete TextEditorScene.");
+	FluidumScene_Log_RequestDeleteScene(::FS::TextEditor);
 	Scene::deleteScene<TextEditor>();
 }
 
@@ -316,13 +301,14 @@ void FS::LeftBar::subWindow() {
 
 	sub.isSubWindowHovered = ImGui::IsWindowHovered();
 
-	if (sub.current == SceneIndex::Coding)
+	if (sub.current == SceneIndex::Coding) {
 		this->subWindowCoding();
-	else if (sub.current == SceneIndex::AnalysisOverview)
+	}
+	else if (sub.current == SceneIndex::AnalysisOverview) {
 		this->subWindowAnalysis();
+	}
 
 	this->subWindowHelpSetting();
-
 
 	ImGui::End();
 
@@ -335,10 +321,10 @@ void FS::LeftBar::subWindowCoding() {
 		ClassCode::GetClassCode<Coding::Tab>()
 	};
 
-	for (std::size_t i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
+	for (Size i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
 
 		//選択されているなら
-		if (sceneRead->isExist(scenes[i])) {
+		if (sceneRead->exist(scenes[i])) {
 			//降ろす　シーンの削除
 			ImGui::ImageButton(sub.codingImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
 
@@ -371,7 +357,7 @@ void FS::LeftBar::subWindowAnalysis() {
 
 	for (std::size_t i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
 
-		if (sceneRead->isExist(scenes[i])) {
+		if (sceneRead->exist(scenes[i])) {
 			ImGui::ImageButton(sub.analysisImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
 
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
@@ -395,71 +381,69 @@ void FS::LeftBar::subWindowAnalysis() {
 
 void FS::LeftBar::addCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
-		GLog.add<FD::Log::Type::None>("Request add Coding::TabScene.");
+		FluidumScene_Log_RequestAddScene(::FS::Coding::Tab);
 		Scene::addScene<Coding::Tab>();
 	}
-	else if (code == ClassCode::GetClassCode<Coding::Debug>()){
-		GLog.add<FD::Log::Type::None>("Request add Coding::DebugScene.");
+	else if (code == ClassCode::GetClassCode<Coding::Debug>()) {
+		FluidumScene_Log_RequestAddScene(::FS::Coding::Debug);
 		Scene::addScene<Coding::Debug>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 }
 
 void FS::LeftBar::addAnalysisSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Analysis::Function>()) {
-		GLog.add<FD::Log::Type::None>("Request add Analysis::FunctionScene.");
+		FluidumScene_Log_RequestAddScene(::FS::Analysis::Function);
 		Scene::addScene<Analysis::Function>();
 	}
 	else if (code == ClassCode::GetClassCode<Analysis::Plot>()) {
-		GLog.add<FD::Log::Type::None>("Request add Analysis::PlotScene.");
+		FluidumScene_Log_RequestAddScene(::FS::Analysis::Plot);
 		Scene::addScene<Analysis::Plot>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 
 }
 
 void FS::LeftBar::deleteCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
-		GLog.add<FD::Log::Type::None>("Request delete Coding::TabScene.");
+		FluidumScene_Log_RequestDeleteScene(::FS::Coding::Tab);
 		Scene::deleteScene<Coding::Tab>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 }
 
 void FS::LeftBar::deleteAnalysisSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Analysis::Function>()) {
-		GLog.add<FD::Log::Type::None>("Request delete Analysis::FunctionScene.");
+		FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Function);
 		Scene::deleteScene<Analysis::Function>();
 	}
 	else if (code == ClassCode::GetClassCode<Analysis::Plot>()) {
-		GLog.add<FD::Log::Type::None>("Request delete Analysis::PlotScene.");
+		FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Plot);
 		Scene::deleteScene<Analysis::Plot>();
 	}
 	else {
-		GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__);
-		abort();
+		FluidumScene_Log_InternalWarning();
+		std::terminate();
 	}
 }
 
 void FS::LeftBar::subWindowHelpSetting() {
-	//余白を取って，横線
+
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
 
 
-	//ボタンのボーダーを消す
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4());
-	//ボタン間の距離を小さく
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x / 4.0f,ImGui::GetStyle().ItemSpacing.y });
 
 	ImGui::SetWindowFontScale(0.8f);
@@ -471,3 +455,32 @@ void FS::LeftBar::subWindowHelpSetting() {
 	ImGui::PopStyleVar();
 
 }
+
+void FS::LeftBar::drawRightBorder() {
+
+	const ImVec2 windowPos = ImGui::GetWindowPos();
+	const ImVec2 windowSize = ImGui::GetWindowSize();
+
+	const ImVec2 pos1 = { windowPos.x + windowSize.x, windowPos.y };
+	const ImVec2 pos2 = { windowPos.x + windowSize.x, windowSize.y + windowPos.y };
+
+	const ImU32 col = ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_Border));
+	ImGui::GetBackgroundDrawList()->AddLine(pos1, pos2, col, ImGui::GetStyle().WindowBorderSize);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

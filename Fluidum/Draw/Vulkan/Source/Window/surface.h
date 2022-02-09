@@ -12,20 +12,39 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		explicit Surface(ManagerPassKey, const Data::SurfaceData& data, const Parameter& parameter);
+		
 		~Surface() = default;
-		FluidumUtils_Class_Default_CopyMove(Surface)
+		FluidumUtils_Class_Default_CopyMove(Surface);
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::SurfaceData& data, const Parameter& parameter);
+
 	public:
+		//no-throw
 		const Data::SurfaceInfo& get() const noexcept;
-		void destroy();
+
+	public:
+		//no-throw
+		void destroy() noexcept;
 
 	private:
+		//no-throw
 		void fillInfo(const Data::SurfaceData& data) noexcept;
 
 	private:
-		Data::SurfaceInfo info = {};
+		Data::SurfaceInfo info{};
+
 	};
+
 }

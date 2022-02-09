@@ -22,7 +22,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_make_plot(State L) {
 			//{}関数MakePlotが呼ばれましたが作成できるPlotの最大数を超えました．最大数{}．
 			Message message(LogType::Plot_Figure_Max);
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), FD::Plot::Limits::Plot::PlotMax);
-			consoleWrite->add(std::move(log));
+		//	consoleWrite->add(std::move(log));
 			throw Internal::Exception();
 		}
 
@@ -42,7 +42,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_make_plot(State L) {
 			//{}関数{}の{}番目の引数に渡されたテーブルの{}番目の要素の型に誤りがあります．渡された型:{}．正しい型:{}．
 			Message message(LogType::TableType);
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), "MakePlot", 2, info.index, info.input, LuAssist::Utils::typeName(LuAssist::Type::Number));
-			consoleWrite->add(std::move(log));
+		//	consoleWrite->add(std::move(log));
 
 			implotWrite->popBackPlot(static_cast<FD::Plot::FigureIndex>(figureIndex));
 
@@ -66,7 +66,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_make_plot(State L) {
 				info.input,
 				LuAssist::Utils::typeName(LuAssist::Type::Number)
 				);
-			consoleWrite->add(std::move(log));
+		//	consoleWrite->add(std::move(log));
 
 			implotWrite->popBackPlot(static_cast<FD::Plot::FigureIndex>(figureIndex));
 
@@ -91,7 +91,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_make_plot(State L) {
 					"MakePlot",
 					LuAssist::Utils::getSrcCurrentLine(L, 2)
 					);
-				consoleWrite->add(std::move(log));
+				//consoleWrite->add(std::move(log));
 
 				implotWrite->popBackPlot(static_cast<FD::Plot::FigureIndex>(figureIndex));
 

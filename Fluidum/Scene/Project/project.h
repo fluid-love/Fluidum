@@ -1,58 +1,82 @@
 #pragma once
 
 #include "../Common/common.h"
-#include "../Coding/Select/new.h"
+#include "../File/new.h"
 
-namespace FS {
+namespace FS::Project {
 
-	class Project final : public Scene {
+	class Explorer final : public Scene {
 	public:
-		explicit Project(
+		explicit Explorer(
+			FD::ImGuiWindowWrite* const imguiWindowWrite,
+			const FD::Style::ColorRead* const colorRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
-			FD::LuaFilesWrite* const luaFilesWrite,
-			FD::FluidumFilesWrite* const fluidumFilesWrite,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
-			FD::ProjectFilesWrite* const projectFilesWrite,
-			const FD::ProjectFilesRead* const projectFilesRead,
-			FD::UserFilesWrite* const userFilesWrite,
-			const FD::UserFilesRead* const userFilesRead,
+			FD::Project::PropertyWrite* const propertyWrite,
+			const FD::Project::PropertyRead* const propertyRead,
+			FD::Project::PropertyLuaWrite* const propertyLuaWrite,
+			const FD::Project::PropertyLuaRead* const propertyLuaRead,
+			FD::ProjectFilesWrite_Lock* const projectFilesWrite,
+			const FD::ProjectFilesRead_Lock* const projectFilesRead,
+			FD::UserFilesWrite_Lock* const userFilesWrite,
+			const FD::UserFilesRead_Lock* const userFilesRead,
 			const FD::SceneRead* const sceneRead,
-			FD::Coding::TabWrite* const tabWrite
+			FD::Coding::TabWrite* const tabWrite,
+			const FD::Coding::TabRead* const tabRead,
+			FD::Coding::DisplayWrite* const displayWrite,
+			const FD::Coding::DisplayRead* const displayRead,
+			FD::ToolBarWrite* const toolBarWrite,
+			const FD::Style::VarRead* const varRead
 		);
 		void Constructor(
+			FD::ImGuiWindowWrite,
+			FD::Style::ColorRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
-			FD::LuaFilesWrite,
-			FD::FluidumFilesWrite,
-			FD::FluidumFilesRead,
-			FD::ProjectFilesWrite,
-			FD::ProjectFilesRead,
-			FD::UserFilesWrite,
-			FD::UserFilesRead,
+			FD::Project::PropertyWrite,
+			FD::Project::PropertyRead,
+			FD::Project::PropertyLuaWrite,
+			FD::Project::PropertyLuaRead,
+			FD::ProjectFilesWrite_Lock,
+			FD::ProjectFilesRead_Lock,
+			FD::UserFilesWrite_Lock,
+			FD::UserFilesRead_Lock,
 			FD::SceneRead,
-			FD::Coding::TabWrite
+			FD::Coding::TabWrite,
+			FD::Coding::TabRead,
+			FD::Coding::DisplayWrite,
+			FD::Coding::DisplayRead,
+			FD::ToolBarWrite,
+			FD::Style::VarRead
 		);
 
-		~Project() noexcept;
+		~Explorer() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Project)
+		FluidumUtils_Class_Delete_CopyMove(Explorer);
 
 	public:
 		virtual void call() override;
 
 	private:
+		FD::ImGuiWindowWrite* const imguiWindowWrite;
+		const FD::Style::ColorRead* const colorRead;
 		FD::ProjectWrite* const projectWrite;
-		FD::LuaFilesWrite* const luaFilesWrite;
-		FD::FluidumFilesWrite* const fluidumFilesWrite;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::ProjectRead* const projectRead;
-		FD::ProjectFilesWrite* const projectFilesWrite;
-		const FD::ProjectFilesRead* const projectFilesRead;
-		FD::UserFilesWrite* const userFilesWrite;
-		const FD::UserFilesRead* const userFilesRead;
+		FD::Project::PropertyWrite* const propertyWrite;
+		const FD::Project::PropertyRead* const propertyRead;
+		FD::Project::PropertyLuaWrite* const propertyLuaWrite;
+		const FD::Project::PropertyLuaRead* const propertyLuaRead;
+		FD::ProjectFilesWrite_Lock* const projectFilesWrite;
+		const FD::ProjectFilesRead_Lock* const projectFilesRead;
+		FD::UserFilesWrite_Lock* const userFilesWrite;
+		const FD::UserFilesRead_Lock* const userFilesRead;
 		const FD::SceneRead* const sceneRead;
 		FD::Coding::TabWrite* const tabWrite;
+		const FD::Coding::TabRead* const tabRead;
+		FD::Coding::DisplayWrite* const displayWrite;
+		const FD::Coding::DisplayRead* const displayRead;
+		FD::ToolBarWrite* const toolBarWrite;
+		const FD::Style::VarRead* const varRead;
 
 		FD::Text::Project text{};
 
@@ -67,7 +91,7 @@ namespace FS {
 			ImVec2 selectedTree{};
 		}pos;
 
-		enum class TabType : uint8_t {
+		enum class TabType : UIF8 {
 			Fluidum,
 			Project,
 			User
@@ -75,29 +99,40 @@ namespace FS {
 
 		struct {
 			TabType tab = TabType::Fluidum;
-			FD::Project::List::FileInfo* fluidumFiles = nullptr;
-			FD::Project::List::FileInfo* projectFiles = nullptr;
-			FD::Project::List::FileInfo* userFiles = nullptr;
+			FD::Project::FileList::FileInfo* projectFiles = nullptr;
+			FD::Project::FileList::FileInfo* userFiles = nullptr;
 
-			inline FD::Project::List::FileInfo* current() noexcept {
+			inline FD::Project::FileList::FileInfo* current() noexcept {
 				if (tab == TabType::Project)
 					return this->projectFiles;
 				else if (tab == TabType::User)
 					return this->userFiles;
 				else
-					return this->fluidumFiles;
+					return nullptr;
 			}
 		}select;
 
+		enum class PopupType : UIF8 {
+			Top,
+			Dir,
+			Supported,
+			Unsupported,
+		};
+
 		struct {
+			PopupType type{};
+
 			bool top = false;
 			static constexpr const char* Top = "TopPopup";
 
 			bool dir = false;
 			static constexpr const char* Dir = "DirPopup";
 
-			bool code = false;
-			static constexpr const char* Code = "CodePopup";
+			bool supported = false;
+			static constexpr const char* Supported = "SupPopup";
+
+			bool unsupported = false;
+			static constexpr const char* Unsupported = "UnsupPopup";
 
 			static constexpr const char* ChangeName = "ChangeNamePopup";
 
@@ -106,6 +141,7 @@ namespace FS {
 		struct {
 			bool popup = false;
 			bool once = false;
+			std::string tempName{};
 			std::string name{};
 			bool folder = false;
 			ImVec2 pos{};
@@ -114,8 +150,26 @@ namespace FS {
 
 		struct {
 			bool popup = false;
-			std::shared_ptr<Coding::New::SharedInfo> info{};
-		}newFile;
+			std::shared_ptr<::FS::File::Add::SharedInfo> info{};
+		}add;
+
+		struct {
+			ImCounter<ImAnimeTime> sync{};
+			ImCounter<ImAnimeTime> collapseAll{};
+			ImCounter<ImAnimeTime> displayCode{};
+		}anime;
+
+		struct {
+			FD::Project::File::SupportedFileType fileType{};
+
+		}supportedPopupInfo;
+
+		bool windowFlag = true;
+
+	private://misc
+		void closeWindow();
+		void toolBar();
+		void setImGuiWindow();
 
 	private:
 		void topBar();
@@ -130,37 +184,46 @@ namespace FS {
 		void standardFluidumLibrary();
 
 	private:
-		std::pair<ImVec2, ImVec2> projectFilesTree(std::vector<FD::Project::List::FileInfo>* node, FD::Project::List::FileInfo* info);
+		std::pair<ImVec2, ImVec2> projectFilesTree(std::vector<FD::Project::FileList::FileInfo>* node, FD::Project::FileList::FileInfo* info);
 		void projectFiles();
-		void createDirectory();
 
 	private:
-		std::pair<ImVec2, ImVec2> userFilesTree(std::vector<FD::Project::List::FileInfo>* node, FD::Project::List::FileInfo* info);
+		std::pair<ImVec2, ImVec2> userFilesTree(std::vector<FD::Project::FileList::FileInfo>* node, FD::Project::FileList::FileInfo* info);
 		void userFiles();
-		void addVirtualFolder();
-		void eraseVirtualFolder();
-		void eraseUserFile();
-		void showCode();
-		void flipOpen();
 
 	private:
+		void addDirectory();
 		void addFile();
-		void catchAddFile();
+		void addSelect();
+		void addFileQuick();
+		void catchAdd();
+		void removeDirectory();
+		void removeFile();
+		void releaseFile();
+		void displayCode();
+		void flipOpen();
+		void collapseAll();
+		void rename();
+		void setMainFile();
 
 	private:
 		void openPopup();
 
 		void topPopup();
 		void directoryPopup();
-		void codePopup();
+		void supportedPopup();
+		void unsupportedPopup();
+
+		void popup_add();
 
 		void changeNamePopup();
 		void tryChangeName();
-		_NODISCARD bool checkChangeName();
+		[[nodiscard]] std::pair<bool, std::string> checkChangeName();
 
 	private:
 		void syncProjectFiles();
-		void collapseAll();
+		I32 popupSpacing();
+
 	};
 
 }

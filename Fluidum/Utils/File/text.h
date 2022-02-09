@@ -10,6 +10,8 @@ namespace FU::File {
 	private:
 		using UT = std::underlying_type_t<Enum>;
 
+		using Loop = std::conditional_t<std::unsigned_integral<UT>, Size, ISize>;
+
 	public:
 		Text(const Enum index) {
 			std::ifstream ifs(Path, std::ios::in);
@@ -19,26 +21,27 @@ namespace FU::File {
 
 			std::string data;
 
-			for (UT i = 0; i <= static_cast<UT>(index); i++) {
+			for (Loop i = 0; i <= static_cast<UT>(index); i++) {
 				std::getline(ifs, data);
 			}
 
 			this->text = data;
 		}
-		~Text() = default;
+
+		~Text() noexcept = default;
 
 	private:
 		std::string text = "";
 
 	public:
-		operator const std::string& ()const noexcept {
+		operator const std::string& () const noexcept {
 			return this->text;
 		}
 
-		operator std::string& ()const noexcept {
+		operator std::string& () const noexcept {
 			return this->text;
 		}
+
 	};
-
 
 }

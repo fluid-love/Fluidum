@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../Coding/TextEditor/texteditor.h"
-#include "../../Coding/Select/select.h"
 #include "../../Coding/Tab/tab.h"
 #include "../../Coding/Debug/debug.h"
 
@@ -18,3 +17,5 @@
 #include "../../Project/project.h"
 
 #include "../../Console/Console/console.h"
+
+#include "../../Calc/Lua/lua.h"

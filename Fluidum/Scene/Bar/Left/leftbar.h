@@ -6,10 +6,8 @@ namespace FS {
 
 	class LeftBar final :public Scene {
 	public:
-		//éûä‘Ç™Ç©Ç©ÇÈÇÃÇ≈leftbarÇÃÉAÉCÉRÉìÇÕÇ†ÇÁÇ©Ç∂ÇﬂèÄîıÇµÇƒÇ®Ç¢ÇƒÇ‡ÇÁÇ§
 		explicit LeftBar(
 			const FD::ProjectRead* const projectRead,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::SceneRead* const sceneRead,
@@ -19,7 +17,6 @@ namespace FS {
 		);
 		void Constructor(
 			FD::ProjectRead,
-			FD::FluidumFilesRead,
 			FD::GuiRead,
 			FD::GuiWrite,
 			FD::SceneRead,
@@ -29,6 +26,8 @@ namespace FS {
 
 		~LeftBar() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(LeftBar);
+
 	public:
 		virtual void call() override;
 
@@ -37,16 +36,14 @@ namespace FS {
 
 	private://data
 		const FD::ProjectRead* const projectRead;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
-		const FD::GuiRead* const  guiRead;
-		const FD::SceneRead* const  sceneRead;
+		const FD::GuiRead* const guiRead;
+		const FD::SceneRead* const sceneRead;
 		const FD::Coding::TabRead* const tabRead;
 		FD::Coding::TabWrite* const tabWrite;
 
 		FD::Text::LeftBar text{};
 
-	private://data
-
+	private:
 		const std::vector<FDR::ImGuiImage> images;
 
 		struct {
@@ -76,6 +73,7 @@ namespace FS {
 			bool isIconHovered = false;
 			bool isSubWindowHovered = false;
 			ImVec2 selectWindowPos = ImVec2();
+			std::pair<ImVec2, ImVec2> hoveringImageRect{};
 			SceneIndex current = SceneIndex::None;
 
 			std::vector<FDR::ImGuiImage> codingImages{};
@@ -83,13 +81,9 @@ namespace FS {
 
 		}sub;
 
-		
-
-
 	private:
-
 		void imageGui();
-		void hoveredIcon(const std::size_t index);
+		void hoveredIcon(const Size index);
 
 		void addScene(const ClassCode::CodeType code);
 		void addCodingScene();
@@ -105,7 +99,6 @@ namespace FS {
 		void deleteCodingScene();
 
 	private:
-		//ImageButtonÇÃHoveredéû
 		void subWindow();
 
 		void subWindowCoding();
@@ -117,8 +110,12 @@ namespace FS {
 		void deleteCodingSubScene(const ClassCode::CodeType code);
 		void deleteAnalysisSubScene(const ClassCode::CodeType code);
 
-
-
+	private:
 		void subWindowHelpSetting();
+
+	private:
+		void drawRightBorder();
+
 	};
+
 }

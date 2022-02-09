@@ -1,64 +1,62 @@
 #pragma once
 
-#include "boost/predef.h"
+//this->consoleWirte
 
-//Microsoft Visual C/C++
-#ifdef BOOST_COMP_MSVC
+#define FluidumScene_Console_InternalError() \
+	this->consoleWrite->push(std::string("Internal Error."))
 
-#define FluidumScene_Log_EnumClass_Error(value)\
-	GLog.add<FD::Log::Type::Error>("Failed. {}. {}." ,__FUNCSIG__, magic_enum::enum_name(value))
+//GLog
 
-#else 
-
-#define FluidumScene_Log_EnumClassException(value)\
-	GLog.add<FD::Log::Type::Error>("Failed. {}. {}." ,__func__, magic_enum::enum_name(value))
-
-#endif 
-
-
-#define FluidumScene_Console_InternalError \
-	this->consoleWrite->add(std::string("Internal Error."))
+#define FluidumScene_Log_InternalWarning_Enum(value) \
+	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Internal Enum Error. Value:({}).", ::magic_enum::enum_name(value))
 
 #define FluidumScene_Log_RequestAddScene(name) \
-	GLog.add<FD::Log::Type::None>("[Request] Add " name " Scene.")
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_RequestAddScene");	   \
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Add " #name " Scene.")
 
 #define FluidumScene_Log_RequestTryAddScene(name) \
-	GLog.add<FD::Log::Type::None>("[Request] Try add " name " Scene.")
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_RequestTryAddScene");  \
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Try add " #name " Scene.")
 
 #define FluidumScene_Log_RequestDeleteScene(name) \
-	GLog.add<FD::Log::Type::None>("[Request] Delete " name " Scene.")
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_RequestDeleteScene");  \
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Delete " #name " Scene.")
 
 #define FluidumScene_Log_RequestTryDeleteScene(name) \
-	GLog.add<FD::Log::Type::None>("[Request] Try delete " name " Scene.")
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_RequestTryDeleteScene");  \
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Try delete " #name " Scene.")
 
 #define FluidumScene_Log_CallSceneConstructor(name) \
-	GLog.add<FD::Log::Type::None>("[Request] Call constructor " name ".")
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_CallSceneConstructor");  \
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Call constructor " #name ".")
 
-#define FluidumScene_Log_Abort() \
-	GLog.add<FD::Log::Type::Error>("abort() has been called. File {}.", __FILE__)
+#define FluidumScene_Log_RecreateScene(name) \
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_RecreateScene");  \
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Recreate " #name " Scene.")
 
 #define FluidumScene_Log_InternalError() \
-	GLog.add<FD::Log::Type::Error>("Internal Error. File {}.", __FILE__)
+	GLog.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Internal Error.")
+
+#define FluidumScene_Log_InternalWarning() \
+	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Internal Error.")
 
 #define FluidumScene_Log_Constructor(name) \
-	GLog.add<FD::Log::Type::None>("Construct " name " Scene.")
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_Constructor");  \
+	GLog.add_str<FU::Log::Type::None>("Construct " #name " Scene.")
 
 #define FluidumScene_Log_Destructor(name) \
-	GLog.add<FD::Log::Type::None>("Destruct " name " Scene.")
+	static_assert(FU::Concept::IsClass<name>, "FluidumScene_Log_Destructor");  \
+	GLog.add_str<FU::Log::Type::None>("Destruct " #name " Scene.")
 
-#define FluidumScene_Log_Destructor_(name)							\
-try {																\
-	GLog.add<FD::Log::Type::None>("Destruct " name " Scene.");	    \
-}																	\
-catch (const std::exception& e) {									\
-	try {															\
-		std::cerr << e.what() << std::endl;							\
-		abort();													\
-	}																\
-	catch (...) {													\
-		abort();													\
-	}																\
-}																	\
-catch (...) {														\
-	abort();														\
-}														
+#define FluidumScene_Log_StdExceptionError(err) \
+	GLog.add<FU::Log::Type::Error>(__FILE__, __LINE__, "std::exception was thrown({}).", err.what())
+
+#define FluidumScene_Log_StdExceptionWarning(err) \
+	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "std::exception was thrown({}).", err.what())
+
+#define FluidumScene_Log_UnexpectedExceptionWarning() \
+	GLog.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "An unexpected exception was thrown.")
+
+#define FluidumScene_Log_SeriousError() \
+	GLog.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Serious Error.")
+

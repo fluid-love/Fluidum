@@ -1,6 +1,0 @@
-﻿  FluidumFilePath.cpp
-  FDproperty.cpp
-  test.cpp
-C:\FluidumDataDetails\FluidumDataGenome\test\test.cpp(5,17): error C2512: 'FD::GenomeWrite': クラス、構造体、共用体に既定のコンストラクターがありません。
-C:\FluidumDataDetails\FluidumDataGenome\FDgenome.h(131,8): message : 'FD::GenomeWrite' の宣言を確認してください
-  コードを生成中...

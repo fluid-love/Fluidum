@@ -1,101 +1,188 @@
 #include "layout.h"
+#include "../Utils/Popup/message.h"
+#include "../Utils/Scene/classcodes.h"
+#include <imgui_internal.h>
 
 using namespace FU::ImGui::Operators;
 
 FS::Layout::Layout(
+	const FD::ImGuiWindowRead* const imguiWindowRead,
 	const FD::LayoutRead* const layoutRead,
 	FD::LayoutWrite* const layoutWrite,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite
 ) :
+	imguiWindowRead(imguiWindowRead),
 	layoutRead(layoutRead),
 	layoutWrite(layoutWrite),
 	guiRead(guiRead),
 	guiWrite(guiWrite)
 {
-	FluidumScene_Log_Constructor("LeftLayuot");
+	FluidumScene_Log_Constructor(::FS::Layout);
 
 	//default project
 	if (layoutRead->empty()) {
-		const ImVec2 pos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() - 4.0f };
+		const ImVec2 pos = { guiRead->leftBarWidth() ,guiRead->menuBarHeight() + guiRead->topBarHeight() };
 		layoutWrite->mainFrameLeft(pos.x);
 		layoutWrite->mainFrameRight(guiRead->windowSize().x);
 		layoutWrite->mainFrameTop(pos.y);
 		layoutWrite->mainFrameBottom(guiRead->windowSize().y - guiRead->statusBarHeight());
-		layoutWrite->reset();
+		layoutWrite->remake();
 	}
 
 	layoutWrite->widthLimit(guiRead->windowSize().x * 0.13f);
 	layoutWrite->heightLimit(guiRead->windowSize().y * 0.13f);
 
-}
+	this->updateWindows();
 
-FS::Layout::~Layout() noexcept {
-	FluidumScene_Log_Destructor_("LeftLayuot")
-}
-
-void FS::Layout::call() {
-
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
-	ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, ImVec4(0.006f, 0.005f, 0.005f, 1.000f));
-	ImGui::PushStyleColor(ImGuiCol_ResizeGrip, 0);
-	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.266f, 0.200f, 0.200f, 1.000f));
-
-	this->dockGui();
-
-	ImGui::PopStyleVar(3);
-	ImGui::PopStyleColor(3);
-
-	this->popup();
-}
-
-void FS::Layout::dockGui() {
-	this->windows = layoutRead->get();
-	for (uint16_t i = 0, size = static_cast<uint16_t>(windows.size()); i < size; i++) {
-		select.current = windows[i];
-		std::string label = "##Lay" + std::to_string(i);
-
-		ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, { 0.007f,0.0f ,0.0f ,1.0f });
-		this->dockSpace(label.c_str());
-		ImGui::PopStyleColor();
+	{
+		const float minHeight = (
+			guiRead->menuBarHeight() +
+			guiRead->statusBarHeight() +
+			guiRead->topBarHeight() +
+			layoutRead->heightLimit())
+			* 1.1f;
+		guiWrite->windowLimitMinHeight(minHeight);
 	}
 }
 
+FS::Layout::~Layout() noexcept {
+	FluidumScene_Log_Destructor(::FS::Layout);
+}
+
+void FS::Layout::call() {
+	{
+		flag.mouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+		const auto mPos = ImGui::GetMousePos();
+		static ImVec2 old = mPos;
+		mouse.delta = mPos - old;
+		old = mPos;
+	}
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImGui::GetStyle().WindowPadding / 6.5f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+	ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, ImVec4(0.007f, 0.000f, 0.000f, 1.000f));
+	ImGui::PushStyleColor(ImGuiCol_ResizeGripActive, ImVec4());
+	ImGui::PushStyleColor(ImGuiCol_ResizeGrip, ImVec4());
+	ImGui::PushStyleColor(ImGuiCol_ResizeGripHovered, ImVec4());
+	ImGui::PushStyleColor(ImGuiCol_SeparatorActive, ImVec4());
+
+	this->updateLayout();
+	this->dockGui();
+
+	ImGui::PopStyleVar(3);
+	ImGui::PopStyleColor(5);
+
+	this->popup();
+	this->save_resize();
+	this->drawSeparators();
+
+}
+
+void FS::Layout::updateLayout() {
+	//Changes the layout when the size of the main window is changed.	
+
+	const std::pair<bool, bool> resized =
+	{
+		static_cast<I32>(guiRead->windowSize().x) != static_cast<I32>(layoutRead->mainFrameRight()) ,
+		static_cast<I32>(guiRead->windowSize().y) != static_cast<I32>(layoutRead->mainFrameBottom())
+	};
+
+	if (!resized.first && !resized.second)
+		return;
+
+	if (resized.first) //width
+		layoutWrite->resizeMainFrameRight(guiRead->windowSize().x);
+	else               //height
+		layoutWrite->resizeMainFrameBottom(guiRead->windowSize().y);
+	this->updateWindows();
+}
+
+void FS::Layout::updateWindowMinSize() {
+	const float minWidth =
+		layoutRead->widthLimitSum() +
+		guiRead->leftBarWidth();
+
+	const float minHeight =
+		layoutRead->heightLimitSum() +
+		guiRead->menuBarHeight() +
+		guiRead->statusBarHeight() +
+		guiRead->topBarHeight();
+
+	if (minWidth > guiRead->windowLimitMinWidth()) {
+		guiWrite->windowLimitMinWidth(minWidth);
+	}
+	if (minHeight > guiRead->windowLimitMinHeight()) {
+		guiWrite->windowLimitMinHeight(minHeight);
+	}
+}
+
+void FS::Layout::dockGui() {
+
+	for (UIF16 i = 0, size = static_cast<UIF16>(windows.size()); i < size; i++) {
+		select.resizedWindowIndex = i;
+		select.current = &windows[i];
+		const std::string label = "##Lyt" + std::to_string(i);
+
+		this->dockSpace(label.c_str());
+	}
+
+}
+
 void FS::Layout::dockSpace(const char* label) {
-	constexpr auto windowFlags =
+	constexpr ImGuiWindowFlags windowFlags =
 		ImGuiWindowFlags_NoBringToFrontOnFocus |
 		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoSavedSettings;
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoBackground;
 
-	ImGui::SetNextWindowSizeConstraints(select.current.minSize, select.current.maxSize);
-	ImGui::SetNextWindowPos(select.current.pos, ImGuiCond_Always);
-	ImGui::SetNextWindowSize(select.current.size, ImGuiCond_Always);
+	ImGui::SetNextWindowSizeConstraints(select.current->minSize, select.current->maxSize);
+	ImGui::SetNextWindowPos(select.current->pos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(select.current->size, ImGuiCond_Always);
 
-	ImGui::Begin(label, nullptr, ImGuiWindowFlags_NoSavedSettings);
+	ImGui::Begin(label, nullptr, windowFlags);
 
-	auto id = ImGui::GetID(label);
-	ImGuiID dockingID = ImGui::DockSpace(id, ImVec2{});
-
-	select.current.pos = ImGui::GetWindowPos();
-	select.current.size = ImGui::GetWindowSize();
-
+	select.current->pos = ImGui::GetWindowPos();
+	select.current->size = ImGui::GetWindowSize();
 	this->ifRightMouseButtonCliked();
 
-	if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowFocused())
-		layoutWrite->update(select.current);
+	auto id = ImGui::GetID(label);
+
+	ImGuiID dockingID = ImGui::DockSpace(id, ImVec2{}, ImGuiDockNodeFlags_PassthruCentralNode);
+
+	if (this->windows.size() != this->dockSpaceIDs.size())
+		this->dockSpaceIDs.emplace_back(ImGui::GetCurrentWindow()->ID);
+
+	this->focusedWindowBackground();
 
 	ImGui::End();
 }
 
 void FS::Layout::ifRightMouseButtonCliked() {
-	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right) || !ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows | ImGuiHoveredFlags_RootAndChildWindows))
+	if (!ImGui::IsMouseHoveringRect(select.current->pos, select.current->pos + select.current->size))
 		return;
 
+	select.hovered = select.current;
+	select.focused = false;
+
+	if (
+		ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) ||
+		ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+	{
+		return;
+	}
+
+	select.focused = true;
+
+	if (!ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+		return;
 
 	flag.popup = true;
 	select.pos = ImGui::GetMousePos();
@@ -107,6 +194,7 @@ void FS::Layout::ifRightMouseButtonCliked() {
 	flag.centerHorizonalConstraintArea = this->centerHorizonalConstraintArea();
 	flag.centerVerticalConstraintArea = this->centerVerticalConstraintArea();
 
+	flag.canMerge = layoutRead->canMerge(*select.right, select.pos);
 }
 
 void FS::Layout::popup() {
@@ -125,10 +213,6 @@ void FS::Layout::popup() {
 		this->splitVerticalCurrentPos();
 	if (ImGui::MenuItem(text.splitHorizonalCurrentPos, 0, false, !flag.heightConstraintArea))
 		this->splitHorizonalCurrentPos();
-	if (ImGui::BeginMenu(text.splitCrossCurrentPos, !flag.widthConstraintArea || !flag.heightConstraintArea)) {
-		this->splitCrossCurrentPos();
-		ImGui::EndMenu();
-	}
 
 	ImGui::Separator();
 
@@ -136,10 +220,7 @@ void FS::Layout::popup() {
 		this->splitVerticalCenterLine();
 	if (ImGui::MenuItem(text.splitHorizonalCenterLine, 0, false, !flag.centerHorizonalConstraintArea))
 		this->splitHorizonalCenterLine();
-	if (ImGui::BeginMenu(text.splitCrossCenterLine, !flag.widthConstraintArea || !flag.heightConstraintArea)) {
-		this->splitCrossCenterLine();
-		ImGui::EndMenu();
-	}
+
 
 	ImGui::Separator();
 
@@ -148,7 +229,7 @@ void FS::Layout::popup() {
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem(text.merge, 0, false, flag.widthConstraintArea))
+	if (ImGui::MenuItem(text.merge, 0, false, flag.canMerge && !(flag.widthConstraintArea && flag.heightConstraintArea) && (flag.widthConstraintArea || flag.heightConstraintArea)))
 		this->merge();
 
 	ImGui::PopStyleVar();
@@ -159,7 +240,12 @@ void FS::Layout::popup() {
 bool FS::Layout::widthConstraintArea() {
 	const float width = layoutRead->widthLimit();
 	for (auto& x : windows) {
+		if (x.pos.y > select.pos.y || x.pos.y + x.size.y < select.pos.y)
+			continue;
+
 		if (x.pos.x - width < select.pos.x && select.pos.x < x.pos.x + width)
+			return true;
+		if (x.pos.x + x.size.x - width < select.pos.x && select.pos.x < x.pos.x + x.size.x + width)
 			return true;
 	}
 
@@ -169,7 +255,12 @@ bool FS::Layout::widthConstraintArea() {
 bool FS::Layout::heightConstraintArea() {
 	const float height = layoutRead->heightLimit();
 	for (auto& x : windows) {
+		if (x.pos.x > select.pos.x || x.pos.x + x.size.x < select.pos.x)
+			continue;
+
 		if (x.pos.y - height < select.pos.y && select.pos.y < x.pos.y + height)
+			return true;
+		if (x.pos.y + x.size.y - height < select.pos.y && select.pos.y < x.pos.y + x.size.y + height)
 			return true;
 	}
 
@@ -178,8 +269,11 @@ bool FS::Layout::heightConstraintArea() {
 
 bool FS::Layout::centerHorizonalConstraintArea() {
 	const float height = layoutRead->heightLimit();
-	const float center = select.right.pos.y + (select.right.size.y / 2.0f);
+	const float center = select.right->pos.y + (select.right->size.y / 2.0f);
 	for (auto& x : windows) {
+		if (x.pos.x > select.pos.x || x.pos.x + x.size.x < select.pos.x)
+			continue;
+
 		if (x.pos.y - height < center && center < x.pos.y + height)
 			return true;
 	}
@@ -188,8 +282,11 @@ bool FS::Layout::centerHorizonalConstraintArea() {
 
 bool FS::Layout::centerVerticalConstraintArea() {
 	const float width = layoutRead->widthLimit();
-	const float center = select.right.pos.x + (select.right.size.x / 2.0f);
+	const float center = select.right->pos.x + (select.right->size.x / 2.0f);
 	for (auto& x : windows) {
+		if (x.pos.y > select.pos.y || x.pos.y + x.size.y < select.pos.y)
+			continue;
+
 		if (x.pos.x - width < center && center < x.pos.x + width)
 			return true;
 	}
@@ -197,67 +294,201 @@ bool FS::Layout::centerVerticalConstraintArea() {
 }
 
 void FS::Layout::splitVerticalCurrentPos() {
-	layoutWrite->splitVertical(select.right, select.pos.x);
+	const bool res = layoutWrite->splitVertical(*select.right, select.pos.x);
+
+	if (!res) {
+		this->messageLimit();
+		return;
+	}
+
+	layoutWrite->save();
+	this->updateWindowMinSize();
+	this->updateWindows();
 }
 
 void FS::Layout::splitHorizonalCurrentPos() {
-	layoutWrite->splitHorizonal(select.right, select.pos.y);
-}
+	const bool res = layoutWrite->splitHorizonal(*select.right, select.pos.y);
 
-void FS::Layout::splitCrossCurrentPos() {
-	if (ImGui::MenuItem(text.horizonal, nullptr, false, !flag.widthConstraintArea))
-		layoutWrite->splitCross(select.right, select.pos);
+	if (!res) {
+		this->messageLimit();
+		return;
+	}
 
-	if (ImGui::MenuItem(text.vertical, nullptr, false, !flag.heightConstraintArea))
-		layoutWrite->splitCross(select.right, select.pos);
-
+	layoutWrite->save();
+	this->updateWindowMinSize();
+	this->updateWindows();
 }
 
 void FS::Layout::splitVerticalCenterLine() {
-	layoutWrite->splitVertical(select.right, select.right.pos.x + (select.right.size.x / 2.0f));
+	const bool res = layoutWrite->splitVertical(*select.right, select.right->pos.x + (select.right->size.x / 2.0f));
+
+	if (!res) {
+		this->messageLimit();
+		return;
+	}
+
+	layoutWrite->save();
+	this->updateWindowMinSize();
+	this->updateWindows();
 }
 
 void FS::Layout::splitHorizonalCenterLine() {
-	layoutWrite->splitHorizonal(select.right, select.right.pos.y + (select.right.size.y / 2.0f));
-}
+	const bool res = layoutWrite->splitHorizonal(*select.right, select.right->pos.y + (select.right->size.y / 2.0f));
 
-void FS::Layout::splitCrossCenterLine() {
-	if (ImGui::MenuItem(text.horizonal), 0, false, !flag.widthConstraintArea) {
-		layoutWrite->splitCross(select.right,
-			{
-				select.right.pos.x + (select.right.size.x / 2.0f),
-				select.right.pos.y + (select.right.size.y / 2.0f)
-			}
-		);
+	if (!res) {
+		this->messageLimit();
+		return;
 	}
 
-	if (ImGui::MenuItem(text.vertical, 0, false, !flag.heightConstraintArea)) {
-		layoutWrite->splitCross(select.right,
-			{
-				select.right.pos.x + (select.right.size.x / 2.0f),
-				select.right.pos.y + (select.right.size.y / 2.0f)
-			}
-		);
-	}
+	layoutWrite->save();
+	this->updateWindowMinSize();
+	this->updateWindows();
 }
 
 void FS::Layout::reset() {
-	const auto clicked = FU::MB::ok_cancel("");
+	const auto clicked = FU::MB::ok_cancel(text.confirm_reset);
 	if (clicked == 0) //ok
 		;
 	else { //cancel
 		assert(clicked == 1);
 		return;
 	}
-	GLog.add<FD::Log::Type::None>("Reset layout.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Reset layout.");
 	layoutWrite->reset();
+	layoutWrite->save();
+	this->updateWindowMinSize();
+	this->updateWindows();
 }
 
 void FS::Layout::merge() {
+	layoutWrite->merge(*select.right, select.pos);
+	layoutWrite->save();
+	this->updateWindowMinSize();
+	this->updateWindows();
+}
+
+void FS::Layout::save_resize() {
+	//if (!flag.mouseDown)
+	//	return;
+
+	//if (select.resizeBorder == FD::Layout::ResizedBorder::None)
+	//	return;
+
+	//if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+	//	return;
+
+	//layoutWrite->resize(windows[select.resizedWindowIndex], select.resizeBorder);
+	//layoutWrite->save();
+
+	//select.resizeBorder = FD::Layout::ResizedBorder::None;
+	//flag.mouseDown = false;
+}
+
+void FS::Layout::updateWindows() {
+	select.current = nullptr;
+	select.hovered = nullptr;
+	select.right = nullptr;
+	select.down = nullptr;
+	this->dockSpaceIDs.clear();
+	this->windows = layoutRead->get();
+	this->separators = layoutRead->getSeparators();
+}
+
+void FS::Layout::messageLimit() {
+	FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+	Scene::addScene<Utils::Message>(text.error_max, select.pos);
+}
+
+void FS::Layout::focusedWindowBackground() {
+	if (select.focused) {
+		const ImVec2 padding = ImGui::GetStyle().WindowPadding;
+		const ImVec2 pos = select.current->pos;
+		const ImVec2 size = select.current->size;
+		constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.00f, 0.004f, 0.004f, 1.0f);
+		ImGui::GetWindowDrawList()->AddRectFilled(pos + padding, pos + size - padding, col);
+	}
+}
+
+void FS::Layout::drawSeparators() {
+	ImDrawList* list = select.down ? ImGui::GetForegroundDrawList() : ImGui::GetBackgroundDrawList();
+	constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.366f, 0.366f, 0.366f, 1.000f);
+	constexpr ImU32 colResize = FU::ImGui::ConvertImVec4ToImU32(0.3f, 1.0f, 0.4f, 1.0f);
+
+	this->hoveredSeparator();
+
+	for (auto& x : separators) {
+		list->AddLine(x.pos1, x.pos2, (flag.mouseDown && select.down == &x) ? colResize : col);
+	}
 
 }
 
+void FS::Layout::hoveredSeparator() {
+	constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.9020f, 0.5647f, 0.2157f, 1.000f);
+	const float width = ImGui::GetStyle().WindowPadding.x;
+	const float height = ImGui::GetStyle().WindowPadding.y;
 
+	for (ISize i = -1; auto & x : separators) {
+		i++;
 
+		const bool hovered = x.horizonal ?
+			FU::ImGui::isMouseHoveringRect({ x.pos1.x, x.pos1.y - height }, { x.pos2.x, x.pos2.y + height }) :
+			FU::ImGui::isMouseHoveringRect({ x.pos1.x - width, x.pos1.y }, { x.pos2.x + width, x.pos2.y });
 
+		if (!hovered) {
+			if (&x != select.down) {
+				continue;
+			}
+			else {
+				if (!flag.mouseDown)
+					select.down = nullptr;
+			}
+		}
 
+		const bool hoveredUndocked = this->isUndockedWindowHovered();
+
+		if (hoveredUndocked)
+			continue;
+
+		if (x.horizonal) {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+			FU::Cursor::setCursorType(FU::Cursor::Type::SizeNS);
+		}
+		else {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+			FU::Cursor::setCursorType(FU::Cursor::Type::SizeWE);
+		}
+
+		if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+			select.down = &x;
+			select.downIndex = i;
+		}
+
+		if (flag.mouseDown && select.down && select.downIndex == i) {
+			layoutWrite->update(x, mouse.delta);
+			this->updateWindows();//note: this->separators = new vector
+			select.down = &separators.at(select.downIndex);
+			break;
+		}
+	}
+
+}
+
+bool FS::Layout::isUndockedWindowHovered() {
+	for (auto x : Utils::Class::ClassCodesView) {
+		const ImGuiWindow* window = imguiWindowRead->get<ImGuiWindow*>(x);
+		if (!window)
+			continue;
+
+		if (window->DockNodeIsVisible) {
+			const auto find = std::find(dockSpaceIDs.cbegin(), dockSpaceIDs.cend(), window->RootWindowDockTree->ID);
+			if (find != dockSpaceIDs.cend()) {
+				//docked
+				continue;
+			}
+		}
+
+		if (FU::ImGui::isMouseHoveringRect(window->Pos, window->Pos + window->Size))
+			return true;
+	}
+	return false;
+}

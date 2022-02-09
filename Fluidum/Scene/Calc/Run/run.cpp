@@ -3,66 +3,66 @@
 #include "../../Utils/Data/reset.h"
 
 FS::Calc::Run::Run(
-	const FD::FluidumFilesRead* const fluidumFilesRead
+	const FD::Project::PropertyRead* const propertyRead,
+	const FD::Project::PropertyLuaRead* const propertyLuaRead,
+	FD::Coding::TabWrite* const tabWrite,
+	Info& info
 ) :
-	fluidumFilesRead(fluidumFilesRead)
+	propertyRead(propertyRead),
+	propertyLuaRead(propertyLuaRead),
+	tabWrite(tabWrite),
+
+	info(info)
 {
-	GLog.add<FD::Log::Type::None>("Construct Calc::RunScene.");
+	FluidumScene_Log_Constructor(::FS::Calc::Run);
+
+	this->run();
 }
 
 FS::Calc::Run::~Run() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Calc::RunScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::Calc::Run);
 }
 
 void FS::Calc::Run::call() {
-	const FD::Project::CodeType type = fluidumFilesRead->getCurrentMainCodeType();
-	using enum FD::Project::CodeType;
+	assert(false);
+}
+
+void FS::Calc::Run::run() {
+	const FD::Project::Property::ProjectType type = propertyRead->currentProjectType();
+	using enum FD::Project::Property::ProjectType;
 
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
 
-	if (type == Empty) {
-		this->deleteThis();
-	}
-	else if (type == Error) {
-		FluidumScene_Log_Abort();
-		abort();
+	if (type == None) {
+		info.errorType = InfoErrorType::NotSetProjectType;
+		return;
 	}
 
-	Scene::addScene<Utils::ResetData<FD::ImPlotWrite>>();
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Call constructor Utils::ResetData<FD::ImPlotWrite, FD::Calc::ArrayWrite>.");
+	Scene::callConstructor<Utils::ResetData<FD::ImPlotWrite, FD::Calc::ArrayWrite>>();
 
 	if (type == Lua) {
-		GLog.add<FD::Log::Type::None>("Request add Lua::CalcScene(Async).");
-		Scene::addAsyncScene<Lua::Calc>();
+		if (!propertyLuaRead->entryFileExists()) {
+			info.errorType = InfoErrorType::NotExistsEntryFile;
+			return;
+		}
+		//save all texts
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save all texts.");
+		tabWrite->saveAllTexts();
+		FluidumScene_Log_RequestAddScene(::FS::Calc::Lua::Run);
+		Scene::addAsyncScene<Calc::Lua::Run>(propertyLuaRead->entryFilePath());
 	}
 	else if (type == Python) {
 		;
 	}
-	else if (type == AngelScript) {
+	else if (type == Cpp) {
 		;
 	}
 	else {
-		FluidumScene_Log_Abort();
-		abort();
+		FluidumScene_Log_InternalWarning();
+		info.errorType = InfoErrorType::InternalError;
+		return;
 	}
 
-	this->deleteThis();
-}
-
-void FS::Calc::Run::deleteThis() {
-	FluidumScene_Log_RequestDeleteScene("Calc::RunScene");
-	Scene::deleteScene<Run>();
+	info.errorType = InfoErrorType::NoError;
 }

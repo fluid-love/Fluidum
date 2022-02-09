@@ -9,18 +9,19 @@ namespace FVK::Internal {
 	private:
 		struct ParameterBase {
 			ParameterBase() = delete;
-			ParameterBase(void* ptr, std::size_t size) : vertices(ptr), size(size) {}
+			explicit ParameterBase(void* ptr, const Size size) noexcept : vertices(ptr), size(size) {}
 
-			std::size_t size;
+			Size size;
 			void* vertices = nullptr;
 		};
+
 	public:
 		struct Parameter final :private ParameterBase {
 			template<typename T>
-			Parameter(std::vector<T>* v) : ParameterBase(v->data(), sizeof(v->at(0))* v->size()), bufferSize(sizeof(v->at(0))* v->size()) {}
+			Parameter(std::vector<T>* v) : ParameterBase(v->data(), sizeof(v->at(0)) * v->size()), bufferSize(sizeof(v->at(0))* v->size()) {}
 
 		public:
-			std::size_t bufferSize = 0;
+			Size bufferSize = 0;
 			std::optional<Key::PhysicalDeviceVariantKey> physicalDeviceKey = std::nullopt;
 			std::optional<Key::LogicalDeviceVariantKey> logicalDeviceKey = std::nullopt;
 			std::optional<Key::CommandPoolVariantKey> commandPoolKey = std::nullopt;
@@ -30,19 +31,42 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//basic
+		/*
+		If an exception is thrown, 
+		it is possible that the create function will leave the value in this->info. 
+		However, the create function is safe because it is only called by the constructor.
+		*/
 		explicit VertexBuffer(ManagerPassKey, const Data::VertexBufferData& data,const Parameter& parameter);
-		~VertexBuffer() = default;
-		FluidumUtils_Class_Default_CopyMove(VertexBuffer)
+	
+		~VertexBuffer() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(VertexBuffer);
 
 	private:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//basic
 		void create(const Data::VertexBufferData& data,const Parameter& parameter);
+	
 	public:
-		const Data::VertexBufferInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		//no-throw
+		[[nodiscard]] const Data::VertexBufferInfo& get() const noexcept;
 
 	private:
-		Data::VertexBufferInfo info = {};
-	};
+		Data::VertexBufferInfo info{};
 
+	};
 
 }

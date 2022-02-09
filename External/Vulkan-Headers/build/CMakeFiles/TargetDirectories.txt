@@ -1,0 +1,4 @@
+C:/Fluidum/Libraries/Vulkan-Headers/build/CMakeFiles/uninstall.dir
+C:/Fluidum/Libraries/Vulkan-Headers/build/CMakeFiles/INSTALL.dir
+C:/Fluidum/Libraries/Vulkan-Headers/build/CMakeFiles/ALL_BUILD.dir
+C:/Fluidum/Libraries/Vulkan-Headers/build/CMakeFiles/ZERO_CHECK.dir

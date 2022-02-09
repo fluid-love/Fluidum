@@ -1,3 +1,3 @@
-print("HelloWorld")
---FSystem.SleepSeconds(10)
-plot = FPlot.Make()
+fsystem = require "fluidum.system"
+
+fsystem.print(nil,nil)

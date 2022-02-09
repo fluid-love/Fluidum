@@ -15,29 +15,29 @@ using namespace FU::ImGui::Operators;
 
 FS::TopBar::TopBar(
 	const FD::ProjectRead* const projectRead,
-	const FD::FluidumFilesRead* const fluidumFilesRead,
 	const FD::GuiRead* const guiRead,
 	FD::GuiWrite* const guiWrite,
 	const FD::SceneRead* const sceneRead,
-	const FD::TopBarRead* const topBarRead,
-	FD::TopBarWrite* const topBarWrite,
+	const FD::ToolBarRead* const toolBarRead,
+	FD::ToolBarWrite* const toolBarWrite,
 	const FD::ImGuiWindowRead* const imguiWindowRead,
-	const FD::LayoutRead* const layoutRead
+	const FD::LayoutRead* const layoutRead,
+	FD::ConsoleWrite* const conoleWrite
 ) :
 	projectRead(projectRead),
-	fluidumFilesRead(fluidumFilesRead),
 	guiRead(guiRead),
 	guiWrite(guiWrite),
 	sceneRead(sceneRead),
-	topBarRead(topBarRead),
-	topBarWrite(topBarWrite),
+	toolBarRead(toolBarRead),
+	toolBarWrite(toolBarWrite),
 	imguiWindowRead(imguiWindowRead),
-	layoutRead(layoutRead)
+	layoutRead(layoutRead),
+	consoleWrite(consoleWrite)
 {
-	FluidumScene_Log_Constructor("TopBarScene");
+	FluidumScene_Log_Constructor(::FS::TopBar);
 
 	style.windowPos = ImVec2(0.0f, guiRead->menuBarHeight());
-	const float windowHeight = guiRead->menuBarHeight();
+	const float windowHeight = guiRead->menuBarHeight() + (ImGui::GetFontSize() * 0.35f);
 	style.windowSize = ImVec2(guiRead->windowSize().x, windowHeight);
 
 	if (windowHeight <= ImGui::GetStyle().WindowMinSize.y)
@@ -48,7 +48,7 @@ FS::TopBar::TopBar(
 }
 
 FS::TopBar::~TopBar() noexcept {
-	FluidumScene_Log_Destructor_("TopBarScene")
+	FluidumScene_Log_Destructor(::FS::TopBar);
 }
 
 namespace FS::Internal::Bar {
@@ -58,21 +58,21 @@ namespace FS::Internal::Bar {
 		ImGuiWindowFlags_NoDocking |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoScrollWithMouse;
+		ImGuiWindowFlags_NoScrollWithMouse |
+		ImGuiWindowFlags_NoSavedSettings;
 }
 
 void FS::TopBar::call() {
+	this->updateStyle();
 
-	ImGui::SetNextWindowPos(style.windowPos);
-	ImGui::SetNextWindowSize(style.windowSize);
+	ImGui::SetNextWindowPos(style.windowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(style.windowSize, ImGuiCond_Always);
 
-	//角をとる
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	//borderを細く
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
 	ImGui::Begin("TopBar", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBringToFrontOnFocus);
-
+	this->windowBorder();
 	ImGui::End();
 
 
@@ -85,36 +85,8 @@ void FS::TopBar::call() {
 
 }
 
-
-//		FluidumScene_Log_InternalError();
-//		FluidumScene_Log_CallSceneConstructor("Utils::InternalError");
-//		Scene::callConstructor<Utils::InternalError>();
-//	}
-//
-//}
-//
-//void FS::TopBar::coding() {
-//	FluidumScene_Log_RequestTryAddScene("TextEditor");
-//	Scene::tryAddScene<::FS::TextEditor>();
-//
-//	FluidumScene_Log_RequestTryAddScene("Coding::Tab");
-//	Scene::tryAddScene<Coding::Tab>();
-//}
-
-void FS::TopBar::projectNameGui() {
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-
-	if (projectRead->isDefaultProject())
-		ImGui::Button(text.tempProject);
-	else
-		ImGui::Button(projectRead->getProjectName().c_str());
-
-	ImGui::PopStyleColor(3);
-	ImGui::PopStyleVar(2);
+void FS::TopBar::updateStyle() {
+	style.windowSize.x = guiRead->windowSize().x;
 }
 
 void FS::TopBar::rightGui() {
@@ -150,11 +122,9 @@ void FS::TopBar::calc() {
 	this->mode();
 	ImGui::SameLine();
 
-	bool isRunning = sceneRead->isExist<Lua::Calc>();
+	const bool running = sceneRead->exist<Calc::Lua::Run>();
 
-	//前のステップまで戻る
-	//一時停止中以外は選択不可
-	if (isRunning) {
+	if (running) {
 		ImGui::Button(ICON_MD_SKIP_PREVIOUS);
 	}
 	else {
@@ -165,38 +135,39 @@ void FS::TopBar::calc() {
 
 	ImGui::SameLine();
 
-	//実行中
-	if (isRunning) {
+	if (running) {
 
-		//一時停止を要求
+		//request pause
 		bool pause = ImGui::Button(ICON_MD_STOP);
 
 		ImGui::SameLine();
 	}
 	else {
-
 		bool run = ImGui::Button(ICON_MD_PLAY_ARROW);
+		FU::ImGui::tooltip(anime.run, text.run);
 		if (run) {
-			pos.run = ImGui::GetItemRectMax();
+			consoleWrite->push_input("flu run");
+			consoleWrite->busy(true);
+			pos.run = FU::ImGui::messagePos();
 			this->run();
 		}
 	}
 
 	ImGui::SameLine();
 
-	//次のステップまで進む
-	if (isRunning) {
+	//next step
+	if (running) {
 		ImGui::Button(ICON_MD_SKIP_NEXT);
 
 	}
 	else {
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.1f);
 
-		//停止を要求
+		//request stop
 		bool stop = ImGui::Button(ICON_MD_PAUSE);
 		ImGui::SameLine();
 
-		//次のステップ
+		//next step
 		ImGui::Button(ICON_MD_SKIP_NEXT);
 
 		ImGui::PopStyleVar();
@@ -216,22 +187,39 @@ void FS::TopBar::mode() {
 	if (ImGui::Selectable("Standard"))
 		std::cout << "a";
 
-
 	ImGui::EndCombo();
 }
 
 void FS::TopBar::run() {
-	//test
-	Scene::addAsyncScene<Lua::Calc>();
 
-	return;
-	if (!fluidumFilesRead->isMainCodeFileExist()) {
-		FluidumScene_Log_RequestAddScene("Utils::Message");
-		Scene::addScene<Utils::Message>(text.error_mainfile, pos.run);
+	Calc::Run::Info info{};
+
+	FluidumScene_Log_CallSceneConstructor(::FS::Calc::Run);
+	Scene::callConstructor<Calc::Run>(info);
+
+	using enum Calc::Run::InfoErrorType;
+	if (info.errorType == NoError) {
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Successfully run.");
+		return;
 	}
 
-	FluidumScene_Log_RequestAddScene("Calc::RunScene");
-	Scene::addScene<Calc::Run>();
+	FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+	if (info.errorType == NotSetProjectType) {
+		Scene::addScene<Utils::Message>(text.error_notSetProperty, pos.run);
+		consoleWrite->push<FU::Log::Type::Error>(text.error_notSetProperty.operator const std::string & ());
+	}
+	else if (info.errorType == NotExistsEntryFile) {
+		Scene::addScene<Utils::Message>(text.error_mainfile, pos.run);
+		consoleWrite->push<FU::Log::Type::Error>(text.error_mainfile.operator const std::string & ());
+	}
+	else if (info.errorType == InternalError) {
+		FluidumScene_Log_InternalWarning();
+		FD::Text::Common errorText(FD::Text::CommonText::InternalError);
+		Scene::addScene<Utils::Message>(errorText, pos.run);
+		consoleWrite->push<FU::Log::Type::Error>(errorText.string_cr());
+	}
+
+	consoleWrite->busy(false);
 }
 
 void FS::TopBar::playCheck() {
@@ -261,7 +249,7 @@ void FS::TopBar::scene() {
 	ImGui::Begin("SceneFunc", nullptr, Internal::Bar::CommonWindowFlag | ImGuiWindowFlags_NoBackground);
 
 	//combo button color
-	if (!topBarRead->getIndices()->empty())
+	if (!toolBarRead->getIndices()->empty())
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.01f, 0.01f, 1.0f));
 	else
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.02f, 0.02f, 0.02f, 1.0f));
@@ -276,18 +264,17 @@ void FS::TopBar::scene() {
 }
 
 void FS::TopBar::combo() {
-	const auto* info = topBarRead->getInfo();
+	const auto* info = toolBarRead->getInfo();
 
 	if (!ImGui::BeginCombo("##SceneFuncCombo", "##None", ImGuiComboFlags_NoPreview))
 		return;
 
 	for (auto& x : *info) {
-
 		if (ImGui::Selectable(x.sceneName.c_str(), x.select)) {
 			if (!x.select)
-				topBarWrite->lock(x.code);
+				toolBarWrite->lock(x.code);
 			else
-				topBarWrite->unlock(x.code);
+				toolBarWrite->unlock(x.code);
 		}
 	}
 
@@ -298,15 +285,22 @@ void FS::TopBar::combo() {
 
 void FS::TopBar::func() {
 
-	const auto* indices = topBarRead->getIndices();
+	const auto* indices = toolBarRead->getIndices();
 
-	for (auto x : *indices) {
+	if (indices->empty())
+		return;
+
+	for (auto itr = indices->begin(), end = (indices->end() - 1); itr != end; itr++) {
 		ImGui::Spacing(); ImGui::SameLine();
-		topBarRead->call(x);
+		toolBarRead->call(*itr);
 		ImGui::SameLine(); ImGui::Spacing();
-		this->separator(ImGui::GetItemRectMax().x + 10.0f);
+		this->separator(ImGui::GetItemRectMax().x + 10.0f, { 0.4f, 0.2f, 0.2f, 1.0f });
 		ImGui::SameLine();
 	}
+
+	ImGui::Spacing(); ImGui::SameLine();
+
+	toolBarRead->call(indices->back());
 
 }
 
@@ -318,3 +312,13 @@ void FS::TopBar::separator(const float posX, const ImVec4& col4) {
 
 }
 
+#include <imgui_internal.h>
+void FS::TopBar::windowBorder() {
+	constexpr ImU32 col = FU::ImGui::ConvertImVec4ToImU32(0.4f, 0.4f, 0.4f, 1.0f);
+	ImGui::GetWindowDrawList()->AddLine(
+		{ style.windowPos.x ,style.windowPos.y + style.windowSize.y },
+		{ style.windowPos.x + style.windowSize.x ,style.windowPos.y + style.windowSize.y },
+		col,
+		5.0f
+	);
+}

@@ -1,11 +1,13 @@
 #include "mainloop.h"
 
 namespace FDR::Internal {
+
 	void loop(auto& commands, auto function) {
 		using namespace FDR::Internal;
 
-		ImGui_ImplGlfw_NewFrame();
-		glfwPollEvents();
+#ifdef FluidumUtils_Type_OS_Windows
+		ImGui_ImplWin32_NewFrame();
+#endif
 
 		ImGui::NewFrame();
 
@@ -14,13 +16,14 @@ namespace FDR::Internal {
 			function();
 		}
 
+
 		ImGui::Render();
 		commands->call();
 	};
 
 	void drawFrame(auto& data, void* null) {
 		static std::vector<vk::Fence> imagesInFlight{};
-		static int32_t currentFrame = 0;
+		static I32 currentFrame = 0;
 
 		vk::Device device = std::get<0>(data);
 		vk::SwapchainKHR swapchain = std::get<1>(data);
@@ -37,8 +40,7 @@ namespace FDR::Internal {
 		if (result != vk::Result::eSuccess)
 			throw std::runtime_error("Failed to wait for Fence");
 
-		uint32_t imageIndex;
-
+		UI32 imageIndex;
 		result = device.acquireNextImageKHR(swapchain, UINT64_MAX, imageAvailableSemaphores[currentFrame], nullptr, &imageIndex);
 
 		if (result == vk::Result::eErrorOutOfDateKHR) {
@@ -49,8 +51,8 @@ namespace FDR::Internal {
 			throw std::runtime_error("Failed to acquire next image");
 		}
 
-		if (imagesInFlight[imageIndex]) {
-			result = device.waitForFences(1, &imagesInFlight[imageIndex], true, UINT64_MAX);
+		if (imagesInFlight[imageIndex].operator bool()) {
+			result = device.waitForFences(1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
 			if (result != vk::Result::eSuccess) {
 				throw std::runtime_error("Failed to wat fence");
 			}
@@ -83,7 +85,7 @@ namespace FDR::Internal {
 			throw std::runtime_error("Failed to reset Fence");
 
 
-		//fenceが終わったタイミングでコマンドブッファを作り直す
+		//Recreate the command buffers at the end of the fence.
 		result = commandBuffers[imageIndex].reset(vk::CommandBufferResetFlagBits::eReleaseResources);
 		FVK::exeCommands(MainCommands);
 
@@ -103,7 +105,7 @@ namespace FDR::Internal {
 			.pSwapchains = swapChainsVK,
 			.pImageIndices = &imageIndex,
 		};
-		
+
 		if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR/* || frameBufferResize*/) {
 			//data.framebufferResized = false;
 			//recreateswapchain
@@ -114,6 +116,8 @@ namespace FDR::Internal {
 		}
 		else {
 			result = presentQueue.presentKHR(presentInfo);
+			//Stacked commands
+			Command::Internal::call();
 		}
 
 		currentFrame = (currentFrame + 1) % inFlightFences.size();
@@ -121,7 +125,7 @@ namespace FDR::Internal {
 
 }
 
-void FDR::Internal::mainLoop(void(*function)(), bool* const flag) {
+void FDR::Internal::mainLoop(void(*function)(), const bool* const flag) {
 	auto draw = FVK::makeAnyCommand(
 		BaseDeviceKey, BaseSwapchainKey,
 		BaseInFlightFenceKeys,

@@ -3,22 +3,30 @@
 #include "../../../External/IconFontCppHeaders/IconsMaterialDesign.h"
 #include "../../../External/IconFontCppHeaders/IconsFontAwesome5.h"
 
-namespace FD::Internal::Text {
+#include "../../../External/magic_enum/include/magic_enum.hpp"
+
+namespace FD::Text::Internal {
+
 	using Language = ::FD::Text::Language;
 
-	std::string newLine(std::ifstream& ifs, const std::string& src) {
+	[[nodiscard]] std::string newLine(std::ifstream& ifs, const std::string& src) {
 		std::string temp{};
 		temp.push_back('\n');
 		std::getline(ifs, temp);
 		return src + '\n' + temp;
 	}
 
-	enum class Type : uint8_t {
+	enum class Type : UT {
+		Common,
 		Analysis,
 		BarExit,
-		CodingNew,
-		CodingSelect,
+		ProjectNewFile,
+		ProjectDirectory,
+		ProjectCheckPath,
+		ProjectSelect,
+		ProjectProperty,
 		CodingTab,
+		Console,
 		Layout,
 		LeftBar,
 		MenuBar,
@@ -31,37 +39,55 @@ namespace FD::Internal::Text {
 		TextEditor,
 		Title,
 		TitleBar,
-		TopBar
+		TopBar,
 	};
 
-
 	template<Type T>
-	std::string makePath(const Language lang) {
+	[[nodiscard]] std::string makePath(const Language lang) {
+		using namespace ::FD::Internal::Resource;
 		using enum Type;
+
 		std::string path{};
 		if (lang == Language::Japanese)
-			path += Resource::JapaneseGuiTextFolderPath;
+			path += JapaneseGuiTextFolderPath;
 		else if (lang == Language::English)
-			path += Resource::EnglishGuiTextFolderPath;
+			path += EnglishGuiTextFolderPath;
 		else if (lang == Language::Chinese)
-			path += Resource::ChineseGuiTextFolderPath;
-		else
-			abort();
+			path += ChineseGuiTextFolderPath;
+		else {
+			::FD::Internal::GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Internal Error.");;
+			std::terminate();
+		}
 
-		if constexpr (T == Analysis) {
+		if constexpr (T == Common) {
+			path += "Common";
+		}
+		else if constexpr (T == Analysis) {
 			path += "Analysis";
 		}
 		else if constexpr (T == BarExit) {
 			path += "BarExit";
 		}
-		else if constexpr (T == CodingNew) {
-			path += "CodingNew";
+		else if constexpr (T == ProjectNewFile) {
+			path += "ProjectNewFile";
 		}
-		else if constexpr (T == CodingSelect) {
-			path += "CodingSelect";
+		else if constexpr (T == ProjectDirectory) {
+			path += "ProjectDirectory";
+		}
+		else if constexpr (T == ProjectCheckPath) {
+			path += "ProjectCheckPath";
+		}
+		else if constexpr (T == ProjectSelect) {
+			path += "ProjectSelect";
+		}
+		else if constexpr (T == ProjectProperty) {
+			path += "ProjectProperty";
 		}
 		else if constexpr (T == CodingTab) {
 			path += "CodingTab";
+		}
+		else if constexpr (T == Console) {
+			path += "Console";
 		}
 		else if constexpr (T == Layout) {
 			path += "Layout";
@@ -108,13 +134,11 @@ namespace FD::Internal::Text {
 		return path;
 	}
 
-
-
 }
 
-namespace FD::Internal::Text {
+namespace FD::Text::Internal {
 
-	//ëOï˚êÈåæ
+	//forward declaration
 	class Getter;
 
 	class LangType final {
@@ -142,15 +166,45 @@ FD::GuiTextRead::GuiTextRead(Internal::PassKey) {
 	std::getline(ifs, data);
 
 	if (data == "Japanese")
-		Internal::Text::LangType::type = Text::Language::Japanese;
+		Text::Internal::LangType::type = Text::Language::Japanese;
 	else if (data == "English")
-		Internal::Text::LangType::type = Text::Language::English;
+		Text::Internal::LangType::type = Text::Language::English;
 	else
 		throw std::runtime_error("Failed to read GuiTextType.");
 
 }
 
-FD::Internal::Text::Title::Title() {
+FD::Text::Internal::Common::Common(const CommonText index)
+	: text(init(index))
+{}
+
+FD::Text::Internal::GuiText FD::Text::Internal::Common::init(const CommonText index) const {
+	using T = std::underlying_type_t<CommonText>;
+
+	const T i = static_cast<T>(index);
+
+	assert(std::numeric_limits<T>::max() != i);
+	assert(i < magic_enum::enum_count<CommonText>());
+
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::Common>(Getter::get()), std::ios::in);
+
+	if (!ifs) {
+		::FD::Internal::GMessenger.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "Failed to open Common file.");;
+		return GuiText{ "Error" };
+	}
+
+	std::string buf{};
+
+	for (T j = 0; j < i + 1; j++) {
+		std::getline(ifs, buf);
+	}
+
+	return GuiText{ buf };
+}
+
+FD::Text::Internal::Title::Title() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::Title>(Getter::get()), std::ios::in);
@@ -173,7 +227,22 @@ FD::Internal::Text::Title::Title() {
 	this->document = data;
 
 	std::getline(ifs, data);
-	this->error_openProjectFile = Internal::Text::newLine(ifs, data);
+	this->erase_icon = ICON_FA_ERASER "  " + data;
+
+	std::getline(ifs, data);
+	this->clear_icon = ICON_FA_ERASER "  " + data;
+
+	std::getline(ifs, data);
+	this->confirm_clearHistory = Internal::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->error_notSupported = data;
+
+	std::getline(ifs, data);
+	this->error_loadProjectHistory = data;
+
+	std::getline(ifs, data);
+	this->error_openProjectFile = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->error_illegalFile = data;
@@ -182,19 +251,24 @@ FD::Internal::Text::Title::Title() {
 	this->error_brokenFile = data;
 
 	std::getline(ifs, data);
-	this->error_internal = data;
+	this->error_unexpected = data;
 }
 
-FD::Internal::Text::TitleBar::TitleBar() {
+FD::Text::Internal::TitleBar::TitleBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::TitleBar>(Getter::get()), std::ios::in);
 	if (!ifs)
 		throw std::runtime_error("Failed to open TitleBar.");
 
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->tempProject = data;
+
 }
 
-FD::Internal::Text::Layout::Layout() {
+FD::Text::Internal::Layout::Layout() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::Layout>(Getter::get()), std::ios::in);
@@ -204,22 +278,16 @@ FD::Internal::Text::Layout::Layout() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->splitVerticalCurrentPos = ICON_MD_BORDER_VERTICAL "  " + data;
+	this->splitVerticalCurrentPos = ICON_MD_IMPORT_EXPORT "  " + data;
 
 	std::getline(ifs, data);
-	this->splitHorizonalCurrentPos = ICON_MD_BORDER_HORIZONTAL "  " + data;
+	this->splitHorizonalCurrentPos = ICON_MD_COMPARE_ARROWS "  " + data;
 
 	std::getline(ifs, data);
-	this->splitCrossCurrentPos = ICON_MD_BORDER_INNER "  " + data;
+	this->splitVerticalCenterLine = ICON_MD_IMPORT_EXPORT "  " + data;
 
 	std::getline(ifs, data);
-	this->splitVerticalCenterLine = ICON_MD_BORDER_VERTICAL "  " + data;
-
-	std::getline(ifs, data);
-	this->splitHorizonalCenterLine = ICON_MD_BORDER_HORIZONTAL "  " + data;
-
-	std::getline(ifs, data);
-	this->splitCrossCenterLine = ICON_MD_BORDER_INNER "  " + data;
+	this->splitHorizonalCenterLine = ICON_MD_COMPARE_ARROWS "  " + data;
 
 	std::getline(ifs, data);
 	this->merge = ICON_MD_HEALING "  " + data;
@@ -228,17 +296,13 @@ FD::Internal::Text::Layout::Layout() {
 	this->reset = ICON_MD_CHECK_BOX_OUTLINE_BLANK "  " + data;
 
 	std::getline(ifs, data);
-	this->horizonal = ICON_MD_COMPARE_ARROWS "  " + data;
-
-	std::getline(ifs, data);
-	this->vertical = ICON_MD_IMPORT_EXPORT "  " + data;
-
-	std::getline(ifs, data);
 	this->error_max = data;
 
+	std::getline(ifs, data);
+	this->confirm_reset = data;
 }
 
-FD::Internal::Text::BarExit::BarExit() {
+FD::Text::Internal::BarExit::BarExit() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::BarExit>(Getter::get()), std::ios::in);
@@ -248,10 +312,10 @@ FD::Internal::Text::BarExit::BarExit() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->popup_projectMessage = Internal::Text::newLine(ifs, data);
+	this->popup_projectMessage = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->popup_codingTabMessage = Internal::Text::newLine(ifs, data);
+	this->popup_codingTabMessage = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->popup_saveAndExit = data;
@@ -263,7 +327,7 @@ FD::Internal::Text::BarExit::BarExit() {
 	this->popup_cancel = data;
 }
 
-FD::Internal::Text::StatusBar::StatusBar() {
+FD::Text::Internal::StatusBar::StatusBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::StatusBar>(Getter::get()), std::ios::in);
@@ -284,7 +348,7 @@ FD::Internal::Text::StatusBar::StatusBar() {
 	this->taskInfo = data;
 }
 
-FD::Internal::Text::MenuBar::MenuBar() {
+FD::Text::Internal::MenuBar::MenuBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::MenuBar>(Getter::get()), std::ios::in);
@@ -371,6 +435,9 @@ FD::Internal::Text::MenuBar::MenuBar() {
 	this->project_ = data;
 
 	std::getline(ifs, data);
+	this->property_icon = ICON_FA_WRENCH "   " + data;
+
+	std::getline(ifs, data);
 	this->extension = data;
 
 	std::getline(ifs, data);
@@ -422,11 +489,11 @@ FD::Internal::Text::MenuBar::MenuBar() {
 	this->error_internal = data;
 
 	std::getline(ifs, data);
-	this->confirm_changeLayout = Internal::Text::newLine(ifs, data);
+	this->confirm_changeLayout = Internal::newLine(ifs, data);
 
 }
 
-FD::Internal::Text::TopBar::TopBar() {
+FD::Text::Internal::TopBar::TopBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::TopBar>(Getter::get()), std::ios::in);
@@ -446,9 +513,6 @@ FD::Internal::Text::TopBar::TopBar() {
 	this->templates = data;
 
 	std::getline(ifs, data);
-	this->tempProject = data;
-
-	std::getline(ifs, data);
 	this->save = data;
 
 	std::getline(ifs, data);
@@ -458,11 +522,17 @@ FD::Internal::Text::TopBar::TopBar() {
 	this->includeFile = data;
 
 	std::getline(ifs, data);
+	this->run = data;
+
+	std::getline(ifs, data);
 	this->error_mainfile = data;
+
+	std::getline(ifs, data);
+	this->error_notSetProperty = data;
 
 }
 
-FD::Internal::Text::LeftBar::LeftBar() {
+FD::Text::Internal::LeftBar::LeftBar() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::LeftBar>(Getter::get()), std::ios::in);
@@ -473,7 +543,7 @@ FD::Internal::Text::LeftBar::LeftBar() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->popup_save = Internal::Text::newLine(ifs, data);;
+	this->popup_save = Internal::newLine(ifs, data);;
 
 	std::getline(ifs, data);
 	this->popup_saveAndClose = data;
@@ -485,14 +555,14 @@ FD::Internal::Text::LeftBar::LeftBar() {
 	this->popup_cancel = data;
 }
 
-FD::Internal::Text::CodingSelect::CodingSelect() {
+FD::Text::Internal::ProjectSelect::ProjectSelect() {
 
 	std::ifstream ifs{};
 
-	ifs = std::ifstream(makePath<Type::CodingSelect>(Getter::get()), std::ios::in);
+	ifs = std::ifstream(makePath<Type::ProjectSelect>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open CodingSelect.");
+		throw std::runtime_error("Failed to open ProjectSelect.");
 
 	std::string data = "";
 
@@ -509,7 +579,7 @@ FD::Internal::Text::CodingSelect::CodingSelect() {
 	this->empty_py = data;
 
 	std::getline(ifs, data);
-	this->empty_as = data;
+	this->empty_cpp = data;
 
 	std::getline(ifs, data);
 	this->openFile = data;
@@ -522,6 +592,12 @@ FD::Internal::Text::CodingSelect::CodingSelect() {
 
 	std::getline(ifs, data);
 	this->newFileDescription = data;
+
+	std::getline(ifs, data);
+	this->newDirectory = data;
+
+	std::getline(ifs, data);
+	this->newDirectoryDescription = data;
 
 	std::getline(ifs, data);
 	this->cancel = data;
@@ -543,15 +619,22 @@ FD::Internal::Text::CodingSelect::CodingSelect() {
 
 	std::getline(ifs, data);
 	this->error_emptyForm = data;
+
+	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
+
 }
 
-FD::Internal::Text::CodingNew::CodingNew() {
+FD::Text::Internal::ProjectNewFile::ProjectNewFile() {
 	std::ifstream ifs{};
 
-	ifs = std::ifstream(makePath<Type::CodingNew>(Getter::get()), std::ios::in);
+	ifs = std::ifstream(makePath<Type::ProjectNewFile>(Getter::get()), std::ios::in);
 
 	if (!ifs)
-		throw std::runtime_error("Failed to open CodingNew.");
+		throw std::runtime_error("Failed to open ProjectNewFile.");
 
 	std::string data = "";
 
@@ -559,10 +642,19 @@ FD::Internal::Text::CodingNew::CodingNew() {
 	this->title = data;
 
 	std::getline(ifs, data);
+	this->search = data;
+
+	std::getline(ifs, data);
+	this->all = data;
+
+	std::getline(ifs, data);
 	this->recent = data;
 
 	std::getline(ifs, data);
-	this->recent_empty = data;
+	this->recentEmpty = data;
+
+	std::getline(ifs, data);
+	this->back = data;
 
 	std::getline(ifs, data);
 	this->cancel = data;
@@ -580,37 +672,93 @@ FD::Internal::Text::CodingNew::CodingNew() {
 	this->empty = data;
 
 	std::getline(ifs, data);
-	this->empty_Description = data;
+	this->empty_description = data;
 
 	std::getline(ifs, data);
 	this->emptyLua = data;
 
 	std::getline(ifs, data);
-	this->emptyLua_Description = data;
+	this->emptyLua_description = data;
 
 	std::getline(ifs, data);
 	this->emptyPython = data;
 
 	std::getline(ifs, data);
-	this->emptyPython_Description = data;
+	this->emptyPython_description = data;
 
 	std::getline(ifs, data);
-	this->emptyAngelScript = data;
+	this->emptyCpp = data;
 
 	std::getline(ifs, data);
-	this->emptyAngelScript_Description = data;
+	this->emptyCpp_description = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
+}
+
+FD::Text::Internal::ProjectDirectory::ProjectDirectory() {
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::ProjectDirectory>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open ProjectDirectory.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->title = data;
+
+	std::getline(ifs, data);
+	this->parent = data;
+
+	std::getline(ifs, data);
+	this->name = data;
+
+	std::getline(ifs, data);
+	this->back = data;
+
+	std::getline(ifs, data);
+	this->cancel = data;
+
+	std::getline(ifs, data);
+	this->create = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
+}
+
+FD::Text::Internal::ProjectCheckPath::ProjectCheckPath() {
+
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::ProjectCheckPath>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open ProjectCheckPath.");
+
+	std::string data = "";
 
 	std::getline(ifs, data);
 	this->error_fill = data;
 
 	std::getline(ifs, data);
-	this->error_directoryNotFound = data;
+	this->error_parentDoesNotExist = data;
+
+	std::getline(ifs, data);
+	this->error_directoryAlreadyExist = data;
 
 	std::getline(ifs, data);
 	this->error_fileAlreadyExist = data;
+
+	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
 }
 
-FD::Internal::Text::NewProject::NewProject() {
+FD::Text::Internal::NewProject::NewProject() {
 
 	std::ifstream ifs{};
 
@@ -658,19 +806,13 @@ FD::Internal::Text::NewProject::NewProject() {
 	this->emptyPythonDescription = data;
 
 	std::getline(ifs, data);
-	this->emptyAngelScript = data;
+	this->emptyCpp = data;
 
 	std::getline(ifs, data);
-	this->emptyAngelScriptDescription = data;
+	this->emptyCppDescription = data;
 
 	std::getline(ifs, data);
 	this->algorithm = data;
-
-	std::getline(ifs, data);
-	this->interactive = data;
-
-	std::getline(ifs, data);
-	this->interactiveDescription = data;
 
 	std::getline(ifs, data);
 	this->cancel = data;
@@ -678,9 +820,18 @@ FD::Internal::Text::NewProject::NewProject() {
 	std::getline(ifs, data);
 	this->select = data;
 
+	std::getline(ifs, data);
+	this->recent_erase = ICON_MD_DELETE "  " + data;
+
+	std::getline(ifs, data);
+	this->recent_clear = ICON_MD_DELETE_FOREVER "  " + data;
+
+	std::getline(ifs, data);
+	this->recent_message = data;
+
 }
 
-FD::Internal::Text::ProjectForm::ProjectForm() {
+FD::Text::Internal::ProjectForm::ProjectForm() {
 
 	std::ifstream ifs{};
 
@@ -728,16 +879,26 @@ FD::Internal::Text::ProjectForm::ProjectForm() {
 	this->error_emptyForm = data;
 
 	std::getline(ifs, data);
+	this->error_maxSize = data;
+
+	std::getline(ifs, data);
+	this->error_absolute = data;
+
+	std::getline(ifs, data);
 	this->error_notFoundDirectory = data;
 
 	std::getline(ifs, data);
 	this->error_alreadyExist = data;
 
 	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
+	std::getline(ifs, data);
 	this->error_failedToCreate = data;
+
 }
 
-FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
+FD::Text::Internal::ProjectSaveAs::ProjectSaveAs() {
 
 	std::ifstream ifs{};
 
@@ -752,7 +913,7 @@ FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
 	this->title = data;
 
 	std::getline(ifs, data);
-	this->folderPath = data;
+	this->directoryPath = data;
 
 	std::getline(ifs, data);
 	this->projectName = data;
@@ -764,13 +925,13 @@ FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
 	this->save = data;
 
 	std::getline(ifs, data);
-	this->checkCurrentProject = data;
+	this->confirm_notSaved = data;
 
 	std::getline(ifs, data);
-	this->saveAndWrite = data;
+	this->confirm_save = data;
 
 	std::getline(ifs, data);
-	this->ignore = data;
+	this->confirm_ignore = data;
 
 	std::getline(ifs, data);
 	this->error_empty = data;
@@ -779,13 +940,17 @@ FD::Internal::Text::ProjectSaveAs::ProjectSaveAs() {
 	this->error_alreadyExist = data;
 
 	std::getline(ifs, data);
+	this->error_notFoundProject = data;
+
+	std::getline(ifs, data);
 	this->error_notFound = data;
 
 	std::getline(ifs, data);
-	this->error_failed = data;
+	this->error_forbiddenCharactor = data;
+
 }
 
-FD::Internal::Text::PopupSelect::PopupSelect() {
+FD::Text::Internal::PopupSelect::PopupSelect() {
 
 	std::ifstream ifs{};
 
@@ -808,7 +973,7 @@ FD::Internal::Text::PopupSelect::PopupSelect() {
 
 }
 
-FD::Internal::Text::TextEditor::TextEditor() {
+FD::Text::Internal::TextEditor::TextEditor() {
 
 	std::ifstream ifs{};
 
@@ -827,9 +992,10 @@ FD::Internal::Text::TextEditor::TextEditor() {
 
 	std::getline(ifs, data);
 	this->save = data;
+	this->save_icon = ICON_FA_SAVE "  " + data;
 
 	std::getline(ifs, data);
-	this->saveAs = data;
+	this->saveAs = ICON_FA_SAVE "  " + data;
 
 	std::getline(ifs, data);
 	this->load = data;
@@ -844,28 +1010,30 @@ FD::Internal::Text::TextEditor::TextEditor() {
 	this->edit = data;
 
 	std::getline(ifs, data);
-	this->readOnly = data;
+	this->readOnly = ICON_FA_BOOK_OPEN "  " + data;
 
 	std::getline(ifs, data);
 	this->undo = data;
+	this->undo_icon = ICON_FA_UNDO "  " + data;
 
 	std::getline(ifs, data);
 	this->redo = data;
+	this->redo_icon = ICON_FA_REDO "  " + data;
 
 	std::getline(ifs, data);
-	this->copy = data;
+	this->copy = ICON_FA_CLIPBOARD "  " + data;
 
 	std::getline(ifs, data);
-	this->cut = data;
+	this->cut = ICON_FA_CUT "  " + data;
 
 	std::getline(ifs, data);
-	this->del = data;
+	this->del = ICON_FA_ERASER "  " + data;
 
 	std::getline(ifs, data);
-	this->paste = data;
+	this->paste = ICON_FA_CLIPBOARD_LIST "  " + data;
 
 	std::getline(ifs, data);
-	this->selectAll = data;
+	this->selectAll = ICON_FA_GRIP_LINES "  " + data;
 
 	std::getline(ifs, data);
 	this->theme = data;
@@ -888,10 +1056,13 @@ FD::Internal::Text::TextEditor::TextEditor() {
 	std::getline(ifs, data);
 	this->column = data;
 
+	std::getline(ifs, data);
+	this->error_forbiddenCharactor = data;
+
 }
 
 
-FD::Internal::Text::CodingTab::CodingTab() {
+FD::Text::Internal::CodingTab::CodingTab() {
 
 	std::ifstream ifs{};
 
@@ -903,10 +1074,7 @@ FD::Internal::Text::CodingTab::CodingTab() {
 	std::string data = "";
 
 	std::getline(ifs, data);
-	this->error_limitMaxSize = data;
-
-	std::getline(ifs, data);
-	this->error_alreadyExist = data;
+	this->tab = data;
 
 	std::getline(ifs, data);
 	this->popup_save = data;
@@ -920,9 +1088,21 @@ FD::Internal::Text::CodingTab::CodingTab() {
 	std::getline(ifs, data);
 	this->popup_cancel = data;
 
+	std::getline(ifs, data);
+	this->error_limitMaxSize = data;
+
+	std::getline(ifs, data);
+	this->error_alreadyExist = data;
+
+	std::getline(ifs, data);
+	this->error_notExist = data;
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
+
 }
 
-FD::Internal::Text::Project::Project() {
+FD::Text::Internal::Project::Project() {
 	std::ifstream ifs{};
 
 	ifs = std::ifstream(makePath<Type::Project>(Getter::get()), std::ios::in);
@@ -933,25 +1113,34 @@ FD::Internal::Text::Project::Project() {
 	std::string data = "";
 
 	std::getline(ifs, data);
+	this->explorer = data;
+
+	std::getline(ifs, data);
 	this->sync = data;
 
 	std::getline(ifs, data);
 	this->add = data;
+	this->add_icon = ICON_MD_ADD "  " + data;
+
+	std::getline(ifs, data);
+	this->add_selectNewFile = ICON_MD_SUBDIRECTORY_ARROW_RIGHT ICON_FA_FILE_ALT "  " + data;
+
+	std::getline(ifs, data);
+	this->add_select = ICON_FA_LIST "  " + data;
 
 	std::getline(ifs, data);
 	this->file = data;
+	this->file_icon = ICON_FA_FILE "  " + data;
 
 	std::getline(ifs, data);
-	this->folder = data;
+	this->directory = data;
+	this->directory_icon = ICON_FA_FOLDER "  " + data;
 
 	std::getline(ifs, data);
-	this->rename = data;
+	this->rename = ICON_FA_PEN "  " + data;
 
 	std::getline(ifs, data);
-	this->remove = data;
-
-	std::getline(ifs, data);
-	this->displayCode = data;
+	this->displayCode = ICON_MD_CODE "  " + data;
 
 	std::getline(ifs, data);
 	this->error_openFile = data;
@@ -960,7 +1149,7 @@ FD::Internal::Text::Project::Project() {
 	this->notice_removeFile = data;
 
 	std::getline(ifs, data);
-	this->notice_removeFolder = data;
+	this->notice_removeDirectory = data;
 
 	std::getline(ifs, data);
 	{
@@ -970,9 +1159,6 @@ FD::Internal::Text::Project::Project() {
 
 	std::getline(ifs, data);
 	this->mainFile = data;
-
-	std::getline(ifs, data);
-	this->projectFolder = data;
 
 	std::getline(ifs, data);
 	this->project = data;
@@ -990,43 +1176,52 @@ FD::Internal::Text::Project::Project() {
 	this->name = data;
 
 	std::getline(ifs, data);
-	this->createFolder = data;
+	this->virtualFolder = ICON_FA_FOLDER "  " + data;
 
 	std::getline(ifs, data);
-	this->createVirtualFolder = data;
+	this->newFile = ICON_FA_FILE "  " + data;
 
 	std::getline(ifs, data);
-	this->createFile = data;
+	this->collapseAll = ICON_FA_FOLDER_MINUS "  " + data;
 
 	std::getline(ifs, data);
-	this->addExistFolder = data;
+	this->addExistDirectory = data;
 
 	std::getline(ifs, data);
 	this->addExistFile = data;
 
 	std::getline(ifs, data);
-	this->open = data;
+	this->open = ICON_FA_FOLDER_OPEN "  " + data;
 
 	std::getline(ifs, data);
-	this->close = data;
+	this->close = ICON_FA_FOLDER "  " + data;
 
 	std::getline(ifs, data);
-	this->delete_release = data;
+	this->remove = ICON_FA_TRASH_ALT "  " + data;
+
+	std::getline(ifs, data);
+	this->release = ICON_FA_TRASH_ALT "  " + data;
+
+	std::getline(ifs, data);
+	this->setAsMainFile = ICON_FA_FLAG "  " + data;
 
 	std::getline(ifs, data);
 	this->error_maxSize = data;
 
 	std::getline(ifs, data);
-	this->confirm_releaseVirtualFolder = Internal::Text::newLine(ifs, data);
+	this->confirm_releaseVirtualFolder = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_releaseFile = Internal::Text::newLine(ifs, data);
+	this->confirm_releaseFile = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_deleteFolder = Internal::Text::newLine(ifs, data);
+	this->confirm_removeDirectory = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
-	this->confirm_deleteFile = Internal::Text::newLine(ifs, data);
+	this->confirm_removeFile = Internal::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->confirm_releaseFile_notSaved = Internal::newLine(ifs, data);
 
 	std::getline(ifs, data);
 	this->error_sameName = data;
@@ -1037,11 +1232,131 @@ FD::Internal::Text::Project::Project() {
 	std::getline(ifs, data);
 	this->error_forbiddenCharactor = data;
 
+	std::getline(ifs, data);
+	this->error_addDirectory = data;
+
+	std::getline(ifs, data);
+	this->error_addFile = data;
+
+	std::getline(ifs, data);
+	this->error_removeDirectory = data;
+
+	std::getline(ifs, data);
+	this->error_removeFile = data;
+
+	std::getline(ifs, data);
+	this->error_releaseVirtualFolder = data;
+
+	std::getline(ifs, data);
+	this->error_releaseFile = data;
+
+	std::getline(ifs, data);
+	this->error_tabFileSize = data;
+
+	std::getline(ifs, data);
+	this->error_existFile = data;
+
+	std::getline(ifs, data);
+	this->error_hugeFile = data;
+
+	std::getline(ifs, data);
+	this->error_changeName = data;
+
+	std::getline(ifs, data);
+	this->error_tab = data;
+
+	std::getline(ifs, data);
+	this->error_fileDoesNotExist = Internal::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->error_unexpected = data;
+
 }
 
+FD::Text::Internal::Console::Console() {
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::Console>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open Console.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->console = data;
+
+	std::getline(ifs, data);
+	this->clear = data;
+
+	std::getline(ifs, data);
+	this->backcolor = data;
+
+}
+
+FD::Text::Internal::ProjectProperty::ProjectProperty() {
+	std::ifstream ifs{};
+
+	ifs = std::ifstream(makePath<Type::ProjectProperty>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open ProjectProperty.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->projectProperty = data;
+
+	std::getline(ifs, data);
+	this->tab_main = data;
+
+	std::getline(ifs, data);
+	this->currentType = data;
+
+	std::getline(ifs, data);
+	this->change = data;
+
+	std::getline(ifs, data);
+	this->entryFilePath = data;
+
+	std::getline(ifs, data);
+	this->luaVersion = data;
+
+	std::getline(ifs, data);
+	this->currentVersion = data;
+
+	std::getline(ifs, data);
+	this->confirm_changeProjectType = data;
+
+	std::getline(ifs, data);
+	this->confirm_notSaved = data;
+
+	std::getline(ifs, data);
+	this->confirm_save = data;
+
+	std::getline(ifs, data);
+	this->confirm_ignore = data;
+
+	std::getline(ifs, data);
+	this->info_currentType = data;
+
+	std::getline(ifs, data);
+	this->info_entryFilePath = Internal::newLine(ifs, data);
+
+	std::getline(ifs, data);
+	this->info_luaVersion = Internal::newLine(ifs, data);;
+
+	std::getline(ifs, data);
+	this->bottom_close = data;
+
+	std::getline(ifs, data);
+	this->bottom_cancel = data;
+
+	std::getline(ifs, data);
+	this->bottom_save = data;
 
 
-
+}
 
 
 

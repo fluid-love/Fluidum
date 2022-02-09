@@ -4,17 +4,11 @@
 
 namespace FDR::Internal::Initialization {
 
-	struct FullScreenWithBarInfo {
+	struct FullScreenWithBarInfo final {
 		const char* title = "";
-
-
 	};
 
-	//初期化
-	/*
-	最低限描写に必要なアイテムとImGuiが使えるようにする
-	ImGuiにはフォントとアイコンをロード
-	*/
+	//initialize
 	void initialize(const FullScreenWithBarInfo& info);
 
 }

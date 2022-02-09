@@ -1,5 +1,7 @@
 #include "add.h"
 
+#include "classcodes.h"
+
 #include "../../Analysis/Overview/overview.h"
 
 #include "../../Coding/Tab/tab.h"
@@ -9,25 +11,11 @@ FS::Utils::AddScenes::AddScenes(
 	const std::vector<FU::Class::ClassCode::CodeType>& codes
 ) : codes(codes)
 {
-	GLog.add<FD::Log::Type::None>("Construct Utils::AddScenesScene.");
+	FluidumScene_Log_Constructor(::FS::Utils::AddScenes);
 }
 
 FS::Utils::AddScenes::~AddScenes() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Utils::AddScenesScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::Utils::AddScenes);
 }
 
 void FS::Utils::AddScenes::call() {
@@ -35,23 +23,28 @@ void FS::Utils::AddScenes::call() {
 
 	for (const auto x : this->codes) {
 
-
 		if (x == ClassCode::GetClassCode<::FS::Analysis::Overview>()) {
-			GLog.add<FD::Log::Type::None>("Request add AnalysisOverviewScene.");
+			FluidumScene_Log_RequestAddScene(::FS::Analysis::Overview);
 			Scene::addScene<::FS::Analysis::Overview>();
 		}
 		else if (x == ClassCode::GetClassCode<::FS::TextEditor>()) {
-			GLog.add<FD::Log::Type::None>("Request add TextEditorScene.");
+			FluidumScene_Log_RequestAddScene(::FS::TextEditor);
 			Scene::addScene<::FS::TextEditor>();
 		}
 		else if (x == ClassCode::GetClassCode<::FS::Coding::Tab>()) {
-			GLog.add<FD::Log::Type::None>("Request add Coding::TabScene.");
+			FluidumScene_Log_RequestAddScene(::FS::Coding::Tab);
 			Scene::addScene<::FS::Coding::Tab>();
 		}
-	
+		else if (x == ClassCode::GetClassCode<::FS::Project::Explorer>()) {
+			FluidumScene_Log_RequestAddScene(::FS::Project::Explorer);
+			Scene::addScene<::FS::Project::Explorer>();
+		}
+		else {
+			FluidumScene_Log_InternalWarning();
+		}
 
 	}
 
-	GLog.add<FD::Log::Type::None>("Request delete Utils::AddScenesScene.");
+	FluidumScene_Log_RequestDeleteScene(::FS::Utils::AddScenes);
 	Scene::deleteScene<AddScenes>();
 }

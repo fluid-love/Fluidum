@@ -6,22 +6,6 @@ FVK::Internal::ImGuiImage::ImGuiImage(ManagerPassKey, const Data::ImGuiImageData
 
 void FVK::Internal::ImGuiImage::create(const Data::ImGuiImageData& data, const Parameter& parameter) {
 
-	//vk::DescriptorSetLayoutBinding binding[1] = {};
-	//binding[0].descriptorCount = 1;
-	//binding[0].stageFlags = vk::ShaderStageFlagBits::eFragment;
-	//binding[0].descriptorType = vk::DescriptorType::eCombinedImageSampler;
-
-	//{
-	//	vk::DescriptorSetLayoutCreateInfo createInfo = {};
-	//	createInfo.bindingCount = 1;
-	//	createInfo.pBindings = binding;
-
-	//	auto result = data.get<FvkType::ImGui>().device.createDescriptorSetLayout(createInfo, nullptr);
-	//	if (result.result != vk::Result::eSuccess)
-	//		Exception::throwFailedToCreate("Failed to create DescriptorSetLayout");
-	//	this->info.descriptorSetLayout = result.value;
-	//}
-
 	auto* backend = ImGui_ImplVulkan_BackendData();
 	vk::DescriptorSetLayout layout = backend->DescriptorSetLayout;
 	{
@@ -31,9 +15,14 @@ void FVK::Internal::ImGuiImage::create(const Data::ImGuiImageData& data, const P
 		allocateInfo.pSetLayouts = &layout;
 
 		auto result = data.get<FvkType::ImGui>().device.allocateDescriptorSets(allocateInfo);
-		if (result.result != vk::Result::eSuccess)
-			Exception::throwFailedToCreate("Failed to allocate DescriptorSet");
-		this->info.descriptorSet = result.value.at(0).operator VkDescriptorSet();
+		if (result.result != vk::Result::eSuccess || result.value.empty()) {
+			GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to allocate DescriptorSets({}).", vk::to_string(result.result));
+			Exception::throwFailedToCreate();
+		}
+
+		//no-throw
+		this->info.descriptorSet = result.value[0].operator VkDescriptorSet();
+		static_assert(noexcept(info.descriptorSet = result.value[0].operator VkDescriptorSet()));
 	}
 	{
 		vk::DescriptorImageInfo imageInfo[1] = {};
@@ -45,13 +34,18 @@ void FVK::Internal::ImGuiImage::create(const Data::ImGuiImageData& data, const P
 		write[0].descriptorCount = 1;
 		write[0].descriptorType = vk::DescriptorType::eCombinedImageSampler;
 		write[0].pImageInfo = imageInfo;
+
+		//no-throw
 		data.get<FvkType::ImGui>().device.updateDescriptorSets(1, write, 0, nullptr);
 	}
 
-	//ImGui_ImplVulkan_bindDescriptorSet(this->info.descriptorSet);
-
+	//no-throw
 	this->info.device = data.get<FvkType::ImGui>().device;
 	this->info.descriptorPool = data.get<FvkType::ImGui>().descriptorPool;
+
+	static_assert(noexcept(info.device = data.get<FvkType::ImGui>().device));
+	static_assert(noexcept(info.descriptorPool = data.get<FvkType::ImGui>().descriptorPool));
+
 }
 
 const FVK::Internal::Data::ImGuiImageInfo& FVK::Internal::ImGuiImage::get() const noexcept {
@@ -61,7 +55,13 @@ const FVK::Internal::Data::ImGuiImageInfo& FVK::Internal::ImGuiImage::get() cons
 
 void FVK::Internal::ImGuiImage::destroy() {
 	assert(info.descriptorSet && info.device);
-	auto result = this->info.device.freeDescriptorSets(this->info.descriptorPool, vk::DescriptorSet(this->info.descriptorSet));
-	if (result != vk::Result::eSuccess)
-		Exception::throwFailedToDestroy("Failed to free descriptorset");
+	try {
+		auto result = this->info.device.freeDescriptorSets(this->info.descriptorPool, vk::DescriptorSet(this->info.descriptorSet));
+		if (result != vk::Result::eSuccess) {
+			Exception::throwFailedToDestroy();
+		}
+	}
+	catch (...) {
+		std::rethrow_exception(std::current_exception());
+	}
 }

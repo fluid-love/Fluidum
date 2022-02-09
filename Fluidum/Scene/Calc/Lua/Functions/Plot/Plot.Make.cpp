@@ -18,7 +18,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_make(State L) {
 			//ŠÖ”FPlot.Create‚ªŒÄ‚Î‚ê‚Ü‚µ‚½‚ªì¬‚Å‚«‚éFigure‚ÌÅ‘å”‚ğ’´‚¦‚Ü‚µ‚½DÅ‘å”{}D
 			Message message(LogType::Plot_Figure_Max);
 			std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), FD::Plot::Limits::Plot::FigureMax);
-			consoleWrite->add(std::move(log));
+			//consoleWrite->add(std::move(log));
 			throw Internal::Exception();
 		}
 

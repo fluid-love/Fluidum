@@ -1,78 +1,88 @@
 #include "texteditor.h"
 #include "../../Calc/Lua/lua.h"
+#include "../../Utils/Popup/message.h"
 #include <nfd.h>
+#include <imgui_internal.h>
 
 FS::TextEditor::TextEditor(
+	FD::ImGuiWindowWrite* const imguiWindowWrite,
+	const FD::Style::VarRead* const varRead,
 	FD::Coding::TabWrite* const tabWrite,
 	const FD::Coding::TabRead* const tabRead,
+	FD::Coding::DisplayWrite* const displayWrite,
+	const FD::Coding::DisplayRead* const displayRead,
 	const FD::GuiRead* const guiRead,
 	FD::ProjectWrite* const projectWrite,
 	const FD::ProjectRead* const projectRead,
-	FD::ProjectFilesWrite* const projectFilesWrite,
-	const FD::ProjectFilesRead* const projectFilesRead
-)
-	: tabWrite(tabWrite), tabRead(tabRead), guiRead(guiRead), projectWrite(projectWrite), projectRead(projectRead)
+	const FD::ProjectFilesRead* const projectFilesRead,
+	FD::ToolBarWrite* const toolBarWrite,
+	const FD::Style::ColorRead* const colorRead
+) :
+	imguiWindowWrite(imguiWindowWrite),
+	varRead(varRead),
+	tabWrite(tabWrite),
+	tabRead(tabRead),
+	displayWrite(displayWrite),
+	displayRead(displayRead),
+	guiRead(guiRead),
+	projectWrite(projectWrite),
+	projectRead(projectRead),
+	toolBarWrite(toolBarWrite),
+	colorRead(colorRead)
 {
-	GLog.add<FD::Log::Type::None>("Construct TextEditorScene.");
+	FluidumScene_Log_Constructor(::FS::TextEditor);
 
-	auto paths = tabRead->getDisplayFilePaths();
-
-	for (auto& x : paths) {
-		std::ifstream ifs(x);
-		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-
-		auto info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,x, FD::Calc::pathToLanguageType(x) });
-		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
-		info_.editor->SetText(str);
-		info_.editor->SetPalette(FTE::getDarkPalette());
-	}
+	this->setInfo();
 
 	this->checkSyntaxTimePoint = std::chrono::system_clock::now() + std::chrono::seconds(3);
 
+	toolBarWrite->add(&TextEditor::toolBar, this, text.editor.operator const std::string & ());
+
 	this->luaState = luaL_newstate();
 
+	style.infoWindowHeight = ImGui::GetFontSize() * 5.0f;
+
+	zoom.input.reserve(4);
 }
 
 FS::TextEditor::~TextEditor() noexcept {
-	try {
-		lua_close(luaState);
+	lua_close(luaState);
 
-		GLog.add<FD::Log::Type::None>("Destruct TextEditorScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	toolBarWrite->remove<TextEditor>();
+
+	FluidumScene_Log_Destructor(::FS::TextEditor);
 }
 
 void FS::TextEditor::call() {
 
 	if (info.empty()) {
+		this->windowEmpty();
+		if (!displayRead->empty())
+			this->setInfo();
 		return;
 	}
 
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(0.07f, 0.07f, 0.07f, 0.65f));
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
 
-	ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(1024, 768), ImGuiCond_FirstUseEver);
 
-	for (uint16_t i = 0; auto & x : this->info) {
+	for (Size i = 0; auto & x : this->info) {
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
+
+		ImGui::SetNextWindowSizeConstraints(varRead->viewWindowSizeConstraints(), FU::ImGui::vec2Max());
+
+		zoom.input = std::to_string(static_cast<UIF32>(std::round(x.info.zoomRatio * 100.0f)));
+
 		current = &info[i];
 
 		std::string label = text.editor.operator const char* ();
 		(label += "##") += std::to_string(i++);
 		ImGui::Begin(label.c_str(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar);
+
+		ImGui::PopStyleVar();
+
+		this->isWindowFocused();
 
 		this->textEditorMenu();
 		this->textEditor();
@@ -85,11 +95,98 @@ void FS::TextEditor::call() {
 		ImGui::End();
 	}
 
-	ImGui::PopStyleVar(2);
+	ImGui::PopStyleVar();
 	ImGui::PopStyleColor();
 
 	this->textChange();
 	this->update();
+	this->shortcut();
+	this->catchZoom();
+}
+
+void FS::TextEditor::setImGuiWindow() {
+	imguiWindowWrite->set(FU::Class::ClassCode::GetClassCode<TextEditor>(), ImGui::GetCurrentWindow());
+}
+
+void FS::TextEditor::toolBar() {
+	if (info.empty())
+		return;
+
+	//save
+	if (ImGui::Button(ICON_FA_SAVE)) {
+		FU::ImGui::tooltip(anime.tool_save, text.save);
+		this->saveText(this->selected);
+	}
+
+	this->tool_separator();
+	ImGui::SameLine();
+
+	if (ImGui::Button(ICON_FA_UNDO)) {
+		FU::ImGui::tooltip(anime.tool_undo, text.undo);
+		this->saveText(this->selected);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button(ICON_FA_REDO)) {
+		FU::ImGui::tooltip(anime.tool_redo, text.redo);
+		this->saveText(this->selected);
+	}
+}
+
+void FS::TextEditor::tool_separator() {
+	const ImVec2 pos1 = { ImGui::GetItemRectMax().x , ImGui::GetItemRectMin().y };
+	const ImVec2 pos2 = ImGui::GetItemRectMax();
+
+	ImGui::GetWindowDrawList()->AddLine(pos1, pos2, colorRead->toolBarVerticalSeparator());
+
+}
+
+void FS::TextEditor::isWindowFocused() {
+	if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
+		return;
+
+	this->selected = current;
+
+	if (displayRead->isEditorFocused(current->editor))
+		return;
+
+	displayWrite->focusedEditor(current->info.path);
+}
+
+void FS::TextEditor::windowEmpty() {
+	std::string label = text.editor.operator const char* ();
+	label += "##0";
+	ImGui::Begin(label.c_str(), nullptr);
+
+	ImGui::End();
+}
+
+void FS::TextEditor::setInfo() {
+	auto displayInfo = displayRead->info();
+	this->info.clear();
+
+	for (auto& x : displayInfo) {
+		std::ifstream ifs(x.path);
+		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+
+		auto& info_ = this->info.emplace_back(Info{ tabWrite->getEditor(x.path) ,x , FD::Project::File::getSupportedFileType(x.path) });
+		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
+		info_.editor->SetText(str);
+
+		//theme
+		{
+			using enum FD::Coding::DisplayInfo::Theme;
+			if (x.theme == Default)
+				info_.editor->SetPalette(FTE::TextEditor::GetDarkPalette());
+			else if (x.theme == Dark)
+				info_.editor->SetPalette(FTE::getDarkPalette());
+			else if (x.theme == Light)
+				info_.editor->SetPalette(FTE::TextEditor::GetLightPalette());
+			else
+				info_.editor->SetPalette(FTE::TextEditor::GetRetroBluePalette());
+		}
+	}
 }
 
 void FS::TextEditor::textEditorMenu() {
@@ -97,21 +194,25 @@ void FS::TextEditor::textEditorMenu() {
 	if (!ImGui::BeginMenuBar())
 		return;
 
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().ItemSpacing.y * 1.85f });
 	this->fileMenu();
 	this->editMenu();
 	this->themeMenu();
+	ImGui::PopStyleVar();
 
 	ImGui::EndMenuBar();
+
 }
 
 void FS::TextEditor::fileMenu() {
 	if (!ImGui::BeginMenu(text.file))
 		return;
 
-	if (ImGui::MenuItem(text.save))
-		this->saveText();
+	if (ImGui::MenuItem(text.save_icon))
+		this->saveText(current);
+
 	if (ImGui::MenuItem(text.saveAs))
-		this->saveAs();
+		this->saveAs(current);
 
 	ImGui::EndMenu();
 }
@@ -126,9 +227,9 @@ void FS::TextEditor::editMenu() {
 
 	ImGui::Separator();
 
-	if (ImGui::MenuItem(text.undo, "ALT-Backspace", nullptr, !ro && current->editor->CanUndo()))
+	if (ImGui::MenuItem(text.undo_icon, "ALT-Backspace", nullptr, !ro && current->editor->CanUndo()))
 		current->editor->Undo();
-	if (ImGui::MenuItem(text.redo, "Ctrl-Y", nullptr, !ro && current->editor->CanRedo()))
+	if (ImGui::MenuItem(text.redo_icon, "Ctrl-Y", nullptr, !ro && current->editor->CanRedo()))
 		current->editor->Redo();
 
 	ImGui::Separator();
@@ -158,63 +259,152 @@ void FS::TextEditor::themeMenu() {
 	//TextEditor::GetDarkPalette == defaut , FTE::getDarkPalette == dark
 	if (ImGui::MenuItem(text.default_)) {
 		current->editor->SetPalette(FTE::TextEditor::GetDarkPalette());
+		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Default);
 	}
 	if (ImGui::MenuItem(text.dark)) {
 		current->editor->SetPalette(FTE::getDarkPalette());
+		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Dark);
 	}
-	if (ImGui::MenuItem(text.light))
+	if (ImGui::MenuItem(text.light)) {
 		current->editor->SetPalette(FTE::TextEditor::GetLightPalette());
-	if (ImGui::MenuItem(text.blue))
+		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Light);
+	}
+	if (ImGui::MenuItem(text.blue)) {
 		current->editor->SetPalette(FTE::TextEditor::GetRetroBluePalette());
+		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Light);
+	}
 	ImGui::EndMenu();
 }
 
 void FS::TextEditor::textEditor() {
-	current->editor->Render("TextEditor", { ImGui::GetWindowWidth(),ImGui::GetWindowHeight() * 0.86f });
+	ImGui::BeginChild("##Editor", { 0.0f, ImGui::GetWindowHeight() - style.infoWindowHeight });
+	ImGui::SetWindowFontScale(current->info.zoomRatio);
+	current->editor->Render(current->info.path.c_str());
+	ImGui::EndChild();
+
+	ImGui::Spacing();
 }
 
 void FS::TextEditor::textEditorInfo() {
+
 	ImGui::BeginChild("TextEditorInfo");
 	auto cpos = current->editor->GetCursorPosition();
-	ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, current->editor->GetTotalLines(),
-		current->editor->IsOverwrite() ? "Ovr" : "Ins",
-		current->editor->CanUndo() ? "*" : " ",
-		current->editor->GetLanguageDefinition().mName.c_str(), "test"
-	);
+
+	ImGui::Spacing(); ImGui::SameLine();
+
+	//zoom percentage
+	this->editorInfo_zoom();
+
+	ImGui::SameLine(); ImGui::Spacing();
+	ImGui::SameLine(); ImGui::Spacing(); ImGui::SameLine();
+
+	//line
+	ImGui::Text(text.line); ImGui::SameLine();
+	ImGui::Text(":%d  ", cpos.mLine + 1);
+
+	ImGui::SameLine();
+
+	//column
+	ImGui::Text(text.column); ImGui::SameLine();
+	ImGui::Text(":%d  ", cpos.mColumn + 1);
+
+	ImGui::SameLine();
+
+	//Ovr or Ins
+	ImGui::Text(current->editor->IsOverwrite() ? "Ovr  " : "Ins  ");
+
+	ImGui::SameLine();
+
+	//Undo
+	if (current->editor->CanUndo())
+		ImGui::Text(ICON_FA_UNDO);
+	else
+		ImGui::TextDisabled(ICON_FA_UNDO);
+
+	ImGui::SameLine();
+
+	//language
+	{
+		using enum FD::Project::File::SupportedFileType;
+		if (current->language == Lua) {
+			ImGui::Text("Lua");
+		}
+		else if (current->language == Python) {
+			ImGui::Text("Python");
+		}
+		else if (current->language == Cpp) {
+			ImGui::Text("C++");
+		}
+	}
+
+	ImGui::SameLine();
+
+
 	ImGui::EndChild();
 }
 
-void FS::TextEditor::saveText() {
-	GLog.add<FD::Log::Type::None>("Save text {}.", current->path);
-	tabWrite->saveText(current->path);
+void FS::TextEditor::editorInfo_zoom() {
+	constexpr UI16 percent[] = {
+		30, 50, 70, 100, 120, 150, 200, 300
+	};
+
+	ImGui::SetNextItemWidth(ImGui::GetFontSize() * 3.2f);
+
+	const bool focus = ImGui::InputText("##ZoomInput", zoom.input.data(), zoom.input.capacity(), ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_CharsDecimal);
+	if (focus) {
+		pos.zoom = ImGui::GetItemRectMin();
+		flag.inputZoom = true;
+	}
+	flag.zoomFocused = focus;
+
+	ImGui::SameLine();
+
+	//combo
+	if (!ImGui::BeginCombo("##ZoomCombo", "", ImGuiComboFlags_NoPreview))
+		return;
+
+	for (auto x : percent) {
+		const std::string label = std::to_string(x) + '%';
+		if (ImGui::Selectable(label.c_str())) {
+			current->info.zoomRatio = x / 100.0f;
+		}
+	}
+
+	ImGui::EndCombo();
 }
 
-void FS::TextEditor::saveAs() {
+void FS::TextEditor::saveText(const Info* const info) {
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save text({}).", current->info.path);
+	tabWrite->saveText(current->info.path);
+}
+
+void FS::TextEditor::saveAs(const Info* const info) {
 	std::unique_ptr<nfdchar_t*> outPath = std::make_unique<nfdchar_t*>();
-	GLog.add<FD::Log::Type::None>("Save dialog.");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save dialog.");
 	const nfdresult_t result = NFD_SaveDialog(nullptr, nullptr, outPath.get());
 	if (result == NFD_OKAY) {
-		GLog.add<FD::Log::Type::None>("Save file {}.", *outPath.get());
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Save file {}.", *outPath.get());
 	}
 	else if (result == NFD_CANCEL) {
-		GLog.add<FD::Log::Type::None>("Cancel save dialog.");
+		GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "Cancel save dialog.");
 		return;
 	}
 	else {//NFD_ERROR
-		GLog.add<FD::Log::Type::Error>("Error file dialog.");
-		throw std::runtime_error("NFD_OpenDialog() return NFD_ERROR.");
+		GLog.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Error file dialog.");
+		FluidumScene_Log_InternalWarning();
+		return;
 	}
 }
 
 void FS::TextEditor::update() {
-	if (!tabRead->isDisplayFileChanged())
+	if (!displayRead->changed())
 		return;
 
-	auto paths = tabRead->getDisplayFilePaths();
+	auto paths = displayRead->paths();
 
 	for (auto& x : paths) {
 		//not new file
-		auto itr = std::find_if(info.begin(), info.end(), [&](auto& y) {return y.path == x; });
+		auto itr = std::find_if(info.begin(), info.end(), [&](auto& y) {return y.info.path == x; });
 		if (itr != info.end()) {
 			continue;
 		}
@@ -229,7 +419,7 @@ void FS::TextEditor::update() {
 	for (const auto& x : paths) {
 		auto itr = std::erase_if(info, [&](auto& y)
 			{
-				auto itr = std::find_if(info.begin(), info.end(), [&](auto&) {return y.path == x; });
+				auto itr = std::find_if(info.begin(), info.end(), [&](auto&) {return y.info.path == x; });
 				return itr == info.end();
 			});
 	}
@@ -239,12 +429,12 @@ void FS::TextEditor::textChange() {
 	if (!current->editor->IsTextChanged())
 		return;
 
-	tabWrite->setIsTextSaved(current->path, false);
+	tabWrite->setIsTextSaved(current->info.path, false);
 }
 
 std::string FS::TextEditor::getCurrentEditorPath() {
 	const auto itr = std::find_if(info.cbegin(), info.cend(), [&](auto& x) {return x.editor == current->editor; });
-	return itr->path;
+	return itr->info.path;
 }
 
 void FS::TextEditor::breakPoint() {
@@ -257,11 +447,11 @@ void FS::TextEditor::breakPoint() {
 	const ImVec2 size = ImGui::GetWindowSize();
 
 	if (ImGui::IsMouseHoveringRect(pos, { pos.x + size.x,pos.y + size.y })) {
-		
+
 		//FTE::TextEditor::Breakpoints points = {1};
 		//current->editor->SetBreakpoints(points);
 	}
-		
+
 }
 
 void FS::TextEditor::checkSyntaxError() {
@@ -270,12 +460,16 @@ void FS::TextEditor::checkSyntaxError() {
 	if (checkSyntaxTimePoint > std::chrono::system_clock::now())
 		return;
 
-	if (current->language == FD::Calc::Language::Lua)
-		this->checkLua();
-	else if (current->language == FD::Calc::Language::Python)
-		this->checkPython();
-	else if (current->language == FD::Calc::Language::AngelScript)
-		this->checkAngelScript();
+	{
+		using enum FD::Project::File::SupportedFileType;
+		if (current->language == Lua)
+			this->checkLua();
+		else if (current->language == Python)
+			this->checkPython();
+		else if (current->language == Cpp)
+			this->checkAngelScript();
+	}
+
 
 	//every 4 seconds
 	this->checkSyntaxTimePoint = std::chrono::system_clock::now() + std::chrono::seconds(4);
@@ -319,3 +513,97 @@ void FS::TextEditor::checkPython() {
 void FS::TextEditor::checkAngelScript() {
 
 }
+
+void FS::TextEditor::shortcut() {
+	if (!selected)
+		return;
+
+	this->shortcut_zoom();
+}
+
+void FS::TextEditor::shortcut_zoom() {
+	const auto& io = ImGui::GetIO();
+
+	if (!io.KeyCtrl || (io.MouseWheel == 0.0f))
+		return;
+
+	const float val = current->info.zoomRatio * 100.0f;
+
+	if (io.MouseWheel > 0.0f) {
+		//limit
+		if ((val + 0.1f) >= FD::Coding::TextEditor::Limits::ZoomMax)
+			return;
+		selected->info.zoomRatio += 0.1f;
+	}
+	else {
+		//limit
+		if ((val - 0.1f) <= FD::Coding::TextEditor::Limits::ZoomMin)
+			return;
+		selected->info.zoomRatio -= 0.1f;
+	}
+
+}
+
+void FS::TextEditor::catchZoom() {
+	if (!flag.inputZoom)
+		return;
+
+	if (flag.zoomFocused)
+		return;
+
+	flag.inputZoom = false;
+
+	const float val = std::stof(std::string(zoom.input.c_str()));
+	const UIF16 roundedVal = static_cast<UIF16>(std::round(val));
+
+	//check
+	//is number
+	const bool isNumber = std::all_of(zoom.input.cbegin(), zoom.input.cend(), [](char c) { return std::isdigit(c) != 0; });
+	if (!isNumber) {
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text.error_forbiddenCharactor, pos.zoom);
+	}
+
+	//limits
+	if (roundedVal >= FD::Coding::TextEditor::Limits::ZoomMax)
+		return;
+	if (roundedVal <= FD::Coding::TextEditor::Limits::ZoomMin)
+		return;
+
+	selected->info.zoomRatio = val;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -10,30 +10,30 @@ namespace FS::Analysis {
 		explicit Overview(
 			const FD::FunctionRead<Lang>* const functionRead,
 			FD::ImGuiWindowWrite* const imguiWindowWrite,
-			FD::TopBarWrite* const topBarWrite,
+			FD::ToolBarWrite* const toolBarWrite,
 			const FD::ImPlotRead* const implotRead
 		) : 
 			imguiWindowWrite(imguiWindowWrite), 
-			topBarWrite(topBarWrite),
+			toolBarWrite(toolBarWrite),
 			implotRead(implotRead)
 		{
-			GLog.add<FD::Log::Type::None>("Construct AnalysisScene.");
+			//GLog.add<FD::Log::Type::None>("Construct AnalysisScene.");
 
-			this->functionRead<Lang> = functionRead;
+			//this->functionRead<Lang> = functionRead;
 
-			topBarWrite->add(&Overview::topBar, this, "AnaOV");
+			//toolBarWrite->add(&Overview::topBar, this, "AnaOV");
 		}
 
 		void Constructor(
 			FD::FunctionRead<FD::Calc::Language::Lua>, 
 			FD::ImGuiWindowWrite, 
-			FD::TopBarWrite,
+			FD::ToolBarWrite,
 			FD::ImPlotRead
 		);
 
 		~Overview() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Overview)
+		FluidumUtils_Class_Delete_CopyMove(Overview);
 
 	public:
 		virtual void call() override;
@@ -43,7 +43,7 @@ namespace FS::Analysis {
 		static inline const FD::FunctionRead<Lang>* functionRead = nullptr;
 
 		FD::ImGuiWindowWrite* const imguiWindowWrite;
-		FD::TopBarWrite* const topBarWrite;
+		FD::ToolBarWrite* const toolBarWrite;
 		const FD::ImPlotRead* const implotRead;
 
 		bool windowShouldClose = true;

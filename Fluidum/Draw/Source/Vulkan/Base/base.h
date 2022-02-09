@@ -2,7 +2,6 @@
 
 #include "../../Common/include.h"
 
-//èâä˙âªéûÇ…ï€óLÇ∑ÇÈkey
 namespace FDR::Internal {
 
 	constexpr inline FVK::WindowKey<const char*> BaseWindowKey{ "_BW" };
@@ -55,20 +54,29 @@ namespace FDR::Internal {
 	constexpr inline FVK::SamplerKey<const char*> BaseSamplerKey{ "_BSMP" };
 
 
-	struct Vertex {
+	struct Vertex final {
 		glm::vec3 pos;
 		glm::vec4 color;
 	};
 
-	constexpr inline int32_t MaxFramesInFlight = 2;
+	constexpr inline I32 MaxFramesInFlight = 2;
 
 	using Vertices = std::vector<Vertex>;
-	using Indices = std::vector<uint32_t>;
-
+	using Indices = std::vector<UI32>;
 
 }
 
 //Main Commands
 namespace FDR::Internal {
+
 	inline FVK::Commands MainCommands{};
+
+	namespace Commands {
+
+		inline std::vector<FVK::SetScissorCommand> MainScissor{};
+		inline std::vector<FVK::SetViewportCommand> MainViewport{};
+		inline std::vector<FVK::BeginRenderPassCommand> MainBeginRenderPass{};
+	
+	}
+
 }

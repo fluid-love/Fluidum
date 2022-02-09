@@ -2,22 +2,8 @@
 #include <imgui_internal.h>
 
 FS::Analysis::Overview::~Overview() noexcept {
-	try {
-		topBarWrite->erase<Overview>();
-		GLog.add<FD::Log::Type::None>("Destruct AnalysisScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	toolBarWrite->remove<Overview>();
+	FluidumScene_Log_Destructor(::FS::Analysis::Overview);
 }
 
 void FS::Analysis::Overview::call() {
@@ -35,7 +21,7 @@ void FS::Analysis::Overview::closeWindow() {
 	if (windowShouldClose)
 		return;
 
-	GLog.add<FD::Log::Type::None>("Request delete AnalysisOverviewScene.");
+	FluidumScene_Log_RequestDeleteScene(::FS::Analysis::Overview);
 	Scene::deleteScene<Overview>();
 }
 
@@ -76,7 +62,7 @@ void FS::Analysis::Overview::plot() {
 		return;
 	}
 
-	if (!ImGui::BeginTable("table2", 2,ImGuiTableFlags_Borders))
+	if (!ImGui::BeginTable("table2", 2, ImGuiTableFlags_Borders))
 		return;
 
 	ImGui::TableNextRow();

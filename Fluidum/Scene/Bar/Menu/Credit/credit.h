@@ -2,7 +2,7 @@
 
 #include "../../../Common/common.h"
 
-namespace FS::Internal::Bar {
+namespace FS::Bar {
 
 	class Credit final : public Scene {
 	public:
@@ -11,9 +11,11 @@ namespace FS::Internal::Bar {
 
 		~Credit() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(Credit);
+
 	public:
 		virtual void call() override;
 
-
 	};
+
 }

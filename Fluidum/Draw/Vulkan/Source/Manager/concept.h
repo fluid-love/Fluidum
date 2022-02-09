@@ -44,5 +44,4 @@ namespace FVK::Internal {
 		std::same_as<T, const ImGuiImage::Parameter>
 		;
 
-
 }
