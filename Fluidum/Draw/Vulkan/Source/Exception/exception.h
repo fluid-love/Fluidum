@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "../Common/type.h"
-#include "glfw.h"
 #include "../Common/fkm.h"
 
 namespace FVK::Internal::Exception {

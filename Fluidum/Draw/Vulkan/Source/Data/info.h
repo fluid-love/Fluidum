@@ -11,9 +11,9 @@ namespace FVK::Internal::Data {
 
 	template<>
 	struct Info<FvkType::Window> final {
-		GLFWwindow* window = nullptr;
+		WindowHandle window = nullptr;
 		bool framebufferResized = false;
-		bool maximized{};
+		bool fullscreen{};
 		bool focused{};
 		std::pair<I32, I32> sizeMinLimits{};//width, height
 		std::pair<I32, I32> sizeMaxLimits{};//width, height
@@ -33,7 +33,7 @@ namespace FVK::Internal::Data {
 
 	template<>
 	struct Info<FvkType::Surface> final {
-		GLFWwindow* window = nullptr;
+		WindowHandle window = nullptr;
 		VkInstance instance = nullptr;
 		vk::SurfaceKHR surface = nullptr;
 	};
@@ -49,14 +49,14 @@ namespace FVK::Internal::Data {
 		std::vector<vk::PresentModeKHR> presentModes{};
 		vk::SampleCountFlagBits usableMaxMsaaSamples{};
 
-		GLFWwindow* window = nullptr;
+		WindowHandle window = nullptr;
 		vk::Instance instance = nullptr;
 		vk::SurfaceKHR surface = nullptr;
 	};
 
 	template<>
 	struct Info<FvkType::LogicalDevice> final {
-		GLFWwindow* window = nullptr;
+		WindowHandle window = nullptr;
 		vk::Instance instance = nullptr;
 		vk::SurfaceKHR surface = nullptr;
 		vk::PhysicalDevice physicalDevice = nullptr;

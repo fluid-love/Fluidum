@@ -8,7 +8,6 @@ namespace FVK::Internal::Manager {
 
 	class Manager final {
 	public:
-		//Glfw and DataTuple's constructor may throw an exception.     -> call std::terminate
 		//If the initialization of glfw fails, an exception is thrown. -> call std::terminate
 		Manager() noexcept;
 
@@ -455,7 +454,6 @@ namespace FVK::Internal::Manager {
 		}
 
 	private://data
-		Glfw glfw{ ManagerPassKey{} };
 		DataTuple data{};
 
 	};

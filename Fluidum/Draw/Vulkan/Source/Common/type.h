@@ -28,6 +28,10 @@
 #define VULKAN_HPP_NO_EXCEPTIONS
 
 FluidumUtils_Debug_BeginDisableAllWarning
+#ifdef FluidumUtils_Type_OS_Windows
+//Use native(win32), not glfw.
+#define VK_USE_PLATFORM_WIN32_KHR
+#endif
 #include <vulkan/vulkan.hpp>
 FluidumUtils_Debug_EndDisableAllWarning
 
@@ -113,6 +117,16 @@ namespace FVK::Internal {
 }
 
 namespace FVK::Internal {
+
 	template<Size N>
 	using DataTypeArray = std::array<FvkType, N>;
+
+}
+
+namespace FVK::Internal {
+
+#ifdef FluidumUtils_Type_OS_Windows
+	using WindowHandle = HWND;
+#endif
+
 }

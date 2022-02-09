@@ -1,10 +1,13 @@
 #include "mainloop.h"
 
 namespace FDR::Internal {
+
 	void loop(auto& commands, auto function) {
 		using namespace FDR::Internal;
 
-		ImGui_ImplGlfw_NewFrame();
+#ifdef FluidumUtils_Type_OS_Windows
+		ImGui_ImplWin32_NewFrame();
+#endif
 
 		ImGui::NewFrame();
 
@@ -16,8 +19,6 @@ namespace FDR::Internal {
 
 		ImGui::Render();
 		commands->call();
-		glfwPollEvents();
-
 	};
 
 	void drawFrame(auto& data, void* null) {

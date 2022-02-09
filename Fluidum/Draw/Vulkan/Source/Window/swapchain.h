@@ -70,7 +70,7 @@ namespace FVK::Internal {
 	public:
 		[[nodiscard]] static bool isSurfaceFormatSupport(const vk::Format format, const vk::ColorSpaceKHR colorSpace, const std::vector<vk::SurfaceFormatKHR>& availableFormats);
 		[[nodiscard]] static bool isPresentModeSupport(const vk::PresentModeKHR presentMode, const std::vector<vk::PresentModeKHR>& availablePresentModes);
-		[[nodiscard]] static vk::Extent2D getCorrectSwapchainExtent(GLFWwindow* window, const vk::SurfaceCapabilitiesKHR& capabilities);
+		[[nodiscard]] static vk::Extent2D getCorrectSwapchainExtent(WindowHandle window, const vk::SurfaceCapabilitiesKHR& capabilities);
 
 	private:
 		Data::SwapchainInfo info{};

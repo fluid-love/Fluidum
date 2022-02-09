@@ -135,9 +135,7 @@ namespace FVK::Internal::Manager {
 
 	template<typename T>
 	consteval FvkType ItemTypeToFvkType() {
-		if constexpr (std::same_as<T, Glfw>)
-			return FvkType::Glfw;
-		else if constexpr (std::same_as<T, Window>)
+		if constexpr (std::same_as<T, Window>)
 			return FvkType::Window;
 		else if constexpr (std::same_as<T, Instance>)
 			return FvkType::Instance;

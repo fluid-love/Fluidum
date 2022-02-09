@@ -130,9 +130,9 @@ void FDR::restoreWindow() {
 
 	const auto [w, h] = FVK::getFulscreenWindowSize();
 
-	const bool maximized = FVK::isWindowMaximized(Internal::BaseWindowKey);
+	const bool full = FVK::isWindowFullscren(Internal::BaseWindowKey);
 
-	if (!maximized) {
+	if (!full) {
 
 		//save current pos and size.
 		{
@@ -199,7 +199,7 @@ bool FDR::isWindowFocused() {
 }
 
 bool FDR::isWindowFullscreen() {
-	return FVK::isWindowMaximized(Internal::BaseWindowKey);
+	return FVK::isWindowFullscren(Internal::BaseWindowKey);
 }
 
 void FDR::setWindowWidthMaxLimit(const IF32 width) {

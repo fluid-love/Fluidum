@@ -2,14 +2,14 @@
 #include "../Text/guitext.h"
 #include "../Type/type.h"
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 #include <Windows.h>
 #endif
 
 std::string FU::File::directoryName(const std::string& path) {
 	std::string result = path;
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	if (result.back() == '/' || result.back() == '\\')
 		result.pop_back();
 	auto itr = std::find_if(result.rbegin(), result.rend(), [](auto& x) {return (x == '/') || (x == '\\'); });
@@ -29,7 +29,7 @@ std::string FU::File::directoryName(const std::string& path) {
 std::string FU::File::directory(const std::string& path) {
 	std::string result = path;
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	if (result.back() == '/' || result.back() == '\\')
 		return path;
 	auto itr = std::find_if(result.rbegin(), result.rend(), [](auto& x) {return (x == '/') || (x == '\\'); });
@@ -54,7 +54,7 @@ std::string FU::File::fileName(const std::string& path) {
 std::string FU::File::consistentDirectory(const std::string& dir) {
 	std::filesystem::path path(dir);
 	std::string result = path.lexically_normal().generic_string();
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	auto itr = result.begin();
 	while (true) {
 		itr = std::find(itr, result.end(), '\\');
@@ -70,7 +70,7 @@ std::string FU::File::consistentDirectory(const std::string& dir) {
 
 void FU::File::hide(const std::string& path) {
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	//set attribute
 	const std::wstring wstr = FU::Text::utf8ToUtf16(path);
 	int att = GetFileAttributes(wstr.data());
@@ -83,7 +83,7 @@ void FU::File::hide(const std::string& path) {
 }
 
 bool FU::File::containForbiddenCharactor(const std::string& name) {
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	auto itr = std::find_if(name.begin(), name.end(), [](char x)
 		{
 			return
@@ -132,7 +132,7 @@ std::string FU::File::finalName(const std::string& name) {
 void FU::File::tryPushSlash(std::string& path) {
 	if (path.empty())
 		return;
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	if (path.back() != '/' && path.back() != '\\')
 		path.push_back('/');
 #else
@@ -142,7 +142,7 @@ void FU::File::tryPushSlash(std::string& path) {
 }
 
 FU::Size FU::File::maxPathSize() noexcept {
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	return MAX_PATH;
 #else
 #error NotSupported
@@ -173,7 +173,7 @@ std::string FU::File::changeName(const std::string& path, const std::string& new
 
 		for (Size i = 0; i < depth; i++) {
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 			auto find = std::find_if(itr, temp.rend(), [](auto& x) {return (x == '/') || (x == '\\'); });
 #endif
 			if (find == temp.rend())

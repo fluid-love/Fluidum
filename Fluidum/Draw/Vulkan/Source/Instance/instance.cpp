@@ -125,13 +125,17 @@ std::vector<const char*> FVK::Internal::Instance::makeValidationLayerNames(const
 }
 
 std::vector<const char*> FVK::Internal::Instance::Instance::getRequiredExtensions() const {
-	UI32 glfwExtensionCount = 0;
-	const char** glfwExtensions{};
-	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-	
-	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-	extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-	
+
+	std::vector<const char*> extensions{
+		VK_KHR_SURFACE_EXTENSION_NAME,
+
+#ifdef FluidumUtils_Type_OS_Windows
+		VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+#endif
+
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+	};
+
 	return extensions;
 }
 

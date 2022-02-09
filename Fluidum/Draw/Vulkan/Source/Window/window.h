@@ -64,9 +64,22 @@ namespace FVK::Internal {
 		void destroy() noexcept;
 
 	public:
-		[[nodiscard]] std::pair<I32, I32> windowSize() const noexcept;
+		[[nodiscard]] std::pair<IF32, IF32> getPos() const;
+		[[nodiscard]] std::pair<IF32, IF32> getSize() const;
 
-		void resizeWindow(const IF32 x, const IF32 y, const IF32 width, const IF32 height) const noexcept;
+		void setPos(const IF32 x, const IF32 y) const;
+		void setSize(const IF32 width, const IF32 height) const;
+
+		void resize(const IF32 x, const IF32 y, const IF32 width, const IF32 height) const;
+
+	public:
+		void setWindowSizeLimit();
+
+	public:
+		void minimize() const;
+
+
+	public:
 
 
 		/*
@@ -76,9 +89,9 @@ namespace FVK::Internal {
 			Unexpected : Native error
 
 		Return:
-			{ width, height }
+			{ posX, posY, width, height }
 		*/
-		static [[nodiscard]] std::pair<IF32, IF32> fullscreenSize();
+		static [[nodiscard]] std::tuple<IF32, IF32, IF32, IF32> fullscreenPosSize();
 
 		/*
 		Exception: strong
@@ -106,16 +119,10 @@ namespace FVK::Internal {
 		//Fullscreen(taskbar)								
 		void create(const Data::WindowData& data, const FullScreenParameter& parameter);
 
-		//GLFW_MAXIMIZED									
 		void create(const Data::WindowData& data, const MaximizedParameter& parameter);
 
 	private:
-		/*
-		Exception:
-			FailedToCreate
-		*/
-		//strong
-		void checkGlfwCreateWindow() const;
+		void checkWindow();
 
 		/*
 		Exception:
@@ -124,25 +131,14 @@ namespace FVK::Internal {
 		//basic
 		void setCallbacks() noexcept;
 
-		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
-		static void setPosCallback(GLFWwindow* window, int posX, int posY);
-		static void focusedCallback(GLFWwindow* window, int focus);
+		//static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+		//static void setPosCallback(GLFWwindow* window, int posX, int posY);
+		//static void focusedCallback(GLFWwindow* window, int focus);
 
-		static void sizeLimitsCallback(
-			GLFWwindow* window,
-			std::optional<int> minwidth,
-			std::optional<int> minheight,
-			std::optional<int> maxwidth,
-			std::optional<int> maxheight
-		);
-
-
-		/*
-		Exception:
-			FailedToCreate
-		*/
-		//strong
-		const GLFWvidmode* getVideoMode() const;
+	private://proc
+#ifdef FluidumUtils_Type_OS_Windows
+		static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+#endif
 
 	private:
 		Data::WindowInfo info{};
@@ -150,6 +146,3 @@ namespace FVK::Internal {
 	};
 
 }
-
-//with callback
-void glfwSetWindowSizeLimits_(GLFWwindow* window, int minwidth, int minheight, int maxwidth, int maxheight);

@@ -103,7 +103,6 @@
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorsetlayout.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Descriptor\updatedescriptorset.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Exception\exception.h" />
-    <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Exception\glfw.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Image\image.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Image\imageview.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Image\sampler.h" />
@@ -136,7 +135,6 @@
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\RenderPass\renderpass.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Sync\fence.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Sync\semaphore.h" />
-    <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Window\glfw.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Window\surface.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Window\swapchain.h" />
     <ClInclude Include="Fluidum\Fluidum\Draw\Vulkan\Source\Window\window.h" />
@@ -229,11 +227,12 @@
     <ClInclude Include="Fluidum\Fluidum\Utils\MessageBox\messagebox.h" />
     <ClInclude Include="Fluidum\Fluidum\Utils\Text\guitext.h" />
     <ClInclude Include="Fluidum\Fluidum\Utils\Tuple\tuple.h" />
+    <ClInclude Include="Fluidum\Fluidum\Utils\Type\env.h" />
     <ClInclude Include="Fluidum\Fluidum\Utils\Type\type.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\External\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="Fluidum\External\ImGuiColorTextEdit\TextEditor.cpp" />
-    <ClCompile Include="Fluidum\External\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="Fluidum\External\imgui\imgui.cpp" />
     <ClCompile Include="Fluidum\External\imgui\imgui_demo.cpp" />
     <ClCompile Include="Fluidum\External\imgui\imgui_draw.cpp" />
@@ -288,7 +287,6 @@
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Descriptor\descriptorsetlayout.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Descriptor\updatedescriptorset.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Exception\exception.cpp" />
-    <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Exception\glfw.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Image\image.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Image\imageview.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Image\sampler.cpp" />
@@ -309,7 +307,6 @@
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\RenderPass\renderpass.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Sync\fence.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Sync\semaphore.cpp" />
-    <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Window\glfw.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Window\surface.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Window\swapchain.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Draw\Vulkan\Source\Window\window.cpp" />
@@ -483,7 +480,7 @@
       <PreprocessorDefinitions>FluidumDraw_Vulkan;IMGUI_ENABLE_FREETYPE;BOOST_JSON_STANDALONE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/glfw/include;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.4/src;../../../Internal;../../../External/json/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../External/imgui;../../../External/Vulkan-Headers/include;../../../External/predef/include;../../../External/freetype-2.10.0/include;../../../External/nativefiledialog/src/include;../../../External/lua-5.4.4/src;../../../Internal;../../../External/json/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/dir%(RelativeDir)</ObjectFileName>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

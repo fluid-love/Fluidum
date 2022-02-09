@@ -24,7 +24,7 @@ SOFTWARE.
 */
 
 #include "backend.h"
-
+#include "../Window/window.h"
 
 // Forward Declarations
 bool ImGui_ImplVulkan_CreateDeviceObjects();
@@ -354,8 +354,7 @@ void ImGui_ImplVulkan_RenderDrawData(ImDrawData* draw_data, VkCommandBuffer comm
 {
 	//Resize window
 	{
-		int l, r, w, h;
-		glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), &l, &r, &w, &h);
+		const auto [l, r, w, h] = FVK::Internal::Window::fullscreenPosSize();
 		draw_data->FramebufferScale.x = static_cast<float>(w) / draw_data->DisplaySize.x;
 		draw_data->FramebufferScale.y = static_cast<float>(h) / draw_data->DisplaySize.y;
 	}

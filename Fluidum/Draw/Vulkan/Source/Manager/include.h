@@ -4,7 +4,6 @@
 #include "../Common/include.h"
 
 //items
-#include "../Window/glfw.h"
 #include "../Window/window.h"
 #include "../Instance/instance.h"
 #include "../Instance/messenger.h"

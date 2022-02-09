@@ -37,9 +37,6 @@ void FVK::Internal::Manager::Manager::terminate() {
 		std::terminate();
 	}
 
-	//no-throw
-	this->glfw.destroy();
-
 	if (GKeyManager.empty())
 		return;
 

@@ -10,9 +10,8 @@
 #include <cassert>
 #include <filesystem>
 
-#include <boost/predef.h>
-
 #include "../Type/type.h"
+#include "../Type/env.h"
 
 namespace FU::File {
 
@@ -42,7 +41,7 @@ namespace FU::File {
 
 			for (Size count = 0; count < BackCount; count++) {
 				for (IMax i = fullPathSize - 1; i >= 0; i--) {
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 					if (result.at(i) == '/' || result.at(i) == '\\') {
 						result.at(i) = '\0';
 						break;
@@ -66,7 +65,7 @@ namespace FU::File {
 				}
 			}
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 			//\\ to /
 			for (auto& x : result) {
 				if (x == '\\')

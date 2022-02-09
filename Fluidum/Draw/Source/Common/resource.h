@@ -32,9 +32,9 @@ namespace FDR::Internal {
 #endif	
 
 #ifdef Fluidum_Path
-	constexpr inline const char* FluidumIconFilePath = Fluidum_Path "Resources/Images/Bar/Icon/Fluidum.png";
+	constexpr inline const char* FluidumIconFilePath = Fluidum_Path "Resources/Images/Window/icon.ico";
 #else
-	constexpr inline const char* FluidumIconFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 5, FU::File::PathArg("/Resources/Images/Bar/Icon/Fluidum.png")>();
+	constexpr inline const char* FluidumIconFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 5, FU::File::PathArg("/Resources/Images/Window/icon.ico")>();
 #endif	
 
 }

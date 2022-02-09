@@ -17,6 +17,7 @@ FS::Misc::ResizeWindow::~ResizeWindow() noexcept {
 }
 
 void FS::Misc::ResizeWindow::call() {
+	return;
 	this->background();
 
 	using namespace FU::ImGui::Operators;

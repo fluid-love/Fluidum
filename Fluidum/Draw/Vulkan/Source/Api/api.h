@@ -78,22 +78,6 @@ namespace FVK {
 		Api::destroyBase<FvkType::Window>(key);
 	}
 
-	//Loop through the func argument until glfwWindowShouldClose == true.
-	template<Internal::Key::IsKeyType T, typename... Args>
-	FluidumVK_API void loopUntilWindowShouldClose(const WindowKey<T>& key, void(*func)(Args...), Args&&...args) {
-		using namespace Internal;
-		GLFWwindow* window;
-		{
-			LockGuard lock(GMutex);
-			Api::checkManagerEmpty();
-			const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-			window = info.window;
-		}
-		while (!glfwWindowShouldClose(window)) {
-			func(std::forward<Args>(args)...);
-		}
-	}
-
 	/*
 	Exception:
 		NotInitialized
@@ -122,7 +106,7 @@ namespace FVK {
 		Api::checkManagerEmpty();
 		static_assert(Internal::Key::IsKey<decltype(key)>);
 		const Window& item = GManager->refItem<FvkType::Window>(key);
-		return item.windowSize();//no-throw
+		return item.getSize();
 	}
 
 	template<Internal::Key::IsKeyType T>
@@ -131,15 +115,15 @@ namespace FVK {
 		int x{}, y{};
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
-		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		glfwGetWindowPos(info.window, &x, &y);
-		return { static_cast<IF32>(x), static_cast<IF32>(y) };
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		return item.getPos();
 	}
 
 	FluidumVK_API [[nodiscard]] inline std::pair<IF32, IF32> getFulscreenWindowSize() {
 		using namespace Internal;
 		Api::checkManagerEmpty();
-		return Internal::Window::fullscreenSize();
+		const auto [l, r, w, h] = Internal::Window::fullscreenPosSize();
+		return { w, h };
 	}
 
 	template<Internal::Key::IsKeyType T>
@@ -147,8 +131,8 @@ namespace FVK {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
-		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		glfwSetWindowSize(info.window, static_cast<int>(width), static_cast<int>(height));
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		item.setSize(width, height);
 	}
 
 	template<Internal::Key::IsKeyType T>
@@ -156,8 +140,8 @@ namespace FVK {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
-		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		glfwSetWindowPos(info.window, static_cast<int>(x), static_cast<int>(y));
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		item.setPos(x, y);
 	}
 
 	template<Internal::Key::IsKeyType T>
@@ -165,8 +149,8 @@ namespace FVK {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
-		const Window& window = GManager->refItem<FvkType::Window>(key);
-		window.resizeWindow(x, y, width, height);
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		item.resize(x, y, width, height);
 	}
 
 	template<Internal::Key::IsKeyType T>
@@ -174,16 +158,16 @@ namespace FVK {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
-		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		assert(width.has_value() || height.has_value());
-		if (width && height)
-			glfwSetWindowSizeLimits_(info.window, static_cast<int>(*width), static_cast<int>(*height), GLFW_DONT_CARE, GLFW_DONT_CARE);
-		else {//width || height
-			if (width)
-				glfwSetWindowSizeLimits_(info.window, static_cast<int>(*width), static_cast<int>(info.sizeMinlimits.second), GLFW_DONT_CARE, GLFW_DONT_CARE);
-			else //height
-				glfwSetWindowSizeLimits_(info.window, static_cast<int>(info.sizeMinlimits.first), static_cast<int>(*height), GLFW_DONT_CARE, GLFW_DONT_CARE);
-		}
+		//const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
+		//assert(width.has_value() || height.has_value());
+		//if (width && height)
+		//	glfwSetWindowSizeLimits_(info.window, static_cast<int>(*width), static_cast<int>(*height), GLFW_DONT_CARE, GLFW_DONT_CARE);
+		//else {//width || height
+		//	if (width)
+		//		glfwSetWindowSizeLimits_(info.window, static_cast<int>(*width), static_cast<int>(info.sizeMinlimits.second), GLFW_DONT_CARE, GLFW_DONT_CARE);
+		//	else //height
+		//		glfwSetWindowSizeLimits_(info.window, static_cast<int>(info.sizeMinlimits.first), static_cast<int>(*height), GLFW_DONT_CARE, GLFW_DONT_CARE);
+		//}
 	}
 
 	template<Internal::Key::IsKeyType T>
@@ -191,16 +175,16 @@ namespace FVK {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
-		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		assert(width.has_value() || height.has_value());
-		if (width && height)
-			glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(*width), static_cast<int>(*height));
-		else {//width || height
-			if (width)
-				glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(*width), static_cast<int>(info.sizeMinLimits.second));
-			else //height
-				glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(info.sizeMinLimits.first), static_cast<int>(*height));
-		}
+		//const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
+		//assert(width.has_value() || height.has_value());
+		//if (width && height)
+		//	glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(*width), static_cast<int>(*height));
+		//else {//width || height
+		//	if (width)
+		//		glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(*width), static_cast<int>(info.sizeMinLimits.second));
+		//	else //height
+		//		glfwSetWindowSizeLimits_(info.window, GLFW_DONT_CARE, GLFW_DONT_CARE, static_cast<int>(info.sizeMinLimits.first), static_cast<int>(*height));
+		//}
 	}
 
 	template<Internal::Key::IsKeyType T>
@@ -233,17 +217,8 @@ namespace FVK {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
-		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		glfwIconifyWindow(info.window);
-	}
-
-	template<Internal::Key::IsKeyType T>
-	FluidumVK_API void maximizeWindow(const WindowKey<T>& key) {
-		using namespace Internal;
-		LockGuard lock(GMutex);
-		Api::checkManagerEmpty();
-		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		glfwMaximizeWindow(info.window);
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		item.minimize();
 	}
 
 	template<Internal::Key::IsKeyType T>
@@ -256,12 +231,12 @@ namespace FVK {
 	}
 
 	template<Internal::Key::IsKeyType T>
-	FluidumVK_API [[nodiscard]] bool isWindowMaximized(const WindowKey<T>& key) {
+	FluidumVK_API [[nodiscard]] bool isWindowFullscren(const WindowKey<T>& key) {
 		using namespace Internal;
 		LockGuard lock(GMutex);
 		Api::checkManagerEmpty();
 		const Data::WindowInfo& info = GManager->refInfo<FvkType::Window>(key);
-		return info.maximized;
+		return info.fullscreen;
 	}
 
 	template<Internal::Key::IsKeyType T>

@@ -46,7 +46,9 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 		}
 
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		ImGui_ImplGlfw_InitForVulkan(data.get<FvkType::Window>().window, true);
+#ifdef FluidumUtils_Type_OS_Windows
+		ImGui_ImplWin32_Init(data.get<FvkType::Window>().window);
+#endif
 	}
 	catch (...) {
 		ImGui::DestroyContext();
@@ -73,7 +75,9 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 		ImGui_ImplVulkan_Init(&init_info, data.get<FvkType::RenderPass>().renderPass);
 	}
 	catch (...) {
-		ImGui_ImplGlfw_Shutdown();
+#ifdef FluidumUtils_Type_OS_Windows
+		ImGui_ImplWin32_Shutdown();
+#endif	
 		ImGui::DestroyContext();
 
 		std::rethrow_exception(std::current_exception());
@@ -93,7 +97,9 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 	}
 	catch (...) {
 		ImGui_ImplVulkan_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
+#ifdef FluidumUtils_Type_OS_Windows
+		ImGui_ImplWin32_Shutdown();
+#endif			
 		ImGui::DestroyContext();
 
 		std::rethrow_exception(std::current_exception());
@@ -112,7 +118,9 @@ const FVK::Internal::Data::ImGuiInfo& FVK::Internal::FvkImGui::get() const noexc
 void FVK::Internal::FvkImGui::destroy() {
 	try {
 		ImGui_ImplVulkan_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
+#ifdef FluidumUtils_Type_OS_Windows
+		ImGui_ImplWin32_Shutdown();
+#endif	
 		ImGui::DestroyContext();
 	}
 	catch (...) {

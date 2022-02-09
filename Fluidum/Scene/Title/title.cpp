@@ -51,6 +51,10 @@ namespace FS::Internal {
 }
 
 void FS::Title::call() {
+	ImGui::Begin("a");
+
+	ImGui::End();
+	return;
 
 	std::call_once(this->flag.once, &Title::writeGuiData, this);
 

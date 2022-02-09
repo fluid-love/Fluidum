@@ -65,14 +65,23 @@ bool FVK::Internal::Swapchain::isPresentModeSupport(const vk::PresentModeKHR pre
 	return false;
 }
 
-vk::Extent2D FVK::Internal::Swapchain::getCorrectSwapchainExtent(GLFWwindow* window, const vk::SurfaceCapabilitiesKHR& capabilities) {
+vk::Extent2D FVK::Internal::Swapchain::getCorrectSwapchainExtent(WindowHandle window, const vk::SurfaceCapabilitiesKHR& capabilities) {
 	if (capabilities.currentExtent.width != std::numeric_limits<UI32>::max()) {
 		return capabilities.currentExtent;
 	}
 
 	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
 
+#ifdef FluidumUtils_Type_OS_Windows
+	RECT rect{};
+	BOOL result = SystemParametersInfo(SPI_SETWORKAREA, NULL, &rect, NULL);
+	if (result == FALSE) {
+		Exception::throwUnexpected();
+	}
+	width = rect.right - rect.left;
+	height = rect.bottom - rect.top;
+
+#endif
 	vk::Extent2D actualExtent = {
 		static_cast<UI32>(width),
 		static_cast<UI32>(height)
