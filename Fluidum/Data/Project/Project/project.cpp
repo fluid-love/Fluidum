@@ -220,6 +220,7 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 		assert(FU::File::isAbsolute(GCurrentData.projectDirectoryPath));
 
 		GCurrentData.projectName = info.projectName;
+		GCurrentData.projectFilePath = GCurrentData.projectDirectoryPath + GCurrentData.projectName + ".fproj";
 
 		//check
 		FU::File::tryPushSlash(GCurrentData.projectDirectoryPath);
