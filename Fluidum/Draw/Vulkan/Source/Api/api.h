@@ -79,6 +79,22 @@ namespace FVK {
 	}
 
 	/*
+	Show window.
+
+	Note:
+		Since the window is initially hidden,
+		you need to call this function to make it visible.
+	*/
+	template<Internal::Key::IsKeyType T>
+	FluidumVK_API void showWindow(const WindowKey<T>& key) {
+		using namespace Internal;
+		LockGuard lock(GMutex);
+		Api::checkManagerEmpty();
+		const Window& item = GManager->refItem<FvkType::Window>(key);
+		item.show();
+	}
+
+	/*
 	Exception:
 		NotInitialized
 		NotFound

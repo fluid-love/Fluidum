@@ -67,6 +67,7 @@ FS::Project::Explorer::~Explorer() noexcept {
 }
 
 void FS::Project::Explorer::call() {
+
 	//lock
 	auto userFilesLock = userFilesWrite->getLock();
 	auto projectFilesLock = projectFilesWrite->getLock();
@@ -201,11 +202,6 @@ void FS::Project::Explorer::tab() {
 
 	ImGui::PushStyleColor(ImGuiCol_TabActive, { 0.2f,0.3f,0.75f,0.3f });
 
-	if (ImGui::BeginTabItem("Fluidum")) {
-		select.tab = TabType::Fluidum;
-		this->fluidumFiles();
-		ImGui::EndTabItem();
-	}
 	if (ImGui::BeginTabItem(text.project)) {
 		select.tab = TabType::Project;
 		this->projectFiles();
@@ -220,83 +216,6 @@ void FS::Project::Explorer::tab() {
 	ImGui::PopStyleColor();
 
 	ImGui::EndTabBar();
-}
-
-namespace FS {
-
-	constexpr inline std::pair<const char*, const char*> LuaStandardFluidumLibrary[] = {
-		{ICON_FA_FILE_CODE " fluidum.system",Resource::LuaFluidumStandardLibraryFolderPath},
-		{ICON_FA_FILE_CODE " fluidum.array",Resource::LuaFluidumStandardLibraryFolderPath},
-		//{ICON_FA_FILE_CODE " genome.lua",Resource::LuaSLLGenomePath},
-		//{ICON_FA_FILE_CODE " piano.lua",Resource::LuaSLLPianoPath},
-		//{ICON_FA_FILE_CODE " math.lua",Resource::LuaSLLMathPath},
-	};
-
-}
-
-void FS::Project::Explorer::fluidumFiles() {
-
-	this->mainCodeFile();
-
-	ImGui::Separator();
-	ImGui::Spacing();
-
-	this->standardFluidumLibrary();
-
-}
-
-void FS::Project::Explorer::mainCodeFile() {
-	//const std::string path = fluidumFilesRead->mainCodeFilePath();
-
-	//if (path.empty()) {
-	//	ImGui::BulletText(text.mainFileDoesNotExist);
-	//	return;
-	//}
-
-	//if (!ImGui::BeginTable("##MainFileInfo", 2, ImGuiTableFlags_Borders))
-	//	return;
-
-
-	//ImGui::Text(text.path); ImGui::NextColumn();
-	//ImGui::Text(path.c_str()); ImGui::NextColumn();
-
-	//const std::string name = FU::File::fileName(path);
-	//ImGui::Text(text.name); ImGui::NextColumn();
-	//ImGui::Text(name.c_str()); ImGui::NextColumn();
-
-
-	//ImGui::EndTable();
-}
-
-void FS::Project::Explorer::standardFluidumLibrary() {
-	ImGui::BulletText("Lua");
-
-	if (!ImGui::TreeNode(text.standardFluidumLibrary)) {
-		ImGui::Separator();
-		ImGui::Spacing();
-		return;
-	}
-
-	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4());
-	ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2());
-	const float buttonWidth = ImGui::GetWindowSize().x;
-
-	constexpr ImGuiTreeNodeFlags nodeFlag =
-		ImGuiTreeNodeFlags_FramePadding |
-		ImGuiTreeNodeFlags_OpenOnDoubleClick |
-		ImGuiTreeNodeFlags_SpanAvailWidth
-		;
-
-	for (IF8 i = 0; i < std::extent_v<decltype(LuaStandardFluidumLibrary), 0>; i++) {
-		if (ImGui::TreeNodeEx(LuaStandardFluidumLibrary[i].first, nodeFlag)) {
-			ImGui::TreePop();
-		}
-	}
-
-	ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
-
-	ImGui::TreePop();
 }
 
 namespace FS {

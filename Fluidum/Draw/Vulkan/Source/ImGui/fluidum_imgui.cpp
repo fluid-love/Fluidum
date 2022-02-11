@@ -46,6 +46,7 @@ void FVK::Internal::FvkImGui::create(const Data::ImGuiData& data, const Paramete
 		}
 
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
 #ifdef FluidumUtils_Type_OS_Windows
 		ImGui_ImplWin32_Init(data.get<FvkType::Window>().window);
 #endif

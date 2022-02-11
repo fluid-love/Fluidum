@@ -76,6 +76,8 @@ namespace FVK::Internal {
 		void setWindowSizeLimit();
 
 	public:
+		void show() const;
+
 		void minimize() const;
 
 

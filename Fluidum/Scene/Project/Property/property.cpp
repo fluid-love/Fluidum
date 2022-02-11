@@ -156,12 +156,7 @@ void FS::Project::Property::tab() {
 
 	if (type.isNone()) {
 		const char* label = "Error";
-		if (type.isLua())
-			label = "Lua";
-		else if (type.isPython())
-			label = "Python";
-		else if (type.isCpp())
-			label = "C++";
+		label = FD::Project::Property::projectTypeToCChar(type.current);
 		if (ImGui::BeginTabItem(label)) {
 			select.tab = Tab::Language;
 			ImGui::EndTabItem();

@@ -168,7 +168,6 @@
     <ClInclude Include="Fluidum\Fluidum\Scene\Calc\Lua\Common\exception.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Calc\Lua\Common\log.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Calc\Lua\Common\type.h" />
-    <ClInclude Include="Fluidum\Fluidum\Scene\Calc\Lua\Functions\Common\array.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Calc\Lua\lua.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Calc\Run\run.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Coding\Debug\debug.h" />
@@ -187,12 +186,12 @@
     <ClInclude Include="Fluidum\Fluidum\Scene\File\shared_info.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Flu\Node\node.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Genome\Overview\overview.h" />
-    <ClInclude Include="Fluidum\Fluidum\Scene\include.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Layout\layout.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Misc\window_resize.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Project\File\form.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Project\File\new.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Project\File\saveas.h" />
+    <ClInclude Include="Fluidum\Fluidum\Scene\Bar\Menu\Info\info.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Project\project.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Project\Property\property.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Title\title.h" />
@@ -231,8 +230,8 @@
     <ClInclude Include="Fluidum\Fluidum\Utils\Type\type.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\External\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="Fluidum\External\ImGuiColorTextEdit\TextEditor.cpp" />
+    <ClCompile Include="Fluidum\External\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="Fluidum\External\imgui\imgui.cpp" />
     <ClCompile Include="Fluidum\External\imgui\imgui_demo.cpp" />
     <ClCompile Include="Fluidum\External\imgui\imgui_draw.cpp" />
@@ -240,6 +239,7 @@
     <ClCompile Include="Fluidum\External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Fluidum\External\imgui\misc\freetype\imgui_freetype.cpp" />
     <ClCompile Include="Fluidum\External\implot\implot.cpp" />
+    <ClCompile Include="Fluidum\External\implot\implot_demo.cpp" />
     <ClCompile Include="Fluidum\External\implot\implot_items.cpp" />
     <ClCompile Include="Fluidum\External\json\src\src.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Data\Calc\Array\array.cpp" />
@@ -358,6 +358,7 @@
     <ClCompile Include="Fluidum\Fluidum\Scene\Project\File\form.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Project\File\new.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Project\File\saveas.cpp" />
+    <ClCompile Include="Fluidum\Fluidum\Scene\Bar\Menu\Info\info.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Project\project.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Project\Property\property.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Title\title.cpp" />

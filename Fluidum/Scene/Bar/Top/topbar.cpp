@@ -266,17 +266,17 @@ void FS::TopBar::scene() {
 void FS::TopBar::combo() {
 	const auto* info = toolBarRead->getInfo();
 
-	if (!ImGui::BeginCombo("##SceneFuncCombo", "##None", ImGuiComboFlags_NoPreview))
+	if (!ImGui::BeginCombo("##ToolBarCombo", "##None", ImGuiComboFlags_NoPreview))
 		return;
 
-	for (auto& x : *info) {
-		if (ImGui::Selectable(x.sceneName.c_str(), x.select)) {
-			if (!x.select)
-				toolBarWrite->lock(x.code);
-			else
-				toolBarWrite->unlock(x.code);
-		}
-	}
+	//for (auto& x : *info) {
+	//	if (ImGui::Selectable(x.sceneName.c_str(), x.select)) {
+	//		if (!x.select)
+	//			toolBarWrite->lock(x.code);
+	//		else
+	//			toolBarWrite->unlock(x.code);
+	//	}
+	//}
 
 
 	ImGui::EndCombo();

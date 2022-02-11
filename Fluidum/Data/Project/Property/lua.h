@@ -2,6 +2,19 @@
 
 #include "property.h"
 
+namespace FD::Project::Property::Lua {
+
+	enum class StandardFluidumLibrary : UT {
+		System,
+		Array,
+		Plot,
+		Genome
+	};
+
+	[[nodiscard]] const char* StandardFluidumLibraryTypeToCChar(const StandardFluidumLibrary val) noexcept;
+
+}
+
 namespace FD::Project::Property::Internal {
 
 	class LuaData final {
@@ -11,6 +24,7 @@ namespace FD::Project::Property::Internal {
 
 	private:
 		static inline std::string entryFilePath{};
+		static inline std::vector<Lua::StandardFluidumLibrary> disabledFluidumStandardLibrary{};
 
 	private:
 		friend class ::FD::Project::PropertyLuaWrite;
@@ -41,6 +55,11 @@ namespace FD::Project {
 		//strong
 		void entryFilePath(const std::string& path);
 
+	public:
+		void enableStandardFluidumLibrary(const Property::Lua::StandardFluidumLibrary val);
+
+		void disableStandardFluidumLibrary(const Property::Lua::StandardFluidumLibrary val);
+
 	};
 
 }
@@ -65,6 +84,11 @@ namespace FD::Project {
 		//no-throw
 		//exists -> true, not exists -> false
 		[[nodiscard]] bool entryFileExists() const noexcept;
+
+	public:
+		[[nodiscard]] std::vector<Property::Lua::StandardFluidumLibrary> disabledStandardFluidumLibrary() const;
+
+		[[nodiscard]] bool isStandardFluidumLibraryDisabled(const Property::Lua::StandardFluidumLibrary val) const;
 
 	};
 

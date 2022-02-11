@@ -12,6 +12,21 @@ namespace FD::Project::Property {
 		Cpp
 	};
 
+	[[nodiscard]] constexpr const char* projectTypeToCChar(const ProjectType type) noexcept {
+		using enum ProjectType;
+		if (type == None)
+			return "None";
+		if (type == Lua)
+			return "Lua";
+		if (type == Python)
+			return "Pyhton";
+		if (type == Cpp)
+			return "C++";
+
+		assert(false);
+		return "";
+	}
+
 }
 
 //forward declaration

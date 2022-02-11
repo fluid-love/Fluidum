@@ -17,7 +17,6 @@ FS::Misc::ResizeWindow::~ResizeWindow() noexcept {
 }
 
 void FS::Misc::ResizeWindow::call() {
-	return;
 	this->background();
 
 	using namespace FU::ImGui::Operators;
@@ -50,8 +49,7 @@ void FS::Misc::ResizeWindow::call() {
 	}
 
 	this->moveWindow();
-
-	if (FDR::isWindowFullscreen())
+	if (FDR::isWindowFullscreen()) 
 		return;
 
 	this->decorateWindow();
@@ -181,7 +179,7 @@ void FS::Misc::ResizeWindow::resize_left() {
 	if (dragDeltaX >= 0 && windowSizeX <= guiRead->windowLimitMinWidth())
 		return;
 
-	FDR::setWindowPosSize(
+	FDR::setWindowPosSize_timing(
 		windowPosX + dragDeltaX,
 		windowPosY,
 		windowSizeX - dragDeltaX,
@@ -249,47 +247,47 @@ void FS::Misc::ResizeWindow::resize_bottom() {
 }
 
 void FS::Misc::ResizeWindow::hold() {
-	
-	//bool hovered = false;
-	//
-	////cursor
-	//if (currentBorder == Border::Left) {
-	//	this->leftCursor();
-	//	hovered = true;
-	//}
-	//else if (currentBorder == Border::Right) {
-	//	this->rightCursor();
-	//	hovered = true;
-	//}
-	//else if (currentBorder == Border::Top) {
-	//	this->topCursor();
-	//	hovered = true;
-	//}
-	//else if (currentBorder == Border::Bottom) {
-	//	this->bottomCursor();
-	//	hovered = true;
-	//}
-	//
-	//if (holdBorder == Border::Left) {
-	//	this->resize_left();
-	//	if (!hovered)
-	//		this->leftCursor();
-	//}
-	//else if (holdBorder == Border::Right) {
-	//	this->resize_right();
-	//	if (!hovered)
-	//		this->rightCursor();
-	//}
-	//else if (holdBorder == Border::Top) {
-	//	this->resize_top();
-	//	if (!hovered)
-	//		this->topCursor();
-	//}
-	//else if (holdBorder == Border::Bottom) {
-	//	this->resize_bottom();
-	//	if (!hovered)
-	//		this->bottomCursor();
-	//}
+
+	bool hovered = false;
+
+	//cursor
+	if (currentBorder == Border::Left) {
+		this->leftCursor();
+		hovered = true;
+	}
+	else if (currentBorder == Border::Right) {
+		this->rightCursor();
+		hovered = true;
+	}
+	else if (currentBorder == Border::Top) {
+		this->topCursor();
+		hovered = true;
+	}
+	else if (currentBorder == Border::Bottom) {
+		this->bottomCursor();
+		hovered = true;
+	}
+
+	if (holdBorder == Border::Left) {
+		this->resize_left();
+		if (!hovered)
+			this->leftCursor();
+	}
+	else if (holdBorder == Border::Right) {
+		this->resize_right();
+		if (!hovered)
+			this->rightCursor();
+	}
+	else if (holdBorder == Border::Top) {
+		this->resize_top();
+		if (!hovered)
+			this->topCursor();
+	}
+	else if (holdBorder == Border::Bottom) {
+		this->resize_bottom();
+		if (!hovered)
+			this->bottomCursor();
+	}
 
 	if (!down) {
 		holdBorder = Border::None;
@@ -323,7 +321,6 @@ void FS::Misc::ResizeWindow::moveWindow() {
 	holdBorder = Border::Move;
 
 	auto [x, y] = FDR::getWindowPos();
-
 	x += dragDeltaX;
 	y += dragDeltaY;
 

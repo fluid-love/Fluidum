@@ -51,11 +51,10 @@ namespace FS::Internal {
 }
 
 void FS::Title::call() {
-	ImGui::Begin("a");
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
-	ImGui::End();
-	return;
-
+		std::cout << "a";
+	}
 	std::call_once(this->flag.once, &Title::writeGuiData, this);
 
 	//if IsMouseButton -> next scene
@@ -119,7 +118,6 @@ void FS::Title::writeGuiData() {
 
 	ImVec2 centerPos = size / 2.0f;
 	guiWrite->centerPos(centerPos);
-
 
 	this->style.windowPos = centerPos - (style.imageHalfSize / 2.0f);
 	this->style.windowPos.y -= style.imageHalfSize.y / 10.0f;

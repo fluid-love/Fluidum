@@ -179,11 +179,6 @@ namespace FS::Project {
 		void tab();
 
 	private:
-		void fluidumFiles();
-		void mainCodeFile();
-		void standardFluidumLibrary();
-
-	private:
 		std::pair<ImVec2, ImVec2> projectFilesTree(std::vector<FD::Project::FileList::FileInfo>* node, FD::Project::FileList::FileInfo* info);
 		void projectFiles();
 

@@ -156,6 +156,13 @@ FD::ProjectWrite::ProjectWrite(Internal::PassKey) noexcept {
 	using namespace Project::Internal;
 
 	try {
+		//remove imgui.ini
+		if (std::filesystem::exists("imgui.ini")) {
+			const bool success = std::filesystem::remove("imgui.ini");
+			if (!success)
+				throw - 1;
+		}
+		
 		//remove previous temp project.
 		//create new temp project.
 		std::filesystem::remove_all(Internal::Resource::TempProjectFolderPath);

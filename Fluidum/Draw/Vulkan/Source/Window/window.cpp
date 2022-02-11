@@ -1,59 +1,7 @@
 #include "window.h"
 
-//using GlfwSetWindowSizeLimitsCallback = void(*)(GLFWwindow* window, std::optional<int> minwidth, std::optional<int> minheight, std::optional<int> maxwidth, std::optional<int> maxheight);
-//GlfwSetWindowSizeLimitsCallback glfwSetWindowSizeLimitsCallback = GlfwSetWindowSizeLimitsCallback{};
-//
-//void FVK::Internal::Window::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-//	//auto win = reinterpret_cast<FVK::Internal::Window*>(glfwGetWindowUserPointer(window));
-//	//win->info.framebufferResized = true;
-//
-//	//int posX, posY;
-//	//glfwGetWindowPos(win->info.window, &posX, &posY);
-//
-//	//const auto [l, r] = fullscreenPos();
-//
-//	//if (posX != l || posY != r) {
-//	//	win->info.maximized = false;
-//	//	return;
-//	//}
-//
-//	//auto [w, h] = fullscreenSize();
-//	//h -= 1;
-//	//if (width == w && h == height)
-//	//	win->info.maximized = true;
-//	//else
-//	//	win->info.maximized = false;
-//}
-//
-//void FVK::Internal::Window::setPosCallback(GLFWwindow* window, int posX, int posY) {
-//	//auto win = reinterpret_cast<FVK::Internal::Window*>(glfwGetWindowUserPointer(window));
-//
-//	//const auto [l, r] = fullscreenPos();
-//
-//	//if (posX != l || posY != r) {
-//	//	win->info.maximized = false;
-//	//	return;
-//	//}
-//
-//	//int width, height;
-//	//glfwGetWindowSize(win->info.window, &width, &height);
-//	//auto [w, h] = fullscreenSize();
-//	//h -= 1;
-//	//if (width == w && h == height)
-//	//	win->info.maximized = true;
-//	//else
-//	//	win->info.maximized = false;
-//
-//}
-//
-//void FVK::Internal::Window::focusedCallback(GLFWwindow* window, int focus) {
-//	//auto win = reinterpret_cast<FVK::Internal::Window*>(glfwGetWindowUserPointer(window));
-//
-//	//if (focus == GLFW_TRUE)
-//	//	win->info.focused = true;
-//	//else
-//	//	win->info.focused = false;
-//}
+
+
 //
 //void FVK::Internal::Window::sizeLimitsCallback(GLFWwindow* window, std::optional<int> minwidth, std::optional<int> minheight, std::optional<int> maxwidth, std::optional<int> maxheight) {
 //	//auto win = reinterpret_cast<FVK::Internal::Window*>(glfwGetWindowUserPointer(window));
@@ -68,24 +16,138 @@
 //}
 
 #ifdef FluidumUtils_Type_OS_Windows
-LRESULT CALLBACK FVK::Internal::Window::windowProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
-	if (msg == WM_SETFOCUS) {
-		auto ptr = GetWindowLongPtr(hwnd, DWLP_USER);
-		if (ptr == NULL)
+namespace FVK::Internal {
+
+	template<typename Data>
+	struct HwndUserData final {
+	public:
+		FluidumUtils_Class_Default_ConDestructor(HwndUserData);
+		FluidumUtils_Class_Delete_CopyMove(HwndUserData);
+
+	public:
+		[[nodiscard]] Data* get(const HWND key) {
+			const auto itr = data.find(key);
+			if (itr == data.cend())
+				return nullptr;
+
+			return itr->second;
+		}
+
+
+		void remove(const HWND key) {
+			const auto itr = data.find(key);
+			if (itr == data.cend()) //not found
+				return;
+
+			data.erase(itr);
+		}
+
+		void add(const HWND key, Data* data) {
+			const auto itr = this->data.find(key);
+			if (itr != this->data.cend()) //not found
+				itr->second = data;
+
+			this->data.insert({ key, data });
+		}
+
+	private:
+		std::map<HWND, Data*> data{};
+
+	};
+	HwndUserData<Window> GHwndUserData{};
+
+}
+
+namespace FVK::Internal {
+
+	void windowProc_destroyWindow(const HWND hwnd) {
+		GHwndUserData.remove(hwnd);
+	}
+
+}
+
+// Forward declare from imgui_impl_win32.cpp
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+LRESULT CALLBACK FVK::Internal::Window::windowProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wp, lp))
+		return true;
+
+	if (msg == WM_SIZE) {
+		Window* window = GHwndUserData.get(hwnd);
+		if (!window)
 			return DefWindowProc(hwnd, msg, wp, lp);
 
-		Window* window = reinterpret_cast<Window*>(ptr);
+		const auto info = reinterpret_cast<WINDOWPOS*>(lp);
+		window->info.framebufferResized = true;
+
+		RECT rect{};
+		const BOOL result = GetWindowRect(
+			hwnd,
+			&rect
+		);
+		if (result == FALSE) {
+			return DefWindowProc(hwnd, msg, wp, lp);
+		}
+		int posX = rect.left, posY = rect.top;
+		UINT width = LOWORD(lp);
+		UINT height = HIWORD(lp);
+
+		auto [l, r, w, h] = fullscreenPosSize();
+
+		if (posX != l || posY != r) {
+			window->info.fullscreen = false;
+			return DefWindowProc(hwnd, msg, wp, lp);
+		}
+
+		h -= 1;
+		if (width == w && h == height)
+			window->info.fullscreen = true;
+		else
+			window->info.fullscreen = false;
+	}
+
+	else if (msg == WM_WINDOWPOSCHANGED) {
+		Window* window = GHwndUserData.get(hwnd);
+		if (!window)
+			return DefWindowProc(hwnd, msg, wp, lp);
+
+		const auto info = reinterpret_cast<WINDOWPOS*>(lp);
+
+		auto [l, r, w, h] = fullscreenPosSize();
+		if (info->x != l || info->y != r) {
+			window->info.fullscreen = false;
+			return DefWindowProc(hwnd, msg, wp, lp);
+		}
+
+		int width = info->cx;
+		int height = info->cy;
+		h -= 1;
+		if (width == w && h == height)
+			window->info.fullscreen = true;
+		else
+			window->info.fullscreen = false;
+	}
+
+	else if (msg == WM_SETFOCUS) {
+		Window* window = GHwndUserData.get(hwnd);
+		if (!window)
+			return DefWindowProc(hwnd, msg, wp, lp);
+
 		window->info.focused = true;
 	}
 
 	else if (msg == WM_KILLFOCUS) {
-		auto ptr = GetWindowLongPtr(hwnd, DWLP_USER);
-		if (ptr == NULL)
+		Window* window = GHwndUserData.get(hwnd);
+		if (!window)
 			return DefWindowProc(hwnd, msg, wp, lp);
 
-		Window* window = reinterpret_cast<Window*>(ptr);
 		window->info.focused = false;
+	}
+
+	else if (msg == WM_DESTROY) {
+		windowProc_destroyWindow(hwnd);
 	}
 
 	return DefWindowProc(hwnd, msg, wp, lp);
@@ -99,6 +161,11 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const NormalPar
 void FVK::Internal::Window::create(const Data::WindowData& data, const FullScreenParameter& parameter) {
 	assert(!this->info.window);
 
+#ifdef FluidumUtils_Type_OS_Windows
+	//DPI
+	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
+#endif
+
 	const auto [x, y, width, height] = fullscreenPosSize();
 
 #ifdef FluidumUtils_Type_OS_Windows
@@ -107,16 +174,20 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const FullScree
 	{
 		WNDCLASSEX  windowClass{};
 
+		//icon
 		const auto iconPath = FU::Text::utf8ToUtf16(parameter.iconFilePath);
-		HANDLE icon = LoadImage(instance, iconPath.c_str(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_LOADFROMFILE);
+		HANDLE iconPtr = LoadImage(NULL,
+			iconPath.c_str(),
+			IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE
+		);
 
 		windowClass.cbSize = sizeof(windowClass);
-		windowClass.style = CS_HREDRAW | CS_VREDRAW;
+		windowClass.style = NULL;
 		windowClass.lpfnWndProc = windowProc;
 		windowClass.cbClsExtra = 0;
 		windowClass.cbWndExtra = 0;
 		windowClass.hInstance = instance;
-		windowClass.hIcon = static_cast<HICON>(icon);
+		windowClass.hIcon = reinterpret_cast<HICON>(iconPtr);
 		windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 		windowClass.hbrBackground = reinterpret_cast<HBRUSH>((COLOR_BACKGROUND + 1));
 		windowClass.lpszMenuName = NULL;
@@ -126,25 +197,22 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const FullScree
 		RegisterClassEx(&windowClass);
 	}
 
-
 	const auto titleUtf16 = FU::Text::utf8ToUtf16(parameter.title);
+	const long windowStyleFlags = WS_POPUP;
+
 	info.window = CreateWindow(
-		TEXT("FluidumClass"),                              //class name
-		titleUtf16.c_str(),                                //tile
-		WS_POPUP ^ WS_CAPTION ^ WS_BORDER ^ WS_MAXIMIZE ^ WS_THICKFRAME,							           //style
-		static_cast<int>(x), static_cast<int>(y),          //pos
+		TEXT("FluidumClass"),                                  //class name
+		titleUtf16.c_str(),                                    //tile
+		windowStyleFlags,							           //style
+		static_cast<int>(x), static_cast<int>(y),              //pos
 		static_cast<int>(width), static_cast<int>(height - 1), //size
-		NULL,									           //parent
-		NULL,									           //menu
-		GetModuleHandle(NULL),					           //instance
+		NULL,									               //parent
+		NULL,									               //menu
+		GetModuleHandle(NULL),					               //instance
 		NULL
 	);
-
-
-	//set userdata
-	SetWindowLongPtr(info.window, DWLP_USER, reinterpret_cast<LONG_PTR>(this));
-
 #endif
+
 
 	this->checkWindow();
 
@@ -160,7 +228,10 @@ void FVK::Internal::Window::create(const Data::WindowData& data, const FullScree
 	//}
 
 #ifdef FluidumUtils_Type_OS_Windows
-	ShowWindow(info.window, SW_SHOWNORMAL);
+	//set userdata
+	GHwndUserData.add(info.window, this);
+
+	ShowWindow(info.window, SW_HIDE);
 #endif
 
 	info.fullscreen = true;
@@ -267,7 +338,7 @@ void FVK::Internal::Window::setSize(const IF32 width, const IF32 height) const {
 		NULL,
 		width,
 		height,
-		SWP_NOREPOSITION
+		SWP_NOMOVE
 	);
 
 	if (result == FALSE) {
@@ -285,7 +356,7 @@ void FVK::Internal::Window::resize(const IF32 x, const IF32 y, const IF32 width,
 		static_cast<int>(y),
 		static_cast<int>(width),
 		static_cast<int>(height),
-		NULL
+		SWP_NOCOPYBITS
 	);
 
 	if (result == FALSE) {
@@ -294,8 +365,10 @@ void FVK::Internal::Window::resize(const IF32 x, const IF32 y, const IF32 width,
 #else
 #error NotSupported
 #endif 
-	//setPosCallback(info.window, x, y);
-	//framebufferResizeCallback(info.window, width, height);
+}
+
+void FVK::Internal::Window::show() const {
+	ShowWindow(this->info.window, SW_SHOWNORMAL);
 }
 
 void FVK::Internal::Window::minimize() const {
@@ -326,7 +399,7 @@ std::tuple<FVK::IF32, FVK::IF32, FVK::IF32, FVK::IF32> FVK::Internal::Window::fu
 
 std::pair<FVK::IF32, FVK::IF32> FVK::Internal::Window::fullscreenPos() {
 	const auto [l, r, w, h] = fullscreenPosSize();
-	return { static_cast<IF32>(l), static_cast<IF32>(r) };
+	return { l, r };
 }
 
 void FVK::Internal::Window::fullscreen() const {

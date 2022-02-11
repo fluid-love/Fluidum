@@ -27,7 +27,7 @@ FS::Project::File::Form::Form(
 	str.name.reserve(maxSize);
 
 	auto path = std::filesystem::current_path();
-	path += "/../../../Projects/";
+	path += "/../../../UserProjects/";
 	
 	str.directoryPath = FU::File::consistentDirectory(path.string());
 	str.directoryPath.reserve(maxSize);
@@ -175,12 +175,12 @@ void FS::Project::File::Form::bottom() {
 
 bool FS::Project::File::Form::createProject() {
 	FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
+	ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 
 	const std::string name = str.name.c_str();
 	const std::string directoryPath = str.directoryPath.c_str();
 	const std::string fullPath = directoryPath + name;
 
-	ImGui::GetForegroundDrawList()->AddCircle(ImGui::GetCursorPos(), 5.0f, 0x3399FF);
 	//The current project is not saved.
 	//save / ignore / cancelÅ@
 //FU::MB
@@ -220,6 +220,16 @@ bool FS::Project::File::Form::createProject() {
 		if (!path.is_absolute()) {
 			FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
 			Scene::addScene<Utils::Message>(text.error_absolute, pos.projectDirectory);
+			return false;
+		}
+	}
+
+	//not exists(directory)
+	{
+		const bool exists = std::filesystem::exists(directoryPath);
+		if (!exists) {
+			FluidumScene_Log_RequestDeleteScene(::FS::Utils::Message);
+			Scene::addScene<Utils::Message>(text.error_notFoundDirectory, pos.projectDirectory);
 			return false;
 		}
 	}

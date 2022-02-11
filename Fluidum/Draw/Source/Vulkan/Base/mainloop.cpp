@@ -6,6 +6,13 @@ namespace FDR::Internal {
 		using namespace FDR::Internal;
 
 #ifdef FluidumUtils_Type_OS_Windows
+		//Poll events
+		MSG msg{};
+		while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			::TranslateMessage(&msg);
+			::DispatchMessage(&msg);
+		}
+
 		ImGui_ImplWin32_NewFrame();
 #endif
 
@@ -137,7 +144,9 @@ void FDR::Internal::mainLoop(void(*function)(), const bool* const flag) {
 	);
 
 	draw->setFunction(drawFrame);
-
+#ifdef FluidumUtils_Type_OS_Windows
+	FVK::showWindow(BaseWindowKey);
+#endif
 	while (!(*flag)) {
 		loop(draw, function);
 	}
