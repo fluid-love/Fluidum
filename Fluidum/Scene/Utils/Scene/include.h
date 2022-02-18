@@ -19,3 +19,5 @@
 #include "../../Console/Console/console.h"
 
 #include "../../Calc/Lua/lua.h"
+
+#include "../../System/TaskManager/taskmanager.h"

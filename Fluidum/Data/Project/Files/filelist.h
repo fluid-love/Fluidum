@@ -3,6 +3,7 @@
 #include "../../Common/common.h"
 
 namespace FD::Project::Internal {
+
 	class FileList final {
 	public:
 		FluidumUtils_Class_Default_ConDestructor(FileList);
@@ -22,7 +23,7 @@ namespace FD::Project::Internal {
 
 		};
 
-		enum class Type : uint8_t {
+		enum class Type : UT {
 			Directory,
 			Supported,
 			Unsupported,
@@ -72,6 +73,8 @@ namespace FD::Project::Internal {
 		//path: C:/test/hoge
 		//name: hoge
 		void changePathAndName(const std::string& path, const std::string& newName);
+
+		void changeType(const std::string& path, const Type newType);
 
 	public:
 		void sync();
@@ -136,6 +139,7 @@ namespace FD::Project::Internal {
 }
 
 namespace FD::Project::FileList {
+
 	using Type = Internal::FileList::Type;
 
 	using FileInfo = Internal::FileList::Ref;

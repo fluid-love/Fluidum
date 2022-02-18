@@ -50,6 +50,10 @@ FS::Project::Explorer::Explorer(
 
 	style.topBarHeight = ImGui::CalcTextSize(ICON_MD_FOLDER_OPEN).x + 2.0f;
 
+	//lock
+	auto userFilesLock = userFilesWrite->getLock();
+	auto projectFilesLock = projectFilesWrite->getLock();
+
 	//sync
 	projectFilesWrite->sync(projectRead->projectDirectoryPath());
 	userFilesWrite->sync();
@@ -606,7 +610,7 @@ void FS::Project::Explorer::addFileQuick() {
 	}
 
 
-	for (uint16_t i = 1; i <= std::numeric_limits<uint16_t>::max(); i++) {
+	for (UI16 i = 1; i <= std::numeric_limits<UI16>::max(); i++) {
 		tempName = "NewFile" + std::to_string(i);
 		if (!std::filesystem::exists(parent + tempName)) {
 			path = parent + tempName;
@@ -719,7 +723,7 @@ void FS::Project::Explorer::removeDirectory() {
 
 	//confirm
 	{
-		int32_t result;
+		I32 result;
 		if (project) {
 			result = FU::MB::ok_cancel(text.confirm_removeDirectory);
 		}
@@ -762,13 +766,14 @@ void FS::Project::Explorer::removeFile() {
 	const bool tab = tabRead->exist(path);
 	bool exist;
 
-	//file does not exists
+	//not exists
 	{
 		try {
 			exist = std::filesystem::exists(path);
 		}
 		catch (const std::filesystem::filesystem_error&) {
 			FU::MB::error(text.error_removeFile);
+
 			return;
 		}
 	}
@@ -776,16 +781,20 @@ void FS::Project::Explorer::removeFile() {
 	//already removed
 	if (!exist) {
 		FU::MB::information(text.error_fileDoesNotExist);
-		if (project)
+		if (project) {
 			projectFilesWrite->remove(path);
-		else
+			projectFilesWrite->save();
+		}
+		else {
 			userFilesWrite->remove(path);
+			userFilesWrite->save();
+		}
 		return;
 	}
 
 	//confirm
 	{
-		const int32_t result = FU::MB::ok_cancel(text.confirm_removeFile);
+		const auto result = FU::MB::ok_cancel(text.confirm_removeFile);
 
 		assert(result == 0 || result == 1);
 		if (result == 1) {//cancel
@@ -878,7 +887,7 @@ void FS::Project::Explorer::displayCode() {
 	const std::string& path = select.current()->path;
 	const bool project = (select.tab == TabType::Project);
 
-	uintmax_t fileSize;
+	UIMax fileSize;
 
 	try {
 		if (!std::filesystem::exists(path)) {
@@ -930,6 +939,7 @@ void FS::Project::Explorer::displayCode() {
 	}
 	else {
 		const std::string focusedPath = displayRead->focusedFilePath();
+
 		if (!focusedPath.empty()) { //Exists focused editor.
 			displayWrite->remove(focusedPath);
 		}
@@ -1107,7 +1117,7 @@ void FS::Project::Explorer::supportedPopup() {
 
 	if (select.tab == TabType::Project) {
 		if (ImGui::Selectable(text.remove))
-			this->removeDirectory();
+			this->removeFile();
 	}
 	else if (select.tab == TabType::User) {
 		if (ImGui::Selectable(text.release))
@@ -1217,6 +1227,7 @@ void FS::Project::Explorer::tryChangeName() {
 
 	const bool project = (select.tab == TabType::Project);
 	const auto type = select.current()->type;
+	const auto current = select.current();
 
 	const auto [check, name] = this->checkChangeName();
 
@@ -1250,11 +1261,14 @@ void FS::Project::Explorer::tryChangeName() {
 		path_.pop_back();
 
 	//supported
-	if (select.current()->type != FD::Project::FileList::Type::Directory &&
-		FD::Project::File::isFileFormatSupported(name)
-		)
-	{
-		select.current()->type = FD::Project::FileList::Type::Supported;
+	if (type != FD::Project::FileList::Type::Directory) {
+		const bool supported = FD::Project::File::isFileFormatSupported(name);
+		if (supported && type == FD::Project::FileList::Type::Unsupported) {
+			projectFilesWrite->changeType(current->path, FD::Project::FileList::Type::Supported);
+		}
+		else if (!supported && type == FD::Project::FileList::Type::Supported) {
+			projectFilesWrite->changeType(current->path, FD::Project::FileList::Type::Unsupported);
+		}
 	}
 
 	if (changeName.tempName == name) {

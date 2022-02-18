@@ -300,6 +300,7 @@ void FS::Title::recentProject() {
 
 		if (clicked) {
 			FU::Cursor::setCursorType(FU::Cursor::Type::Wait);
+			ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 			this->openProject(x.projectFilePath.c_str(), pos.recentButton);
 		}
 	}

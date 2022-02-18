@@ -81,6 +81,10 @@ namespace FS {
 
 		}sub;
 
+		struct {
+			bool deleteScene{};
+		}flag;
+
 	private:
 		void imageGui();
 		void hoveredIcon(const Size index);
@@ -115,6 +119,11 @@ namespace FS {
 
 	private:
 		void drawRightBorder();
+
+	private:
+		void mini();
+		void clickedMiniIcons(const ClassCode::CodeType code,const bool exists);
+		void taskManagerScene(const bool exists);
 
 	};
 

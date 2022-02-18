@@ -210,6 +210,8 @@
     <ClInclude Include="Fluidum\Fluidum\Scene\Calc\Run\run.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Calc\Lua\lua.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Bar\Menu\Info\info.h" />
+    <ClInclude Include="Fluidum\Fluidum\Scene\System\TaskManager\taskmanager.h" />
+    <ClInclude Include="Fluidum\Fluidum\Data\Gui\Texts\taskmanager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fluidum\Fluidum\Data\Calc\Array\array.cpp" />
@@ -361,5 +363,6 @@
     <ClCompile Include="Fluidum\Internal\LuAssist\Utils\misc.cpp" />
     <ClCompile Include="Fluidum\Internal\LuAssist\Utils\table.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Bar\Menu\Info\info.cpp" />
+    <ClCompile Include="Fluidum\Fluidum\Scene\System\TaskManager\taskmanager.cpp" />
   </ItemGroup>
 </Project>

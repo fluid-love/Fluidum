@@ -5,7 +5,7 @@ void FD::Style::ColorRead::pushButtonDisabled() const noexcept {
 	ImGui::PushStyleColor(ImGuiCol_Button, colDisabled);
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colDisabled);
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, colDisabled);
-	ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f,1.0f,1.0f,0.3f });
+	ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
 }
 
 void FD::Style::ColorRead::popButtonDisabled() const noexcept {

@@ -8,9 +8,9 @@ FS::Analysis::Overview::~Overview() noexcept {
 
 void FS::Analysis::Overview::call() {
 	ImGui::Begin("AnalysisOverview", &windowShouldClose);
-	this->setWindowInfo();
+	//this->setWindowInfo();
 
-	this->tab();
+	//this->tab();
 
 	ImGui::End();
 

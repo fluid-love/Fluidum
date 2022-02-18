@@ -99,9 +99,6 @@ namespace FS {
 		void merge();
 
 	private:
-		void save_resize();
-
-	private:
 		void updateWindows();
 		void messageLimit();
 

@@ -1,17 +1,6 @@
 ﻿#include "leftbar.h"
 
-#include "../../Coding/TextEditor/texteditor.h"
-#include "../../Coding/Tab/tab.h"
-#include "../../Coding/Debug/debug.h"
-#include "../../Project/project.h"
-#include "../../Analysis/Overview/overview.h"
-#include "../../Analysis/Func/function.h"
-#include "../../Analysis/Plot/plot.h"
-#include "../../Flu/Node/node.h"
-#include "../../Console/Console/console.h"
-#include "../../Animation/Animation/animation.h"
-#include "../../Genome/Overview/overview.h"
-
+#include "../../Utils/Scene/include.h"
 
 using namespace FU::ImGui::Operators;
 
@@ -81,6 +70,7 @@ void FS::LeftBar::call() {
 	ImGui::Begin("LeftBar", nullptr, flag);
 
 	this->imageGui();
+	this->mini();
 
 	ImGui::PopStyleColor(2);
 	ImGui::PopStyleVar(3);
@@ -90,9 +80,11 @@ void FS::LeftBar::call() {
 
 
 	//subwindow
-
-	if (sub.isIconHovered)
+	if (sub.isIconHovered && !this->flag.deleteScene && !ImGui::IsPopupOpen("", ImGuiPopupFlags_AnyPopup)) {
 		this->subWindow();
+		this->flag.deleteScene = false;
+	}
+
 }
 
 namespace FS::Internal {
@@ -112,7 +104,7 @@ void FS::LeftBar::imageGui() {
 	ImGui::Spacing();
 
 	for (std::size_t i = 0; i < std::tuple_size_v<decltype(Internal::MainScenes)>; i++) {
-		//シーンが存在するなら降ろす
+		//scene exists
 		if (sceneRead->exist(Internal::MainScenes[i])) {
 
 			ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.main);
@@ -123,7 +115,7 @@ void FS::LeftBar::imageGui() {
 
 		}
 		else {
-			//ボタンが押されたら == シーンの追加を要請
+			//clicked == request add scene
 			ImGui::ImageButton(this->images[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.dummy);
 
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
@@ -228,6 +220,7 @@ void FS::LeftBar::addConsoleScene() {
 void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 	if (code == Internal::MainScenes[0]) {
 		this->deleteCodingScene();
+		sub.codingImages.clear();
 	}
 	else if (code == Internal::MainScenes[1]) {
 		FluidumScene_Log_RequestDeleteScene(::FS::Flu::Node);
@@ -257,7 +250,8 @@ void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 		FluidumScene_Log_InternalError();
 		std::terminate();
 	}
-	sub.codingImages.clear();
+
+	flag.deleteScene = true;
 }
 
 void FS::LeftBar::deleteCodingScene() {
@@ -291,9 +285,9 @@ void FS::LeftBar::deleteCodingScene() {
 void FS::LeftBar::subWindow() {
 
 	ImGui::SetNextWindowPos(sub.selectWindowPos);
-	//padding xを半分
+	//padding
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(ImGui::GetStyle().WindowPadding.x / 1.8f, ImGui::GetStyle().WindowPadding.y));
-	//frameも
+	//frame
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { ImGui::GetStyle().FramePadding.x / 2.0f,ImGui::GetStyle().FramePadding.y });
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 
@@ -323,9 +317,8 @@ void FS::LeftBar::subWindowCoding() {
 
 	for (Size i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
 
-		//選択されているなら
 		if (sceneRead->exist(scenes[i])) {
-			//降ろす　シーンの削除
+
 			ImGui::ImageButton(sub.codingImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
 
 			const ImVec2 pos1 = ImGui::GetItemRectMin();
@@ -351,11 +344,11 @@ void FS::LeftBar::subWindowCoding() {
 
 void FS::LeftBar::subWindowAnalysis() {
 	constexpr std::array<ClassCode::CodeType, 2> scenes = {
-		ClassCode::GetClassCode<Analysis::Function>(),
-		ClassCode::GetClassCode<Analysis::Plot>()
+		ClassCode::GetClassCode<Analysis::Plot>(),
+		ClassCode::GetClassCode<Analysis::Function>()
 	};
 
-	for (std::size_t i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
+	for (Size i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
 
 		if (sceneRead->exist(scenes[i])) {
 			ImGui::ImageButton(sub.analysisImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
@@ -467,6 +460,70 @@ void FS::LeftBar::drawRightBorder() {
 	const ImU32 col = ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_Border));
 	ImGui::GetBackgroundDrawList()->AddLine(pos1, pos2, col, ImGui::GetStyle().WindowBorderSize);
 
+}
+
+namespace FS::Internal {
+
+	constexpr std::array<std::pair<const char*, FU::Class::ClassCode::CodeType>, 1> MiniScenes{
+		std::pair{ICON_MD_MEMORY, FU::Class::ClassCode::GetClassCode<System::TaskManager>()}
+	};
+
+}
+
+void FS::LeftBar::mini() {
+	ImGui::Spacing();
+
+	ImGui::BeginChild("##LeftBarMini");
+	ImGui::SetWindowFontScale(1.3f);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.0f, ImGui::GetStyle().FramePadding.y });
+
+	const ImVec2 size =
+	{
+		2.0f + (style.windowSize.x / 2.0f) - ImGui::GetStyle().WindowPadding.x ,
+		0.0f
+	};
+
+	for (auto& x : Internal::MiniScenes) {
+		const bool exists = sceneRead->exist(x.second);
+
+		//col
+		if (exists)
+			ImGui::PushStyleColor(ImGuiCol_Button, color.main);
+
+		ImGui::Button(x.first, size);
+
+		const bool clicked = ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
+		if (clicked)
+			this->clickedMiniIcons(x.second, exists);
+
+		if (exists)
+			ImGui::PopStyleColor();
+	}
+
+	ImGui::PopStyleVar();
+
+	ImGui::EndChild();
+}
+
+void FS::LeftBar::clickedMiniIcons(const ClassCode::CodeType code, const bool exists) {
+	if (code == ClassCode::GetClassCode<System::TaskManager>()) {
+		this->taskManagerScene(exists);
+	}
+	else {
+		FluidumScene_Log_InternalWarning();
+	}
+}
+
+void FS::LeftBar::taskManagerScene(const bool exists) {
+	if (!exists) {
+		FluidumScene_Log_RequestAddScene(::FS::System::TaskManager);
+		Scene::addScene<System::TaskManager>();
+	}
+	else {
+		FluidumScene_Log_RequestDeleteScene(::FS::System::TaskManager);
+		Scene::deleteScene<System::TaskManager>();
+	}
 }
 
 

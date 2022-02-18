@@ -9,6 +9,7 @@ void FD::Scene::Internal::Data::addSceneCallback(bool async, FU::Class::ClassCod
 		return;
 
 	codes.emplace_back(code);
+	erase.store(false);
 	save.store(true);
 }
 
@@ -18,6 +19,7 @@ void FD::Scene::Internal::Data::deleteSceneCallback(bool async, FU::Class::Class
 	assert((itr != codes.crend()) && "FluidumScene‚ÌİŒv‚É–â‘è‚ª‚ ‚è‚Ü‚·D");
 
 	codes.erase(std::next(itr).base());
+	erase.store(true);
 	save.store(true);
 }
 

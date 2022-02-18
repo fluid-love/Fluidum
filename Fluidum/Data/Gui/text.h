@@ -448,9 +448,12 @@ namespace FD::Text::Internal {
 
 	struct CodingTab final {
 		CodingTab();
-		~CodingTab() = default;
+		~CodingTab() noexcept = default;
 
 		GuiText tab;
+
+		GuiText tooltip_saveSelectedFile;
+		GuiText tooltip_saveAllFiles;
 
 		GuiText popup_save;
 		GuiText popup_saveAndClose;

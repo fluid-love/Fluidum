@@ -32,7 +32,7 @@ namespace name {								   \
 	using ISize = std::make_signed_t<Size>;		   \
 												   \
 	using IMax = std::intmax_t;					   \
-	using UImax = std::uintmax_t;				   \
+	using UIMax = std::uintmax_t;				   \
 }												   
 												   
 namespace FU::Type {							   

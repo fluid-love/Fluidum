@@ -71,16 +71,17 @@ void FS::MenuBar::call() {
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.087f, 0.087f, 0.087f, 0.7f));
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.16f, 0.16f, 0.24f, 0.9f));
 
-	constexpr ImGuiWindowFlags flag =
+	constexpr ImGuiWindowFlags flags =
 		ImGuiWindowFlags_NoBringToFrontOnFocus |
 		ImGuiWindowFlags_MenuBar |
 		ImGuiWindowFlags_NoBackground |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoSavedSettings;
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoDocking;
 
-	ImGui::Begin("MenuBar", nullptr, flag);
+	ImGui::Begin("MenuBar", nullptr, flags);
 	if (ImGui::BeginMenuBar()) {
 		//dummy: for Fluidum icon
 		if (ImGui::BeginMenu("   "))
@@ -267,7 +268,7 @@ void FS::MenuBar::calcGui() {
 		this->menuBarItemWidth.calc = ImGui::GetItemRectMax().x;
 		return;
 	}
-	
+
 
 	bool exist = false;
 

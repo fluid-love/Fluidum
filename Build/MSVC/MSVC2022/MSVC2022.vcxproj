@@ -40,6 +40,7 @@
     <ClInclude Include="Fluidum\Fluidum\Data\Gui\Style\theme.h" />
     <ClInclude Include="Fluidum\Fluidum\Data\Gui\Style\var.h" />
     <ClInclude Include="Fluidum\Fluidum\Data\Gui\text.h" />
+    <ClInclude Include="Fluidum\Fluidum\Data\Gui\Texts\taskmanager.h" />
     <ClInclude Include="Fluidum\Fluidum\Data\Gui\tool.h" />
     <ClInclude Include="Fluidum\Fluidum\Data\History\file.h" />
     <ClInclude Include="Fluidum\Fluidum\Data\History\project.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Fluidum\Fluidum\Scene\Bar\Menu\Info\info.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Project\project.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Project\Property\property.h" />
+    <ClInclude Include="Fluidum\Fluidum\Scene\System\TaskManager\taskmanager.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Title\title.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Utils\Data\reset.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Utils\Popup\backwindow.h" />
@@ -361,6 +363,7 @@
     <ClCompile Include="Fluidum\Fluidum\Scene\Bar\Menu\Info\info.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Project\project.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Project\Property\property.cpp" />
+    <ClCompile Include="Fluidum\Fluidum\Scene\System\TaskManager\taskmanager.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Title\title.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Utils\Data\reset.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Utils\Popup\backwindow.cpp" />

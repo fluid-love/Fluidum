@@ -29,6 +29,7 @@ namespace FD::Coding::Tab::Limits {
 
 	constexpr inline UIF8 FileSizeMax = 100;
 	constexpr inline UIF8 DisplaySizeMax = 10;
+	constexpr inline UIF8 RecentDepthMax = 100;
 
 }
 

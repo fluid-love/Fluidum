@@ -280,10 +280,10 @@ namespace FD::Layout {
 void FD::Layout::Internal::LayoutData::remake() {
 	using namespace Layout::Internal;
 
-	std::vector<History> copy{};
+	std::vector<History> hisCopy{};
 	{
 		std::lock_guard<std::mutex> lock(LayoutData::mtx);
-		copy = history;
+		hisCopy = history;
 	}
 
 	LayoutWrite::reset();
@@ -292,7 +292,7 @@ void FD::Layout::Internal::LayoutData::remake() {
 	const float layoutWindowHeight = *LayoutData::mainFrameBottom - *LayoutData::mainFrameTop;
 
 	try {
-		for (auto& x : copy) {
+		for (auto& x : hisCopy) {
 			const float readPosX = *LayoutData::mainFrameLeft + (layoutWindowWidth * x.readPosRatio.x);
 			const float readPosY = *LayoutData::mainFrameTop + (layoutWindowHeight * x.readPosRatio.y);
 
@@ -374,13 +374,16 @@ void FD::LayoutWrite::resizeMainFrameRight(const float val) {
 	*LayoutData::mainFrameRight = val;
 
 	for (auto& x : Layout::GAdjacent) {
+		if (x->horizonal)
+			continue;
+
 		for (auto& y : x->separators) {
 			if ((*y->right - *y->separator) <= Layout::GData.widthLimit) {
 				*y->separator = (*y->right - Layout::GData.widthLimit);
 			}
 		}
 	}
-
+	
 	this->remakeAllWindows();
 }
 
@@ -389,8 +392,12 @@ void FD::LayoutWrite::resizeMainFrameBottom(const float val) {
 	std::lock_guard<std::mutex> lock(LayoutData::mtx);
 
 	*LayoutData::mainFrameBottom = val;
+	auto& x = Layout::GAdjacent;
 
 	for (auto& x : Layout::GAdjacent) {
+		if (!x->horizonal)
+			continue;
+
 		for (auto& y : x->separators) {
 			if ((*y->bottom - *y->separator) <= Layout::GData.heightLimit) {
 				*y->separator = (*y->bottom - Layout::GData.heightLimit);

@@ -17,11 +17,11 @@ namespace FS::Analysis {
 			toolBarWrite(toolBarWrite),
 			implotRead(implotRead)
 		{
-			//GLog.add<FD::Log::Type::None>("Construct AnalysisScene.");
+			FluidumScene_Log_Constructor(::FS::Analysis::Overview);
 
-			//this->functionRead<Lang> = functionRead;
+			this->functionRead<Lang> = functionRead;
 
-			//toolBarWrite->add(&Overview::topBar, this, "AnaOV");
+			toolBarWrite->add(&Overview::topBar, this, "AnaOV");
 		}
 
 		void Constructor(

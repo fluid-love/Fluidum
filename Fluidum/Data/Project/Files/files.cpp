@@ -20,6 +20,11 @@ bool FD::ProjectFilesWrite_Lock::tryChangeName(const std::string& path, const st
 	return true;
 }
 
+void FD::ProjectFilesWrite_Lock::changeType(const std::string& path, const Project::FileList::Type newType) {
+	using namespace Project::Internal;
+	ProjectFilesData::projectFiles.changeType(path, newType);
+}
+
 void FD::ProjectFilesWrite_Lock::sync(const std::string& top) {
 	using namespace Project::Internal;
 

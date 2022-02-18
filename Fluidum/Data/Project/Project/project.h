@@ -153,12 +153,11 @@ namespace FD {
 		void updateHistory();
 
 	private://read
-		void readProjectInfo(std::ifstream& ifs) const;
+		void readProjectInfo(const std::string& path) const;
 
 		Project::FileList::FileInfo readFiles_element(const boost::json::value& val) const;
 
-		void read_files_recursive(const bool top, std::vector< FD::Project::Internal::FileList::Ref>* data, const boost::json::value& val, Project::FileList::FileInfo* parent) const;
-		void read_fluidumFiles() const;
+		void read_files_recursive(const bool project, const bool top, std::vector< FD::Project::Internal::FileList::Ref>* data, const boost::json::value& val, Project::FileList::FileInfo* parent) const;
 		void read_projectFiles() const;
 		void read_userFiles() const;
 

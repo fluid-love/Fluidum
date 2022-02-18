@@ -60,6 +60,7 @@ namespace FS {
 	private:
 		struct {
 			float infoWindowHeight{};
+			float leftInfoAreaWidth{};
 		}style;
 
 		struct {
@@ -86,6 +87,8 @@ namespace FS {
 			FTE::TextEditor* editor = nullptr;
 			FD::Coding::DisplayInfo info{};
 			FD::Project::File::SupportedFileType language{};
+			std::string name{};
+			float nameWidth{};
 		};
 		std::vector<Info> info{};
 
@@ -97,6 +100,9 @@ namespace FS {
 
 	private:
 		void toolBar();
+		void toolBar_dummy();
+		void toolBar_undo();
+		void toolBar_redo();
 		void tool_separator();
 
 	private:
@@ -117,6 +123,8 @@ namespace FS {
 
 	private://info
 		void textEditorInfo();
+		void textEditorInfo_left();
+		void textEditorInfo_right();
 		void editorInfo_zoom();
 
 	private:

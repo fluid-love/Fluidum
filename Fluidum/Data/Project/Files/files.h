@@ -75,6 +75,8 @@ namespace FD {
 		//already exists(in the same directory) -> return false
 		bool tryChangeName(const std::string& path, const std::string& newName);
 
+		void changeType(const std::string&path,const Project::FileList::Type newType);
+
 		void remove(const std::string& path);
 
 		void sync(const std::string& top);

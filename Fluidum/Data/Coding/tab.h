@@ -119,10 +119,7 @@ namespace FD::Coding {
 		[[nodiscard]] FTE::TextEditor* getEditor(const std::string& path) const;
 
 	public:
-		void save();
-
-	private:
-		void update();
+		void save() noexcept;
 
 	};
 
@@ -137,8 +134,13 @@ namespace FD::Coding {
 		FluidumUtils_Class_Delete_CopyMove(TabRead);
 
 	public:
-		[[nodiscard]] bool update() const;
+		[[nodiscard]] bool update_add() const;
+		[[nodiscard]] bool update_remove() const;
+
+	public:
 		[[nodiscard]] std::vector<std::string> paths() const;
+		[[nodiscard]] std::string lastPathAdded() const;
+		[[nodiscard]] std::string lastPathRemoved() const;
 
 	public:
 		[[nodiscard]] bool update_isTextSaved() const;

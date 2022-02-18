@@ -311,7 +311,7 @@ std::pair<bool, FD::Size> FD::Project::Internal::FileList::childExists_helper(co
 		}
 	}
 
-	return {false, depth};
+	return { false, depth };
 }
 
 std::vector<FD::Project::Internal::FileList::Ref>* FD::Project::Internal::FileList::get() noexcept {
@@ -334,6 +334,8 @@ void FD::Project::Internal::FileList::deletePtr(RefIterator itr) {
 		assert(f != unsupported.end());
 		unsupported.erase(f);
 	}
+
+	itr->ptr = nullptr;
 }
 
 bool FD::Project::Internal::FileList::tryReplaceExistElm(RefIterator itr, Ref& ref) {
@@ -383,6 +385,29 @@ FD::Project::Internal::FileList::Ref FD::Project::Internal::FileList::makeRef(co
 		.name = FU::File::fileName(path),
 		.ptr = unsupported.back().get(),
 	};
+}
+
+void FD::Project::Internal::FileList::changeType(const std::string& path, const Type newType) {
+	auto itr = this->find(path).value();
+
+	if (itr->ptr) {
+		this->deletePtr(itr);
+	}
+	itr->type = newType;
+
+	if (newType == Type::Supported) {
+		codes.emplace_back(std::make_shared<Supported>());
+		itr->ptr = codes.back().get();
+	}
+	else if (newType == Type::Unsupported) {
+		unsupported.emplace_back(std::make_shared<Unsupported>());
+		itr->ptr = unsupported.back().get();
+	}
+	else if (newType == Type::Directory) {
+		directories.emplace_back(std::make_shared<Directory>());
+		itr->ptr = directories.back().get();
+	}
+
 }
 
 

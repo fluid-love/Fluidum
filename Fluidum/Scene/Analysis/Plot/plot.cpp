@@ -27,12 +27,38 @@ FS::Analysis::Plot::~Plot() noexcept {
 }
 
 void FS::Analysis::Plot::call() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
+	//ImPlot::ShowDemoWindow();
 
-	this->dockSpace();
-	this->plot();
+	static float xs1[11], ys1[11];
+	for (int i = 0; i < 11; ++i) {
+		xs1[i] = i * 0.001f;
+		ys1[i] = 0.5f + 0.5f * sinf(50 * (xs1[i] + (float)ImGui::GetTime() / 10));
+	}
+	static double xs2[11], ys2[11];
+	for (int i = 0; i < 11; ++i) {
+		xs2[i] = i * 0.1f;
+		ys2[i] = xs2[i] * xs2[i];
+	}
 
-	ImGui::PopStyleVar();
+	ImGui::Begin("Genome");
+
+	if (ImPlot::BeginPlot("Fitness")) {
+		ImPlot::SetupAxes("generation", "fitness");
+		ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle);
+		ImPlot::PlotLine("chromesome-1", xs1, ys1, 11);
+		ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle);
+		ImPlot::PlotLine("chromesome-2", xs2, ys2, 11);
+		ImPlot::EndPlot();
+	}
+
+	ImGui::End();
+
+	//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2());
+
+	////this->dockSpace();
+	////this->plot();
+
+	//ImGui::PopStyleVar();
 }
 
 
@@ -61,26 +87,26 @@ void FS::Analysis::Plot::plot() {
 
 	GWindows.resize(data->size());
 
-	for (FD::Plot::FigureIndex i = 0; const auto & x : *data) {
-		ImGui::Begin(x.figure.title.c_str(), nullptr, ImGuiWindowFlags_NoSavedSettings);
-
-		if (ImPlot::BeginPlot(x.figure.title.c_str(), x.figure.axisLabelX.c_str(), x.figure.axisLabelY.c_str(), ImVec2(-1, -1), ImPlotFlags_NoMousePos, NULL)) {
-
-			for (const auto& y : x.plots) {
-				ImPlot::SetNextMarkerStyle(static_cast<ImPlotMarker>(y.marker));
-				if (y.imPlotType == FD::Plot::ImPlotType::Line)
-					ImPlot::PlotLine(x.figure.title.c_str(), y.values1.data(), y.values2.data(), static_cast<int>(y.values1.size()));
-				//	else if (data.type == ImPlotType::BAR)
-				//		ImPlot::PlotBars(x.figure.name.c_str(), data.values2.data(), 2);
-			}
-			ImPlot::EndPlot();
-		}
-
-		//for docking
-		GWindows[i++] = ImGui::GetCurrentWindow();
-
-		ImGui::End();
-	}
+//for (FD::Plot::FigureIndex i = 0; const auto & x : *data) {
+//	ImGui::Begin(x.figure.title.c_str(), nullptr, ImGuiWindowFlags_NoSavedSettings);
+//
+//	if (ImPlot::BeginPlot(x.figure.title.c_str(), x.figure.axisLabelX.c_str(), x.figure.axisLabelY.c_str(), ImVec2(-1, -1), ImPlotFlags_NoMousePos, NULL)) {
+//
+//		for (const auto& y : x.plots) {
+//			ImPlot::SetNextMarkerStyle(static_cast<ImPlotMarker>(y.marker));
+//			if (y.imPlotType == FD::Plot::ImPlotType::Line)
+//				ImPlot::PlotLine(x.figure.title.c_str(), y.values1.data(), y.values2.data(), static_cast<int>(y.values1.size()));
+//			//	else if (data.type == ImPlotType::BAR)
+//			//		ImPlot::PlotBars(x.figure.name.c_str(), data.values2.data(), 2);
+//		}
+//		ImPlot::EndPlot();
+//	}
+//
+//	//for docking
+//	GWindows[i++] = ImGui::GetCurrentWindow();
+//
+//	ImGui::End();
+//}
 }
 
 

@@ -54,6 +54,8 @@ FS::TextEditor::~TextEditor() noexcept {
 }
 
 void FS::TextEditor::call() {
+	//It catches events of addition and deletion.
+	this->update();
 
 	if (info.empty()) {
 		this->windowEmpty();
@@ -99,7 +101,6 @@ void FS::TextEditor::call() {
 	ImGui::PopStyleColor();
 
 	this->textChange();
-	this->update();
 	this->shortcut();
 	this->catchZoom();
 }
@@ -109,29 +110,74 @@ void FS::TextEditor::setImGuiWindow() {
 }
 
 void FS::TextEditor::toolBar() {
-	if (info.empty())
+	if (info.empty()) {
+		this->toolBar_dummy();
 		return;
-
-	//save
-	if (ImGui::Button(ICON_FA_SAVE)) {
-		FU::ImGui::tooltip(anime.tool_save, text.save);
-		this->saveText(this->selected);
 	}
 
-	this->tool_separator();
+	//undo
+	this->toolBar_undo();
+
 	ImGui::SameLine();
 
-	if (ImGui::Button(ICON_FA_UNDO)) {
+	//redo
+	this->toolBar_redo();
+
+}
+
+void FS::TextEditor::toolBar_dummy() {
+
+	//undo
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextDisabled(ICON_FA_UNDO);
+	FU::ImGui::tooltip(anime.tool_undo, text.undo);
+
+	ImGui::SameLine();
+
+	//redo
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextDisabled(ICON_FA_REDO);
+	FU::ImGui::tooltip(anime.tool_redo, text.redo);
+
+}
+
+void FS::TextEditor::toolBar_undo() {
+	if (!current->editor->CanUndo()) {
+		//dummy
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextDisabled(ICON_FA_UNDO);
 		FU::ImGui::tooltip(anime.tool_undo, text.undo);
-		this->saveText(this->selected);
+		return;
 	}
 
-	ImGui::SameLine();
+	//canundo
 
+	if (!ImGui::Button(ICON_FA_UNDO)) {
+		FU::ImGui::tooltip(anime.tool_undo, text.undo);
+		return;
+	}
+
+	current->editor->Undo();
+
+}
+
+void FS::TextEditor::toolBar_redo() {
+	if (!current->editor->CanRedo()) {
+		//dummy
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextDisabled(ICON_FA_REDO);
+		FU::ImGui::tooltip(anime.tool_redo, text.redo);
+		return;
+	}
+
+	//canredo
+
+	current->editor->Undo();
 	if (ImGui::Button(ICON_FA_REDO)) {
 		FU::ImGui::tooltip(anime.tool_redo, text.redo);
-		this->saveText(this->selected);
+		current->editor->Redo();
 	}
+
 }
 
 void FS::TextEditor::tool_separator() {
@@ -171,6 +217,8 @@ void FS::TextEditor::setInfo() {
 		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
 		auto& info_ = this->info.emplace_back(Info{ tabWrite->getEditor(x.path) ,x , FD::Project::File::getSupportedFileType(x.path) });
+		info_.name = FU::File::fileName(x.path);
+		info_.nameWidth = ImGui::CalcTextSize(info_.name.c_str()).x;
 		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 		info_.editor->SetText(str);
 
@@ -260,18 +308,22 @@ void FS::TextEditor::themeMenu() {
 	if (ImGui::MenuItem(text.default_)) {
 		current->editor->SetPalette(FTE::TextEditor::GetDarkPalette());
 		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Default);
+		tabWrite->save();
 	}
 	if (ImGui::MenuItem(text.dark)) {
 		current->editor->SetPalette(FTE::getDarkPalette());
 		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Dark);
+		tabWrite->save();
 	}
 	if (ImGui::MenuItem(text.light)) {
 		current->editor->SetPalette(FTE::TextEditor::GetLightPalette());
 		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Light);
+		tabWrite->save();
 	}
 	if (ImGui::MenuItem(text.blue)) {
 		current->editor->SetPalette(FTE::TextEditor::GetRetroBluePalette());
 		displayWrite->theme(current->info.path, FD::Coding::DisplayInfo::Theme::Light);
+		tabWrite->save();
 	}
 	ImGui::EndMenu();
 }
@@ -286,8 +338,15 @@ void FS::TextEditor::textEditor() {
 }
 
 void FS::TextEditor::textEditorInfo() {
+	this->textEditorInfo_left();
+	ImGui::SameLine();
+	this->textEditorInfo_right();
+}
 
-	ImGui::BeginChild("TextEditorInfo");
+void FS::TextEditor::textEditorInfo_left() {
+	const float windowWidth = ImGui::GetWindowWidth() - current->nameWidth - (ImGui::GetStyle().WindowPadding.x * 2.0f);
+
+	ImGui::BeginChild("TextEditorInfoLeft", { windowWidth, 0.0f });
 	auto cpos = current->editor->GetCursorPosition();
 
 	ImGui::Spacing(); ImGui::SameLine();
@@ -316,6 +375,7 @@ void FS::TextEditor::textEditorInfo() {
 	ImGui::SameLine();
 
 	//Undo
+	ImGui::AlignTextToFramePadding();
 	if (current->editor->CanUndo())
 		ImGui::Text(ICON_FA_UNDO);
 	else
@@ -337,8 +397,15 @@ void FS::TextEditor::textEditorInfo() {
 		}
 	}
 
-	ImGui::SameLine();
 
+	ImGui::EndChild();
+}
+
+void FS::TextEditor::textEditorInfo_right() {
+
+	ImGui::BeginChild("TextEditorInfoRight");
+
+	ImGui::Text(current->name.c_str());
 
 	ImGui::EndChild();
 }
@@ -403,26 +470,28 @@ void FS::TextEditor::update() {
 	auto paths = displayRead->paths();
 
 	for (auto& x : paths) {
-		//not new file
 		auto itr = std::find_if(info.begin(), info.end(), [&](auto& y) {return y.info.path == x; });
 		if (itr != info.end()) {
+			//Not a new file
 			continue;
 		}
 
 		std::ifstream ifs(x);
 		std::string str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-		auto info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,x });
+		auto& info_ = info.emplace_back(Info{ tabWrite->getEditor(x) ,x });
+		info_.name = FU::File::fileName(x);
+		info_.nameWidth = ImGui::CalcTextSize(info_.name.c_str()).x;
 		info_.editor->SetLanguageDefinition(FTE::getLuaLanguageDefinition());
 		info_.editor->SetText(str);
 	}
 
-	for (const auto& x : paths) {
-		auto itr = std::erase_if(info, [&](auto& y)
-			{
-				auto itr = std::find_if(info.begin(), info.end(), [&](auto&) {return y.info.path == x; });
-				return itr == info.end();
-			});
-	}
+	auto itr = std::erase_if(info, [&](auto& x)
+		{
+			const auto find = std::find(paths.cbegin(), paths.cend(), x.info.path);
+			return find == paths.cend();
+		}
+	);
+
 }
 
 void FS::TextEditor::textChange() {
@@ -542,6 +611,8 @@ void FS::TextEditor::shortcut_zoom() {
 		selected->info.zoomRatio -= 0.1f;
 	}
 
+	displayWrite->zoomRatio(selected->info.path, selected->info.zoomRatio);
+	tabWrite->save();
 }
 
 void FS::TextEditor::catchZoom() {

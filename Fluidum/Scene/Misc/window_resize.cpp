@@ -49,7 +49,7 @@ void FS::Misc::ResizeWindow::call() {
 	}
 
 	this->moveWindow();
-	if (FDR::isWindowFullscreen()) 
+	if (FDR::isWindowFullscreen())
 		return;
 
 	this->decorateWindow();
@@ -260,7 +260,8 @@ void FS::Misc::ResizeWindow::hold() {
 		hovered = true;
 	}
 	else if (currentBorder == Border::Top) {
-		this->topCursor();
+		if (holdBorder != Border::Move)
+			this->topCursor();
 		hovered = true;
 	}
 	else if (currentBorder == Border::Bottom) {
@@ -296,13 +297,17 @@ void FS::Misc::ResizeWindow::hold() {
 }
 
 void FS::Misc::ResizeWindow::moveWindow() {
+	const bool clicked = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+	if (holdBorder != Border::Move && down && !clicked)
+		return;
+
 	if (holdBorder != Border::Move && mousePosY > guiRead->menuBarHeight())
 		return;
 
 	if (currentBorder == Border::Top || holdBorder == Border::Top)
 		return;
 
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+	if (clicked)
 		this->isItemHoved = ImGui::IsAnyItemHovered();
 
 	currentBorder = Border::Move;

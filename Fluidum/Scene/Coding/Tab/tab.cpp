@@ -16,21 +16,32 @@ FS::Coding::Tab::Tab(
 	const FD::Coding::TabRead* const tabRead,
 	FD::Coding::DisplayWrite* const displayWrite,
 	const FD::Coding::DisplayRead* const displayRead,
-	const FD::ProjectRead* const projectRead
+	const FD::ProjectRead* const projectRead,
+	const FD::LayoutRead* const layoutRead,
+	FD::ToolBarWrite* const toolBarWrite,
+	const FD::Style::ColorRead* const colorRead
 ) :
 	imguiWindowWrite(imguiWindowWrite),
 	tabWrite(tabWrite),
 	tabRead(tabRead),
 	displayWrite(displayWrite),
 	displayRead(displayRead),
-	projectRead(projectRead)
+	projectRead(projectRead),
+	toolBarWrite(toolBarWrite),
+	colorRead(colorRead)
 {
 	FluidumScene_Log_Constructor(::FS::Coding::Tab);
 
-	this->updateInfo();
+	style.windowMinSize = { layoutRead->widthLimit(), layoutRead->heightLimit() };
+
+	toolBarWrite->add(&Tab::toolBar, this, text.tab.operator const std::string & ());
+
+	this->update();
 }
 
 FS::Coding::Tab::~Tab() noexcept {
+	toolBarWrite->remove<Tab>();
+
 	FluidumScene_Log_Destructor(::FS::Coding::Tab);
 }
 
@@ -42,6 +53,7 @@ void FS::Coding::Tab::call() {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, 0.0f));
 
+	ImGui::SetNextWindowSizeConstraints(style.windowMinSize, ImGui::GetWindowContentRegionMax());
 	ImGui::Begin(text.tab, &windowCloseFlag);
 	pos.center = ImGui::GetWindowPos() / 2.3f;
 
@@ -55,6 +67,7 @@ void FS::Coding::Tab::call() {
 
 
 	this->checkWindowShouldClose();
+
 }
 
 void FS::Coding::Tab::checkWindowShouldClose() {
@@ -69,20 +82,227 @@ void FS::Coding::Tab::setImGuiWindow() {
 	imguiWindowWrite->set(FU::Class::ClassCode::GetClassCode<Tab>(), ImGui::GetCurrentWindow());
 }
 
-void FS::Coding::Tab::update() {
-	if (!tabRead->update())
+void FS::Coding::Tab::toolBar() {
+
+	//dummy
+	if (info.files.empty()) {
+		this->toolBar_dummy();
 		return;
-	this->updateInfo();
+	}
+
+	//Hide border.
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+
+	//Save selected file.
+	this->toolBar_saveSelected();
+
+	ImGui::SameLine();
+
+	//Save all files.
+	this->toolBar_saveAll();
+
+	ImGui::PopStyleVar();
+
 }
 
-void FS::Coding::Tab::updateInfo() {
+void FS::Coding::Tab::toolBar_dummy() {
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextDisabled(ICON_MD_SAVE);
+	FU::ImGui::tooltip(anime.toolBar_saveSelected, text.tooltip_saveSelectedFile);
+
+	ImGui::SameLine();
+
+	const ImVec4 textCol = ImGui::GetStyleColorVec4(ImGuiCol_Text);
+
+	colorRead->pushButtonDisabled();
+
+	//Hide border.
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+
+	ImGui::Button(ICON_MD_SAVE);
+
+	//pushButtonDisabled -> ImGuiCol_Text == ImGuiCol_TextDisabled
+	ImGui::PushStyleColor(ImGuiCol_Text, textCol);
+	FU::ImGui::tooltip(anime.toolBar_saveAll, text.tooltip_saveAllFiles);
+	ImGui::PopStyleColor();
+
+	colorRead->popButtonDisabled();
+	ImGui::PopStyleVar();
+
+	const auto min = ImGui::GetItemRectMin();
+	const auto max = ImGui::GetItemRectMax();
+	const float val = ImGui::GetFontSize() * 0.17f;
+	const ImVec2 inner = ImGui::GetStyle().ItemInnerSpacing;
+	const auto col = ImGui::ColorConvertFloat4ToU32(ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+	ImGui::GetWindowDrawList()->AddLine(
+		{ max.x - val - 3.0f , min.y + val + 2.0f },
+		{ max.x - val - 3.0f , max.y - val },
+		col,
+		2.0f
+	);
+	ImGui::GetWindowDrawList()->AddLine(
+		{ min.x + val + inner.x, max.y - val },
+		{ max.x - val - 3.0f, max.y - val },
+		col,
+		2.0f
+	);
+
+}
+
+void FS::Coding::Tab::toolBar_saveSelected() {
+
+	ImGui::PushStyleColor(ImGuiCol_Text, colorRead->info());
+	const bool clicked = ImGui::Button(ICON_MD_SAVE);
+	ImGui::PopStyleColor();
+
+	FU::ImGui::tooltip(anime.toolBar_saveSelected, text.tooltip_saveSelectedFile);
+
+	if (!clicked)
+		return;
+
+	try {
+		const std::string& path = info.files.at(select.index).path;
+		const bool alreadySaved = tabRead->isTextSaved(path);
+		if (alreadySaved)
+			return;
+
+		tabWrite->saveText(path);
+	}
+	catch (...) {
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text.error_unexpected, pos.toolBar_saveSelected);
+	}
+}
+
+void FS::Coding::Tab::toolBar_saveAll() {
+	ImGui::PushStyleColor(ImGuiCol_Text, colorRead->info());
+	const bool clicked = ImGui::Button(ICON_MD_SAVE);
+	ImGui::PopStyleColor();
+	FU::ImGui::tooltip(anime.toolBar_saveAll, text.tooltip_saveAllFiles);
+
+	const auto min = ImGui::GetItemRectMin();
+	const auto max = ImGui::GetItemRectMax();
+	const float val = ImGui::GetFontSize() * 0.17f;
+	const ImVec2 inner = ImGui::GetStyle().ItemInnerSpacing;
+	ImGui::GetWindowDrawList()->AddLine(
+		{ max.x - val - 3.0f , min.y + val + 2.0f },
+		{ max.x - val - 3.0f , max.y - val },
+		IM_COL32_WHITE,
+		2.0f
+	);
+	ImGui::GetWindowDrawList()->AddLine(
+		{ min.x + val + inner.x, max.y - val },
+		{ max.x - val - 3.0f, max.y - val },
+		IM_COL32_WHITE,
+		2.0f
+	);
+
+	if (!clicked)
+		return;
+
+	try {
+		const bool alreadySaved = tabRead->isAllTextSaved();
+		if (alreadySaved)
+			return;
+
+		tabWrite->saveAllTexts();
+	}
+	catch (...) {
+		FluidumScene_Log_RequestAddScene(::FS::Utils::Message);
+		Scene::addScene<Utils::Message>(text.error_unexpected, pos.toolBar_saveAll);
+	}
+
+}
+
+void FS::Coding::Tab::update() {
+	if (tabRead->update_add())
+		this->updateInfo_add();
+
+	if (tabRead->update_remove())
+		this->updateInfo_remove();
+}
+
+void FS::Coding::Tab::updateInfo_add() {
+	std::vector<std::string> paths = tabRead->paths();
+	assert(!paths.empty());
+
+	const std::string addedPath = tabRead->lastPathAdded();
+	assert(!addedPath.empty());
+
+	std::string name = FU::File::fileName(addedPath);
+	const auto find = std::find_if(info.files.cbegin(), info.files.cend(), [&](auto& x)
+		{
+			return name <= x.name;
+		}
+	);
+
+	const Recent::Index index = static_cast<Recent::Index>(std::distance(info.files.cbegin(), find));
+
+	File fileInfo{
+		.path = addedPath,
+		.name = name,
+		.asterisk = false,
+	};
+
+	info.files.insert(find, std::move(fileInfo));
+
+	//update index
+	{
+		recent.sort(index);
+		recent.push(index);
+		select.index = index;
+	}
+
+	//change
+	displayWrite->focusedEditor(addedPath);
+
+	tabWrite->save();
+}
+
+void FS::Coding::Tab::updateInfo_remove() {
 	std::vector<std::string> paths = tabRead->paths();
 
-	info.files.resize(paths.size());
-	for (Size i = 0, size = paths.size(); i < size; i++) {
-		std::string name = FU::File::fileName(paths[i]);
-		info.files[i] = { std::move(paths[i]),  std::move(name) };
+	if (paths.empty()) {
+		info.files.clear();
+		info.files.shrink_to_fit();
+		select.index = 0;
+		tabWrite->save();
+		return;
 	}
+
+	const std::string removedPath = tabRead->lastPathRemoved();
+	assert(!removedPath.empty());
+
+	const auto find = std::find_if(info.files.cbegin(), info.files.cend(), [&](auto& x)
+		{
+			return removedPath == x.path;
+		}
+	);
+	assert(find != info.files.cend());
+	if (find == info.files.cend()) {
+		FluidumData_Log_Internal_InternalError();
+		std::terminate();
+	}
+
+	const Recent::Index index = static_cast<Recent::Index>(std::distance(info.files.cbegin(), find));
+
+	info.files.erase(find);
+
+	//update index
+	{
+		recent.erase(index);
+		assert(!recent.empty());
+		select.index = recent.back();
+	}
+
+	//display
+	{
+		const std::string& path = info.files.at(select.index).path;
+		displayWrite->add(path);
+		displayWrite->focusedEditor(path);
+	}
+
+	tabWrite->save();
 }
 
 void FS::Coding::Tab::updateTextSaved() {
@@ -110,25 +330,25 @@ void FS::Coding::Tab::fileList() {
 
 	ImGui::Spacing();
 
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.3f,0.4f,0.9f,0.4f });
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, { 0.3f,0.4f,0.9f,0.4f });
 
 	for (UIF16 i = 0; auto & x : info.files) {
 		if (i == select.index) {
-			ImGui::PushStyleColor(ImGuiCol_Button, { 0.2f,0.3f,0.9f,0.5f });
+			ImGui::PushStyleColor(ImGuiCol_Header, { 0.2f,0.3f,0.9f,0.5f });
 
-			if (ImGui::Button(x.name.c_str(), size)) {
+			if (ImGui::Selectable(x.name.c_str(), ImGuiSelectableFlags_SpanAvailWidth)) {
 				pos.clicked = FU::ImGui::messagePos();
 				select.index = i;
+				recent.push(i);
 				this->display();
 			}
 			ImGui::PopStyleColor();
 		}
 		else {
 			if (i == select.hovered)
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.2f,0.4f,0.8f,0.5f });
+				ImGui::PushStyleColor(ImGuiCol_HeaderHovered, { 0.2f,0.4f,0.8f,0.5f });
 
-			if (ImGui::Button(x.name.c_str(), size)) {
-				select.index = i;
+			if (ImGui::Selectable(x.name.c_str(), ImGuiSelectableFlags_SpanAvailWidth)) {
 				this->display();
 			}
 
@@ -340,17 +560,20 @@ void FS::Coding::Tab::closeButton() {
 	if (!ImGui::IsItemHovered())
 		return;
 
-	ImGui::SameLine();
-
 	const auto min = ImGui::GetItemRectMin();
 	const auto max = ImGui::GetItemRectMax();
 
-	constexpr ImU32 hoveredCol = FU::ImGui::ConvertImVec4ToImU32(0.8f, 0.2f, 0.2f, 0.6f);
-	const ImVec2 pos = { max.x - ImGui::GetFontSize() - 3.0f,min.y };
+	constexpr ImU32 crossCol = FU::ImGui::ConvertImVec4ToImU32(1.0f, 0.3f, 0.3f, 1.0f);
+	const ImVec2 pos =
+	{
+		max.x - ImGui::GetFontSize() - 3.0f,
+		min.y + (((max.y - min.y) - ImGui::GetFontSize()) / 2.0f)
+	};
 	const ImVec2 pos2 = pos + ImGui::CalcTextSize(ICON_MD_CLOSE);
 
 	if (ImGui::IsMouseHoveringRect(pos, pos2)) {
-		ImGui::GetWindowDrawList()->AddText(pos, hoveredCol, ICON_MD_CLOSE);
+
+		ImGui::GetWindowDrawList()->AddText(pos, crossCol, ICON_MD_CLOSE);
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 			this->close();
 	}
@@ -363,9 +586,10 @@ void FS::Coding::Tab::close() {
 	auto& current = info.files.at(select.index);
 	if (tabRead->isTextSaved(current.path)) {
 		tabWrite->remove(current.path);
-		tabWrite->save();
 		return;
 	}
+
+	//Not saved.
 
 	const auto button = FU::MB::button_button_cancel(FU::MB::Icon::Warning, text.popup_save, text.popup_saveAndClose, text.popup_withoutSaving, text.popup_cancel);
 	if (button == 0) {//save close
@@ -382,7 +606,6 @@ void FS::Coding::Tab::close() {
 		return;
 	}
 
-	tabWrite->save();
 }
 
 //if mouse right button clicked 

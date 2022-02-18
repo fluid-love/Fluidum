@@ -162,7 +162,7 @@ FD::ProjectWrite::ProjectWrite(Internal::PassKey) noexcept {
 			if (!success)
 				throw - 1;
 		}
-		
+
 		//remove previous temp project.
 		//create new temp project.
 		std::filesystem::remove_all(Internal::Resource::TempProjectFolderPath);
@@ -220,7 +220,6 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 		assert(FU::File::isAbsolute(GCurrentData.projectDirectoryPath));
 
 		GCurrentData.projectName = info.projectName;
-		GCurrentData.projectFilePath = GCurrentData.projectDirectoryPath + GCurrentData.projectName + ".fproj";
 
 		//check
 		FU::File::tryPushSlash(GCurrentData.projectDirectoryPath);
@@ -230,6 +229,7 @@ void FD::ProjectWrite::createNewProject(const CreateInfo& info) {
 			throw Exception::NotFoundDirectory;
 
 		GCurrentData.projectDirectoryPath += (GCurrentData.projectName + '/');
+		GCurrentData.projectFilePath = GCurrentData.projectDirectoryPath + GCurrentData.projectName + ".fproj";
 
 		{
 			std::string path = GCurrentData.projectDirectoryPath;
@@ -352,24 +352,15 @@ void FD::ProjectWrite::loadProject(const std::string& path) {
 		throw Exception::Unexpected;
 	}
 
-	std::ifstream ifs(path, std::ios::in | std::ios::binary);
-	if (!ifs) {
-		throw Exception::FailedToOpenProjectFile;
-	}
-
 	//thread
 	this->requestStop(); //save old data.
 	while (!this->joinable()) { ; }
 
 	try {
-		UI64 identifier = 0;
-		ifs.read(reinterpret_cast<char*>(&identifier), 8);//identifier
-
-		this->readProjectInfo(ifs);
+		this->readProjectInfo(path);
 		this->checkIsProjectFolderExist();
 
 		//Project
-		this->read_fluidumFiles();
 		this->read_projectFiles();
 		this->read_userFiles();
 
@@ -576,7 +567,7 @@ void FD::ProjectWrite::save_scene() {
 
 		//If we do not need to save the file, do not copy it.
 		//std::filesystem_copy_file is slow.
-		if (!copy)
+		if (!copy && !::FD::Scene::Internal::Data::erase)
 			return;
 
 		ofs << Project::Internal::Name::Delimiter << std::endl;
@@ -1044,7 +1035,7 @@ void FD::ProjectWrite::updateHistory() {
 
 	//already locked
 
-	const std::string currentProjectFilePath = GCurrentData.projectFilePath + GCurrentData.projectName + ".fproj";
+	const std::string currentProjectFilePath = GCurrentData.projectFilePath;
 
 	bool empty = false;
 
@@ -1085,7 +1076,7 @@ void FD::ProjectWrite::updateHistory() {
 			info.projectName = val.at("Name").get_string();
 			info.ymd_h = val.at("Date").get_string();
 
-			if (!newProject && info.projectFilePath == currentProjectFilePath) {
+			if (info.projectFilePath == currentProjectFilePath) {
 				newProject = false;
 				oldProjectItr = temp.begin() + index;
 			}
@@ -1147,17 +1138,15 @@ void FD::ProjectWrite::updateHistory() {
 
 }
 
-void FD::ProjectWrite::readProjectInfo(std::ifstream& ifs) const {
+void FD::ProjectWrite::readProjectInfo(const std::string& path) const {
 	using namespace Project::Internal;
 	namespace json = boost::json;
 
 	json::value val{};
 	try {
-		val = makeJsonValue(GCurrentData.projectDirectoryPath + Name::Project_Layout);
+		val = makeJsonValue(path);
 	}
-	catch (const Exception v) {
-		if (v == Exception::FileEmpty)
-			return;
+	catch (const Exception) {
 		FU::Exception::rethrow();
 	}
 
@@ -1188,7 +1177,7 @@ FD::Project::FileList::FileInfo FD::ProjectWrite::readFiles_element(const boost:
 	return info;
 }
 
-void FD::ProjectWrite::read_files_recursive(const bool top, std::vector< FD::Project::Internal::FileList::Ref>* data, const boost::json::value& val, Project::FileList::FileInfo* parent) const {
+void FD::ProjectWrite::read_files_recursive(const bool project, const bool top, std::vector< FD::Project::Internal::FileList::Ref>* data, const boost::json::value& val, Project::FileList::FileInfo* parent) const {
 	namespace json = boost::json;
 
 	if (val.kind() != json::kind::object) {
@@ -1205,7 +1194,15 @@ void FD::ProjectWrite::read_files_recursive(const bool top, std::vector< FD::Pro
 			FD::Project::FileList::FileInfo info = this->readFiles_element(itr->value());
 			info.path = itr->key();
 			data->emplace_back(std::move(info));
-			this->read_files_recursive(false, nullptr, itr->value(), &data->back());
+
+			//make ptr
+			{
+				const auto& back = data->back();
+				Project::Internal::FileList& fileList = project ? Project::Internal::ProjectFilesData::projectFiles : Project::Internal::UserFilesData::userFiles;
+				fileList.changeType(back.path, back.type);
+			}
+
+			this->read_files_recursive(project, false, nullptr, itr->value(), &data->back());
 		}
 	}
 	else {
@@ -1216,29 +1213,19 @@ void FD::ProjectWrite::read_files_recursive(const bool top, std::vector< FD::Pro
 			FD::Project::FileList::FileInfo info = this->readFiles_element(itr->value());
 			info.path = itr->key();
 			parent->dir_internal.emplace_back(std::move(info));
-			this->read_files_recursive(false, nullptr, itr->value(), &parent->dir_internal.back());
+			
+			//make ptr
+			{
+				const auto& back = parent->dir_internal.back();
+				Project::Internal::FileList& fileList = project ? Project::Internal::ProjectFilesData::projectFiles : Project::Internal::UserFilesData::userFiles;
+				fileList.changeType(back.path, back.type);
+			}
+
+			this->read_files_recursive(project, false, nullptr, itr->value(), &parent->dir_internal.back());
 		}
 	}
 
 
-}
-
-void FD::ProjectWrite::read_fluidumFiles() const {
-	//using namespace Project::Internal;
-
-	//std::ifstream ifs(GCurrentData.projectDirectoryPath + Name::Project_FluidumFiles);
-	//if (!ifs)
-	//	throw Exception::NotFoundProjectFiles;
-
-	//if (FU::File::empty(ifs))
-	//	return;
-
-	//std::string buf{};
-
-	////MainCodeFilePath
-	//std::getline(ifs, buf);
-
-	//FluidumFilesData::mainCodeFilePath = buf;
 }
 
 void FD::ProjectWrite::read_projectFiles() const {
@@ -1261,7 +1248,7 @@ void FD::ProjectWrite::read_projectFiles() const {
 	if (!val.is_object())
 		throw Exception::Unexpected;
 
-	this->read_files_recursive(true, data, val, nullptr);
+	this->read_files_recursive(true, true, data, val, nullptr);
 }
 
 void FD::ProjectWrite::read_userFiles() const {
@@ -1283,7 +1270,7 @@ void FD::ProjectWrite::read_userFiles() const {
 
 	const json::object& obj = val.get_object();
 
-	this->read_files_recursive(true, data, val, nullptr);
+	this->read_files_recursive(false, true, data, val, nullptr);
 }
 
 void FD::ProjectWrite::read_layout() const {

@@ -64,19 +64,15 @@ void FS::Layout::call() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
 	ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, ImVec4(0.007f, 0.000f, 0.000f, 1.000f));
-	ImGui::PushStyleColor(ImGuiCol_ResizeGripActive, ImVec4());
-	ImGui::PushStyleColor(ImGuiCol_ResizeGrip, ImVec4());
-	ImGui::PushStyleColor(ImGuiCol_ResizeGripHovered, ImVec4());
 	ImGui::PushStyleColor(ImGuiCol_SeparatorActive, ImVec4());
 
 	this->updateLayout();
 	this->dockGui();
 
 	ImGui::PopStyleVar(3);
-	ImGui::PopStyleColor(5);
+	ImGui::PopStyleColor(2);
 
 	this->popup();
-	this->save_resize();
 	this->drawSeparators();
 
 }
@@ -87,7 +83,7 @@ void FS::Layout::updateLayout() {
 	const std::pair<bool, bool> resized =
 	{
 		static_cast<I32>(guiRead->windowSize().x) != static_cast<I32>(layoutRead->mainFrameRight()) ,
-		static_cast<I32>(guiRead->windowSize().y) != static_cast<I32>(layoutRead->mainFrameBottom())
+		static_cast<I32>(guiRead->windowSize().y) != static_cast<I32>(layoutRead->mainFrameBottom() + guiRead->statusBarHeight())
 	};
 
 	if (!resized.first && !resized.second)
@@ -96,7 +92,7 @@ void FS::Layout::updateLayout() {
 	if (resized.first) //width
 		layoutWrite->resizeMainFrameRight(guiRead->windowSize().x);
 	else               //height
-		layoutWrite->resizeMainFrameBottom(guiRead->windowSize().y);
+		layoutWrite->resizeMainFrameBottom(guiRead->windowSize().y - guiRead->statusBarHeight());
 	this->updateWindows();
 }
 
@@ -367,23 +363,6 @@ void FS::Layout::merge() {
 	this->updateWindows();
 }
 
-void FS::Layout::save_resize() {
-	//if (!flag.mouseDown)
-	//	return;
-
-	//if (select.resizeBorder == FD::Layout::ResizedBorder::None)
-	//	return;
-
-	//if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
-	//	return;
-
-	//layoutWrite->resize(windows[select.resizedWindowIndex], select.resizeBorder);
-	//layoutWrite->save();
-
-	//select.resizeBorder = FD::Layout::ResizedBorder::None;
-	//flag.mouseDown = false;
-}
-
 void FS::Layout::updateWindows() {
 	select.current = nullptr;
 	select.hovered = nullptr;
@@ -439,8 +418,10 @@ void FS::Layout::hoveredSeparator() {
 				continue;
 			}
 			else {
-				if (!flag.mouseDown)
+				if (!flag.mouseDown) {
+					layoutWrite->save();
 					select.down = nullptr;
+				}
 			}
 		}
 

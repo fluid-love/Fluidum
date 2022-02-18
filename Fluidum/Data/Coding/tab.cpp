@@ -1,9 +1,15 @@
 #include "tab.h"
 
 namespace FD::Coding::Internal {
-	bool Update = false;
+
+	bool Update_add = false;
+	bool Update_remove = false;
+
+
 	bool Update_textSaved = false;
 	bool DisplayFileChanged = false;
+
+	std::string LastPathRemoved{};
 
 	struct EditorInfo final {
 		FTE::TextEditor editor{};
@@ -13,6 +19,7 @@ namespace FD::Coding::Internal {
 	EditorInfo* FocusedEditor = nullptr;
 
 	std::map<std::string, std::unique_ptr<EditorInfo>> GData;
+
 }
 
 void FD::Coding::Internal::Data::ProjectWrite::initializeInternalData() {
@@ -45,7 +52,7 @@ void FD::Coding::TabWrite::add(const std::string& path) {
 
 	Data::filePaths.emplace_back(path);
 
-	this->update();
+	Update_add = true;
 }
 
 void FD::Coding::TabWrite::remove(const std::string& path) {
@@ -55,12 +62,16 @@ void FD::Coding::TabWrite::remove(const std::string& path) {
 		auto itr = std::find(Data::filePaths.begin(), Data::filePaths.end(), path);
 		if (itr == Data::filePaths.end())
 			throw Exception::NotFound;
+		LastPathRemoved = *itr;
 		Data::filePaths.erase(itr);
 	}
 	{
 		auto itr = GData.find(path);
-		if (itr != GData.end())
+		if (itr != GData.end()) {
+			if (FocusedEditor == itr->second.get())
+				FocusedEditor = nullptr;
 			GData.erase(itr);
+		}
 	}
 	{
 		auto itr = std::find_if(Data::displayInfo.begin(), Data::displayInfo.end(),
@@ -70,7 +81,8 @@ void FD::Coding::TabWrite::remove(const std::string& path) {
 			Data::displayInfo.erase(itr);
 	}
 
-	this->update();
+	Update_remove = true;
+	DisplayFileChanged = true;
 }
 
 void FD::Coding::TabWrite::clear() {
@@ -81,7 +93,7 @@ void FD::Coding::TabWrite::clear() {
 	Data::filePaths.clear();
 	GData.clear();
 
-	this->update();
+	Update_remove = true;;
 }
 
 FTE::TextEditor* FD::Coding::TabWrite::getEditor(const std::string& path) const {
@@ -95,12 +107,7 @@ FTE::TextEditor* FD::Coding::TabWrite::getEditor(const std::string& path) const 
 	return &itr->second.get()->editor;
 }
 
-void FD::Coding::TabWrite::update() {
-	using namespace Internal;
-	Update = true;
-}
-
-void FD::Coding::TabWrite::save() {
+void FD::Coding::TabWrite::save() noexcept {
 	using namespace Internal;
 	Data::save.store(true);
 }
@@ -170,12 +177,22 @@ void FD::Coding::TabWrite::saveAllTexts() {
 	Update_textSaved = true;
 }
 
-bool FD::Coding::TabRead::update() const {
+bool FD::Coding::TabRead::update_add() const {
 	using namespace Internal;
 	std::lock_guard<std::mutex> lock(Data::mtx);
-	bool result = Update;
+	bool result = Update_add;
 	if (result) {
-		Update = false;
+		Update_add = false;
+	}
+	return result;
+}
+
+bool FD::Coding::TabRead::update_remove() const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	bool result = Update_remove;
+	if (result) {
+		Update_remove = false;
 	}
 	return result;
 }
@@ -184,6 +201,18 @@ std::vector<std::string> FD::Coding::TabRead::paths() const {
 	using namespace Internal;
 	std::lock_guard<std::mutex> lock(Data::mtx);
 	return Data::filePaths;
+}
+
+std::string FD::Coding::TabRead::lastPathAdded() const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	return Data::filePaths.empty() ? std::string{} : Data::filePaths.back();
+}
+
+std::string FD::Coding::TabRead::lastPathRemoved() const {
+	using namespace Internal;
+	std::lock_guard<std::mutex> lock(Data::mtx);
+	return LastPathRemoved;
 }
 
 bool FD::Coding::TabRead::isTextSaved(const std::string& path) const {
@@ -331,6 +360,8 @@ void FD::Coding::DisplayWrite::focusedEditor(const std::string& path) {
 		throw Exception::NotFound;
 
 	FocusedEditor = GData.at(path).get();
+
+	DisplayFileChanged = true;
 }
 
 std::vector<std::string> FD::Coding::DisplayRead::paths() const {

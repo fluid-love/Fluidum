@@ -5,6 +5,8 @@
 
 #include "../../../External/magic_enum/include/magic_enum.hpp"
 
+#include "Texts/taskmanager.h"
+
 namespace FD::Text::Internal {
 
 	using Language = ::FD::Text::Language;
@@ -40,6 +42,7 @@ namespace FD::Text::Internal {
 		Title,
 		TitleBar,
 		TopBar,
+		TaskManager
 	};
 
 	template<Type T>
@@ -127,6 +130,9 @@ namespace FD::Text::Internal {
 		}
 		else if constexpr (T == TitleBar) {
 			path += "TitleBar";
+		}
+		else if constexpr (T == TaskManager) {
+			path += "TaskManager";
 		}
 		else {
 			static_assert(FU::Concept::DelayAssert_N<T>);
@@ -1077,6 +1083,12 @@ FD::Text::Internal::CodingTab::CodingTab() {
 	this->tab = data;
 
 	std::getline(ifs, data);
+	this->tooltip_saveSelectedFile = data;
+
+	std::getline(ifs, data);
+	this->tooltip_saveAllFiles = data;
+
+	std::getline(ifs, data);
 	this->popup_save = data;
 
 	std::getline(ifs, data);
@@ -1355,10 +1367,34 @@ FD::Text::Internal::ProjectProperty::ProjectProperty() {
 	std::getline(ifs, data);
 	this->bottom_save = data;
 
-
 }
 
+FD::Text::Internal::TaskManager::TaskManager() {
+	std::ifstream ifs{};
 
+	ifs = std::ifstream(makePath<Type::TaskManager>(Getter::get()), std::ios::in);
+
+	if (!ifs)
+		throw std::runtime_error("Failed to open TaskManager.");
+
+	std::string data = "";
+
+	std::getline(ifs, data);
+	this->taskManager = data;
+	
+	std::getline(ifs, data);
+	this->cpuLoad = data;
+
+	std::getline(ifs, data);
+	this->numOfPhysicalProcessor = data;
+
+	std::getline(ifs, data);
+	this->numOfLogicalProcessor = data;
+
+	std::getline(ifs, data);
+	this->cpuArchitecture = data;
+
+}
 
 
 
