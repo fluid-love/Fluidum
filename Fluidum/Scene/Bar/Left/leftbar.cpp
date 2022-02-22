@@ -208,6 +208,10 @@ void FS::LeftBar::addAnimationScene() {
 }
 
 void FS::LeftBar::addGenomeScene() {
+	//set image
+	const std::string path = Resource::LeftBarIconsFilePath;
+	sub.genomeImages.emplace_back(FDR::createImGuiImage((path + "generation.png").c_str()));
+
 	FluidumScene_Log_RequestAddScene(::FS::Genome::Overview);
 	Scene::addScene<::FS::Genome::Overview>();
 }
@@ -233,6 +237,7 @@ void FS::LeftBar::deleteScene(const ClassCode::CodeType code) {
 	else if (code == Internal::MainScenes[3]) {
 		FluidumScene_Log_RequestDeleteScene(::FS::Genome::Overview);
 		Scene::deleteScene<Genome::Overview>();
+		sub.genomeImages.clear();
 	}
 	else if (code == Internal::MainScenes[4]) {
 		FluidumScene_Log_RequestDeleteScene(::FS::Animation);
@@ -300,6 +305,9 @@ void FS::LeftBar::subWindow() {
 	}
 	else if (sub.current == SceneIndex::AnalysisOverview) {
 		this->subWindowAnalysis();
+	}
+	else if (sub.current == SceneIndex::Genome) {
+		this->subWindowGenome();
 	}
 
 	this->subWindowHelpSetting();
@@ -372,6 +380,35 @@ void FS::LeftBar::subWindowAnalysis() {
 	}
 }
 
+void FS::LeftBar::subWindowGenome() {
+	constexpr std::array<ClassCode::CodeType, 1> scenes = {
+		ClassCode::GetClassCode<Genome::Generation>(),
+	};
+
+	for (Size i = 0; i < std::tuple_size_v<decltype(scenes)>; i++) {
+
+		if (sceneRead->exist(scenes[i])) {
+			ImGui::ImageButton(sub.genomeImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.sub);
+
+			const ImVec2 pos1 = ImGui::GetItemRectMin();
+			const ImVec2 pos2 = ImGui::GetItemRectMax();
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pos1, pos2, false)) {
+				this->deleteGenomeSubScene(scenes[i]);
+			}
+		}
+		else {
+			ImGui::ImageButton(sub.genomeImages[i], style.imageSize, ImVec2(), ImVec2(1.0f, 1.0f), 2, color.dummy);
+
+			const ImVec2 pos1 = ImGui::GetItemRectMin();
+			const ImVec2 pos2 = ImGui::GetItemRectMax();
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsMouseHoveringRect(pos1, pos2, false)) {
+				this->addGenomeSubScene(scenes[i]);
+			}
+
+		}
+	}
+}
+
 void FS::LeftBar::addCodingSubScene(const ClassCode::CodeType code) {
 	if (code == ClassCode::GetClassCode<Coding::Tab>()) {
 		FluidumScene_Log_RequestAddScene(::FS::Coding::Tab);
@@ -382,7 +419,7 @@ void FS::LeftBar::addCodingSubScene(const ClassCode::CodeType code) {
 		Scene::addScene<Coding::Debug>();
 	}
 	else {
-		FluidumScene_Log_InternalWarning();
+		FluidumScene_Log_InternalError();
 		std::terminate();
 	}
 }
@@ -397,10 +434,21 @@ void FS::LeftBar::addAnalysisSubScene(const ClassCode::CodeType code) {
 		Scene::addScene<Analysis::Plot>();
 	}
 	else {
-		FluidumScene_Log_InternalWarning();
+		FluidumScene_Log_InternalError();
 		std::terminate();
 	}
 
+}
+
+void FS::LeftBar::addGenomeSubScene(const ClassCode::CodeType code) {
+	if (code == ClassCode::GetClassCode<Genome::Generation>()) {
+		FluidumScene_Log_RequestAddScene(::FS::Genome::Generation);
+		Scene::addScene<Genome::Generation>();
+	}
+	else {
+		FluidumScene_Log_InternalError();
+		std::terminate();
+	}
 }
 
 void FS::LeftBar::deleteCodingSubScene(const ClassCode::CodeType code) {
@@ -409,7 +457,7 @@ void FS::LeftBar::deleteCodingSubScene(const ClassCode::CodeType code) {
 		Scene::deleteScene<Coding::Tab>();
 	}
 	else {
-		FluidumScene_Log_InternalWarning();
+		FluidumScene_Log_InternalError();
 		std::terminate();
 	}
 }
@@ -424,7 +472,18 @@ void FS::LeftBar::deleteAnalysisSubScene(const ClassCode::CodeType code) {
 		Scene::deleteScene<Analysis::Plot>();
 	}
 	else {
-		FluidumScene_Log_InternalWarning();
+		FluidumScene_Log_InternalError();
+		std::terminate();
+	}
+}
+
+void FS::LeftBar::deleteGenomeSubScene(const ClassCode::CodeType code) {
+	if (code == ClassCode::GetClassCode<Genome::Generation>()) {
+		FluidumScene_Log_RequestDeleteScene(::FS::Genome::Generation);
+		Scene::deleteScene<Genome::Generation>();
+	}
+	else {
+		FluidumScene_Log_InternalError();
 		std::terminate();
 	}
 }

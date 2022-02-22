@@ -63,13 +63,14 @@ namespace FS {
 			ImVec4 analysis = { 0.2f, 0.2f, 0.02f, 0.9f };
 		}color;
 
-		enum class SceneIndex : uint8_t {
+		enum class SceneIndex : UIF8 {
 			None = 0,
 			Coding = 1,
 			AnalysisOverview = 3,
+			Genome = 4
 		};
 
-		struct SubWindow final {
+		struct {
 			bool isIconHovered = false;
 			bool isSubWindowHovered = false;
 			ImVec2 selectWindowPos = ImVec2();
@@ -78,6 +79,7 @@ namespace FS {
 
 			std::vector<FDR::ImGuiImage> codingImages{};
 			std::vector<FDR::ImGuiImage> analysisImages{};
+			std::vector<FDR::ImGuiImage> genomeImages{};
 
 		}sub;
 
@@ -107,12 +109,15 @@ namespace FS {
 
 		void subWindowCoding();
 		void subWindowAnalysis();
+		void subWindowGenome();
 
 		void addCodingSubScene(const ClassCode::CodeType code);
 		void addAnalysisSubScene(const ClassCode::CodeType code);
+		void addGenomeSubScene(const ClassCode::CodeType code);
 
 		void deleteCodingSubScene(const ClassCode::CodeType code);
 		void deleteAnalysisSubScene(const ClassCode::CodeType code);
+		void deleteGenomeSubScene(const ClassCode::CodeType code);
 
 	private:
 		void subWindowHelpSetting();
@@ -122,7 +127,7 @@ namespace FS {
 
 	private:
 		void mini();
-		void clickedMiniIcons(const ClassCode::CodeType code,const bool exists);
+		void clickedMiniIcons(const ClassCode::CodeType code, const bool exists);
 		void taskManagerScene(const bool exists);
 
 	};

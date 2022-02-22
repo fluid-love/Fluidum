@@ -4,24 +4,23 @@
 
 namespace FS::Genome {
 
-	class Overview final : public Scene {
+	class Generation final : public Scene {
 	public:
-		explicit Overview();
+		explicit Generation();
 		void Constructor();
 
-		~Overview() noexcept;
+		~Generation() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Overview);
+		FluidumUtils_Class_Delete_CopyMove(Generation);
 
 	public:
 		virtual void call() override;
 
 	private:
 
+	private:
+		void table();
 
-	private:
-	
-	private:
 
 	};
 }

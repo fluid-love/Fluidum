@@ -186,6 +186,7 @@
     <ClInclude Include="Fluidum\Fluidum\Scene\File\select.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\File\shared_info.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Flu\Node\node.h" />
+    <ClInclude Include="Fluidum\Fluidum\Scene\Genome\Generation\generation.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Genome\Overview\overview.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Layout\layout.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\Misc\window_resize.h" />
@@ -354,6 +355,7 @@
     <ClCompile Include="Fluidum\Fluidum\Scene\File\new.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\File\select.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Flu\Node\node.cpp" />
+    <ClCompile Include="Fluidum\Fluidum\Scene\Genome\Generation\generation.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Genome\Overview\overview.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Layout\layout.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Misc\window_resize.cpp" />

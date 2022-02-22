@@ -11,6 +11,7 @@
 #include "../../Analysis/Plot/plot.h"
 
 #include "../../Genome/Overview/overview.h"
+#include "../../Genome/Generation/generation.h"
 
 #include "../../Animation/Animation/animation.h"
 

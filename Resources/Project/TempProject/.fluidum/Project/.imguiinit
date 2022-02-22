@@ -3,6 +3,19 @@ Pos=60,60
 Size=400,400
 Collapsed=0
 
+[Window][SubWinow]
+Pos=50,362
+Size=51,47
+Collapsed=0
+
+[Window][エクスプローラー]
+Pos=1388,71
+Size=530,1098
+Collapsed=0
+DockId=0xCA5BE464,0
+
 [Docking][Data]
-DockSpace ID=0xB3CA9461 Window=0x51F3BBEB Pos=58,70 Size=1859,1097 CentralNode=1
+DockSpace ID=0x62BAAF43 Window=0x26F48B7D Pos=911,71 Size=474,1098 CentralNode=1
+DockSpace ID=0xB3CA9461 Window=0x51F3BBEB Pos=59,71 Size=849,1098 CentralNode=1
+DockSpace ID=0xCA5BE464 Window=0xBFFDDAC7 Pos=1388,71 Size=530,1098 CentralNode=1 Selected=0x2F72D7A0
 

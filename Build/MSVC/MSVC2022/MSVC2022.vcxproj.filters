@@ -212,6 +212,7 @@
     <ClInclude Include="Fluidum\Fluidum\Scene\Bar\Menu\Info\info.h" />
     <ClInclude Include="Fluidum\Fluidum\Scene\System\TaskManager\taskmanager.h" />
     <ClInclude Include="Fluidum\Fluidum\Data\Gui\Texts\taskmanager.h" />
+    <ClInclude Include="Fluidum\Fluidum\Scene\Genome\Generation\generation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fluidum\Fluidum\Data\Calc\Array\array.cpp" />
@@ -364,5 +365,6 @@
     <ClCompile Include="Fluidum\Internal\LuAssist\Utils\table.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\Bar\Menu\Info\info.cpp" />
     <ClCompile Include="Fluidum\Fluidum\Scene\System\TaskManager\taskmanager.cpp" />
+    <ClCompile Include="Fluidum\Fluidum\Scene\Genome\Generation\generation.cpp" />
   </ItemGroup>
 </Project>

@@ -308,8 +308,8 @@ void FS::System::TaskManager::cpu_info() {
 	ImGui::EndTable();
 }
 
-void FS::System::TaskManager::gpu()
-{
+void FS::System::TaskManager::gpu() {
+
 }
 
 void FS::System::TaskManager::memory() {

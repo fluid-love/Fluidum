@@ -166,6 +166,13 @@ void FS::Console::push() {
 		inputText.reserve(inputText.max_size());
 	else
 		inputText.reserve(FD::Console::Limits::Characters);
+
+	consoleWrite->busy(true);
+	for (Size i = 452; i < 589; i++) {
+
+		consoleWrite->push(std::string("Generation:{}. Fitness:{}."), i, (float)(double)i*100  / (double)i + 2 * 2 * (double)i * i + 1 / 2.5f);
+
+	}
 }
 
 void FS::Console::popupTitle() {
