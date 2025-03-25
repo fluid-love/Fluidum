@@ -15,7 +15,7 @@ namespace FS::Utils {
 
 		~Message() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Message)
+		FluidumUtils_Class_Delete_CopyMove(Message);
 
 	public:
 		virtual void call() override;
@@ -24,8 +24,11 @@ namespace FS::Utils {
 		const FU::GuiText::Text message;
 		const ImVec2 pos;
 		const ImVec4 bgColor;
+		const ImVec2 size;
 
 	private:
 		ImCounter<ImAnimeTime> counter{};
+
 	};
+
 }

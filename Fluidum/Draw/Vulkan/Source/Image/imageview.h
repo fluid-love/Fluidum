@@ -34,22 +34,51 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		explicit ImageView(ManagerPassKey, const Data::ImageViewData& data, Parameter& parameter);
+
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//strong		
 		explicit ImageView(ManagerPassKey, const Data::ImageViewSwapchainData& data, const SwapchainParameter& parameter);
 
-		~ImageView() = default;
-		FluidumUtils_Class_Default_CopyMove(ImageView)
+		~ImageView() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(ImageView);
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::ImageViewData& data, Parameter& parameter);
+
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::ImageViewSwapchainData& data, const SwapchainParameter& parameter);
 
 	public:
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		//no-throw
 		const Data::ImageViewInfo& get() const noexcept;
-		void destroy();
 
 	private:
-		Data::ImageViewInfo info = {};
+		Data::ImageViewInfo info{};
 
 	};
+
 }

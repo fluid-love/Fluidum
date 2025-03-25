@@ -2,12 +2,12 @@
 #include "delete.h"
 
 FS::Utils::DeleteAllScenes::DeleteAllScenes() {
-	FluidumScene_Log_Constructor("Utils::DeleteAllScenes");
+	FluidumScene_Log_Constructor(::FS::Utils::DeleteAllScenes);
 	this->deleteAll();
 }
 
 FS::Utils::DeleteAllScenes::~DeleteAllScenes() noexcept {
-	FluidumScene_Log_Destructor_("Utils::DeleteAllScenes")
+	FluidumScene_Log_Destructor(::FS::Utils::DeleteAllScenes);
 }
 
 void FS::Utils::DeleteAllScenes::call() {
@@ -15,14 +15,7 @@ void FS::Utils::DeleteAllScenes::call() {
 }
 
 void FS::Utils::DeleteAllScenes::deleteAll() {
-	FluidumScene_Log_CallSceneConstructor(
-		"Utils::DeleteScenes<TextEditor,"\
-		"Flu::Node,"\
-		"Analysis::Overview,"\
-		"Genome::Overview,"\
-		"Animation,"\
-		"Project,"\
-		"Console>");
+	GLog.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Call constructor ::FS::Utils::DeleteScenes<::FS::TextEditor,::FS::Flu::Node,::FS::Analysis::Overview,::FS::Genome::Overview,::FS::Animation,::FS::Project::Explorer,::FS::Console>.");
 
 	Scene::callConstructor<DeleteScenes<
 		TextEditor,
@@ -30,7 +23,7 @@ void FS::Utils::DeleteAllScenes::deleteAll() {
 		Analysis::Overview,
 		Genome::Overview,
 		Animation,
-		Project,
+		Project::Explorer,
 		Console
 		>>();
 }

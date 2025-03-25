@@ -1,12 +1,18 @@
 #pragma once
 
-#include <stdint.h>
+#include "../Type/type.h"
 
 namespace FU::Cursor {
 
-	enum class Type : uint8_t {
+	enum class Type : UIF8 {
 		Wait,
-		Arrow
+		Arrow,
+		Hand,
+		SizeWE,
+		SizeNS,
+		SizeNESW,
+		SizeNWSE,
+		SizeAll,
 	};
 
 	void setCursorType(const Type type);

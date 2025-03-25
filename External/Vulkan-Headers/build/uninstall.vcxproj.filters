@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Fluidum\Libraries\Vulkan-Headers\build\CMakeFiles\4a3d4a89f50e714d2ec2f10fad9fb660\uninstall.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Fluidum\Libraries\Vulkan-Headers\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Fluidum\Libraries\Vulkan-Headers\build\CMakeFiles\uninstall" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{29838396-3522-37C7-B70E-0C57AACEEE31}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

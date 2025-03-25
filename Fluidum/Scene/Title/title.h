@@ -11,19 +11,23 @@ namespace FS {
 			const FD::ProjectRead* const projectRead,
 			const FD::SceneRead* const sceneRead,
 			FD::GuiWrite* const guiWrite,
-			const FD::GuiRead* const guiRead
+			const FD::GuiRead* const guiRead,
+			const FD::Style::VarRead* const varRead,
+			FD::Style::ThemeWrite* const themeWrite
 		);
 		void Constructor(
 			FD::ProjectWrite,
 			FD::ProjectRead,
 			FD::SceneRead,
 			FD::GuiWrite,
-			FD::GuiRead
+			FD::GuiRead,
+			FD::Style::VarRead,
+			FD::Style::ThemeWrite
 		);
 
 		~Title() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(Title)
+		FluidumUtils_Class_Delete_CopyMove(Title);
 
 	public:
 		virtual void call() override;
@@ -34,63 +38,94 @@ namespace FS {
 		const FD::SceneRead* const sceneRead;
 		FD::GuiWrite* const guiWrite;
 		const FD::GuiRead* const guiRead;
+		const FD::Style::VarRead* const varRead;
+		FD::Style::ThemeWrite* const themeWrite;
 
 		FD::Text::Title text{};
+		struct {
+			FD::Text::Common unexpected{FD::Text::CommonText::UnexpectedError};
+		}text_;
 
 	private:
-		std::once_flag once{};
-		std::array<FD::Project::HistoryInfo, 50> recentProjectInfos;
+		std::array<FD::ProjectRead::HistoryInfo, FD::Project::Limits::HistoryLogMax> recentProjectInfo;
 
 		struct {
+			ImVec2 recentWindow{};
 			ImVec2 open{};
+			ImVec2 document{};
 			ImVec2 recentButton{};
 		}pos;
 
-	private:
-		//constructorはまだFluidumDrawの初期化が終わってないのでループ内で一回だけよぶ
-		void writeGuiData();
-
-		//マウスをクリックしたらシーンを切り替え
-		void changeScene();
-
-		//タイトル画像の描写
-		void drawTitleImage();
-
-		//select recent project
-		void selectProject();
-
-		void recentProject();
-
-		void newProject();
-		void openProjectButton();
-		void openProject(const char* filePath,const ImVec2& pos);
-		void documentLink();
-
-	private:
-
-		//1920×1080 title画像
-		//画像データ
-		//Titleシーンは特別で，コンストラクタ時点でFluidumDrawは初期化されていないのでoptionalで遅延する．
+		//1920×1080 
+		/*
+		The Title scene is special.
+		FluidumDraw is not initialized at the constructor,
+		so it is delayed by std::optional.
+		*/
 		std::optional<FDR::ImGuiImage> image = std::nullopt;
 
 		//recent
 		std::optional<FDR::ImGuiImage> projectIcon = std::nullopt;
 
-		//project windowがhoveredされていれば次に進ませない
-		bool isSelectProjectHovered = false;
+		struct {
+			std::once_flag once{};
+			bool projectHistoryError = false;
+			bool isSelectProjectHovered = false;
+			bool recentProjectPopup = false;
+			bool recentProjectButtonPopup = false;
+			bool recentProjectButtonHovered = false;
+		}flag;
 
-		//style
+		struct {
+			const FD::ProjectRead::HistoryInfo* info = nullptr;
+		}buttonPopup;
+
 		struct {
 			const ImVec2 imageHalfSize = ImVec2(960, 540);
 			ImVec2 windowPos{};
-
 			ImVec2 selectWindowPos{};
 			ImVec2 selectWindowSize{};
-
 		}style;
 
-		//時間がかかるのでこっちで準備しておく
+		//Since it takes time, load the image for the next scene.
 		std::optional<std::vector<FDR::ImGuiImage>> leftBarImages = std::nullopt;
 
+	private:
+		//no-throw
+		[[nodiscard]] std::array<FD::ProjectRead::HistoryInfo, FD::Project::Limits::HistoryLogMax> getProjectHistory() noexcept;
+
+	private:
+		//The constructor hasn't finished initializing FluidumDraw yet. Therefore, call it only once in the loop.
+		void writeGuiData();
+
+		//Change scenes with a click of the mouse.
+		void changeScene();
+
+		//title image
+		void drawTitleImage();
+
+	private:
+		//select recent project
+		void selectProject();
+
+		void recentProject();
+		
+		void recentProjectPopup();
+		void recentProjectButtonPopup();
+		void recentPopupItem_clear();
+		void recentPopupItem_erase();
+
+	private:
+		void newProject();
+
+	public:
+		void openProjectButton();
+		void openProject(const char* filePath, const ImVec2& pos);
+
+	private:
+		void documentLink();
+		[[nodiscard]] bool checkIsShellAvailable() const;
+
 	};
+
 }

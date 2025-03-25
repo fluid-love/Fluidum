@@ -18,7 +18,7 @@ namespace FD {
 
 namespace FD::Calc::Internal {
 	struct Data final {
-		FluidumUtils_Class_Delete_ConDestructor(Data)
+		FluidumUtils_Class_Delete_ConDestructor(Data);
 	private:
 		static inline Calc::Mode mode = Calc::Mode::Debug;
 		static inline bool first = true;
@@ -38,7 +38,7 @@ namespace FD {
 	public:
 		explicit CalcWrite(Internal::PassKey) noexcept {};
 		~CalcWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(CalcWrite)
+		FluidumUtils_Class_Delete_CopyMove(CalcWrite);
 
 	public:
 		void mode(const Calc::Mode val) const;
@@ -53,7 +53,7 @@ namespace FD {
 	public:
 		explicit CalcRead(Internal::PassKey) noexcept {};
 		~CalcRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(CalcRead)
+		FluidumUtils_Class_Delete_CopyMove(CalcRead);
 
 	public:
 		[[nodiscard]] Calc::Mode mode() const;

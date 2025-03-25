@@ -1,21 +1,27 @@
 ﻿#include "shadermodule.h"
 
-//前方宣言
+//forward declaration
 std::vector<char> readFile(const char* filePath);
+
+FVK::Internal::ShaderModule::ShaderModule(ManagerPassKey, const Data::ShaderModuleData& data, const Parameter& parameter) {
+	this->create(data, parameter);
+}
 
 void FVK::Internal::ShaderModule::create(const Data::ShaderModuleData& data, const Parameter& parameter) {
 	auto result = data.get<FvkType::LogicalDevice>().device.createShaderModule(*parameter.pInfo);
 
-	if (result.result != vk::Result::eSuccess)
-		Exception::throwFailedToCreate("Failed to creare ShaderModule");
+	if (result.result != vk::Result::eSuccess) {
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to create ShaderModule({}).", vk::to_string(result.result));
+		Exception::throwFailedToCreate();
+	}
 
+	//no-throw
 	this->info.shaderModule = result.value;
+	static_assert(noexcept(info.shaderModule = result.value));
 
+	//no-throw
 	this->info.device = data.get<FvkType::LogicalDevice>().device;
-}
-
-FVK::Internal::ShaderModule::ShaderModule(ManagerPassKey, const Data::ShaderModuleData& data, const Parameter& parameter) {
-	this->create(data, parameter);
+	static_assert(noexcept(info.device = data.get<FvkType::LogicalDevice>().device));
 }
 
 const FVK::Internal::Data::ShaderModuleInfo& FVK::Internal::ShaderModule::get() const noexcept {
@@ -23,7 +29,7 @@ const FVK::Internal::Data::ShaderModuleInfo& FVK::Internal::ShaderModule::get() 
 	return this->info;
 }
 
-void FVK::Internal::ShaderModule::destroy() {
+void FVK::Internal::ShaderModule::destroy() noexcept {
 	assert(info.shaderModule);
 	this->info.device.destroyShaderModule(info.shaderModule);
 }
@@ -34,7 +40,7 @@ std::vector<char> FVK::Internal::ShaderModule::readFile(const char* filePath) {
 	if (!ifs)
 		throw std::runtime_error("Failed to open shader file");
 
-	std::size_t fileSize = static_cast<std::size_t>(ifs.tellg());
+	const std::streampos fileSize = ifs.tellg();
 	std::vector<char> buffer(fileSize);
 
 	ifs.seekg(0);

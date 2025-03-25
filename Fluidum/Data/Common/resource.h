@@ -34,11 +34,11 @@ namespace FD::Internal::Resource {
 
 #ifdef Fluidum_Path
 	constexpr inline const char* TempProjectFolderPath = Fluidum_Path "/Resources/Project/TempProject/";
-	constexpr inline const char* RecentProjectHistoryFilePath = Fluidum_Path "/Resources/Project/RecentProject.history";
+	constexpr inline const char* RecentProjectHistoryFilePath = Fluidum_Path "/Resources/History/Project.history";
 
 #else
 	constexpr inline const char* TempProjectFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Project/TempProject/")>();
-	constexpr inline const char* RecentProjectHistoryFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Project/RecentProject.history")>();
+	constexpr inline const char* RecentProjectHistoryFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/History/Project.history")>();
 
 #endif	
 
@@ -47,12 +47,12 @@ namespace FD::Internal::Resource {
 namespace FD::Internal::Resource {
 
 #ifdef Fluidum_Path
-	constexpr inline const char* RecentProjectTemplateHistoryFilePath = Fluidum_Path "/Resources/Log/Recent/RecentTemplateProject.history";
-	constexpr inline const char* RecentFileHistoryFilePath = Fluidum_Path "/Resources/Log/Recent/RecentFile.history";
+	constexpr inline const char* RecentProjectTemplateHistoryFilePath = Fluidum_Path "/Resources/History/TemplateProject.history";
+	constexpr inline const char* RecentFileHistoryFilePath = Fluidum_Path "/Resources/History/NewFile.history";
 
 #else
-	constexpr inline const char* RecentProjectTemplateHistoryFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Log/Recent/RecentTemplateProject.history")>();
-	constexpr inline const char* RecentFileHistoryFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Log/Recent/RecentFile.history")>();
+	constexpr inline const char* RecentProjectTemplateHistoryFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/History/TemplateProject.history")>();
+	constexpr inline const char* RecentFileHistoryFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/History/NewFile.history")>();
 
 #endif	
 

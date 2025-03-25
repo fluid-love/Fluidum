@@ -2,26 +2,11 @@
 
 FS::Coding::Debug::Debug()
 {
-	GLog.add<FD::Log::Type::None>("Construct Coding::DebugScene.");
-
+	FluidumScene_Log_Constructor(::FS::Coding::Debug);
 }
 
 FS::Coding::Debug::~Debug() {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct Coding::DebugScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::Coding::Debug);
 }
 
 void FS::Coding::Debug::call() {

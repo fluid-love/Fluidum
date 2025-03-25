@@ -4,11 +4,11 @@ void FVK::Internal::Command::FunctionIndex::operator++(int) noexcept {
 	this->index++;
 }
 
-FVK::Internal::Command::FunctionIndex::operator uint32_t() const noexcept {
+FVK::Internal::Command::FunctionIndex::operator FVK::UIF32() const noexcept {
 	return this->index;
 }
 
-void FVK::Internal::Command::FunctionIndex::operator=(uint32_t val) noexcept {
+void FVK::Internal::Command::FunctionIndex::operator=(const UIF32 val) noexcept {
 	this->index = val;
 }
 
@@ -27,17 +27,17 @@ void FVK::Internal::Command::Commands::call() {
 void FVK::Internal::Command::Commands::internalCall() {
 	const auto currentSize = Blocks::size();
 
-	//前回の終了位置からスタート位置
+	//Start from the previous end index.
 	const ConstIterator startItr = Blocks::cbegin() + index;
 
-	//CommandType::Nextまでループする
+	//till CommandType::Next
 	ConstIterator itr = std::find_if(
 		startItr,
 		Blocks::cend(),
 		[&](const Block& x) {x.function(); index++; return x.type == CommandType::Next; }
 	);
 
-	//最後まで行ってNextがない->はじめから探す
+	//can't find Next at the end -> start from the beginning.
 	if (itr == Blocks::cend()) {
 		index = 0;
 		itr = std::find_if(
@@ -46,8 +46,6 @@ void FVK::Internal::Command::Commands::internalCall() {
 			[&](const Block& x) {x.function(); index++; return x.type == CommandType::Next; }
 		);
 	}
-
-
 
 
 	//	//onceの処理 

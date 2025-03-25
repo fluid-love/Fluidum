@@ -1,21 +1,20 @@
 #pragma once
 
-//Fluidum Vulkan
+//FluidumVulkan
 #include "type.h"
 
 //KeyManager
-#include "../../KeyManager/include.h"
+#include "../../../../KeyManager/include.h"
 
 //disable warning push
 FluidumUtils_Debug_BeginDisableAllWarning
 
-//glfw
-#include <GLFW/glfw3.h>
-
 //imgui
 #include <imgui.h>
-#include <backends/imgui_impl_glfw.h>
- 
+#ifdef FluidumUtils_Type_OS_Windows
+#include <backends/imgui_impl_win32.h>
+#endif
+
 //glm
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

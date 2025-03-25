@@ -4,57 +4,73 @@
 
 namespace FS {
 
-	class StatusBar final :public Scene {
+	class StatusBar final : public Scene {
 	public:
 		explicit StatusBar(
 			FD::GuiWrite* const guiWrite,
 			const FD::GuiRead* const guiRead,
-			const FD::TaskRead* const taskRead
+			const FD::Style::ColorRead* const colorRead,
+			const FD::TaskRead* const taskRead,
+			const FD::SceneRead* const sceneRead
 		);
+
 		void Constructor(
 			FD::GuiWrite,
-			FD::GuiRead, 
-			FD::TaskRead
+			FD::GuiRead,
+			FD::Style::ColorRead,
+			FD::TaskRead,
+			FD::SceneRead
 		);
 
 		~StatusBar() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(StatusBar);;
+
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		FD::GuiWrite* const guiWrite;
 		const FD::GuiRead* const guiRead;
+		const FD::Style::ColorRead* const colorRead;
 		const FD::TaskRead* const taskRead;
+		const FD::SceneRead* const sceneRead;
 
 		FD::Text::StatusBar text{};
 
-	private://data
+	private:
+		struct {
+			float taskIcon{};
+			float version{};
 
-		struct Size final {
-			float taskIcon = 0.0f;
-			float version = 0.0f;
+			float barHeight{};
+			ImVec2 windowPos{};
 
-			float barHeight = 30.0f;
-			ImVec2 windowPos = ImVec2();
+			ImVec2 infoWindowPos{};
+			ImVec2 infoWindowSize{};
 
-			ImVec2 infoWindowPos = ImVec2();
-			ImVec2 infoWindowSize = ImVec2();
-
-			ImVec2 versionWindowPos = ImVec2();
-			ImVec2 versionWindowSize = ImVec2();
+			ImVec2 versionWindowPos{};
+			ImVec2 versionWindowSize{};
 		}style;
 
+		struct {
+			ImCounter<ImAnimeTime> running{ ImCounterCond::REPEAT };
+		}anime;
 
 	private:
-		//左下に今のタスク
+		void updateStyle();
+
+	private:
 		void taskGui();
 		void taskPopup();
+		void taskIcons();
 
-		//中央
+	private:
 		void infoGui();
 
-		//右下のバージョン
+	private:
 		void versionGui();
 
 	};
+
 }

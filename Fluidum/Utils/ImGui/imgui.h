@@ -1,18 +1,25 @@
 #pragma once
 
 #include <imgui.h>
+#include <string>
 
 namespace FU::ImGui {
 
-	void helpTooltip(const char* desc);
+	template<typename ImCounter>//ImGuiAnimation ImCounter<ImAnime>
+	void tooltip(ImCounter& counter, const char* desc);
 
-	void exclamationTooltip(const char* desc);
+	[[nodiscard]] ImVec2 messagePos();
 
-	void exclamationFadeTooltip(const ImVec2& pos, const char* desc);
+	[[nodiscard]] inline ImVec2 vec2Max() noexcept {
+		constexpr auto max = std::numeric_limits<decltype(ImVec2::x)>::max();
+		return { max, max };
+	}
 
-	void hoveredMarker(const char* desc);
+}
 
-	consteval ImU32 convertImVec4ToImU32(const float x, const float y, const float z, const float w) {
+namespace FU::ImGui {
+
+	consteval ImU32 ConvertImVec4ToImU32(const float x, const float y, const float z, const float w) {
 		auto saturate = [](const float f) { return (f < 0.0f) ? 0.0f : (f > 1.0f) ? 1.0f : f; };
 
 		ImU32 out;
@@ -38,4 +45,13 @@ namespace FU::ImGui {
 			::ImGui::PushStyleColor(x, col);
 		return sizeof...(Colors);
 	}*/
+
+}
+
+namespace FU::ImGui {
+
+	[[nodiscard]] bool isTitleBarClicked(const ImGuiMouseButton mouse) noexcept;
+
+	[[nodiscard]] bool isMouseHoveringRect(const ImVec2& min, const ImVec2& max) noexcept;
+
 }

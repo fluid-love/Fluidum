@@ -4,9 +4,9 @@
 
 namespace FVK::Internal {
 
-	//各アイテムの作成に必要なデータ
+	//Data required to create each item.
 	template<FvkType Type>
-	_NODISCARD consteval auto GetRequiredDataTypes() {
+	[[nodiscard]] consteval auto GetRequiredDataTypes() {
 		using enum FvkType;
 		if constexpr (Type == None)
 			return DataTypeArray<0>();
@@ -68,22 +68,24 @@ namespace FVK::Internal {
 			return DataTypeArray<1>({ LogicalDevice });
 		else if constexpr (Type == Texture)
 			return DataTypeArray<4>({ PhysicalDevice, LogicalDevice, Queue, CommandPool });
-		else if constexpr (Type == Draw)
-			return DataTypeArray<1>({ LogicalDevice });
 		else if constexpr (Type == ImGui)
 			return DataTypeArray<8>({ Window,Instance,PhysicalDevice,LogicalDevice,Queue_Vector,RenderPass,CommandPool,DescriptorPool });
 		else if constexpr (Type == ImGuiImage)
 			return DataTypeArray<3>({ Sampler, Texture, ImGui });
-
+		else
+			FU::Concept::DelayAssert_N<Type>;
 	}
 
+}
+
+namespace FVK::Internal {
 
 	template<FvkType Type>
-	_NODISCARD consteval std::size_t GetRequiredDataSize() {
-		return GetRequiredDataTypes<Type>().size();
+	[[nodiscard]] consteval Size GetRequiredDataSize() {
+		return static_cast<Size>(GetRequiredDataTypes<Type>().size());
 	}
 
-	_NODISCARD consteval FvkType ToObjectType(const FvkType type) {
+	[[nodiscard]] consteval FvkType ToHandleType(const FvkType type) {
 		if (type == FvkType::PhysicalDevice_Swapchain)
 			return FvkType::PhysicalDevice;
 		else if (type == FvkType::Queue_Vector)
@@ -104,7 +106,7 @@ namespace FVK::Internal {
 			return type;
 	}
 
-	_NODISCARD consteval FvkType ToObjectVectorType(const FvkType type) {
+	[[nodiscard]] consteval FvkType ToHandleVectorType(const FvkType type) {
 		if (type == FvkType::DescriptorSetLayout)
 			return FvkType::DescriptorSetLayout_Vector;
 		else if (type == FvkType::Queue)
@@ -122,13 +124,13 @@ namespace FVK::Internal {
 	}
 
 	template<FvkType Type>
-	_NODISCARD consteval FvkType ToObjectType() {
-		return ToObjectType(Type);
+	[[nodiscard]] consteval FvkType ToHandleType() {
+		return ToHandleType(Type);
 	}
 
 	template<FvkType Type>
-	_NODISCARD consteval FvkType ToObjectVectorType() {
-		return ToObjectVectorType(Type);
+	[[nodiscard]] consteval FvkType ToHandleVectorType() {
+		return ToHandleVectorType(Type);
 	}
 
 }

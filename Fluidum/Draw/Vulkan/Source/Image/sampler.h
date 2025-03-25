@@ -6,7 +6,6 @@ namespace FVK::Internal {
 
 	class Sampler final {
 	public:
-
 		struct CreateInfo : public vk::SamplerCreateInfo {
 		public:
 			using vk::SamplerCreateInfo::flags;
@@ -36,20 +35,35 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		explicit Sampler(ManagerPassKey, const Data::SamplerData& data, const Parameter& parameter);
-		~Sampler() = default;
-		FluidumUtils_Class_Default_CopyMove(Sampler)
+
+		~Sampler() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(Sampler);
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::SamplerData& data, const Parameter& parameter);
+
 	public:
-		_NODISCARD const Data::SamplerInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+		
+	public:
+		//no-throw
+		[[nodiscard]] const Data::SamplerInfo& get() const noexcept;
+		
+	private:
+		Data::SamplerInfo info{};
 
-	private://data
-		Data::SamplerInfo info = {};
 	};
-
-
 
 }

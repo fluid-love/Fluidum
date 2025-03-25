@@ -8,6 +8,8 @@ long FU::MB::Internal::iconToVal(const Icon type) {
 		return MB_ICONWARNING;
 	else if (type == Icon::Error)
 		return MB_ICONERROR;
+	else if (type == Icon::Information)
+		return MB_ICONINFORMATION;
 	else
 		abort();
 }
@@ -30,7 +32,7 @@ int FU::MB::Internal::MsgBox3(const wchar_t* caption, UINT uType) {
 
 #endif
 
-int32_t FU::MB::button_button_cancel(
+FU::I32 FU::MB::button_button_cancel(
 	const Icon iconType,
 	const char* message,
 	const char* button1,
@@ -83,7 +85,7 @@ void FU::MB::error(const char* message) {
 	std::wstring  wMessage = ::FU::Text::utf8ToUtf16(message);
 
 	long icon = MB_ICONERROR;
-
+	
 	MessageBox(NULL, wMessage.data(), Title, icon | MB_OK | MB_TASKMODAL);
 
 #else
@@ -91,7 +93,23 @@ void FU::MB::error(const char* message) {
 #endif
 }
 
-int32_t FU::MB::ok_cancel(const char* message) {
+void FU::MB::information(const char* message) {
+#ifdef BOOST_OS_WINDOWS
+	using namespace Internal;
+
+	//arg -> utf-8 | windows -> wchar_t
+	std::wstring  wMessage = ::FU::Text::utf8ToUtf16(message);
+
+	long icon = MB_ICONINFORMATION;
+	
+	MessageBox(NULL, wMessage.data(), Title, icon | MB_OK | MB_TASKMODAL);
+
+#else
+#error Not Supported
+#endif
+}
+
+FU::I32 FU::MB::ok_cancel(const char* message) {
 #ifdef BOOST_OS_WINDOWS
 	using namespace Internal;
 
@@ -110,10 +128,34 @@ int32_t FU::MB::ok_cancel(const char* message) {
 #else
 #error Not Supported
 #endif
-
+	assert(false);
+	return 1;
 }
 
-int32_t FU::MB::child_button_button_cancel(
+FU::I32 FU::MB::yes_no(const char* message) {
+#ifdef BOOST_OS_WINDOWS
+	using namespace Internal;
+
+	//arg -> utf-8 | windows -> wchar_t
+	std::wstring  wMessage = ::FU::Text::utf8ToUtf16(message);
+
+	long icon = MB_ICONWARNING;
+
+	int result = MessageBox(NULL, wMessage.data(), Title, icon | MB_YESNO | MB_TASKMODAL);
+
+	if (result == IDYES)
+		return 0;
+	else if (result == IDNO)
+		return 1;
+
+#else
+#error Not Supported
+#endif
+	assert(false);
+	return 1;
+}
+
+FU::I32 FU::MB::child_button_button_cancel(
 	const Icon iconType,
 	const char* message,
 	const char* childMessage,

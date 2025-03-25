@@ -7,15 +7,18 @@ FVK::Internal::Image::Image(ManagerPassKey, const Data::ImageData& data, const P
 
 void FVK::Internal::Image::create(const Data::ImageData& data, const Parameter& parameter) {
 
-
 	auto result = data.get<FvkType::LogicalDevice>().device.createImage(*parameter.pInfo);
+	if (result.result != vk::Result::eSuccess) {
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to create Image({}).", vk::to_string(result.result));
+		Exception::throwFailedToCreate();
+	}
 
-	if (result.result != vk::Result::eSuccess)
-		Exception::throwFailedToCreate("Failed to create Image");
-
+	//no-throw
 	this->info.image = result.value;
-
 	this->info.device = data.get<FvkType::LogicalDevice>().device;
+
+	static_assert(noexcept(this->info.image = result.value));
+	static_assert(noexcept(this->info.device = data.get<FvkType::LogicalDevice>().device));
 }
 
 const FVK::Internal::Data::ImageInfo& FVK::Internal::Image::get() const noexcept {
@@ -23,7 +26,7 @@ const FVK::Internal::Data::ImageInfo& FVK::Internal::Image::get() const noexcept
 	return this->info;
 }
 
-void FVK::Internal::Image::destroy() {
+void FVK::Internal::Image::destroy() noexcept {
 	assert(this->info.image);
 	this->info.device.destroyImage(this->info.image);
 }

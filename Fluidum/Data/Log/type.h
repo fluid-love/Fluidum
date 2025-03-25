@@ -11,16 +11,9 @@
 
 #include "../Common/common.h"
 
-namespace FD::Log {
-	using FU::Log::Type;
-}
-
 namespace FD::Internal::Log {
-
-	//100までたまったらファイルへ出力
-	constexpr inline uint16_t LogArraySize = 100;
-
-	//相対パスで実行ファイル直下にフォルダを作成
+	
+	//Create a directly under the executable using relative paths.
 	constexpr inline const char* FluidumLogFolderDirectory = "FluidumLog/";
 
 }

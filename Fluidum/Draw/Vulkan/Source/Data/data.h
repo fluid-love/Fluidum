@@ -11,28 +11,29 @@ namespace FVK::Internal::Data {
 	struct Data final {
 	public:
 		using Tuple = DataTuple<GetRequiredDataTypes<Type>()>;
-	public:
-		explicit Data(const Tuple& data) :data(data) {}
-		explicit Data(Tuple&& data) :data(std::move(data)) {}
 
-		~Data() = default;
-		FluidumUtils_Class_Default_CopyMove(Data)
+	public:
+		explicit Data(const Tuple& data) : data(data) {}
+		explicit Data(Tuple&& data) : data(std::move(data)) {}
+
+		~Data() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(Data);
 
 	public:
 		template<FvkType T> requires(!FU::Concept::IsStdVector<CorrespondenceType<T>>)
-			_NODISCARD CorrespondenceType<T>::type& get() const noexcept {
+			[[nodiscard]] CorrespondenceType<T>::type& get() const noexcept {
 			return std::get<CorrespondenceType<T>>(data).get();
 		}
 
 		//vector<reference_wapper<ref>>
 		template<FvkType T> requires(FU::Concept::IsStdVector<CorrespondenceType<T>>)
-			_NODISCARD auto& get() const noexcept {
+			[[nodiscard]] auto& get() const noexcept {
 			return std::get<CorrespondenceType<T>>(data);
 		}
 	private:
 		const Tuple data;
-	};
 
+	};
 
 	using WindowData = Data<FvkType::Window>;
 	using InstanceData = Data<FvkType::Instance>;
@@ -64,14 +65,8 @@ namespace FVK::Internal::Data {
 	using FenceData = Data<FvkType::Fence>;
 	using SamplerData = Data<FvkType::Sampler>;
 	using TextureData = Data<FvkType::Texture>;
-	using DrawData = Data<FvkType::Draw>;
 	using ImGuiData = Data<FvkType::ImGui>;
 	using ImGuiImageData = Data<FvkType::ImGuiImage>;
-
-
-
-
-
 
 }
 
@@ -81,26 +76,28 @@ namespace FVK::Internal::Data {
 	struct CommandData final {
 	public:
 		using Tuple = ::FVK::Internal::Data::DataTuple<GetCommandDataTypes<Type>()>;
-	public:
-		explicit CommandData(const Tuple& data) :data(data) {}
-		explicit CommandData(Tuple&& data) :data(std::move(data)) {}
 
-		~CommandData() = default;
-		FluidumUtils_Class_Default_CopyMove(CommandData)
+	public:
+		explicit CommandData(const Tuple& data) : data(data) {}
+		explicit CommandData(Tuple&& data) : data(std::move(data)) {}
+
+		~CommandData() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(CommandData);
 
 	public:
 		template<FvkType T> requires(!FU::Concept::IsStdVector<CorrespondenceType<T>>)
-			_NODISCARD CorrespondenceType<T>::type& get() const noexcept {
+			[[nodiscard]] CorrespondenceType<T>::type& get() const noexcept {
 			return std::get<CorrespondenceType<T>>(data).get();
 		}
 
 		//vector<reference_wapper<ref>>
 		template<FvkType T> requires(FU::Concept::IsStdVector<CorrespondenceType<T>>)
-			_NODISCARD auto& get() const noexcept {
+			[[nodiscard]] auto& get() const noexcept {
 			return std::get<CorrespondenceType<T>>(data);
 		}
 	private:
 		const Tuple data;
+
 	};
 
 
@@ -124,7 +121,5 @@ namespace FVK::Internal::Data {
 	using NextData = CommandData<CommandType::Next>;
 	using AnyData = CommandData<CommandType::Any>;
 	using CommandsData = CommandData<CommandType::Commands>;
-
-
 
 }

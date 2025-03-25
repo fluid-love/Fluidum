@@ -6,14 +6,17 @@ namespace FVK::Internal::Data {
 
 	template<FvkType Type>
 	struct Info final {
-		Info() = delete;
-		~Info() = delete;
+		FluidumUtils_Class_Delete_ConDestructor(Info);
 	};
 
 	template<>
 	struct Info<FvkType::Window> final {
-		GLFWwindow* window = nullptr;
+		WindowHandle window = nullptr;
 		bool framebufferResized = false;
+		bool fullscreen{};
+		bool focused{};
+		std::pair<I32, I32> sizeMinLimits{};//width, height
+		std::pair<I32, I32> sizeMaxLimits{};//width, height
 	};
 
 	template<>
@@ -30,7 +33,7 @@ namespace FVK::Internal::Data {
 
 	template<>
 	struct Info<FvkType::Surface> final {
-		GLFWwindow* window = nullptr;
+		WindowHandle window = nullptr;
 		VkInstance instance = nullptr;
 		vk::SurfaceKHR surface = nullptr;
 	};
@@ -46,14 +49,14 @@ namespace FVK::Internal::Data {
 		std::vector<vk::PresentModeKHR> presentModes{};
 		vk::SampleCountFlagBits usableMaxMsaaSamples{};
 
-		GLFWwindow* window = nullptr;
+		WindowHandle window = nullptr;
 		vk::Instance instance = nullptr;
 		vk::SurfaceKHR surface = nullptr;
 	};
 
 	template<>
 	struct Info<FvkType::LogicalDevice> final {
-		GLFWwindow* window = nullptr;
+		WindowHandle window = nullptr;
 		vk::Instance instance = nullptr;
 		vk::SurfaceKHR surface = nullptr;
 		vk::PhysicalDevice physicalDevice = nullptr;
@@ -72,7 +75,7 @@ namespace FVK::Internal::Data {
 		vk::Format format = {};
 		vk::ColorSpaceKHR colorSpace = {};
 		vk::Extent2D extent = {};
-		uint32_t minImageCount = 0;
+		UI32 minImageCount = 0;
 	};
 
 	template<>
@@ -82,7 +85,7 @@ namespace FVK::Internal::Data {
 	};
 
 	template<>
-	struct Info<FvkType::DescriptorSetLayout> final {	
+	struct Info<FvkType::DescriptorSetLayout> final {
 		vk::Device device = nullptr;
 		vk::DescriptorSetLayout descriptorSetLayout = nullptr;
 	};
@@ -206,11 +209,6 @@ namespace FVK::Internal::Data {
 	};
 
 	template<>
-	struct Info<FvkType::Draw> final {
-
-	};
-
-	template<>
 	struct Info<FvkType::ImGui> final {
 		vk::Device device = nullptr;
 		vk::DescriptorPool descriptorPool = nullptr;
@@ -226,8 +224,9 @@ namespace FVK::Internal::Data {
 		vk::Image image = nullptr;
 	};
 
+}
 
-
+namespace FVK::Internal::Data {
 
 	using WindowInfo = Info<FvkType::Window>;
 	using InstanceInfo = Info<FvkType::Instance>;
@@ -257,9 +256,7 @@ namespace FVK::Internal::Data {
 	using FenceInfo = Info<FvkType::Fence>;
 	using SamplerInfo = Info<FvkType::Sampler>;
 	using TextureInfo = Info<FvkType::Texture>;
-	using DrawInfo = Info<FvkType::Draw>;
 	using ImGuiInfo = Info<FvkType::ImGui>;
 	using ImGuiImageInfo = Info<FvkType::ImGuiImage>;
-
 
 }

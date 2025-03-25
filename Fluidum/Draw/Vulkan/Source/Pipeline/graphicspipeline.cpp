@@ -8,13 +8,17 @@ void FVK::Internal::GraphicsPipeline::create(const Data::GraphicsPipelineData& d
 	this->fillParameter(data, parameter);
 
 	auto result = data.get<FvkType::LogicalDevice>().device.createGraphicsPipeline(nullptr, *parameter.pInfo);
+	if (result.result != vk::Result::eSuccess) {
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to create GraphicsPipeline({}).", vk::to_string(result.result));
+		Exception::throwFailedToCreate();
+	}
 
-	if (result.result != vk::Result::eSuccess)
-		Exception::throwFailedToCreate("Failed to create GraphicsPipeline");
-
+	//no-throw
 	this->info.graphicsPipeline = result.value;
-
 	this->info.device = data.get<FvkType::LogicalDevice>().device;
+
+	static_assert(noexcept(info.graphicsPipeline = result.value));
+	static_assert(noexcept(info.device = data.get<FvkType::LogicalDevice>().device));
 }
 
 const FVK::Internal::Data::GraphicsPipelineInfo& FVK::Internal::GraphicsPipeline::get() const noexcept {
@@ -22,7 +26,7 @@ const FVK::Internal::Data::GraphicsPipelineInfo& FVK::Internal::GraphicsPipeline
 	return this->info;
 }
 
-void FVK::Internal::GraphicsPipeline::destroy() {
+void FVK::Internal::GraphicsPipeline::destroy() noexcept {
 	assert(info.graphicsPipeline);
 	this->info.device.destroyPipeline(this->info.graphicsPipeline);
 }
@@ -31,11 +35,12 @@ void FVK::Internal::GraphicsPipeline::fillParameter(const Data::GraphicsPipeline
 	parameter.pInfo->layout = data.get<FvkType::GraphicsPipelineLayout>().graphicsPipelineLayout;
 	parameter.pInfo->renderPass = data.get<FvkType::RenderPass>().renderPass;
 
+	//no-throw
 	const auto& shaderModuleInfos = data.get<FvkType::ShaderModule_Vector>();
 	const auto size = shaderModuleInfos.size();
 	assert(parameter.pInfo->stageCount == size);
 
-	for (std::size_t i = 0; i < size; i++) {
+	for (Size i = 0; i < size; i++) {
 		parameter.pInfo->pStageCreateInfos[i].module = shaderModuleInfos[i].get().shaderModule;
 	}
 

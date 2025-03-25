@@ -11,7 +11,7 @@ namespace FS::Utils {
 
 		~DeleteAllScenes() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(DeleteAllScenes)
+		FluidumUtils_Class_Delete_CopyMove(DeleteAllScenes);
 
 	public:
 		virtual void call() override;

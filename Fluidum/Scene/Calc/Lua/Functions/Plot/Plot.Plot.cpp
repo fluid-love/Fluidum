@@ -31,7 +31,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_plot(State L) {
 			info.input,
 			LuAssist::Utils::typeName(LuAssist::Type::Number)
 			);
-		consoleWrite->add(std::move(log));
+		//consoleWrite->add(std::move(log));
 		throw Internal::Exception();
 	}
 
@@ -52,7 +52,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_plot(State L) {
 			info.input,
 			LuAssist::Utils::typeName(LuAssist::Type::Number)
 			);
-		consoleWrite->add(std::move(log));
+		//consoleWrite->add(std::move(log));
 		throw Internal::Exception();
 	}
 
@@ -73,7 +73,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_plot(State L) {
 				LuAssist::Utils::getSrcCurrentLine(L, 2),
 				"Plot"
 				);
-			consoleWrite->add(std::move(log));
+			//consoleWrite->add(std::move(log));
 			throw Internal::Exception();
 		}
 

@@ -37,7 +37,7 @@ namespace FD {
 	public:
 		explicit TaskWrite(Internal::PassKey) noexcept {};
 		~TaskWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(TaskWrite)
+		FluidumUtils_Class_Delete_CopyMove(TaskWrite);
 
 	public:
 		void add(const Task::Message& message) const;
@@ -50,7 +50,7 @@ namespace FD {
 	public:
 		explicit TaskRead(Internal::PassKey) noexcept {};
 		~TaskRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(TaskRead)
+		FluidumUtils_Class_Delete_CopyMove(TaskRead);
 
 	public:
 		template<typename Function>

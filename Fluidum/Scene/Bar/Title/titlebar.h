@@ -7,6 +7,7 @@ namespace FS {
 	class TitleBar final : public Scene {
 	public:
 		explicit TitleBar(
+			const FD::Style::ColorRead* const colorRead,
 			const FD::GuiRead* const guiRead,
 			FD::GuiWrite* const guiWrite,
 			const FD::WindowRead* const windowRead,
@@ -18,6 +19,7 @@ namespace FS {
 			FD::Coding::TabWrite* const tabWrite
 		);
 		void Constructor(
+			FD::Style::ColorRead,
 			FD::GuiRead,
 			FD::GuiWrite,
 			FD::WindowRead,
@@ -31,10 +33,13 @@ namespace FS {
 
 		~TitleBar() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(TitleBar);
+
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		const FD::Style::ColorRead* const colorRead;
 		const FD::GuiRead* const guiRead;
 		FD::GuiWrite* const guiWrite;
 		const FD::WindowRead* const windowRead;
@@ -45,8 +50,7 @@ namespace FS {
 		const FD::Coding::TabRead* const tabRead;
 		FD::Coding::TabWrite* const tabWrite;
 
-	private://data
-
+	private:
 		const FD::Text::TitleBar text{};
 
 		const FDR::ImGuiImage iconImage = FDR::createImGuiImage(Resource::TitleBarIconFilePath);
@@ -58,17 +62,26 @@ namespace FS {
 			ImVec2 windowPos{};
 			ImVec2 windowSize{};
 
+			ImVec2 projectNameWindowPos{};
+			ImVec2 projectNameWindowSize{};
+
+
 			ImVec2 iconSize{};
 
 			ImVec2 buttonSize{};
 		}style;
 
 	private:
+		void update();
+
+	private:
 		void icon();
 		void bar();
+		void project();
 
 	private:
 		void exit();
 
 	};
+
 }

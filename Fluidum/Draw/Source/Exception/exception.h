@@ -1,9 +1,20 @@
 #pragma once
 
-#include <exception>
+#include "../../../Utils/Exception/exception.h"
+
+namespace FDR::Exception::Internal {
+
+	[[noreturn]] void throwFailed();
+
+}
 
 namespace FDR::Exception {
 
-	class Error final : public std::nested_exception {};
+	enum class ErrorType : UIF8 {
+		Failed
+	};
+
+	using Error = FU::Exception::Base<ErrorType>;
 
 }
+

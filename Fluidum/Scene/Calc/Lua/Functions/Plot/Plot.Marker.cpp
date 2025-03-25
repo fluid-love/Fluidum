@@ -73,7 +73,7 @@ FS::Lua::Ret FS::Lua::Calc::plot_marker(State L) {
 		//{}ŠÖ”SetMarker‚Ìˆø”‚É–³Œø‚È•¶š—ñ‚ª“n‚³‚ê‚Ü‚µ‚½D“n‚³‚ê‚½•¶š—ñ{}D³‚µ‚¢•¶š—ñ{}D
 		Message message(LogType::Plot_MarkerStr);
 		std::string log = GLog.add<FD::Log::Type::None>(message, LuAssist::Utils::getSrcCurrentLine(L, 2), marker, markerStr());
-		consoleWrite->add(std::move(log));
+		//consoleWrite->add(std::move(log));
 		std::rethrow_exception(std::current_exception());
 	}
 

@@ -7,7 +7,6 @@ namespace FVK::Internal {
 
 	class ImGuiImage final {
 	public:
-
 		struct Parameter {
 			std::optional<Key::SamplerVariantKey> samplerKey = std::nullopt;
 			std::optional<Key::TextureVariantKey> textureKey = std::nullopt;
@@ -15,20 +14,40 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//strong
 		explicit ImGuiImage(ManagerPassKey, const Data::ImGuiImageData& data, const Parameter& parameter);
-		~ImGuiImage() = default;
-		FluidumUtils_Class_Default_CopyMove(ImGuiImage)
+
+		~ImGuiImage() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(ImGuiImage);
 
 	private:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::ImGuiImageData& data, const Parameter& parameter);
+
 	public:
-		_NODISCARD const Data::ImGuiImageInfo& get() const noexcept;
+		/*
+		Exception:
+			FailedToDestroy
+		*/
+		//strong
 		void destroy();
 
-	private://data
-		Data::ImGuiImageInfo info = {};
+	public:
+		[[nodiscard]] const Data::ImGuiImageInfo& get() const noexcept;
+
+	private:
+		Data::ImGuiImageInfo info{};
+
 	};
-
-
 
 }

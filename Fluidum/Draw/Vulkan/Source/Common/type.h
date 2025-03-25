@@ -17,22 +17,28 @@
 #include <condition_variable>
 #include <sstream>
 
+//utils
 #include "../../../../Utils/include.h"
 
 //vulkan
-#define VULKAN_HPP_NO_SPACESHIP_OPERATOR
-#define VULKAN_HPP_NO_EXCEPTIONS
+//If VULKAN_HPP_NO_SPACESHIP_OPERATOR is not defined, "noexcept" modifier will be lost.
+#define VULKAN_HPP_NO_SPACESHIP_OPERATOR 
 #define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 #define VULKAN_HPP_NO_SETTERS
+#define VULKAN_HPP_NO_EXCEPTIONS
 
-FluidumUtils_Debug_BeginDisableAllWarning 
+FluidumUtils_Debug_BeginDisableAllWarning
+#ifdef FluidumUtils_Type_OS_Windows
+//Use native(win32), not glfw.
+#define VK_USE_PLATFORM_WIN32_KHR
+#endif
 #include <vulkan/vulkan.hpp>
 FluidumUtils_Debug_EndDisableAllWarning
 
 
 namespace FVK::Internal {
 	//underlying_type
-	using UT = uint16_t;
+	using UT = UIF16;
 }
 
 namespace FVK::Internal {
@@ -76,13 +82,10 @@ namespace FVK::Internal {
 		Fence_Vector,
 		Sampler,
 		Texture,
-		Draw,
 		ImGui,
 		ImGuiImage,
 
 		COUNT,
-
-
 	};
 
 	enum class CommandType : UT {
@@ -111,8 +114,19 @@ namespace FVK::Internal {
 		COUNT
 	};
 
+}
 
-	template<std::size_t Size>
-	using DataTypeArray = std::array<FvkType, Size>;
+namespace FVK::Internal {
+
+	template<Size N>
+	using DataTypeArray = std::array<FvkType, N>;
+
+}
+
+namespace FVK::Internal {
+
+#ifdef FluidumUtils_Type_OS_Windows
+	using WindowHandle = HWND;
+#endif
 
 }

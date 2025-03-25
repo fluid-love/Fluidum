@@ -4,50 +4,22 @@
 #include "../Common/fkm.h"
 
 namespace FVK::Internal::Key {
-	using StringKeyType = std::string;
-	using CharKeyType = const char*;
-	using SelectKeyType = FKM::SelectKey;
-	using IndexKeyType = FKM::IndexKey;
+	using ::FKM::OrderKey;
+	using ::FKM::IndexKey;
+	using ::FKM::CharKey;
+	using ::FKM::StrKey;
+	using ::FKM::SelectKey;
 }
 
-namespace FVK::Internal::Key {
-	/*Keyの型は4つ*/
-
-	//std::string
-	template<typename T>
-	concept IsStringKey = std::same_as<T, std::string>;
-
-	//const char*
-	template<typename T>
-	concept IsCharKey = std::same_as<T, const char*>;
-
-	//SelectKey->はじめ　とか　さいご　とか
-	template<typename T>
-	concept IsSelectKey = std::same_as<T, FKM::SelectKey>;
-
-	//IndexKey->順番 Windowを追加したら，それを0として，追加していく毎に+1していく
-	template<typename T>
-	concept IsIndexKey = std::same_as<T, FKM::IndexKey>;
-
-	//Keyに許すもの
-	template<typename T>
-	concept IsKeyType =
-		IsStringKey<T> ||
-		IsCharKey<T> ||
-		IsSelectKey<T> ||
-		IsIndexKey<T>;
-
-}
-
-//前方宣言
+//forward declaration
 namespace FVK::Internal {
 	namespace Key {
 		template<FvkType>
-		class RequiredDataKeysBase;
+		class RequiredDataKeys;
 
 		class Converter;
 
-		template<FvkType, IsKeyType>
+		template<FvkType, ::FKM::Concept::IsKeyType>
 		class Key;
 	}
 	namespace Manager {
@@ -58,7 +30,9 @@ namespace FVK::Internal {
 namespace FVK::Internal::Key {
 
 	template<typename T>
-	concept IsKey = FU::Concept::IsInstanceOfNonTypeType<T, ::FVK::Internal::Key::Key>;
+	concept IsKey = std::true_type::value;/*MSVC bug FU::Concept::IsInstanceOfNonTypeType<FU::Concept::remove_all_const_t<T>, ::FVK::Internal::Key::Key>;*/
 
+	template<typename T>
+	concept IsKeyType = ::FKM::Concept::IsKeyType<T>;
 
 }

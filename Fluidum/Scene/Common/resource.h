@@ -2,8 +2,6 @@
 
 #include "using.h"
 
-//相対パスにする時はResources/までの相対パスを指定する
-
 namespace FS::Resource {
 
 #ifdef Fluidum_Path
@@ -42,30 +40,23 @@ namespace FS::Resource {
 
 }
 
-//Coding
+//Project
 namespace FS::Resource {
 
 #ifdef Fluidum_Path
-	constexpr inline const char* CodingNewFilePath = Fluidum_Path "/Resources/Images/Coding/Icon/open.png";
-	constexpr inline const char* CodingOpenFilePath = Fluidum_Path "/Resources/Images/Coding/Icon/new.png";
-	constexpr inline const char* CodingNewIconsFolderPath = Fluidum_Path "/Resources/Images/Coding/Icons/";
+	constexpr inline const char* ProjectNewFilePath = Fluidum_Path "/Resources/Images/Project/Icon/open.png";
+	constexpr inline const char* ProjectOpenFilePath = Fluidum_Path "/Resources/Images/Project/Icon/new.png";
+	constexpr inline const char* ProjectDirectoryPath = Fluidum_Path "/Resources/Images/Project/Icon/dir.png";
+
+	constexpr inline const char* ProjectNewIconsFolderPath = Fluidum_Path "/Resources/Images/Project/Icons/";
 
 #else
-	constexpr inline const char* CodingOpenFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Coding/Icon/open.png")>();
-	constexpr inline const char* CodingNewFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Coding/Icon/new.png")>();
-	constexpr inline const char* CodingNewIconsFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Coding/Icons/")>();
-
-#endif	
-
-}
-
-//Utils
-namespace FS::Resource {
-
-#ifdef Fluidum_Path
-	constexpr inline const char* UtilsIconFolderPath = Fluidum_Path "/Resources/Utils/icon/";
-#else
-	constexpr inline const char* UtilsIconFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/FluidumSceneUtils/icon/")>();
+	constexpr inline const char* ProjectOpenFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icon/open.png")>();
+	constexpr inline const char* ProjectNewFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icon/new.png")>();
+	constexpr inline const char* ProjectDirectoryPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icon/dir.png")>();
+								 
+	constexpr inline const char* ProjectNewIconsFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Images/Project/Icons/")>();
+								 
 #endif	
 
 }
@@ -76,18 +67,12 @@ namespace FS::Resource {
 #ifdef Fluidum_Path
 	constexpr inline const char* LuaMessagePath = Fluidum_Path "/Resources/Log/Lua/jpn";
 	constexpr inline const char* LuaFluidumStandardLibraryFolderPath = Fluidum_Path "/Fluidum/Language/Lua/FluidumStandardLibrary/";
-	constexpr inline const char* LuaSLLPlotPath = Fluidum_Path  "/Resources/Source/Lua/plot.lua";
-	constexpr inline const char* LuaSLLGenomePath = Fluidum_Path  "/Resources/Source/Lua/genome.lua";
-	constexpr inline const char* LuaSLLPianoPath = Fluidum_Path  "/Resources/Source/Lua/piano.lua";
-	constexpr inline const char* LuaSLLMathPath = Fluidum_Path  "/Resources/Source/Lua/math.lua";
+	constexpr inline const char* LuaInitFilePath = Fluidum_Path "/Fluidum/Language/Lua/init.lua";
 
 #else
 	constexpr inline const char* LuaMessagePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Log/Lua/jpn")>();
-	constexpr inline const char* LuaFluidumStandardLibraryFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Fluidum/Language/Lua/FluidumStandardLibrary/")>();
-	constexpr inline const char* LuaSLLPlotPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/plot.lua")>();
-	constexpr inline const char* LuaSLLGenomePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/genome.lua")>();
-	constexpr inline const char* LuaSLLPianoPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/piano.lua")>();
-	constexpr inline const char* LuaSLLMathPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Resources/Source/Lua/math.lua")>();
+	constexpr inline const char* LuaFluidumStandardLibraryFolderPath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Fluidum/Languages/Lua/FluidumStandardLibrary/")>();
+	constexpr inline const char* LuaInitFilePath = FU::File::MakePath<FU::File::PathArg(__FILE__), 4, FU::File::PathArg("/Fluidum/Languages/Lua/init.lua")>();
 
 #endif	
 

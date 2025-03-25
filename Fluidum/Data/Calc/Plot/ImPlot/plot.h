@@ -8,7 +8,7 @@ namespace FD {
 	public:
 		explicit ImPlotWrite(Internal::PassKey) noexcept {};
 		~ImPlotWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(ImPlotWrite)
+		FluidumUtils_Class_Delete_CopyMove(ImPlotWrite);
 
 	public:
 		enum class Exception : uint8_t {
@@ -81,7 +81,7 @@ namespace FD {
 	public:
 		explicit ImPlotRead_Lock(Internal::PassKey) noexcept {};
 		~ImPlotRead_Lock() = default;
-		FluidumUtils_Class_Delete_CopyMove(ImPlotRead_Lock)
+		FluidumUtils_Class_Delete_CopyMove(ImPlotRead_Lock);
 
 	public:
 		[[nodiscard]] Plot::FigureIndex figureSize() const;
@@ -96,7 +96,7 @@ namespace FD {
 	public:
 		explicit ImPlotRead(Internal::PassKey) noexcept {};
 		~ImPlotRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ImPlotRead)
+		FluidumUtils_Class_Delete_CopyMove(ImPlotRead);
 
 	public:
 		[[nodiscard]] Plot::FigureIndex figureSize() const;

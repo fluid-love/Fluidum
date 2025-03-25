@@ -5,7 +5,7 @@
 namespace FVK::Internal {
 
 	template<CommandType Type>
-	_NODISCARD consteval auto GetCommandDataTypes() {
+	[[nodiscard]] consteval auto GetCommandDataTypes() {
 		using enum FvkType;
 
 		if constexpr (Type == CommandType::BeginCommandBuffer)
@@ -47,8 +47,8 @@ namespace FVK::Internal {
 	}
 
 	template<CommandType Type>
-	_NODISCARD consteval std::size_t GetCommandDataTypesSize() {
-		return GetCommandDataTypes<Type>().size();
+	[[nodiscard]] consteval Size GetCommandDataSize() {
+		return static_cast<Size>(GetCommandDataTypes<Type>().size());
 	}
 
 }

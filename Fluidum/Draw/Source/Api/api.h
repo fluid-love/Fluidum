@@ -1,9 +1,3 @@
-/*
-対処できる例外はない
-例外はログをMessengerに渡したあと，一律に"FDR::Exception::Error"を投げる．
-FDR::Exception::Errorはstd::nasted_exceptionから派生している．
-*/
-
 #pragma once
 
 #ifdef FluidumDraw_Vulkan
@@ -17,28 +11,22 @@ FDR::Exception::Errorはstd::nasted_exceptionから派生している．
 //Main
 namespace FDR {
 
-	//初期化する
+	//initialize
 	/*
-	メインウィンドウを作成し，ImGuiをセットアップする.
-	そして，引数のfunctionを毎フレーム適切な場所で呼び出す
+	Create the main window and set up ImGui.
+	Then call the function in the argument at the appropriate place every frame.
 
-	フォントはfreetypeを利用して3つロードされる.
-		fa_
+	Three fonts are loaded using freetype.
 
-	注意：setMessengerCallbackFunctionを除き，全ての関数はmainLoopないで呼ばなければならない
-
-	引数:
-		function 呼び出される関数
-				 ImGuiの機能は利用可能なので，ImGui::Begin()から記述してよい．
-				 ImGui::RenderやImGui::NewFrameは呼び出さなくてよい．FluidumDraw側で処理される．
-
+	ImGui can be used, so they can be written from ImGui::Begin().
+	ImGui::Render and ImGui::NewFrame do not need to be called; they are handled by FluidumDraw.
 	*/
 
-	//フルスクリーンウィンドウ
+	//FullscreenWindow
 	/*
-	引数:
-		title           windowのtitlebarに表示される文字列
-		windowCloseFlag この変数がtrueになるとloopを抜ける
+	arg:
+		title           : The string displayed in the window's titlebar
+		windowCloseFlag : When this variable is true, exit the loop.
 	*/
 	FluidumDrawAPI void mainLoop(const char* title, void(*function)(), bool* const windowCloseFlag);
 
@@ -47,112 +35,205 @@ namespace FDR {
 //Function
 namespace FDR {
 
-	//Messageが発生したときに一回呼び出される
+	//set callback
 	/*
-	引数はconst std::string&であり，TimeとLogType付のメッセージが入ってくる．
-
-	引数:
-		callback 呼び出される関数
-
+	arg:
+		callback : callback
 	*/
 	FluidumDrawAPI void setMessengerCallbackFunction(const MessengerCallbackType callback);
 
-
 }
 
-//Window
+//Main Window
 namespace FDR {
 
-	//Windowのサイズを取得
+	//get main window size
 	/*
-	戻り値: {width, height}
+	return:
+		{width, height}
 	*/
-	FluidumDrawAPI _NODISCARD std::pair<int32_t, int32_t> getWindowSize();
+	FluidumDrawAPI [[nodiscard]] std::pair<IF32, IF32> getWindowSize();
 
+	FluidumDrawAPI [[nodiscard]] std::pair<IF32, IF32> getFullscreenWindowSize();
 
-	//Windowの位置を取得
+	//get main window pos
 	/*
-	戻り値: {x, y}
+	return:
+		{x, y}
 	*/
-	FluidumDrawAPI _NODISCARD std::pair<int32_t, int32_t> getWindowPos();
+	FluidumDrawAPI [[nodiscard]] std::pair<IF32, IF32> getWindowPos();
 
-
-	//Windowのサイズを変更
+	//set window size
 	/*
-	引数:
-		width  横
-		height 縦
+	arg:
+		width  : width
+		height : height
 	*/
-	FluidumDrawAPI void setWindowSize(const int32_t width, const int32_t height);
+	FluidumDrawAPI void setWindowSize(const IF32 width, const IF32 height);
 	/*
-	引数:
-		size サイズ
+	arg:
+		size {width, height}
 	*/
 	FluidumDrawAPI void setWindowSize(const ImVec2& size);
 
-
-	//Windowの位置を変更
+	//set window pos
 	/*
-	引数:
-		x 横
-		y 縦
+	arg:
+		x : x
+		y : y
 	*/
-	FluidumDrawAPI void setWindowPos(const int32_t x, const int32_t y);
+	FluidumDrawAPI void setWindowPos(const IF32 x, const IF32 y);
 	/*
-	引数:
-		pos 位置
+	arg:
+		pos : pos
 	*/
 	FluidumDrawAPI void setWindowPos(const ImVec2& pos);
 
 
-	//Windowのサイズと位置を変更
 	/*
-	引数:
-		width  横のサイズ
-		height 縦のサイズ
-		x	   横の位置
-		y	   縦の位置
+	Set window pos and size.
+
+	Args:
+		width  : width(size)
+		height : height(size)
+		x	   : x(pos)
+		y	   : y(pos)
 	*/
-	FluidumDrawAPI void setWindowSizePos(const int32_t width, const int32_t height, const int32_t x, const int32_t y);
+	FluidumDrawAPI void setWindowPosSize(const IF32 x, const IF32 y, const IF32 width, const IF32 height);
+
 	/*
-	引数:
-		size サイズ
-		pos 位置
+	Set window pos and size.
+
+	Args:
+		width  : width(size)
+		height : height(size)
+		x	   : x(pos)
+		y	   : y(pos)
+
+	Note:
+		It will be changed at the appropriate time.
 	*/
-	FluidumDrawAPI void setWindowSizePos(const ImVec2& size, const ImVec2& pos);
+	FluidumDrawAPI void setWindowPosSize_timing(const IF32 x, const IF32 y, const IF32 width, const IF32 height);
 
+	/*
+	Set window size.
 
-	FluidumDrawAPI void miximizeWindow();
+	Args:
+		width  : width of window.
+		height : height of window.
 
+	Note:
+		It will be changed at the appropriate time.
+	*/
+	FluidumDrawAPI void setWindowSize_timing(const IF32 width, const IF32 height);
+
+	/*
+	Set window size.
+
+	Args:
+		size : { width, height }
+
+	Note:
+		It will be changed at the appropriate time.
+	*/
+	FluidumDrawAPI void setWindowSize_timing(const ImVec2& size);
+
+	/*
+	Set window pos.
+
+	Args:
+		width  : posX
+		height : posY
+
+	Note:
+		It will be changed at the appropriate time.
+	*/
+	FluidumDrawAPI void setWindowPos_timing(const IF32 x, const IF32 y);
+
+	/*
+	Set window pos.
+
+	Args:
+		pos  : { posX, posY }
+
+	Note:
+		It will be changed at the appropriate time.
+	*/
+	FluidumDrawAPI void setWindowPos_timing(const ImVec2& pos);
+
+	//minimize window
 	FluidumDrawAPI void minimizeWindow();
 
+	//fullcreen window
+	FluidumDrawAPI void fullscreenWindow();
+
+	//restore window
+	FluidumDrawAPI void restoreWindow();
+
+	FluidumDrawAPI [[nodiscard]] bool isWindowFocused();
+
+	FluidumDrawAPI [[nodiscard]] bool isWindowFullscreen();
+
+	FluidumDrawAPI void setWindowWidthMaxLimit(const IF32 width);
+
+	FluidumDrawAPI void setWindowHeightMaxLimit(const IF32 height);
+
+	/*
+	Args:
+		r	  : red   0-255
+		g	  : green 0-255
+		b	  : blue  0-255
+		alpha : alpha 0-255
+	*/
+	FluidumDrawAPI void setTransparentWindow(const I32 r, const I32 g, const I32 b, const I32 alpha);
+	FluidumDrawAPI void unsetTransparentWindow();
+
+}
+
+//viewport scissor
+namespace FDR {
+
+	FluidumDrawAPI void setViewportWidthHeight(const float width, const float height);
+
+	FluidumDrawAPI void setScissorExtent(const UI32 width, const UI32 height);
+
+	FluidumDrawAPI void setScissorOffset(const I32 x, const I32 y);
+
+}
+
+//RenderPass
+namespace FDR {
+
+	FluidumDrawAPI void setClearColor(const float r, const float g, const float b, const float a);
 
 }
 
 //Image
 namespace FDR {
 
-	//ImGuiで使用できるImageを作成して取得する
+	//Create and retrieve an Image that can be used with ImGui
 	/*
-	戻り値はImGuiImageで，内部にImTextureIDをもっている．
-	ImGui::Image(ImTextureID,...)関数のオーバーロードとしてImGui::Image(FDR::ImGuiImage,...)を提供する．
-	これは次のようにリソースを解放するため，ImGuiImage内部のImTextureID(void*)を取得すると無効なアドレスを指してしまう可能性があるからだ．
-	内部でshared_ptrを使っている．リソースの解放は共有数が0になると解放される．
+	The return value is ImGuiImage, which has ImTextureID inside.
+	ImGui::Image(ImTextureID,...) ImGui::Image(FDR::ImGuiImage,...) is provided as a function overload. as an overload of the ImGui::Image function.
+	This is because getting the ImTextureID(void*) inside ImGuiImage may point to an invalid address, since it releases resources as follows.
+	I use shared_ptr internally. The resource is released when the number of shares reaches zero.
 
-	引数:
-		filePath 読み込む画像のパス(.png .jpeg .jpg .ppm ...)
+	Translated with www.DeepL.com/Translator (free version)
 
+	arg:
+		filePath : Path of the image to load(.png .jpeg .jpg .ppm ...).
+
+	return:
+		image
 	*/
 	FluidumDrawAPI ImGuiImage createImGuiImage(const char* filePath);
-
 
 }
 
 //Font
 namespace FDR {
 
-	//デフォルトで用意したフォントの小さいサイズを取得 ImGui::PushFont用
-	FluidumDrawAPI _NODISCARD ImFont* getDefaultFontMiniSize();
-
+	//Get the small size of the font provided by default for ImGui::PushFont;
+	FluidumDrawAPI [[nodiscard]] ImFont* getDefaultFontMiniSize();
 
 }

@@ -6,7 +6,6 @@ namespace FVK::Internal {
 
 	class Fence final {
 	public:
-
 		struct CreateInfo : public vk::FenceCreateInfo {
 		public:
 			using vk::FenceCreateInfo::flags;
@@ -21,22 +20,35 @@ namespace FVK::Internal {
 		};
 
 	public:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		explicit Fence(ManagerPassKey, const Data::FenceData& data, const Parameter& parameter);
-		~Fence() = default;
-		FluidumUtils_Class_Default_CopyMove(Fence)
+
+		~Fence() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(Fence);
 
 	private:
+		/*
+		Exception:
+			FailedToCreate
+		*/
+		//strong
 		void create(const Data::FenceData& data, const Parameter& parameter);
+	
 	public:
-		_NODISCARD const Data::FenceInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		//no-throw
+		[[nodiscard]] const Data::FenceInfo& get() const noexcept;
 
 	private:
-		Data::FenceInfo info = {};
+		Data::FenceInfo info{};
 
 	};
-
-
-
 
 }

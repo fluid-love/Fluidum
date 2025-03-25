@@ -1,28 +1,14 @@
 #include "credit.h"
 
-FS::Internal::Bar::Credit::Credit() {
-	GLog.add<FD::Log::Type::None>("Construct CreditScene.");
+FS::Bar::Credit::Credit() {
+	FluidumScene_Log_Constructor(::FS::Bar::Credit);
 }
 
-FS::Internal::Bar::Credit::~Credit() noexcept {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct CreditScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+FS::Bar::Credit::~Credit() noexcept {
+	FluidumScene_Log_Destructor(::FS::Bar::Credit);
 }
 
-void FS::Internal::Bar::Credit::call() {
+void FS::Bar::Credit::call() {
 
 	if (ImGui::BeginPopupModal("Credit", nullptr)) {
 

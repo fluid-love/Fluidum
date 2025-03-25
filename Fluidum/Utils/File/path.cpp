@@ -1,14 +1,15 @@
 #include "path.h"
-
-#ifdef BOOST_OS_WINDOWS
-#include <Windows.h>
 #include "../Text/guitext.h"
+#include "../Type/type.h"
+
+#ifdef FluidumUtils_Type_OS_Windows
+#include <Windows.h>
 #endif
 
 std::string FU::File::directoryName(const std::string& path) {
 	std::string result = path;
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	if (result.back() == '/' || result.back() == '\\')
 		result.pop_back();
 	auto itr = std::find_if(result.rbegin(), result.rend(), [](auto& x) {return (x == '/') || (x == '\\'); });
@@ -28,7 +29,7 @@ std::string FU::File::directoryName(const std::string& path) {
 std::string FU::File::directory(const std::string& path) {
 	std::string result = path;
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	if (result.back() == '/' || result.back() == '\\')
 		return path;
 	auto itr = std::find_if(result.rbegin(), result.rend(), [](auto& x) {return (x == '/') || (x == '\\'); });
@@ -40,7 +41,7 @@ std::string FU::File::directory(const std::string& path) {
 	if (itr == result.rend())
 		throw std::runtime_error("Arg \"path\" is not directory.");
 
-	result.erase(std::next(itr).base(), result.end());
+	result.erase(itr.base(), result.end());
 
 	return result;
 }
@@ -51,8 +52,9 @@ std::string FU::File::fileName(const std::string& path) {
 }
 
 std::string FU::File::consistentDirectory(const std::string& dir) {
-	std::string result = std::filesystem::path(dir).lexically_normal().generic_string();
-#ifdef BOOST_OS_WINDOWS
+	std::filesystem::path path(dir);
+	std::string result = path.lexically_normal().generic_string();
+#ifdef FluidumUtils_Type_OS_Windows
 	auto itr = result.begin();
 	while (true) {
 		itr = std::find(itr, result.end(), '\\');
@@ -63,14 +65,12 @@ std::string FU::File::consistentDirectory(const std::string& dir) {
 			break;
 	}
 #endif
-	if (result.back() != '/')
-		result.push_back('/');
 	return result;
 }
 
 void FU::File::hide(const std::string& path) {
 
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	//set attribute
 	const std::wstring wstr = FU::Text::utf8ToUtf16(path);
 	int att = GetFileAttributes(wstr.data());
@@ -83,7 +83,7 @@ void FU::File::hide(const std::string& path) {
 }
 
 bool FU::File::containForbiddenCharactor(const std::string& name) {
-#ifdef BOOST_OS_WINDOWS
+#ifdef FluidumUtils_Type_OS_Windows
 	auto itr = std::find_if(name.begin(), name.end(), [](char x)
 		{
 			return
@@ -98,8 +98,103 @@ bool FU::File::containForbiddenCharactor(const std::string& name) {
 				(x == '|');
 		}
 	);
+
+	const auto dotCount = std::count(name.begin(), name.end(), '.');
+	const auto spaceCount = std::count(name.begin(), name.end(), ' ');
+
 #else
 #error NotSupported
 #endif
-	return itr != name.end();
+	return (itr != name.end()) || (dotCount == name.size()) || (spaceCount == name.size());
+}
+
+std::string FU::File::finalName(const std::string& name) {
+	assert(!containForbiddenCharactor(name) && !name.empty());
+
+	std::string result = name;
+
+	Size count = 0;
+
+	for (auto itr = result.rbegin(), end = result.rend(); itr != end; itr++) {
+		if (*itr == '.' || *itr == ' ')
+			count++;
+		else
+			break;
+	}
+
+	if (count == 0)
+		return name;
+
+	result.erase(result.end() - count, result.end());
+	return result;
+}
+
+void FU::File::tryPushSlash(std::string& path) {
+	if (path.empty())
+		return;
+#ifdef FluidumUtils_Type_OS_Windows
+	if (path.back() != '/' && path.back() != '\\')
+		path.push_back('/');
+#else
+	if (path.back() != '/')
+		path.push_back('/');
+#endif
+}
+
+FU::Size FU::File::maxPathSize() noexcept {
+#ifdef FluidumUtils_Type_OS_Windows
+	return MAX_PATH;
+#else
+#error NotSupported
+#endif
+}
+
+std::string FU::File::absolute(const std::string& path) {
+	std::filesystem::path p(path);
+	if (p.is_absolute())
+		return path;
+
+	const auto abso = std::filesystem::absolute(path);
+	return abso.string();
+}
+
+bool FU::File::isAbsolute(const std::string& path) {
+	const std::filesystem::path p(path);
+	return p.is_absolute();
+}
+
+std::string FU::File::changeName(const std::string& path, const std::string& newName, const Size depth) {
+	std::string back{};
+	back.resize(path.size());
+	{
+		std::string temp = path;
+		auto itr = temp.rbegin();
+		Size dis = 0;
+
+		for (Size i = 0; i < depth; i++) {
+
+#ifdef FluidumUtils_Type_OS_Windows
+			auto find = std::find_if(itr, temp.rend(), [](auto& x) {return (x == '/') || (x == '\\'); });
+#endif
+			if (find == temp.rend())
+				return newName;
+
+			std::copy((find + 1).base(), itr.base(), std::inserter(back, back.begin()));
+
+			dis += static_cast<Size>(std::distance(itr, find));
+			itr = (find + 1);
+		}
+
+	}
+
+	std::string front = path;
+
+	for (Size i = 0; i < depth + 1; i++) {
+		front = ::FU::File::directory(front);
+		front.pop_back();
+	}
+	front.push_back('/');
+
+	(front += newName) += back;
+	return front;
 }

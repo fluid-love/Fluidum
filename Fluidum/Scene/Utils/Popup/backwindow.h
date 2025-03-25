@@ -2,7 +2,7 @@
 
 #include "../../Common/common.h"
 
-namespace FS {
+namespace FS::Utils {
 
 	class PopupBackWindow final : public Scene {
 	public:
@@ -11,24 +11,21 @@ namespace FS {
 
 		~PopupBackWindow() noexcept;
 
-		FluidumUtils_Class_Delete_CopyMove(PopupBackWindow)
+		FluidumUtils_Class_Delete_CopyMove(PopupBackWindow);
 
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
 		const FD::GuiRead* const guiRead;
 
-
+	private:
 		struct {
 			ImVec2 windowPos{};
 			ImVec2 windowSize{};
 
 		}style;
-
-	private:
-
-
-
+	
 	};
+
 }

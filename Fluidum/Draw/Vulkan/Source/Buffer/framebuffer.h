@@ -28,18 +28,39 @@ namespace FVK::Internal {
 			CreateInfo* pInfo = nullptr;
 			std::optional<Key::LogicalDeviceVariantKey> logicalDeviceKey = std::nullopt;
 		};
+
 	public:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//basic
 		explicit FrameBuffer(ManagerPassKey, const Data::FrameBufferData& data, Parameter& parameter);
-		~FrameBuffer() = default;
-		FluidumUtils_Class_Default_CopyMove(FrameBuffer)
+
+		~FrameBuffer() noexcept = default;
+		FluidumUtils_Class_Default_CopyMove(FrameBuffer);
 
 	private:
+		/*
+		Exception:
+			std::exception
+			FailedToCreate
+		*/
+		//basic
 		void create(const Data::FrameBufferData& data, Parameter& parameter);
+
 	public:
-		const Data::FrameBufferInfo& get() const noexcept;
-		void destroy();
+		//no-throw
+		void destroy() noexcept;
+
+	public:
+		//no-throw
+		[[nodiscard]] const Data::FrameBufferInfo& get() const noexcept;
 
 	private:
-		Data::FrameBufferInfo info = {};
+		Data::FrameBufferInfo info{};
+
 	};
+
 }

@@ -1,29 +1,3 @@
-/*
-MIT License
-
-Copyright (c) 2021- fluid-love
-
-https://github.com/fluid-love/ImGuiAnimation
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
 #pragma once
 /*
 ImGuiの既存の関数を利用しているだけで,ImGui内部の情報を直接いじることはない.
@@ -44,22 +18,6 @@ Define
 ImGuiAnimation_Namespace_ImAnime
 ImGuiAnimation_Namespace_ImAnimeS
 */
-
-/*
-Functions:
-
-namespace ImAnime
-ver1.0.0
-	ImAnime::PushStyleColor
-	ImAnime::PushStyleVar
-	ImAnime::SetNextWindowBgAlpha
-	ImAnime::SetNextWindowSize
-	ImAnime::SetNextItemWidth
-	ImAnime::Dummy
-	ImAnimeS::Dummy
-
-*/
-
 
 #include <iostream>
 #include <chrono>
@@ -400,16 +358,16 @@ namespace ImAnime::Internal {
 		static auto get(const ImCounter<T>& counter) { return counter.count; }
 
 		template<ImAnimeCounterType T>
-		static void add(ImCounter<T>& counter) {
-			static_assert(!std::is_same_v<T, ImAnimeSecond>, "ERROR: add");
+		static void advance(ImCounter<T>& counter) {
+			static_assert(!std::is_same_v<T, ImAnimeSecond>, "ERROR: advance");
 			constexpr T max = std::numeric_limits<T>::max();
 			if (counter.count < max)
 				counter.count++;
 		}
 
 		template<ImAnimeCounterType T>
-		static void sub(ImCounter<T>& counter) {
-			static_assert(!std::is_same_v<T, ImAnimeSecond>, "ERROR: sub");
+		static void prev(ImCounter<T>& counter) {
+			static_assert(!std::is_same_v<T, ImAnimeSecond>, "ERROR: prev");
 			constexpr T min = std::numeric_limits<T>::min();
 			if (counter.count > min)
 				counter.count--;
@@ -481,13 +439,13 @@ namespace ImAnime::Internal {
 
 	//呼び出すImGuiの関数
 	enum class ImGuiFunctionType : FlagUnderlyingType {
-		NONE,
-		DUMMY,
-		PUSH_STYLE_COLOR,
-		PUSH_STYLE_VAR,
-		SET_NEXT_WINDOW_BG_ALPHA,
-		SET_NEXT_WINDOW_SIZE,
-		SET_NEXT_ITEM_WIDTH,
+		None,
+		Dummy,
+		PushStyleColor,
+		PushStyleVar,
+		SetNextWindowBgAlpha,
+		SetNextWindowSize,
+		SetNextItemWidth,
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -667,7 +625,7 @@ namespace ImAnime::Internal {
 
 			//pause状態でないのであれば進める
 			if (counter.isDown(ImCounterCond::PAUSE)) {
-				ImAnime::Internal::CounterManager::add(counter);//カウントを進める
+				ImAnime::Internal::CounterManager::advance(counter);//カウントを進める
 			}
 		}
 
@@ -742,13 +700,14 @@ namespace ImAnime::Internal {
 
 	private://計算
 
-		auto calc() {
+		T calc() {
 			if (this->animeType == ImAnimeType::LINEAR)
 				return begin + this->linear();
 			else if (this->animeType == ImAnimeType::SQUARE)
 				return begin + this->square();
-			else
-				assert(true);
+
+			assert(true);
+			return {};
 		}
 
 		//線形
@@ -769,21 +728,23 @@ namespace ImAnime::Internal {
 
 		void callImGuiFunction(const T& val) {
 			using Type = ImGuiFunctionType;
-			if constexpr (FuncType == Type::DUMMY)
+			if constexpr (FuncType == Type::None)
+				return;
+			else if constexpr (FuncType == Type::Dummy)
 				ImGui::Dummy(val);
-			else if constexpr (FuncType == Type::PUSH_STYLE_COLOR) {
+			else if constexpr (FuncType == Type::PushStyleColor) {
 				static_assert(sizeof...(Params) > 0);
 				pushStyleColor(this->params, val);
 			}
-			else if constexpr (FuncType == Type::PUSH_STYLE_VAR) {
+			else if constexpr (FuncType == Type::PushStyleVar) {
 				static_assert(sizeof...(Params) > 0);
 				pushStyleVar(this->params, val);
 			}
-			else if constexpr (FuncType == Type::SET_NEXT_WINDOW_BG_ALPHA)
+			else if constexpr (FuncType == Type::SetNextWindowBgAlpha)
 				ImGui::SetNextWindowBgAlpha(val);
-			else if constexpr (FuncType == Type::SET_NEXT_WINDOW_SIZE)
+			else if constexpr (FuncType == Type::SetNextWindowSize)
 				ImGui::SetNextWindowSize(val);
-			else if constexpr (FuncType == Type::SET_NEXT_ITEM_WIDTH)
+			else if constexpr (FuncType == Type::SetNextItemWidth)
 				ImGui::SetNextItemWidth(val);
 
 		}
@@ -793,7 +754,6 @@ namespace ImAnime::Internal {
 
 
 //static
-
 struct ImAnimeVec2 final {
 	float x = 0.0f;
 	float y = 0.0f;
@@ -906,7 +866,7 @@ namespace ImAnime::Internal {
 
 				//pause状態でないのであれば進める
 				if (counter.isDown(ImCounterCond::PAUSE)) {
-					ImAnime::Internal::CounterManager::add(counter);//カウントを進める
+					ImAnime::Internal::CounterManager::advance(counter);//カウントを進める
 				}
 			}
 
@@ -1050,22 +1010,32 @@ namespace ImAnime {
 
 
 	template<ImAnimeCounterType Counter>
-	using PushStyleColor = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::PUSH_STYLE_COLOR, ImVec4, Counter, ImGuiCol>;
+	using PushStyleColor = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::PushStyleColor, ImVec4, Counter, ImGuiCol>;
 
 	template<typename T, ImAnimeCounterType Counter>
-	using PushStyleVar = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::PUSH_STYLE_VAR, T, Counter, ImGuiStyleVar>;
+	using PushStyleVar = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::PushStyleVar, T, Counter, ImGuiStyleVar>;
 
 	template<ImAnimeCounterType Counter>
-	using Dummy = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::DUMMY, ImVec2, Counter>;
+	using Dummy = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::Dummy, ImVec2, Counter>;
 
 	template<ImAnimeCounterType Counter>
-	using SetNextWindowBgAlpha = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::SET_NEXT_WINDOW_BG_ALPHA, float, Counter>;
+	using SetNextWindowBgAlpha = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::SetNextWindowBgAlpha, float, Counter>;
 
 	template<ImAnimeCounterType Counter>
-	using SetNextWindowSize = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::SET_NEXT_WINDOW_SIZE, float, Counter>;
+	using SetNextWindowSize = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::SetNextWindowSize, float, Counter>;
 
 	template<ImAnimeCounterType Counter>
-	using SetNextItemSize = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::SET_NEXT_ITEM_WIDTH, float, Counter>;
+	using SetNextItemSize = ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::SetNextItemWidth, float, Counter>;
+
+	template<ImAnimeCounterType Counter>
+	void Advance(ImCounter<Counter>& counter, const ImAnimeCountType<Counter> count) {
+		ImAnime::Internal::Anime<ImAnime::Internal::ImGuiFunctionType::None, float, Counter> dummy{
+			counter,
+			count,
+			0.0f,
+			1.0f
+		};
+	}
 
 	inline void PopStyleColor(int count = 1) {
 		ImGui::PopStyleColor(count);
@@ -1095,7 +1065,7 @@ namespace ImAnimeS {
 
 
 	template<ImAnimeVec2 Begin, ImAnimeVec2 End, auto Count, ImAnimeType AnimeType = ImAnimeType::LINEAR>
-	using Dummy = ImAnime::Internal::AnimeS<ImAnime::Internal::ImGuiFunctionType::DUMMY, Internal::CountTypeToCounterType<decltype(Count)>, Count, ImAnimeVec2, Begin, End, AnimeType>;
+	using Dummy = ImAnime::Internal::AnimeS<ImAnime::Internal::ImGuiFunctionType::Dummy, Internal::CountTypeToCounterType<decltype(Count)>, Count, ImAnimeVec2, Begin, End, AnimeType>;
 
 
 

@@ -5,7 +5,7 @@ FU::GuiText::Text::Text(const std::string text)
 {}
 
 FU::GuiText::Text::Text(std::string&& text) noexcept
-	: text(text)
+	: text(std::move(text))
 {}
 
 FU::GuiText::Text::Text(const char* text)
@@ -24,6 +24,12 @@ FU::GuiText::Text::operator const char* () const noexcept {
 	return this->text.c_str();
 }
 
+FU::GuiText::Text::operator const std::string& () const noexcept {
+	return this->text;
+}
+
+#ifdef BOOST_OS_WINDOWS
+
 #include <windows.h>
 std::wstring FU::Text::utf8ToUtf16(const std::string& str) {
 	if (str.empty())
@@ -33,3 +39,5 @@ std::wstring FU::Text::utf8ToUtf16(const std::string& str) {
 	MultiByteToWideChar(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), size);
 	return result;
 }
+
+#endif

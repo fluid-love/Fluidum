@@ -1,11 +1,12 @@
 #include "manager.h"
 
-FVK::Internal::Manager::Manager::Manager() {
-	GMessenger.add<FU::Log::Type::None>("Construct FluidumVK Manager.");
+FVK::Internal::Manager::Manager::Manager() noexcept {
+	//no-throw
+	GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, "Construct FluidumVK Manager.");
 }
 
-FVK::Internal::Manager::Manager::~Manager() {
-	GMessenger.add<FU::Log::Type::None>("Destruct FluidumVK Manager.");
+FVK::Internal::Manager::Manager::~Manager() noexcept {
+	GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, "Destruct FluidumVK Manager.");
 }
 
 namespace FVK::Internal {
@@ -20,14 +21,28 @@ namespace FVK::Internal {
 }
 
 void FVK::Internal::Manager::Manager::terminate() {
-	//waitIdle コマンドバッファで使用中に削除させない
+	//Don't delete when using commandbuffer
 	for (auto& x : std::get<CorrespondenceAt<FvkType::LogicalDevice>()>(this->data)) {
-		vk::Device dv = x.get().device;
+		vk::Device dv = x->get().device;
 		auto result = dv.waitIdle();
 		if (result != vk::Result::eSuccess) {
-			throw std::runtime_error("Failed to waitIdle.");
+			Exception::throwFailedToDestroy();
 		}
 	}
 
-	this->terminate_recursive();
+	try {
+		this->terminate_recursive();
+	}
+	catch (...) {
+		std::terminate();
+	}
+
+	if (GKeyManager.empty())
+		return;
+
+	//not empty
+	GMessenger.add<FU::Log::Type::Warning>(__FILE__, __LINE__, "All items have been destroyed, but keys(size = {}) are still in the GKeyManager.", GKeyManager.size());
+
+	//no-throw
+	GKeyManager.clear();
 }

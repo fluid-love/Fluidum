@@ -3,7 +3,7 @@
 #include "../../Common/include.h"
 #include "../Base/base.h"
 
-//ëOï˚êÈåæ
+//forward declaration
 namespace FDR::Internal {
 	struct ImGuiImageGetter;
 }
@@ -27,7 +27,7 @@ namespace FDR::Internal {
 	public:
 		explicit ImGuiImage(ImTextureID image, std::pair<FVK::TextureKey<std::string>, FVK::ImGuiImageKey<std::string>>&& keys);
 		~ImGuiImage() = default;
-		FluidumUtils_Class_Default_CopyMove(ImGuiImage)
+		FluidumUtils_Class_Default_CopyMove(ImGuiImage);
 
 	private:
 		std::shared_ptr<ImGuiImageData> data;
@@ -38,7 +38,7 @@ namespace FDR::Internal {
 	ImGuiImage createImGuiImage(const char* filePath);
 
 	struct ImGuiImageGetter final {
-		_NODISCARD ImTextureID get(const ImGuiImage& image) const noexcept;
+		[[nodiscard]] ImTextureID get(const ImGuiImage& image) const noexcept;
 	};
 }
 

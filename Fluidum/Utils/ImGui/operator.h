@@ -26,28 +26,28 @@ namespace FU::ImGui::Operators {
 	l.x + r.x
 	l.y + r.y
 	*/
-	ImVec2 operator+(const ImVec2& l, const ImVec2& r) noexcept;
+	[[nodiscard]] ImVec2 operator+(const ImVec2& l, const ImVec2& r) noexcept;
 
 
 	/*
 	l.x - r.x
 	l.y - r.y
 	*/
-	ImVec2 operator-(const ImVec2& l, const ImVec2& r) noexcept;
+	[[nodiscard]] ImVec2 operator-(const ImVec2& l, const ImVec2& r) noexcept;
 
 
 	/*
 	l.x * r.x
 	l.y * r.y
 	*/
-	ImVec2 operator*(const ImVec2& l, const ImVec2& r) noexcept;
+	[[nodiscard]] ImVec2 operator*(const ImVec2& l, const ImVec2& r) noexcept;
 
 
 	/*
 	l.x / r.x
 	l.y / r.y
 	*/
-	ImVec2 operator/(const ImVec2& l, const ImVec2& r) noexcept;
+	[[nodiscard]] ImVec2 operator/(const ImVec2& l, const ImVec2& r) noexcept;
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,28 +57,28 @@ namespace FU::ImGui::Operators {
 	l.x + r
 	l.y + r
 	*/
-	ImVec2 operator+(const ImVec2& l, const float r) noexcept;
+	[[nodiscard]] ImVec2 operator+(const ImVec2& l, const float r) noexcept;
 
 
 	/*
 	l.x - r
 	l.y - r
 	*/
-	ImVec2 operator-(const ImVec2& l, const float r) noexcept;
+	[[nodiscard]] ImVec2 operator-(const ImVec2& l, const float r) noexcept;
 
 
 	/*
 	l.x * r
 	l.y * r
 	*/
-	ImVec2 operator*(const ImVec2& l, const float r) noexcept;
+	[[nodiscard]] ImVec2 operator*(const ImVec2& l, const float r) noexcept;
 
 
 	/*
 	l.x / r
 	l.y / r
 	*/
-	ImVec2 operator/(const ImVec2& l, const float r) noexcept;
+	[[nodiscard]] ImVec2 operator/(const ImVec2& l, const float r) noexcept;
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ namespace FU::ImGui::Operators {
 	l.z + r.z
 	l.w + r.w
 	*/
-	ImVec4 operator+(const ImVec4& l, const ImVec4& r) noexcept;
+	[[nodiscard]] ImVec4 operator+(const ImVec4& l, const ImVec4& r) noexcept;
 
 
 	/*
@@ -99,7 +99,7 @@ namespace FU::ImGui::Operators {
 	l.z - r.z
 	l.w - r.w
 	*/
-	ImVec4 operator-(const ImVec4& l, const ImVec4& r) noexcept;
+	[[nodiscard]] ImVec4 operator-(const ImVec4& l, const ImVec4& r) noexcept;
 
 
 	/*
@@ -108,7 +108,7 @@ namespace FU::ImGui::Operators {
 	l.z * r.z
 	l.w * r.w
 	*/
-	ImVec4 operator*(const ImVec4& l, const ImVec4& r) noexcept;
+	[[nodiscard]] ImVec4 operator*(const ImVec4& l, const ImVec4& r) noexcept;
 
 
 	/*
@@ -117,7 +117,7 @@ namespace FU::ImGui::Operators {
 	l.z / r.z
 	l.w / r.w
 	*/
-	ImVec4 operator/(const ImVec4& l, const ImVec4& r) noexcept;
+	[[nodiscard]] ImVec4 operator/(const ImVec4& l, const ImVec4& r) noexcept;
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ namespace FU::ImGui::Operators {
 	l.z + r
 	l.w + r
 	*/
-	ImVec4 operator+(const ImVec4& l, const float r) noexcept;
+	[[nodiscard]] ImVec4 operator+(const ImVec4& l, const float r) noexcept;
 
 
 	/*
@@ -138,7 +138,7 @@ namespace FU::ImGui::Operators {
 	l.z - r
 	l.w - r
 	*/
-	ImVec4 operator-(const ImVec4& l, const float r) noexcept;
+	[[nodiscard]] ImVec4 operator-(const ImVec4& l, const float r) noexcept;
 
 
 	/*
@@ -147,7 +147,7 @@ namespace FU::ImGui::Operators {
 	l.z * r
 	l.w * r
 	*/
-	ImVec4 operator*(const ImVec4& l, const float r) noexcept;
+	[[nodiscard]] ImVec4 operator*(const ImVec4& l, const float r) noexcept;
 
 
 	/*
@@ -156,7 +156,7 @@ namespace FU::ImGui::Operators {
 	l.z / r
 	l.w / r
 	*/
-	ImVec4 operator/(const ImVec4& l, const float r) noexcept;
+	[[nodiscard]] ImVec4 operator/(const ImVec4& l, const float r) noexcept;
 
 
 }

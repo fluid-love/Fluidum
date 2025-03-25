@@ -23,6 +23,8 @@ namespace FD::Calc::Lua {
 		System_SleepSeconds,
 		System_SleepMilliSeconds,
 
+		array_make,
+
 		Plot_Make,
 		Plot_makePlot,
 		Plot_Plot,
@@ -39,7 +41,7 @@ namespace FD::Calc::Lua::Internal {
 
 	template<FunctionType>
 	struct RetArgInfo final {
-		FluidumUtils_Class_Delete_ConDestructor(RetArgInfo)
+		FluidumUtils_Class_Delete_ConDestructor(RetArgInfo);
 	};
 
 	template<>

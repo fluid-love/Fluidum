@@ -1,0 +1,18 @@
+[Window][Debug##Default]
+Pos=60,60
+Size=400,400
+Collapsed=0
+
+[Window][ProjectForm]
+Pos=320,199
+Size=1280,799
+Collapsed=0
+
+[Window][NewProject]
+Pos=320,199
+Size=1280,799
+Collapsed=0
+
+[Docking][Data]
+DockSpace ID=0xB3CA9461 Window=0x51F3BBEB Pos=58,70 Size=1859,1097 CentralNode=1
+

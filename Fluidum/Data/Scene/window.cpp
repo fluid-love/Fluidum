@@ -1,4 +1,5 @@
 #include "window.h"
+#include "..\..\Draw\Vulkan\Source\Window\window.h"
 
 bool* FD::WindowWrite::getCloseFlag() const noexcept {
 	using namespace Internal::Scene;

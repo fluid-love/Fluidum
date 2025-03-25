@@ -1,38 +1,28 @@
 #pragma once
 
 #include <exception>
+#include <string>
 
 namespace FS::Exception {
 
-	class AlreadyAdded final : public std::exception {
-	private:
-		using Base = std::exception;
-	public:
-		explicit AlreadyAdded(const std::string& message) : Base(message.c_str()) {}
+	enum class ErrorType : UIF8 {
+		AlreadyAdded,
+		AlreadyDeleted,
 	};
 
-	class AlreadyDeleted final : public std::exception {
-	private:
-		using Base = std::exception;
-	public:
-		explicit AlreadyDeleted(const std::string& message) : Base(message.c_str()) {}
-	};
+	using Error = FU::Exception::Base<ErrorType>;
 
 	namespace Internal {
-		template<typename Scene>
-		[[noreturn]] void throwAlreadyAdded() {
-			//typeid()::name VisualStudio‚È‚ç‚¿‚á‚ñ‚ÆƒNƒ‰ƒX–¼‚ğ•¶š—ñ‚Æ‚µ‚Äo—Í‚Å‚«‚é.
-			std::string message = typeid(Scene).name();
-			message += " is already added.";
-			throw AlreadyAdded(message);
+
+		[[noreturn]] inline void throwAlreadyAdded() {
+			throw Error(ErrorType::AlreadyAdded);
 		}
 
 		template<typename Scene>
-		[[noreturn]] void throwAlreadyDeleted() {
-			std::string message = typeid(Scene).name();
-			message += " is already deleted.";
-			throw AlreadyDeleted(message);
+		[[noreturn]] inline void throwAlreadyDeleted() {
+			throw Error(ErrorType::AlreadyDeleted);
 		}
+
 	}
 
 }

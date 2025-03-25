@@ -7,6 +7,7 @@ namespace FS {
 	class MenuBar final : public Scene {
 	public:
 		explicit MenuBar(
+			const FD::Style::ColorRead* const colorRead,
 			FD::ProjectWrite* const projectWrite,
 			const FD::ProjectRead* const projectRead,
 			FD::WindowWrite* const windowWrite,
@@ -14,12 +15,12 @@ namespace FS {
 			FD::GuiWrite* const guiWrite,
 			FD::Coding::TabWrite* const tabWrite,
 			const FD::Coding::TabRead* const tabRead,
-			const FD::FluidumFilesRead* const fluidumFilesRead,
 			const FD::CalcRead* const calcRead,
 			FD::CalcWrite* const calcWrite,
 			const FD::SceneRead* const sceneRead
 		);
 		void Constructor(
+			FD::Style::ColorRead,
 			FD::ProjectWrite,
 			FD::ProjectRead,
 			FD::WindowWrite,
@@ -27,7 +28,6 @@ namespace FS {
 			FD::GuiWrite,
 			FD::Coding::TabWrite,
 			FD::Coding::TabRead,
-			FD::FluidumFilesRead,
 			FD::CalcRead,
 			FD::CalcWrite,
 			FD::SceneRead
@@ -35,10 +35,13 @@ namespace FS {
 
 		~MenuBar() noexcept;
 
+		FluidumUtils_Class_Delete_CopyMove(MenuBar);
+
 	public:
 		virtual void call() override;
 
-	private://data
+	private:
+		const FD::Style::ColorRead* const colorRead;
 		FD::ProjectWrite* const projectWrite;
 		const FD::ProjectRead* const projectRead;
 		FD::WindowWrite* const windowWrite;
@@ -46,19 +49,28 @@ namespace FS {
 		FD::GuiWrite* const guiWrite;
 		FD::Coding::TabWrite* const tabWrite;
 		const FD::Coding::TabRead* const tabRead;
-		const FD::FluidumFilesRead* const fluidumFilesRead;
 		const FD::CalcRead* const calcRead;
 		FD::CalcWrite* const calcWrite;
 		const FD::SceneRead* const sceneRead;
 
 		FD::Text::MenuBar text{};
 
-	private://data
-
+	private:
 		struct {
 			ImVec2 offset{};
 			ImVec2 itemSpacing{};
 		}style;
+
+		struct {
+			float file = 0.0f;
+			float edit = 0.0f;
+			float calc = 0.0f;
+			float view = 0.0f;
+			float project = 0.0f;
+			float extension = 0.0f;
+			float window = 0.0f;
+			float help = 0.0f;
+		}menuBarItemWidth;
 
 		struct {
 			ImVec2 open{};
@@ -86,7 +98,6 @@ namespace FS {
 		}view;
 
 	private:
-
 		//file
 		void fileGui();
 		void itemCreateNewProject();
@@ -116,6 +127,7 @@ namespace FS {
 
 	private://project
 		void projectGui();
+		void project_property();
 
 	private://extention
 		void extensionGui();
@@ -132,5 +144,7 @@ namespace FS {
 
 	private:
 		void pushItemSpacing();
+
 	};
+
 }

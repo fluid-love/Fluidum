@@ -10,40 +10,35 @@ void FVK::Internal::FrameBuffer::create(const Data::FrameBufferData& data, Param
 
 	const auto& imageViewRefs = data.get<FvkType::ImageView_Vector>();
 	std::vector<vk::ImageView> imageViews(imageViewRefs.size());
-	for (std::size_t i = 0, size = imageViewRefs.size(); i < size; i++) {
+	for (Size i = 0, size = imageViewRefs.size(); i < size; i++) {
 		imageViews[i] = imageViewRefs[i].get().imageView;
 	}
 
 	parameter.pInfo->pAttachments = imageViews.data();
-	parameter.pInfo->attachmentCount = static_cast<uint32_t>(imageViews.size());
+	parameter.pInfo->attachmentCount = static_cast<UI32>(imageViews.size());
 
 	auto result = data.get<FvkType::LogicalDevice>().device.createFramebuffer(*parameter.pInfo, nullptr);
 
-	if (result.result != vk::Result::eSuccess)
-		Exception::throwFailedToCreate("Failed to create FrameBuffer");
+	if (result.result != vk::Result::eSuccess) {
+		GMessenger.add<FU::Log::Type::Error>(__FILE__, __LINE__, "Failed to create FrameBuffer({}).", vk::to_string(result.result));
+		Exception::throwFailedToCreate();
+	}
 
+	//no-throw
 	this->info.frameBuffer = result.value;
-
 	this->info.device = data.get<FvkType::LogicalDevice>().device;
-}
-//
-//void FVK::Internal::FrameBuffer::create(const Data::OffScreenFrameBufferData& data, Parameter& parameter) {
-//
-//	auto result = data.get<FvkType::LogicalDevice>().device.createFramebuffer(*parameter.pInfo, nullptr);
-//
-//	if (result.result != vk::Result::eSuccess)
-//		Exception::throwFailedToCreate("Failed to create FrameBuffer");
-//
-//	this->info.frameBuffer = result.value;
-//}
 
+	static_assert(noexcept(info.frameBuffer = result.value));
+	static_assert(noexcept(info.device = data.get<FvkType::LogicalDevice>().device));
+
+}
 
 const FVK::Internal::Data::FrameBufferInfo& FVK::Internal::FrameBuffer::get() const noexcept {
 	assert(this->info.frameBuffer);
 	return this->info;
 }
 
-void FVK::Internal::FrameBuffer::destroy() {
+void FVK::Internal::FrameBuffer::destroy() noexcept {
 	assert(this->info.frameBuffer);
 	this->info.device.destroyFramebuffer(this->info.frameBuffer);
 }

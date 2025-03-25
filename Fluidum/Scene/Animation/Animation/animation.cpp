@@ -1,27 +1,11 @@
 ﻿#include "animation.h"
 
 FS::Animation::Animation() {
-
-	GLog.add<FD::Log::Type::None>("Construct AnimationScene.");
-
+	FluidumScene_Log_Constructor(::FS::Animation);
 }
 
 FS::Animation::~Animation() {
-	try {
-		GLog.add<FD::Log::Type::None>("Destruct AnimationScene.");
-	}
-	catch (const std::exception& e) {
-		try {
-			std::cerr << e.what() << std::endl;
-			abort();
-		}
-		catch (...) {
-			abort();
-		}
-	}
-	catch (...) {
-		abort();
-	}
+	FluidumScene_Log_Destructor(::FS::Animation);
 }
 
 void FS::Animation::call() {

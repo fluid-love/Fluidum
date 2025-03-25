@@ -146,11 +146,6 @@ namespace FVK::Internal::Key {
 	using TextureKeys = std::vector<TextureKey<T>>;
 
 	template<IsKeyType T>
-	using DrawKey = Key<FvkType::Draw, T>;
-	template<IsKeyType T>
-	using DrawKeys = std::vector<DrawKey<T>>;
-
-	template<IsKeyType T>
 	using ImGuiKey = Key<FvkType::ImGui, T>;
 	template<IsKeyType T>
 	using ImGuiKeys = std::vector<ImGuiKey<T>>;
@@ -159,7 +154,6 @@ namespace FVK::Internal::Key {
 	using ImGuiImageKey = Key<FvkType::ImGuiImage, T>;
 	template<IsKeyType T>
 	using ImGuiImageKeys = std::vector<ImGuiImageKey<T>>;
-
 
 }
 
@@ -197,10 +191,8 @@ namespace FVK::Internal::Key {
 	using GraphicsPipelineLayoutVariantKey = VariantKey<GraphicsPipelineLayoutKey>;
 	using GraphicsPipelineLayoutVariantVectorKey = VariantVectorKey<GraphicsPipelineLayoutKey>;
 
-
 	using DescriptorSetLayoutVariantKey = VariantKey<DescriptorSetLayoutKey>;
 	using DescriptorSetLayoutVariantVectorKey = VariantVectorKey<DescriptorSetLayoutKey>;
-
 
 	using ImageVariantKey = VariantKey<ImageKey>;
 	using ImageVariantVectorKey = VariantVectorKey<ImageKey>;

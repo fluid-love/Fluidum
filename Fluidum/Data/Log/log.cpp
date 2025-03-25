@@ -1,79 +1,110 @@
 #include "log.h"
 
-void FD::Internal::Log::Data::insert(std::string&& message) {
-	std::lock_guard<std::mutex> lock(mtx);
+void FD::Log::Internal::Data::insert(std::string&& message) {
+	std::lock_guard<std::mutex> lock(mtx); //exception
+
+	//no-throw
 	data[currentIndex] = std::move(message);
 
 	currentIndex++;
-	if (currentIndex >= LogArraySize) {
+	if (currentIndex >= Limits::LogArraySize) {
 		writeFlag.store(true);
 		currentIndex = 0;
 	}
 }
 
-void FD::Internal::Log::Data::insert(const std::string& message) {
-	std::lock_guard<std::mutex> lock(mtx);
-	data[currentIndex] = message;
+void FD::Log::Internal::Data::insert(const std::string& message) {
+	std::lock_guard<std::mutex> lock(mtx); //exception
+	data[currentIndex] = message;		   //exception
 
+	//no-throw
 	currentIndex++;
-	if (currentIndex >= LogArraySize) {
+
+	if (currentIndex >= Limits::LogArraySize) {
 		writeFlag.store(true);
 		currentIndex = 0;
 	}
 }
 
-void FD::LogWrite::file(const bool all) {
-
-	//作ったはずのdirectoryがない
-	if (!std::filesystem::is_directory(Internal::Log::FluidumLogFolderDirectory))
-		throw std::runtime_error("Failed to find FluidumLog cirectory.");
-
-	std::ofstream ofs(filePath, std::ios::app);//追記モード
-
-	if (!ofs)
-		throw std::runtime_error("Failed to write log data.");
-
-
-	//出力
-	static_assert(sizeof(std::string::value_type) == 1, "特殊な環境です．");
-	using namespace Internal::Log;
-
-	if (all) {
-		std::lock_guard<std::mutex> lock(Internal::Log::Data::mtx);
-		for (const auto& x : Data::data) {
-			ofs.write(x.data(), x.size());
+namespace FD {
+	void cerr(const char* message) noexcept {
+		try {
+			std::cerr << message << std::endl;
+		}
+		catch (...) {
+			;
 		}
 	}
-	else {
-		std::lock_guard<std::mutex> lock(Internal::Log::Data::mtx);
-		for (uint16_t i = 0; i < Data::currentIndex; i++) {
-			ofs.write(Data::data[i].data(), Data::data[i].size());
+}
+
+void FD::LogWrite::file(const bool all) noexcept {
+
+	//no directory
+	try {
+		if (!std::filesystem::is_directory(Internal::Log::FluidumLogFolderDirectory)) {
+			std::filesystem::create_directory(Internal::Log::FluidumLogFolderDirectory);
 		}
+	}
+	catch (...) {
+		cerr("Failed to write log.");
+		return;
+	}
+
+	try {
+		std::ofstream ofs(filePath, std::ios::app);
+
+		if (!ofs)
+			throw std::runtime_error("");
+
+		using namespace Internal::Log;
+
+		if (all) {
+			std::lock_guard<std::mutex> lock(Log::Internal::Data::mtx);
+			for (const auto& x : Log::Internal::Data::data) {
+				ofs.write(x.data(), x.size() * sizeof(std::string::value_type));
+			}
+		}
+		else {
+			std::lock_guard<std::mutex> lock(Log::Internal::Data::mtx);
+			for (UIF16 i = 0; i < Log::Internal::Data::currentIndex; i++) {
+				ofs.write(Log::Internal::Data::data[i].data(), Log::Internal::Data::data[i].size() * sizeof(std::string::value_type));
+			}
+			const std::string last = "All the logs were successfully output to a file.";
+			ofs.write(last.data(), last.size() * sizeof(std::string::value_type));
+		}
+	}
+	catch (...) {
+		cerr("Failed to write log.");
+		return;
 	}
 
 }
 
-void FD::LogWrite::write() {
+void FD::LogWrite::write() noexcept {
+	bool breakFlag = false;
 
 	while (true) {
-		//待機
-		while (!Internal::Log::Data::writeFlag.load()) {
+		//wait
+		while (!Log::Internal::Data::writeFlag.load()) {
 			const bool request = this->writeLogThread.get_stop_token().stop_requested();
-			if (request)//終了要請されたら終わる
+			if (request) { //finish. Write the remaining logs to a file.
+				breakFlag = true;
 				break;
+			}
 		}
 
-		//通常->全てを出力
-		if (!writeLogThread.get_stop_token().stop_requested()) {
+		if (!breakFlag) {
 			this->file();
 		}
-		//最後->currentIndexまで出力
-		else {
+		else {//Write the remaining logs to a file.
 			this->file(false);
 			break;
 		}
 
-		Internal::Log::Data::writeFlag.store(false);
+		Log::Internal::Data::writeFlag.store(false);
+
+		if (breakFlag)
+			break;
 	}
 
 }
@@ -101,21 +132,52 @@ namespace FD::Internal::Log {
 	}
 }
 
-FD::LogWrite::LogWrite()
+FD::LogWrite::LogWrite() noexcept
 	: filePath(Internal::Log::makeFilePath())
 {
-	//ディレクトリがなければ作る
-	if (!std::filesystem::is_directory(Internal::Log::FluidumLogFolderDirectory)) {
-		if (!std::filesystem::create_directory(Internal::Log::FluidumLogFolderDirectory))
-			throw std::runtime_error("Failed to create FluidumLog directory.");
-	}
+	try {
+		//If there is no directory, create.
+		if (!std::filesystem::is_directory(Internal::Log::FluidumLogFolderDirectory)) {
+			if (!std::filesystem::create_directory(Internal::Log::FluidumLogFolderDirectory))
+				throw - 1;
+		}
 
-	this->writeLogThread = std::jthread(&LogWrite::write, this);
+		this->writeLogThread = std::jthread(&LogWrite::write, this);
+	}
+	catch (...) {
+		try {
+			std::cerr << "[Serious Error] Failed to construct ::FD::LogWrite.";
+		}
+		catch (...) {
+			;
+		}
+		std::abort();
+	}
 }
 
+void FD::LogWrite::add(const std::string& message) {
+#ifndef NDEBUG
+	std::cout << message << std::endl;
+#endif
+
+	try {
+		Log::Internal::Data::insert(message);
+	}
+	catch (...) {
+		throw Exception::FailedToAdd;
+	}
+}
+
+void FD::LogWrite::requestStop() noexcept {
+	Internal::GMessenger.add<FU::Log::Type::None>(__FILE__, __LINE__, "[Request] Stop log thread.");
+	this->writeLogThread.request_stop();
+}
+
+bool FD::LogWrite::threadJoinable() const noexcept {
+	return this->writeLogThread.joinable();
+}
 
 std::string FD::LogRead::getLatestMessage() const {
-	std::lock_guard<std::mutex> lock(Internal::Log::Data::mtx);
-	using namespace Internal::Log;
-	return Data::data[Data::currentIndex == 0 ? LogArraySize - 1 : Data::currentIndex - 1];
+	std::lock_guard<std::mutex> lock(Log::Internal::Data::mtx);
+	return Log::Internal::Data::data[Log::Internal::Data::currentIndex == 0 ? Log::Limits::LogArraySize - 1 : Log::Internal::Data::currentIndex - 1];
 }

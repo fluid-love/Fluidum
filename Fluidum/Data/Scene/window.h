@@ -41,7 +41,7 @@ namespace FD {
 	public:
 		explicit WindowWrite(Internal::PassKey) noexcept {};
 		~WindowWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(WindowWrite)
+		FluidumUtils_Class_Delete_CopyMove(WindowWrite);
 
 	public:
 		//true -> exit
@@ -58,7 +58,7 @@ namespace FD {
 	public:
 		explicit WindowRead(Internal::PassKey) noexcept {};
 		~WindowRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(WindowRead)
+		FluidumUtils_Class_Delete_CopyMove(WindowRead);
 
 	public:
 		bool getIsMaximise() const;
@@ -77,7 +77,7 @@ namespace FD {
 	public:
 		explicit ExitWrite(Internal::PassKey) noexcept {};
 		~ExitWrite() = default;
-		FluidumUtils_Class_Delete_CopyMove(ExitWrite)
+		FluidumUtils_Class_Delete_CopyMove(ExitWrite);
 
 	public:
 		void saveAsAndExit() const;
@@ -87,7 +87,7 @@ namespace FD {
 	public:
 		explicit ExitRead(Internal::PassKey) noexcept {};
 		~ExitRead() = default;
-		FluidumUtils_Class_Delete_CopyMove(ExitRead)
+		FluidumUtils_Class_Delete_CopyMove(ExitRead);
 
 	public:
 		_NODISCARD bool saveAsAndExit() const;
